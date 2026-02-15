@@ -31,7 +31,7 @@ export default function AgentPanel({ isMinimized, onToggleMinimize }: AgentPanel
         className="sf-agent-collapsed"
         title="Expand Agentforce"
       >
-        <ChevronRight className="w-4 h-4 text-[var(--sf-text-tertiary)]" />
+        <ChevronLeft className="w-4 h-4 text-[var(--sf-text-tertiary)]" />
       </button>
     );
   }
@@ -44,7 +44,7 @@ export default function AgentPanel({ isMinimized, onToggleMinimize }: AgentPanel
         className="sf-agent-collapse-btn"
         title="Collapse panel"
       >
-        <ChevronLeft className="w-3.5 h-3.5" />
+        <ChevronRight className="w-3.5 h-3.5" />
       </button>
 
       {/* Header */}

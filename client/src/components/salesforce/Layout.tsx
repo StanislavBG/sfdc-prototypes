@@ -1,7 +1,10 @@
 import { useState } from 'react';
 import Header from './Header';
+import LeftNav from './LeftNav';
 import AgentPanel from './AgentPanel';
+import AppLauncher from './AppLauncher';
 import HomeContent from './HomeContent';
+import { salesforceApps } from '@/lib/mock-data';
 
 interface LayoutProps {
   children?: React.ReactNode;
@@ -11,10 +14,14 @@ export default function Layout({ children }: LayoutProps) {
   const [currentApp, setCurrentApp] = useState('data-cloud');
   const [activeTab, setActiveTab] = useState('Home');
   const [agentMinimized, setAgentMinimized] = useState(false);
+  const [appLauncherOpen, setAppLauncherOpen] = useState(false);
+
+  const currentAppData = salesforceApps.find((a) => a.id === currentApp);
 
   const handleChangeApp = (appId: string) => {
     setCurrentApp(appId);
     setActiveTab('Home');
+    setAppLauncherOpen(false);
   };
 
   const handleSelectSearchResult = (id: string) => {
@@ -23,20 +30,20 @@ export default function Layout({ children }: LayoutProps) {
 
   return (
     <div className="min-h-screen flex flex-col bg-[var(--sf-content-bg)]">
+      {/* Single-row header: Waffle + Logo + App Name | Search | Icons */}
       <Header
-        currentApp={currentApp}
-        activeTab={activeTab}
-        onChangeApp={handleChangeApp}
-        onChangeTab={setActiveTab}
+        appName={currentAppData?.name || 'Data Cloud'}
+        onOpenAppLauncher={() => setAppLauncherOpen(!appLauncherOpen)}
         onSelectSearchResult={handleSelectSearchResult}
       />
 
-      {/* Body: Agent panel + Main content */}
+      {/* Body: LeftNav | Content | AgentPanel */}
       <div className="flex flex-1 overflow-hidden">
-        {/* Permanent agent panel — left side */}
-        <AgentPanel
-          isMinimized={agentMinimized}
-          onToggleMinimize={() => setAgentMinimized(!agentMinimized)}
+        {/* Far left: Vertical navigation */}
+        <LeftNav
+          currentApp={currentApp}
+          activeTab={activeTab}
+          onChangeTab={setActiveTab}
         />
 
         {/* Main content area */}
@@ -62,7 +69,21 @@ export default function Layout({ children }: LayoutProps) {
             )
           )}
         </main>
+
+        {/* Far right: Agent panel */}
+        <AgentPanel
+          isMinimized={agentMinimized}
+          onToggleMinimize={() => setAgentMinimized(!agentMinimized)}
+        />
       </div>
+
+      {/* App Launcher overlay */}
+      <AppLauncher
+        isOpen={appLauncherOpen}
+        onClose={() => setAppLauncherOpen(false)}
+        onSelectApp={handleChangeApp}
+        currentApp={currentApp}
+      />
     </div>
   );
 }
