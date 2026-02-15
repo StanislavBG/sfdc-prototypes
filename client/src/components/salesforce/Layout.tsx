@@ -2,27 +2,18 @@ import { useState } from 'react';
 import Header from './Header';
 import LeftNav from './LeftNav';
 import AgentPanel from './AgentPanel';
-import AppLauncher from './AppLauncher';
+import TimeMachine from './TimeMachine';
 import HomeContent from './HomeContent';
-import { salesforceApps } from '@/lib/mock-data';
 
 interface LayoutProps {
   children?: React.ReactNode;
 }
 
 export default function Layout({ children }: LayoutProps) {
-  const [currentApp, setCurrentApp] = useState('data-cloud');
   const [activeTab, setActiveTab] = useState('Home');
   const [agentMinimized, setAgentMinimized] = useState(false);
-  const [appLauncherOpen, setAppLauncherOpen] = useState(false);
-
-  const currentAppData = salesforceApps.find((a) => a.id === currentApp);
-
-  const handleChangeApp = (appId: string) => {
-    setCurrentApp(appId);
-    setActiveTab('Home');
-    setAppLauncherOpen(false);
-  };
+  const [timeMachineOpen, setTimeMachineOpen] = useState(false);
+  const [currentTimeline, setCurrentTimeline] = useState('today');
 
   const handleSelectSearchResult = (id: string) => {
     console.log('Selected search result:', id);
@@ -30,10 +21,11 @@ export default function Layout({ children }: LayoutProps) {
 
   return (
     <div className="min-h-screen flex flex-col bg-[var(--sf-content-bg)]">
-      {/* Single-row header: Waffle + Logo + App Name | Search | Icons */}
+      {/* Single-row header */}
       <Header
-        appName={currentAppData?.name || 'Data 360'}
-        onOpenAppLauncher={() => setAppLauncherOpen(!appLauncherOpen)}
+        appName="Data 360"
+        currentTimeline={currentTimeline}
+        onOpenTimeMachine={() => setTimeMachineOpen(!timeMachineOpen)}
         onSelectSearchResult={handleSelectSearchResult}
       />
 
@@ -41,7 +33,7 @@ export default function Layout({ children }: LayoutProps) {
       <div className="flex flex-1 overflow-hidden">
         {/* Far left: Vertical navigation */}
         <LeftNav
-          currentApp={currentApp}
+          currentApp="data-cloud"
           activeTab={activeTab}
           onChangeTab={setActiveTab}
         />
@@ -77,12 +69,12 @@ export default function Layout({ children }: LayoutProps) {
         />
       </div>
 
-      {/* App Launcher overlay */}
-      <AppLauncher
-        isOpen={appLauncherOpen}
-        onClose={() => setAppLauncherOpen(false)}
-        onSelectApp={handleChangeApp}
-        currentApp={currentApp}
+      {/* Time Machine overlay */}
+      <TimeMachine
+        isOpen={timeMachineOpen}
+        onClose={() => setTimeMachineOpen(false)}
+        onSelectTimeline={setCurrentTimeline}
+        currentTimeline={currentTimeline}
       />
     </div>
   );
