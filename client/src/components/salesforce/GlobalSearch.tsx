@@ -77,11 +77,11 @@ export default function GlobalSearch({ onSelectResult }: GlobalSearchProps) {
   }, {});
 
   return (
-    <div ref={containerRef} className="relative flex-1 max-w-[540px]">
+    <div ref={containerRef} className="relative w-[480px]">
       <div className="relative flex items-center">
         {/* All Sources dropdown */}
         <button
-          className={`flex items-center gap-1 px-3 h-[32px] text-xs font-medium border rounded-l whitespace-nowrap ${
+          className={`sf-search-scope flex items-center gap-1 px-3 h-[32px] text-xs font-medium border rounded-l whitespace-nowrap ${
             isFocused
               ? 'bg-white text-[var(--sf-text-secondary)] border-[var(--sf-blue-light)] border-r-[var(--sf-border)]'
               : 'bg-white/10 text-white/90 border-white/25 border-r-white/15'
