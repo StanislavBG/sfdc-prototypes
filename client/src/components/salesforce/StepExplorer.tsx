@@ -1,40 +1,54 @@
+/**
+ * Region 3: Step Explorer Panel
+ * Uses bilko-flow StepDetail component for detailed step inspection.
+ * Shows input/output/goal/instructions for the selected step.
+ * Toggleable between tracker (actual values) and definition (expected values).
+ */
+import { useMemo } from 'react';
 import {
-  Target,
-  FileInput,
-  FileOutput,
-  ListChecks,
   ArrowRightLeft,
   Eye,
   Sparkles,
 } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
-import type { PlannerStep, StepDataSource } from '@/lib/planner-data';
+import { StepDetail } from 'bilko-flow/react';
+import type { PlannerStep, StepDataSource, PlannedWorkflow } from '@/lib/planner-data';
+import {
+  toFlowStep,
+  toFlowDefinition,
+  toStepExecutions,
+} from '@/lib/bilko-adapter';
 
 interface StepExplorerProps {
   step: PlannerStep | null;
+  workflow: PlannedWorkflow | null;
   dataSource: StepDataSource;
   onToggleSource: () => void;
 }
 
-function DataTable({ data, variant }: { data: Record<string, string>; variant: 'input' | 'output' }) {
-  return (
-    <div className="sf-explorer-data-table">
-      {Object.entries(data).map(([key, value]) => (
-        <div key={key} className="sf-explorer-data-row">
-          <span className="sf-explorer-data-key">{key}</span>
-          <span className={`sf-explorer-data-value ${variant}`}>{value}</span>
-        </div>
-      ))}
-    </div>
-  );
-}
-
 export default function StepExplorer({
   step,
+  workflow,
   dataSource,
   onToggleSource,
 }: StepExplorerProps) {
-  if (!step) {
+  const flowDefinition = useMemo(
+    () => (workflow ? toFlowDefinition(workflow) : null),
+    [workflow],
+  );
+
+  const flowStep = useMemo(
+    () => (step ? toFlowStep(step) : null),
+    [step],
+  );
+
+  const executions = useMemo(
+    () => (workflow ? toStepExecutions(workflow.steps) : {}),
+    [workflow],
+  );
+
+  const isTracker = dataSource === 'tracker';
+
+  if (!step || !flowStep || !flowDefinition) {
     return (
       <div className="sf-explorer-empty">
         <Eye className="w-6 h-6 text-[var(--sf-text-tertiary)]" />
@@ -45,14 +59,12 @@ export default function StepExplorer({
     );
   }
 
-  const isTracker = dataSource === 'tracker';
-  const inputData = isTracker && step.actualInput ? step.actualInput : step.expectedInput;
-  const outputData = isTracker && step.actualOutput ? step.actualOutput : step.expectedOutput;
-  const hasActualData = Boolean(step.actualInput || step.actualOutput);
+  // When viewing as "definition", don't pass execution data
+  const execution = isTracker ? executions[step.id] : undefined;
 
   return (
     <div className="sf-explorer-panel">
-      {/* Header */}
+      {/* Header with source toggle */}
       <div className="sf-explorer-header">
         <div className="flex items-center gap-2 flex-1 min-w-0">
           <div className="sf-explorer-step-badge">
@@ -92,77 +104,21 @@ export default function StepExplorer({
         <Sparkles className="w-3 h-3" />
         <span>
           {isTracker
-            ? hasActualData
+            ? execution
               ? 'Showing actual values from tracker execution'
-              : 'No actual data yet — showing expected values'
+              : 'No execution data yet — showing definition'
             : 'Showing expected values from workflow definition'}
         </span>
       </div>
 
-      {/* Content body */}
-      <div className="sf-explorer-body">
-        <AnimatePresence mode="wait">
-          <motion.div
-            key={`${step.id}-${dataSource}`}
-            initial={{ opacity: 0, y: 8 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -8 }}
-            transition={{ duration: 0.2 }}
-          >
-            {/* Goal section */}
-            <div className="sf-explorer-section">
-              <div className="sf-explorer-section-header">
-                <Target className="w-3.5 h-3.5 text-[#9B8BF4]" />
-                <span>Goal</span>
-              </div>
-              <p className="text-xs text-[var(--sf-text-secondary)] leading-relaxed">
-                {step.goal}
-              </p>
-            </div>
-
-            {/* Instructions section */}
-            <div className="sf-explorer-section">
-              <div className="sf-explorer-section-header">
-                <ListChecks className="w-3.5 h-3.5 text-[#9B8BF4]" />
-                <span>Instructions</span>
-              </div>
-              <ol className="sf-explorer-instructions">
-                {step.instructions.map((inst, i) => (
-                  <li key={i} className="sf-explorer-instruction">
-                    <span className="sf-explorer-instruction-num">{i + 1}</span>
-                    <span className="text-xs text-[var(--sf-text-secondary)] leading-relaxed">
-                      {inst}
-                    </span>
-                  </li>
-                ))}
-              </ol>
-            </div>
-
-            {/* Input section */}
-            <div className="sf-explorer-section">
-              <div className="sf-explorer-section-header">
-                <FileInput className="w-3.5 h-3.5 text-[var(--sf-blue)]" />
-                <span>Input</span>
-                {isTracker && step.actualInput && (
-                  <span className="sf-explorer-actual-badge">Actual</span>
-                )}
-              </div>
-              <DataTable data={inputData} variant="input" />
-            </div>
-
-            {/* Output section */}
-            <div className="sf-explorer-section">
-              <div className="sf-explorer-section-header">
-                <FileOutput className="w-3.5 h-3.5 text-[var(--sf-success)]" />
-                <span>Output</span>
-                {isTracker && step.actualOutput && (
-                  <span className="sf-explorer-actual-badge">Actual</span>
-                )}
-              </div>
-              <DataTable data={outputData} variant="output" />
-            </div>
-          </motion.div>
-        </AnimatePresence>
+      {/* Bilko-Flow StepDetail component */}
+      <div className="sf-explorer-bilko-detail">
+        <StepDetail
+          step={flowStep}
+          flow={flowDefinition}
+          execution={execution}
+          className="bilko-step-detail-panel"
+        />
       </div>
     </div>
   );

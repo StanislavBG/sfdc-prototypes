@@ -1,14 +1,18 @@
+/**
+ * Region 4: Workflow Preview Panel
+ * Uses bilko-flow FlowCanvas for DAG visualization and FlowCard for summary.
+ * Shows workflow definitions (expected values, static view).
+ */
+import { useMemo, useState } from 'react';
+import { FileText, Eye, LayoutGrid, Network } from 'lucide-react';
+import { FlowCanvas, FlowCard, FlowTimeline } from 'bilko-flow/react';
+import type { PlannedWorkflow } from '@/lib/planner-data';
 import {
-  FileText,
-  ChevronRight,
-  Target,
-  FileInput,
-  FileOutput,
-  ListChecks,
-  Eye,
-} from 'lucide-react';
-import { motion } from 'framer-motion';
-import type { PlannedWorkflow, PlannerStep } from '@/lib/planner-data';
+  toFlowDefinition,
+  toStepExecutions,
+} from '@/lib/bilko-adapter';
+
+type PreviewMode = 'canvas' | 'timeline' | 'card';
 
 interface WorkflowPreviewPanelProps {
   workflow: PlannedWorkflow | null;
@@ -16,111 +20,24 @@ interface WorkflowPreviewPanelProps {
   onStepSelect: (stepId: string) => void;
 }
 
-function StepDefinitionCard({
-  step,
-  index,
-  isSelected,
-  isExpanded,
-  onSelect,
-}: {
-  step: PlannerStep;
-  index: number;
-  isSelected: boolean;
-  isExpanded: boolean;
-  onSelect: () => void;
-}) {
-  return (
-    <div className={`sf-preview-step ${isSelected ? 'selected' : ''}`}>
-      <button className="sf-preview-step-header" onClick={onSelect}>
-        <div className="sf-preview-step-num">{index + 1}</div>
-        <div className="flex-1 min-w-0">
-          <span className="text-xs font-semibold text-[var(--sf-text-primary)] block truncate">
-            {step.title}
-          </span>
-        </div>
-        <ChevronRight
-          className={`w-3 h-3 text-[var(--sf-text-tertiary)] transition-transform ${
-            isExpanded ? 'rotate-90' : ''
-          }`}
-        />
-      </button>
-
-      {isExpanded && (
-        <motion.div
-          className="sf-preview-step-body"
-          initial={{ height: 0, opacity: 0 }}
-          animate={{ height: 'auto', opacity: 1 }}
-          transition={{ duration: 0.2 }}
-        >
-          {/* Goal */}
-          <div className="sf-preview-field">
-            <div className="sf-preview-field-label">
-              <Target className="w-3 h-3" />
-              <span>Goal</span>
-            </div>
-            <p className="text-[11px] text-[var(--sf-text-secondary)] leading-relaxed">
-              {step.goal}
-            </p>
-          </div>
-
-          {/* Instructions */}
-          <div className="sf-preview-field">
-            <div className="sf-preview-field-label">
-              <ListChecks className="w-3 h-3" />
-              <span>Instructions</span>
-            </div>
-            <ul className="sf-preview-instructions">
-              {step.instructions.map((inst, i) => (
-                <li key={i} className="text-[10px] text-[var(--sf-text-tertiary)] leading-snug">
-                  {inst}
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          {/* Expected Input */}
-          <div className="sf-preview-field">
-            <div className="sf-preview-field-label">
-              <FileInput className="w-3 h-3" />
-              <span>Expected Input</span>
-            </div>
-            <div className="sf-preview-kv-list">
-              {Object.entries(step.expectedInput).map(([k, v]) => (
-                <div key={k} className="sf-preview-kv">
-                  <span className="sf-preview-kv-key">{k}</span>
-                  <span className="sf-preview-kv-val">{v}</span>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* Expected Output */}
-          <div className="sf-preview-field">
-            <div className="sf-preview-field-label">
-              <FileOutput className="w-3 h-3" />
-              <span>Expected Output</span>
-            </div>
-            <div className="sf-preview-kv-list">
-              {Object.entries(step.expectedOutput).map(([k, v]) => (
-                <div key={k} className="sf-preview-kv">
-                  <span className="sf-preview-kv-key">{k}</span>
-                  <span className="sf-preview-kv-val">{v}</span>
-                </div>
-              ))}
-            </div>
-          </div>
-        </motion.div>
-      )}
-    </div>
-  );
-}
-
 export default function WorkflowPreviewPanel({
   workflow,
   selectedStepId,
   onStepSelect,
 }: WorkflowPreviewPanelProps) {
-  if (!workflow) {
+  const [previewMode, setPreviewMode] = useState<PreviewMode>('canvas');
+
+  const flowDefinition = useMemo(
+    () => (workflow ? toFlowDefinition(workflow) : null),
+    [workflow],
+  );
+
+  const executions = useMemo(
+    () => (workflow ? toStepExecutions(workflow.steps) : {}),
+    [workflow],
+  );
+
+  if (!workflow || !flowDefinition) {
     return (
       <div className="sf-preview-empty">
         <FileText className="w-6 h-6 text-[var(--sf-text-tertiary)]" />
@@ -133,49 +50,94 @@ export default function WorkflowPreviewPanel({
 
   return (
     <div className="sf-preview-panel">
-      {/* Header */}
+      {/* Header with view mode toggle */}
       <div className="sf-preview-header">
         <div className="flex items-center gap-2">
           <Eye className="w-4 h-4 text-[var(--sf-text-tertiary)]" />
           <span className="text-xs font-semibold text-[var(--sf-text-primary)]">
-            Workflow Definition
+            Workflow Preview
           </span>
         </div>
-        <span className="text-[10px] text-[var(--sf-text-tertiary)]">
-          {workflow.steps.length} steps
-        </span>
-      </div>
-
-      {/* Workflow metadata */}
-      <div className="sf-preview-meta">
-        <h3 className="text-xs font-semibold text-[var(--sf-text-primary)]">
-          {workflow.title}
-        </h3>
-        <p className="text-[10px] text-[var(--sf-text-tertiary)] mt-1 leading-relaxed">
-          {workflow.description}
-        </p>
-        <div className="sf-preview-meta-tags">
-          <span className="sf-preview-tag">
-            {workflow.jobInput.persona.role}
-          </span>
-          <span className="sf-preview-tag">
-            {workflow.steps.length} steps
-          </span>
+        <div className="sf-preview-mode-toggle">
+          <button
+            className={`sf-preview-mode-btn ${previewMode === 'canvas' ? 'active' : ''}`}
+            onClick={() => setPreviewMode('canvas')}
+            title="DAG Canvas"
+          >
+            <Network className="w-3 h-3" />
+          </button>
+          <button
+            className={`sf-preview-mode-btn ${previewMode === 'timeline' ? 'active' : ''}`}
+            onClick={() => setPreviewMode('timeline')}
+            title="Timeline"
+          >
+            <LayoutGrid className="w-3 h-3" />
+          </button>
+          <button
+            className={`sf-preview-mode-btn ${previewMode === 'card' ? 'active' : ''}`}
+            onClick={() => setPreviewMode('card')}
+            title="Card Summary"
+          >
+            <FileText className="w-3 h-3" />
+          </button>
         </div>
       </div>
 
-      {/* Step definitions */}
-      <div className="sf-preview-steps">
-        {workflow.steps.map((step, i) => (
-          <StepDefinitionCard
-            key={step.id}
-            step={step}
-            index={i}
-            isSelected={step.id === selectedStepId}
-            isExpanded={step.id === selectedStepId}
-            onSelect={() => onStepSelect(step.id)}
+      {/* Bilko-Flow Preview Content */}
+      <div className="sf-preview-bilko-content">
+        {previewMode === 'canvas' && (
+          <FlowCanvas
+            flow={flowDefinition}
+            selectedStepId={selectedStepId}
+            onSelectStep={onStepSelect}
+            executions={executions}
+            className="bilko-preview-canvas"
           />
-        ))}
+        )}
+
+        {previewMode === 'timeline' && (
+          <FlowTimeline
+            flow={flowDefinition}
+            selectedStepId={selectedStepId}
+            onSelectStep={onStepSelect}
+            executions={executions}
+            className="bilko-preview-timeline"
+          />
+        )}
+
+        {previewMode === 'card' && (
+          <div className="sf-preview-card-container">
+            <FlowCard
+              flow={flowDefinition}
+              onClick={() => {}}
+              className="bilko-preview-card"
+            />
+
+            {/* Additional definition info below card */}
+            <div className="sf-preview-definition-info">
+              <h4 className="text-xs font-semibold text-[var(--sf-text-primary)] mb-2">
+                Step Definitions
+              </h4>
+              {workflow.steps.map((step, i) => (
+                <button
+                  key={step.id}
+                  className={`sf-preview-def-step ${step.id === selectedStepId ? 'selected' : ''}`}
+                  onClick={() => onStepSelect(step.id)}
+                >
+                  <span className="sf-preview-def-num">{i + 1}</span>
+                  <div className="flex-1 min-w-0">
+                    <span className="text-xs font-medium text-[var(--sf-text-primary)] block truncate">
+                      {step.title}
+                    </span>
+                    <span className="text-[10px] text-[var(--sf-text-tertiary)] block truncate">
+                      {step.goal}
+                    </span>
+                  </div>
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

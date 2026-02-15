@@ -61,6 +61,7 @@ export default function WorkflowPlanner() {
       <div className="sf-planner-explorer-region">
         <StepExplorer
           step={selectedStep}
+          workflow={workflow}
           dataSource={stepDataSource}
           onToggleSource={toggleDataSource}
         />
