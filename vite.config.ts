@@ -24,6 +24,9 @@ export default defineConfig({
       "@": path.resolve(import.meta.dirname, "client", "src"),
       "@shared": path.resolve(import.meta.dirname, "shared"),
       "@assets": path.resolve(import.meta.dirname, "attached_assets"),
+      "bilko-flow/react": path.resolve(import.meta.dirname, "node_modules/bilko-flow/src/react/index.ts"),
+      "bilko-flow/styles.css": path.resolve(import.meta.dirname, "node_modules/bilko-flow/src/styles.css"),
+      "bilko-flow": path.resolve(import.meta.dirname, "node_modules/bilko-flow/src/index.ts"),
     },
   },
   root: path.resolve(import.meta.dirname, "client"),
@@ -35,6 +38,12 @@ export default defineConfig({
     fs: {
       strict: true,
       deny: ["**/.*"],
+      allow: [
+        path.resolve(import.meta.dirname, "client"),
+        path.resolve(import.meta.dirname, "shared"),
+        path.resolve(import.meta.dirname, "attached_assets"),
+        path.resolve(import.meta.dirname, "node_modules"),
+      ],
     },
   },
 });
