@@ -543,3 +543,489 @@ export function getRecord(id: string): Data360Record | undefined {
 export function getDefaultRecord(): Data360Record {
   return data360Records[0]; // Acme Corporation
 }
+
+// ==========================================
+// Workflow types & mock data
+// ==========================================
+
+export interface WorkflowStep {
+  id: string;
+  title: string;
+  description: string;
+  status: 'completed' | 'active' | 'upcoming';
+  detailType: 'config' | 'choices' | 'learning' | 'review';
+  detailContent: {
+    heading: string;
+    description: string;
+    options?: { label: string; description: string; recommended?: boolean }[];
+    fields?: { label: string; value: string; editable?: boolean }[];
+    tips?: string[];
+  };
+}
+
+export interface Workflow {
+  id: string;
+  title: string;
+  description: string;
+  icon: string;
+  category: 'for-you' | 'popular';
+  steps: WorkflowStep[];
+}
+
+export interface UserProfile {
+  name: string;
+  title: string;
+  role: string;
+  avatar?: string;
+}
+
+// Current logged-in user mock
+export const currentUser: UserProfile = {
+  name: 'Sarah Johnson',
+  title: 'Data Cloud Admin',
+  role: 'admin',
+};
+
+// Workflows personalised for the logged-in user
+export const forYouWorkflows: Workflow[] = [
+  {
+    id: 'wf-segment-builder',
+    title: 'Build a Customer Segment',
+    description: 'Create a targeted audience segment using unified customer profiles.',
+    icon: 'Users',
+    category: 'for-you',
+    steps: [
+      {
+        id: 'sb-1',
+        title: 'Define Segment Goal',
+        description: 'Describe the audience you want to reach.',
+        status: 'completed',
+        detailType: 'config',
+        detailContent: {
+          heading: 'Segment Goal',
+          description: 'What audience are you trying to build?',
+          fields: [
+            { label: 'Segment Name', value: 'High-Value West Coast', editable: true },
+            { label: 'Description', value: 'Enterprise accounts in CA, OR, WA with >$1M revenue', editable: true },
+          ],
+        },
+      },
+      {
+        id: 'sb-2',
+        title: 'Select Data Sources',
+        description: 'Choose which data streams to include.',
+        status: 'active',
+        detailType: 'choices',
+        detailContent: {
+          heading: 'Data Sources',
+          description: 'Select the data streams that will power this segment.',
+          options: [
+            { label: 'CRM Accounts', description: 'Salesforce CRM account records', recommended: true },
+            { label: 'Marketing Cloud', description: 'Email engagement & campaign data' },
+            { label: 'Commerce Cloud', description: 'Purchase history & transactions', recommended: true },
+            { label: 'Web Analytics', description: 'Website visit & behavior data' },
+          ],
+        },
+      },
+      {
+        id: 'sb-3',
+        title: 'Set Filter Criteria',
+        description: 'Define the rules that determine segment membership.',
+        status: 'upcoming',
+        detailType: 'config',
+        detailContent: {
+          heading: 'Filter Rules',
+          description: 'Configure the criteria for segment membership.',
+          fields: [
+            { label: 'Region', value: 'West Coast (CA, OR, WA)', editable: true },
+            { label: 'Revenue', value: '> $1,000,000', editable: true },
+            { label: 'Account Type', value: 'Enterprise', editable: true },
+            { label: 'Engagement Score', value: '> 70', editable: true },
+          ],
+        },
+      },
+      {
+        id: 'sb-4',
+        title: 'Review & Activate',
+        description: 'Preview segment size and activate.',
+        status: 'upcoming',
+        detailType: 'review',
+        detailContent: {
+          heading: 'Segment Review',
+          description: 'Review your segment configuration before activation.',
+          tips: [
+            'Estimated segment size will be calculated after activation.',
+            'You can edit the segment criteria at any time.',
+            'Activation targets can be added in the next step.',
+          ],
+        },
+      },
+    ],
+  },
+  {
+    id: 'wf-identity-resolution',
+    title: 'Set Up Identity Resolution',
+    description: 'Configure matching rules to unify customer profiles across sources.',
+    icon: 'Fingerprint',
+    category: 'for-you',
+    steps: [
+      {
+        id: 'ir-1',
+        title: 'Choose Match Strategy',
+        description: 'Select the approach for matching records.',
+        status: 'active',
+        detailType: 'choices',
+        detailContent: {
+          heading: 'Match Strategy',
+          description: 'How should we match records across data sources?',
+          options: [
+            { label: 'Deterministic', description: 'Exact matches on email, phone, or ID', recommended: true },
+            { label: 'Probabilistic', description: 'Fuzzy matching using ML algorithms' },
+            { label: 'Hybrid', description: 'Combine both approaches for best results' },
+          ],
+        },
+      },
+      {
+        id: 'ir-2',
+        title: 'Configure Match Rules',
+        description: 'Define the fields and thresholds for matching.',
+        status: 'upcoming',
+        detailType: 'config',
+        detailContent: {
+          heading: 'Match Rules',
+          description: 'Set up the fields and thresholds for identity matching.',
+          fields: [
+            { label: 'Primary Key', value: 'Email Address', editable: true },
+            { label: 'Secondary Key', value: 'Phone Number', editable: true },
+            { label: 'Match Threshold', value: '85%', editable: true },
+          ],
+        },
+      },
+      {
+        id: 'ir-3',
+        title: 'Test & Validate',
+        description: 'Run a test batch and review match quality.',
+        status: 'upcoming',
+        detailType: 'review',
+        detailContent: {
+          heading: 'Validation',
+          description: 'Review the identity resolution test results.',
+          tips: [
+            'A sample of 1,000 records will be processed.',
+            'Review match pairs for accuracy before full run.',
+            'Adjust thresholds if too many false positives appear.',
+          ],
+        },
+      },
+    ],
+  },
+  {
+    id: 'wf-data-quality',
+    title: 'Run Data Quality Assessment',
+    description: 'Scan your data streams for completeness, accuracy, and freshness.',
+    icon: 'BarChart3',
+    category: 'for-you',
+    steps: [
+      {
+        id: 'dq-1',
+        title: 'Select Data Streams',
+        description: 'Choose which streams to assess.',
+        status: 'active',
+        detailType: 'choices',
+        detailContent: {
+          heading: 'Data Streams',
+          description: 'Which data streams should be included in the quality assessment?',
+          options: [
+            { label: 'CRM Core', description: 'Accounts, contacts, opportunities', recommended: true },
+            { label: 'Marketing Events', description: 'Campaign responses & engagement' },
+            { label: 'Support Tickets', description: 'Case and ticket data' },
+            { label: 'Product Usage', description: 'Telemetry & usage analytics' },
+          ],
+        },
+      },
+      {
+        id: 'dq-2',
+        title: 'Configure Quality Rules',
+        description: 'Set thresholds for quality scoring.',
+        status: 'upcoming',
+        detailType: 'config',
+        detailContent: {
+          heading: 'Quality Thresholds',
+          description: 'Define what constitutes acceptable data quality.',
+          fields: [
+            { label: 'Completeness', value: '> 90%', editable: true },
+            { label: 'Freshness', value: '< 7 days old', editable: true },
+            { label: 'Accuracy', value: '> 95% valid formats', editable: true },
+          ],
+        },
+      },
+      {
+        id: 'dq-3',
+        title: 'Review Results',
+        description: 'Analyze the quality report and take action.',
+        status: 'upcoming',
+        detailType: 'learning',
+        detailContent: {
+          heading: 'Understanding Data Quality',
+          description: 'Learn how to interpret and improve your data quality scores.',
+          tips: [
+            'Completeness measures how many required fields are populated.',
+            'Freshness indicates how recently each record was updated.',
+            'Accuracy checks field values against expected formats and ranges.',
+            'Use the recommendations to prioritize data cleanup tasks.',
+          ],
+        },
+      },
+    ],
+  },
+];
+
+// Static popular use cases
+export const popularWorkflows: Workflow[] = [
+  {
+    id: 'wf-activation',
+    title: 'Create an Activation',
+    description: 'Push a segment to a marketing or advertising platform.',
+    icon: 'Zap',
+    category: 'popular',
+    steps: [
+      {
+        id: 'act-1',
+        title: 'Choose Segment',
+        description: 'Select the segment to activate.',
+        status: 'active',
+        detailType: 'choices',
+        detailContent: {
+          heading: 'Segment Selection',
+          description: 'Which segment would you like to activate?',
+          options: [
+            { label: 'Enterprise Tech Buyers', description: '12,400 profiles · Updated 2h ago', recommended: true },
+            { label: 'High-Value Accounts', description: '3,200 profiles · Updated 1d ago' },
+            { label: 'West Coast Enterprise', description: '8,100 profiles · Updated 4h ago' },
+          ],
+        },
+      },
+      {
+        id: 'act-2',
+        title: 'Select Target',
+        description: 'Choose the activation target platform.',
+        status: 'upcoming',
+        detailType: 'choices',
+        detailContent: {
+          heading: 'Activation Target',
+          description: 'Where should this segment be sent?',
+          options: [
+            { label: 'Google Ads', description: 'Customer Match audiences' },
+            { label: 'Meta Ads', description: 'Custom Audiences' },
+            { label: 'Marketing Cloud', description: 'Journey Builder entry' },
+            { label: 'Salesforce CRM', description: 'Campaign member sync' },
+          ],
+        },
+      },
+      {
+        id: 'act-3',
+        title: 'Map Fields',
+        description: 'Map segment fields to target platform fields.',
+        status: 'upcoming',
+        detailType: 'config',
+        detailContent: {
+          heading: 'Field Mapping',
+          description: 'Map your segment fields to the target platform.',
+          fields: [
+            { label: 'Email', value: 'email → hashed_email', editable: true },
+            { label: 'Name', value: 'full_name → customer_name', editable: true },
+            { label: 'Phone', value: 'phone → phone_number', editable: true },
+          ],
+        },
+      },
+      {
+        id: 'act-4',
+        title: 'Review & Publish',
+        description: 'Confirm settings and activate.',
+        status: 'upcoming',
+        detailType: 'review',
+        detailContent: {
+          heading: 'Activation Review',
+          description: 'Confirm your activation settings before publishing.',
+          tips: [
+            'Data will be refreshed on the schedule you configure.',
+            'Initial sync may process for several minutes.',
+            'You can pause or stop the activation at any time.',
+          ],
+        },
+      },
+    ],
+  },
+  {
+    id: 'wf-calculated-insight',
+    title: 'Build a Calculated Insight',
+    description: 'Create a derived metric from your unified data model.',
+    icon: 'Calculator',
+    category: 'popular',
+    steps: [
+      {
+        id: 'ci-1',
+        title: 'Define Metric',
+        description: 'Describe the insight you want to calculate.',
+        status: 'active',
+        detailType: 'config',
+        detailContent: {
+          heading: 'Metric Definition',
+          description: 'Define the calculated insight.',
+          fields: [
+            { label: 'Metric Name', value: 'Lifetime Value Score', editable: true },
+            { label: 'Object', value: 'Unified Individual', editable: true },
+            { label: 'Calculation', value: 'SUM(purchases) * engagement_weight', editable: true },
+          ],
+        },
+      },
+      {
+        id: 'ci-2',
+        title: 'Select Dimensions',
+        description: 'Choose grouping and filtering dimensions.',
+        status: 'upcoming',
+        detailType: 'choices',
+        detailContent: {
+          heading: 'Dimensions',
+          description: 'How should the metric be grouped?',
+          options: [
+            { label: 'By Account', description: 'Aggregate at account level' },
+            { label: 'By Region', description: 'Group by geographic region' },
+            { label: 'By Time Period', description: 'Monthly / quarterly breakdown', recommended: true },
+          ],
+        },
+      },
+      {
+        id: 'ci-3',
+        title: 'Preview & Save',
+        description: 'Review sample calculations and save.',
+        status: 'upcoming',
+        detailType: 'review',
+        detailContent: {
+          heading: 'Preview',
+          description: 'Review sample output before saving.',
+          tips: [
+            'Preview shows the first 100 calculated values.',
+            'Full computation runs on the configured schedule.',
+            'You can reference this insight in segments and reports.',
+          ],
+        },
+      },
+    ],
+  },
+  {
+    id: 'wf-data-stream',
+    title: 'Connect a Data Stream',
+    description: 'Ingest data from an external source into Data Cloud.',
+    icon: 'Database',
+    category: 'popular',
+    steps: [
+      {
+        id: 'ds-1',
+        title: 'Choose Connector',
+        description: 'Select the data source type.',
+        status: 'active',
+        detailType: 'choices',
+        detailContent: {
+          heading: 'Connector Type',
+          description: 'What type of data source are you connecting?',
+          options: [
+            { label: 'Salesforce CRM', description: 'Sync CRM objects directly', recommended: true },
+            { label: 'Amazon S3', description: 'Import files from S3 buckets' },
+            { label: 'Google Cloud Storage', description: 'Import from GCS' },
+            { label: 'Custom API', description: 'Connect via Ingestion API' },
+          ],
+        },
+      },
+      {
+        id: 'ds-2',
+        title: 'Configure Connection',
+        description: 'Set up authentication and source settings.',
+        status: 'upcoming',
+        detailType: 'config',
+        detailContent: {
+          heading: 'Connection Settings',
+          description: 'Configure the data source connection.',
+          fields: [
+            { label: 'Connection Name', value: '', editable: true },
+            { label: 'Refresh Schedule', value: 'Every 6 hours', editable: true },
+            { label: 'Data Format', value: 'Auto-detect', editable: true },
+          ],
+        },
+      },
+      {
+        id: 'ds-3',
+        title: 'Map to Data Model',
+        description: 'Map source fields to your data model objects.',
+        status: 'upcoming',
+        detailType: 'config',
+        detailContent: {
+          heading: 'Data Model Mapping',
+          description: 'Map incoming fields to Data Cloud objects.',
+          fields: [
+            { label: 'Target Object', value: 'Select...', editable: true },
+            { label: 'Primary Key', value: 'Select...', editable: true },
+            { label: 'Timestamp Field', value: 'Select...', editable: true },
+          ],
+        },
+      },
+      {
+        id: 'ds-4',
+        title: 'Test & Deploy',
+        description: 'Run a test ingestion and deploy.',
+        status: 'upcoming',
+        detailType: 'review',
+        detailContent: {
+          heading: 'Test Ingestion',
+          description: 'Verify the data stream before deploying.',
+          tips: [
+            'A sample of records will be ingested for testing.',
+            'Review field mappings and data types in the preview.',
+            'Deploy to start scheduled ingestion.',
+          ],
+        },
+      },
+    ],
+  },
+  {
+    id: 'wf-explore-profiles',
+    title: 'Explore Unified Profiles',
+    description: 'Browse and search unified customer profiles.',
+    icon: 'UserSearch',
+    category: 'popular',
+    steps: [
+      {
+        id: 'ep-1',
+        title: 'Search Profiles',
+        description: 'Find a profile by name, email, or ID.',
+        status: 'active',
+        detailType: 'config',
+        detailContent: {
+          heading: 'Profile Search',
+          description: 'Enter search criteria to find unified profiles.',
+          fields: [
+            { label: 'Search Term', value: '', editable: true },
+            { label: 'Filter by Source', value: 'All Sources', editable: true },
+          ],
+        },
+      },
+      {
+        id: 'ep-2',
+        title: 'View Profile Details',
+        description: 'Examine the unified profile and its source records.',
+        status: 'upcoming',
+        detailType: 'learning',
+        detailContent: {
+          heading: 'Understanding Unified Profiles',
+          description: 'Learn how Data Cloud merges records into unified profiles.',
+          tips: [
+            'Each profile shows all matched records from connected sources.',
+            'Identity resolution scores indicate match confidence.',
+            'Timeline view shows all interactions across channels.',
+            'Use the graph view to see entity relationships.',
+          ],
+        },
+      },
+    ],
+  },
+];
