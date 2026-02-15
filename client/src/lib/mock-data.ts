@@ -38,51 +38,98 @@ export interface NavTab {
   hasDropdown?: boolean;
 }
 
-// Navigation items per app context (matches Data Cloud UI from screenshots)
-export const appNavItems: Record<string, NavTab[]> = {
+// Grouped navigation for vertical left-nav (Data Cloud groupings based on official docs)
+export interface NavGroup {
+  title: string;
+  items: NavTab[];
+}
+
+export const appNavGroups: Record<string, NavGroup[]> = {
   'data-cloud': [
-    { label: 'Home' },
-    { label: 'Data Streams', hasDropdown: true },
-    { label: 'Data Model' },
-    { label: 'Data Explorer' },
-    { label: 'Identity Resolutions', hasDropdown: true },
-    { label: 'Profile Explorer' },
-    { label: 'Reports', hasDropdown: true },
-    { label: 'Dashboards', hasDropdown: true },
-    { label: 'Query Editor', hasDropdown: true },
-    { label: 'Calculated Insights', hasDropdown: true },
-    { label: 'Segments', hasDropdown: true },
-    { label: 'Activation Targets', hasDropdown: true },
-    { label: 'Activations', hasDropdown: true },
-    { label: 'More', hasDropdown: true },
+    {
+      title: '',
+      items: [{ label: 'Home' }],
+    },
+    {
+      title: 'Data Management',
+      items: [
+        { label: 'Data Streams', hasDropdown: true },
+        { label: 'Data Model' },
+        { label: 'Data Explorer' },
+      ],
+    },
+    {
+      title: 'Unify',
+      items: [
+        { label: 'Identity Resolutions', hasDropdown: true },
+        { label: 'Profile Explorer' },
+      ],
+    },
+    {
+      title: 'Insights & Analytics',
+      items: [
+        { label: 'Calculated Insights', hasDropdown: true },
+        { label: 'Query Editor', hasDropdown: true },
+        { label: 'Reports', hasDropdown: true },
+        { label: 'Dashboards', hasDropdown: true },
+      ],
+    },
+    {
+      title: 'Segmentation & Activation',
+      items: [
+        { label: 'Segments', hasDropdown: true },
+        { label: 'Activation Targets', hasDropdown: true },
+        { label: 'Activations', hasDropdown: true },
+      ],
+    },
   ],
   sales: [
-    { label: 'Home' },
-    { label: 'Accounts', hasDropdown: true },
-    { label: 'Contacts', hasDropdown: true },
-    { label: 'Opportunities', hasDropdown: true },
-    { label: 'Leads', hasDropdown: true },
-    { label: 'Reports', hasDropdown: true },
-    { label: 'Dashboards', hasDropdown: true },
+    { title: '', items: [{ label: 'Home' }] },
+    { title: 'Sales', items: [
+      { label: 'Accounts', hasDropdown: true },
+      { label: 'Contacts', hasDropdown: true },
+      { label: 'Opportunities', hasDropdown: true },
+      { label: 'Leads', hasDropdown: true },
+    ]},
+    { title: 'Analytics', items: [
+      { label: 'Reports', hasDropdown: true },
+      { label: 'Dashboards', hasDropdown: true },
+    ]},
   ],
   service: [
-    { label: 'Home' },
-    { label: 'Cases', hasDropdown: true },
-    { label: 'Contacts', hasDropdown: true },
-    { label: 'Accounts', hasDropdown: true },
-    { label: 'Knowledge', hasDropdown: true },
-    { label: 'Reports', hasDropdown: true },
-    { label: 'Dashboards', hasDropdown: true },
+    { title: '', items: [{ label: 'Home' }] },
+    { title: 'Service', items: [
+      { label: 'Cases', hasDropdown: true },
+      { label: 'Contacts', hasDropdown: true },
+      { label: 'Accounts', hasDropdown: true },
+      { label: 'Knowledge', hasDropdown: true },
+    ]},
+    { title: 'Analytics', items: [
+      { label: 'Reports', hasDropdown: true },
+      { label: 'Dashboards', hasDropdown: true },
+    ]},
   ],
   marketing: [
-    { label: 'Home' },
-    { label: 'Campaigns', hasDropdown: true },
-    { label: 'Leads', hasDropdown: true },
-    { label: 'Contacts', hasDropdown: true },
-    { label: 'Reports', hasDropdown: true },
-    { label: 'Dashboards', hasDropdown: true },
+    { title: '', items: [{ label: 'Home' }] },
+    { title: 'Marketing', items: [
+      { label: 'Campaigns', hasDropdown: true },
+      { label: 'Leads', hasDropdown: true },
+      { label: 'Contacts', hasDropdown: true },
+    ]},
+    { title: 'Analytics', items: [
+      { label: 'Reports', hasDropdown: true },
+      { label: 'Dashboards', hasDropdown: true },
+    ]},
   ],
 };
+
+// Flat nav items (kept for backward compat)
+export const appNavItems: Record<string, NavTab[]> = Object.fromEntries(
+  Object.entries(appNavGroups).map(([key, groups]) => [
+    key,
+    groups.flatMap((g) => g.items),
+  ])
+);
 
 // Available Salesforce apps
 export const salesforceApps: SalesforceApp[] = [

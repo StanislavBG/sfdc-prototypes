@@ -1,7 +1,5 @@
-import { useState } from 'react';
 import {
   Grid3X3,
-  ChevronDown,
   Star,
   Bell,
   CircleHelp,
@@ -9,15 +7,11 @@ import {
   Smile,
   Pencil,
 } from 'lucide-react';
-import { appNavItems, salesforceApps, type NavTab } from '@/lib/mock-data';
-import AppLauncher from './AppLauncher';
 import GlobalSearch from './GlobalSearch';
 
 interface HeaderProps {
-  currentApp: string;
-  activeTab: string;
-  onChangeApp: (appId: string) => void;
-  onChangeTab: (tab: string) => void;
+  appName: string;
+  onOpenAppLauncher: () => void;
   onSelectSearchResult: (id: string) => void;
 }
 
@@ -30,110 +24,60 @@ function SalesforceLogo() {
   );
 }
 
-export default function Header({
-  currentApp,
-  activeTab,
-  onChangeApp,
-  onChangeTab,
-  onSelectSearchResult,
-}: HeaderProps) {
-  const [appLauncherOpen, setAppLauncherOpen] = useState(false);
-
-  const currentAppData = salesforceApps.find((a) => a.id === currentApp);
-  const navTabs: NavTab[] = appNavItems[currentApp] || appNavItems['data-cloud'];
-
+export default function Header({ appName, onOpenAppLauncher, onSelectSearchResult }: HeaderProps) {
   return (
-    <>
-      {/* Row 1: Top bar — Logo | Centered Search | Right Icons */}
-      <div className="sf-header-row1 flex items-center px-4">
-        {/* Left: Logo */}
-        <div className="flex items-center flex-shrink-0">
-          <SalesforceLogo />
-        </div>
-
-        {/* Center: Search (pushed to center with flex) */}
-        <div className="flex-1 flex justify-center">
-          <GlobalSearch onSelectResult={onSelectSearchResult} />
-        </div>
-
-        {/* Right: Utility icons */}
-        <div className="flex items-center gap-0.5 flex-shrink-0">
-          <button className="sf-icon-btn" title="Agentforce">
-            <Smile className="w-[18px] h-[18px]" />
-          </button>
-          <button className="sf-icon-btn" title="Favorites">
-            <Star className="w-[18px] h-[18px]" />
-          </button>
-          <button className="sf-icon-btn" title="Notifications">
-            <Bell className="w-[18px] h-[18px]" />
-          </button>
-          <button className="sf-icon-btn" title="Help">
-            <CircleHelp className="w-[18px] h-[18px]" />
-          </button>
-          <button className="sf-icon-btn" title="Setup">
-            <Settings className="w-[18px] h-[18px]" />
-          </button>
-
-          {/* User avatar */}
-          <button
-            className="w-7 h-7 rounded-full bg-[#FF8C00] flex items-center justify-center text-white text-xs font-bold ml-1 flex-shrink-0"
-            title="User"
-          >
-            U
-          </button>
-
-          <button className="sf-icon-btn" title="Edit Page">
-            <Pencil className="w-[16px] h-[16px]" />
-          </button>
-        </div>
-      </div>
-
-      {/* Row 2: Nav bar — Waffle + App Name + Tabs */}
-      <div className="sf-header-row2 flex items-center px-3">
-        {/* Waffle / App Launcher */}
+    <div className="sf-header-row1 flex items-center px-4">
+      {/* Left: Waffle + Logo + App Name */}
+      <div className="flex items-center gap-2 flex-shrink-0">
         <button
-          className="sf-icon-btn flex-shrink-0"
-          onClick={() => setAppLauncherOpen(!appLauncherOpen)}
+          className="sf-icon-btn"
+          onClick={onOpenAppLauncher}
           title="App Launcher"
         >
           <Grid3X3 className="w-5 h-5" />
         </button>
-
-        {/* App name */}
-        <span className="text-white text-sm font-semibold ml-1 mr-3 whitespace-nowrap flex-shrink-0">
-          {currentAppData?.name || 'Data Cloud'}
+        <SalesforceLogo />
+        <div className="w-px h-5 bg-white/20 mx-1" />
+        <span className="text-white text-sm font-semibold whitespace-nowrap">
+          {appName}
         </span>
-
-        {/* Divider */}
-        <div className="w-px h-5 bg-white/20 mr-2 flex-shrink-0" />
-
-        {/* Navigation Tabs */}
-        <nav className="flex items-center h-full overflow-x-auto flex-1 scrollbar-hide">
-          {navTabs.map((tab) => (
-            <button
-              key={tab.label}
-              className={`sf-nav-item ${activeTab === tab.label ? 'active' : ''}`}
-              onClick={() => onChangeTab(tab.label)}
-            >
-              {tab.label}
-              {tab.hasDropdown && (
-                <ChevronDown className="w-3 h-3 ml-1 opacity-70" />
-              )}
-            </button>
-          ))}
-        </nav>
       </div>
 
-      {/* App Launcher overlay */}
-      <AppLauncher
-        isOpen={appLauncherOpen}
-        onClose={() => setAppLauncherOpen(false)}
-        onSelectApp={(appId) => {
-          onChangeApp(appId);
-          setAppLauncherOpen(false);
-        }}
-        currentApp={currentApp}
-      />
-    </>
+      {/* Center: Search (pushed to center with flex) */}
+      <div className="flex-1 flex justify-center">
+        <GlobalSearch onSelectResult={onSelectSearchResult} />
+      </div>
+
+      {/* Right: Utility icons */}
+      <div className="flex items-center gap-0.5 flex-shrink-0">
+        <button className="sf-icon-btn" title="Agentforce">
+          <Smile className="w-[18px] h-[18px]" />
+        </button>
+        <button className="sf-icon-btn" title="Favorites">
+          <Star className="w-[18px] h-[18px]" />
+        </button>
+        <button className="sf-icon-btn" title="Notifications">
+          <Bell className="w-[18px] h-[18px]" />
+        </button>
+        <button className="sf-icon-btn" title="Help">
+          <CircleHelp className="w-[18px] h-[18px]" />
+        </button>
+        <button className="sf-icon-btn" title="Setup">
+          <Settings className="w-[18px] h-[18px]" />
+        </button>
+
+        {/* User avatar */}
+        <button
+          className="w-7 h-7 rounded-full bg-[#FF8C00] flex items-center justify-center text-white text-xs font-bold ml-1 flex-shrink-0"
+          title="User"
+        >
+          U
+        </button>
+
+        <button className="sf-icon-btn" title="Edit Page">
+          <Pencil className="w-[16px] h-[16px]" />
+        </button>
+      </div>
+    </div>
   );
 }

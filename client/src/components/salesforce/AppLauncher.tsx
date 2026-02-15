@@ -50,7 +50,7 @@ export default function AppLauncher({ isOpen, onClose, onSelectApp, currentApp }
         if (e.target === overlayRef.current) onClose();
       }}
     >
-      <div className="absolute left-0 top-[84px] w-[400px] bg-white rounded-b-lg shadow-xl border border-[var(--sf-border)]">
+      <div className="absolute left-0 top-[44px] w-[400px] bg-white rounded-b-lg shadow-xl border border-[var(--sf-border)]">
         {/* Search */}
         <div className="p-4 border-b border-[var(--sf-border)]">
           <div className="relative">
