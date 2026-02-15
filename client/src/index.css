@@ -5,37 +5,64 @@
 @tailwind utilities;
 
 :root {
-  /* Clean Minimal Palette */
-  --background: 210 40% 98%;    /* Soft off-white */
-  --foreground: 222 47% 11%;    /* Deep navy/black */
-  
-  --primary: 221 83% 53%;       /* Vibrant blue accent */
-  --primary-foreground: 210 40% 98%;
-  
-  --muted: 210 40% 96.1%;
-  --muted-foreground: 215.4 16.3% 46.9%;
-  
-  --card: 0 0% 100%;
-  --card-foreground: 222 47% 11%;
-  
-  --border: 214.3 31.8% 91.4%;
-  --input: 214.3 31.8% 91.4%;
-  
-  --radius: 0.75rem;
+  /* Salesforce Lightning Design System Colors */
+  --sf-blue-dark: #032D60;
+  --sf-blue: #0176D3;
+  --sf-blue-light: #1B96FF;
+  --sf-blue-hover: #014486;
+  --sf-header-bg: #0176D3;
+  --sf-nav-bg: #FFFFFF;
+  --sf-nav-border: #C9C9C9;
+  --sf-content-bg: #F3F3F3;
+  --sf-card-bg: #FFFFFF;
+  --sf-text-primary: #181818;
+  --sf-text-secondary: #444444;
+  --sf-text-tertiary: #706E6B;
+  --sf-text-inverse: #FFFFFF;
+  --sf-border: #DDDBDA;
+  --sf-border-light: #E5E5E5;
+  --sf-success: #2E844A;
+  --sf-warning: #DD7A01;
+  --sf-error: #EA001E;
+  --sf-link: #0176D3;
 
-  --font-sans: 'Inter', sans-serif;
+  /* Base theme */
+  --background: 0 0% 95.3%;
+  --foreground: 0 0% 9.4%;
+
+  --primary: 207 98% 41%;
+  --primary-foreground: 0 0% 100%;
+
+  --muted: 0 0% 90%;
+  --muted-foreground: 0 0% 26.7%;
+
+  --card: 0 0% 100%;
+  --card-foreground: 0 0% 9.4%;
+
+  --border: 0 0% 86.7%;
+  --input: 0 0% 86.7%;
+
+  --radius: 0.25rem;
+
+  --font-sans: 'Salesforce Sans', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
   --font-display: 'Outfit', sans-serif;
 }
 
 @layer base {
   body {
-    @apply bg-background text-foreground antialiased selection:bg-primary/20 selection:text-primary;
+    @apply bg-background text-foreground antialiased;
     font-family: var(--font-sans);
+    font-size: 13px;
+    line-height: 1.5;
   }
 
   h1, h2, h3, h4, h5, h6 {
-    font-family: var(--font-display);
     @apply tracking-tight;
+    font-family: var(--font-sans);
+  }
+
+  * {
+    @apply border-border;
   }
 }
 
@@ -43,4 +70,342 @@
   .text-balance {
     text-wrap: balance;
   }
+}
+
+/* Salesforce Lightning specific styles */
+.sf-header {
+  background: var(--sf-header-bg);
+  height: 45px;
+}
+
+.sf-search-input {
+  background: rgba(255, 255, 255, 0.16);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  color: white;
+  border-radius: 4px;
+  transition: all 0.15s ease;
+}
+
+.sf-search-input::placeholder {
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.sf-search-input:focus {
+  background: white;
+  color: var(--sf-text-primary);
+  border-color: var(--sf-blue-light);
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(27, 150, 255, 0.3);
+}
+
+.sf-search-input:focus::placeholder {
+  color: var(--sf-text-tertiary);
+}
+
+.sf-nav-item {
+  position: relative;
+  color: white;
+  padding: 0 12px;
+  height: 45px;
+  display: flex;
+  align-items: center;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.15s ease;
+  white-space: nowrap;
+}
+
+.sf-nav-item:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.sf-nav-item.active {
+  background: rgba(255, 255, 255, 0.15);
+}
+
+.sf-nav-item.active::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: white;
+  border-radius: 3px 3px 0 0;
+}
+
+.sf-icon-btn {
+  color: white;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+.sf-icon-btn:hover {
+  background: rgba(255, 255, 255, 0.15);
+}
+
+/* App Launcher Grid */
+.sf-app-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+  padding: 16px;
+}
+
+.sf-app-tile {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 16px 8px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+.sf-app-tile:hover {
+  background: #F3F3F3;
+}
+
+.sf-app-tile-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Card styles */
+.sf-card {
+  background: var(--sf-card-bg);
+  border: 1px solid var(--sf-border);
+  border-radius: 4px;
+}
+
+.sf-card-header {
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--sf-border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.sf-card-body {
+  padding: 16px;
+}
+
+/* Tab styles (Salesforce-like) */
+.sf-tabs {
+  display: flex;
+  border-bottom: 1px solid var(--sf-border);
+  background: white;
+  padding: 0 16px;
+}
+
+.sf-tab {
+  padding: 10px 16px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--sf-text-secondary);
+  cursor: pointer;
+  position: relative;
+  border: none;
+  background: none;
+  transition: color 0.15s ease;
+  white-space: nowrap;
+}
+
+.sf-tab:hover {
+  color: var(--sf-text-primary);
+}
+
+.sf-tab.active {
+  color: var(--sf-blue);
+  font-weight: 600;
+}
+
+.sf-tab.active::after {
+  content: '';
+  position: absolute;
+  bottom: -1px;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: var(--sf-blue);
+  border-radius: 3px 3px 0 0;
+}
+
+/* Related list table */
+.sf-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.sf-table th {
+  text-align: left;
+  padding: 8px 16px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--sf-text-tertiary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  border-bottom: 1px solid var(--sf-border);
+  background: #FAFAF9;
+}
+
+.sf-table td {
+  padding: 8px 16px;
+  font-size: 13px;
+  color: var(--sf-text-primary);
+  border-bottom: 1px solid var(--sf-border-light);
+}
+
+.sf-table tr:hover td {
+  background: #F3F3F3;
+}
+
+.sf-table td a,
+.sf-link {
+  color: var(--sf-link);
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.sf-link:hover,
+.sf-table td a:hover {
+  text-decoration: underline;
+  color: var(--sf-blue-hover);
+}
+
+/* Search results dropdown */
+.sf-search-results {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background: white;
+  border: 1px solid var(--sf-border);
+  border-radius: 0 0 4px 4px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+  max-height: 400px;
+  overflow-y: auto;
+  z-index: 100;
+}
+
+.sf-search-result-item {
+  padding: 10px 16px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  cursor: pointer;
+  border-bottom: 1px solid var(--sf-border-light);
+  transition: background 0.1s ease;
+}
+
+.sf-search-result-item:hover {
+  background: #F3F3F3;
+}
+
+.sf-search-result-item:last-child {
+  border-bottom: none;
+}
+
+/* Badge / pill */
+.sf-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+.sf-badge-success {
+  background: #E6F6EC;
+  color: #2E844A;
+}
+
+.sf-badge-warning {
+  background: #FFF3E0;
+  color: #DD7A01;
+}
+
+.sf-badge-error {
+  background: #FDE8E8;
+  color: #EA001E;
+}
+
+.sf-badge-info {
+  background: #E1F5FE;
+  color: #0176D3;
+}
+
+.sf-badge-neutral {
+  background: #ECEBEA;
+  color: #706E6B;
+}
+
+/* Detail field layout */
+.sf-detail-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0;
+}
+
+.sf-detail-field {
+  padding: 8px 16px;
+  border-bottom: 1px solid var(--sf-border-light);
+}
+
+.sf-detail-label {
+  font-size: 11px;
+  font-weight: 400;
+  color: var(--sf-text-tertiary);
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  margin-bottom: 2px;
+}
+
+.sf-detail-value {
+  font-size: 13px;
+  color: var(--sf-text-primary);
+}
+
+/* Scrollbar styling */
+.sf-search-results::-webkit-scrollbar {
+  width: 6px;
+}
+
+.sf-search-results::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.sf-search-results::-webkit-scrollbar-thumb {
+  background: var(--sf-border);
+  border-radius: 3px;
+}
+
+/* Utility bar (thin bar at top) */
+.sf-utility-bar {
+  background: var(--sf-blue-dark);
+  height: 4px;
+}
+
+/* Hide scrollbar for nav overflow */
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
 }
