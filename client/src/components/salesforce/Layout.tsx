@@ -1,5 +1,8 @@
 import { useState } from 'react';
 import Header from './Header';
+import LeftNav from './LeftNav';
+import AgentPanel from './AgentPanel';
+import HomeContent from './HomeContent';
 import WorkflowSidebar from './WorkflowSidebar';
 import WorkflowArea from './WorkflowArea';
 import WorkflowPlanner from './WorkflowPlanner';
@@ -17,6 +20,8 @@ export default function Layout({ children }: LayoutProps) {
   const [timeMachineOpen, setTimeMachineOpen] = useState(false);
   const [currentTimeline, setCurrentTimeline] = useState('today');
   const [viewMode, setViewMode] = useState<ViewMode>('home');
+  const [activeTab, setActiveTab] = useState('Home');
+  const [agentMinimized, setAgentMinimized] = useState(false);
 
   const handleSelectSearchResult = (id: string) => {
     console.log('Selected search result:', id);
@@ -31,21 +36,55 @@ export default function Layout({ children }: LayoutProps) {
         onOpenTimeMachine={() => setTimeMachineOpen(!timeMachineOpen)}
         onSelectSearchResult={handleSelectSearchResult}
         viewMode={viewMode}
-        onViewModeChange={setViewMode}
+        onViewModeChange={currentTimeline === '2-years' ? setViewMode : undefined}
       />
 
-      {/* Body: switches between home view and planner view */}
-      {viewMode === 'planner' ? (
+      {/* Body: conditionally render based on timeline */}
+      {currentTimeline === 'today' ? (
+        /* Today view: original LeftNav + HomeContent + AgentPanel layout */
+        <div className="flex flex-1 overflow-hidden">
+          <LeftNav
+            currentApp="data-cloud"
+            activeTab={activeTab}
+            onChangeTab={setActiveTab}
+          />
+          <main className="flex-1 overflow-y-auto">
+            {children || (
+              activeTab === 'Home' ? (
+                <HomeContent />
+              ) : (
+                <div className="p-6">
+                  <div className="sf-card">
+                    <div className="sf-card-header">
+                      <h1 className="text-base font-semibold text-[var(--sf-text-primary)]">
+                        {activeTab}
+                      </h1>
+                    </div>
+                    <div className="sf-card-body">
+                      <p className="text-sm text-[var(--sf-text-tertiary)]">
+                        Content area for {activeTab}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              )
+            )}
+          </main>
+          <AgentPanel
+            isMinimized={agentMinimized}
+            onToggleMinimize={() => setAgentMinimized(!agentMinimized)}
+          />
+        </div>
+      ) : viewMode === 'planner' ? (
+        /* 2 Years view – Planner mode */
         <WorkflowPlanner />
       ) : (
+        /* 2 Years view – Home mode: WorkflowSidebar + WorkflowArea */
         <div className="flex flex-1 overflow-hidden">
-          {/* Region 1: Workflow sidebar (replaces LeftNav) */}
           <WorkflowSidebar
             activeWorkflow={activeWorkflow}
             onSelectWorkflow={setActiveWorkflow}
           />
-
-          {/* Pointer 3 + Region 4 + Region 5: Workflow area */}
           <main className="flex-1 overflow-y-auto">
             {children || <WorkflowArea workflow={activeWorkflow} />}
           </main>
