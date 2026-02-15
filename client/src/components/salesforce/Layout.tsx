@@ -32,7 +32,7 @@ export default function Layout({ children }: LayoutProps) {
     <div className="min-h-screen flex flex-col bg-[var(--sf-content-bg)]">
       {/* Single-row header: Waffle + Logo + App Name | Search | Icons */}
       <Header
-        appName={currentAppData?.name || 'Data Cloud'}
+        appName={currentAppData?.name || 'Data 360'}
         onOpenAppLauncher={() => setAppLauncherOpen(!appLauncherOpen)}
         onSelectSearchResult={handleSelectSearchResult}
       />

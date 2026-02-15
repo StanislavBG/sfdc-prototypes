@@ -52,7 +52,7 @@ export default function AgentPanel({ isMinimized, onToggleMinimize }: AgentPanel
         <div className="flex items-center gap-2">
           <Sparkles className="w-4 h-4 text-[#0176D3]" />
           <button className="flex items-center gap-1 text-sm font-semibold text-[var(--sf-text-primary)] hover:text-[var(--sf-blue)]">
-            Search Agent
+            Data 360 Agent
             <ChevronDown className="w-3 h-3" />
           </button>
         </div>
