@@ -33,25 +33,6 @@ const metrics = [
 export default function HomeContent() {
   return (
     <div className="p-6 space-y-6">
-      {/* Hero section */}
-      <div className="sf-home-hero">
-        <div className="relative z-10">
-          <div className="flex items-center gap-2 mb-3">
-            <Sparkles className="w-5 h-5 text-white/90" />
-            <span className="text-sm font-medium text-white/80 tracking-wide uppercase">
-              Trailblazer
-            </span>
-          </div>
-          <h1 className="text-2xl font-bold mb-2" style={{ fontFamily: 'var(--font-display)' }}>
-            Good morning! Blaze Your Trail.
-          </h1>
-          <p className="text-sm text-white/80 max-w-lg leading-relaxed">
-            Your unified customer data platform is ready. Explore your data streams,
-            build segments, and activate insights across every channel.
-          </p>
-        </div>
-      </div>
-
       {/* Metrics row */}
       <div className="grid grid-cols-4 gap-4">
         {metrics.map((m) => {
@@ -85,7 +66,7 @@ export default function HomeContent() {
               </h3>
               <p className="text-xs text-[var(--sf-text-tertiary)] leading-relaxed">
                 Ask questions about your data, create segments, or get insights. Use the agent panel
-                on the left to start a conversation.
+                on the right to start a conversation.
               </p>
             </div>
             <button className="flex items-center gap-1 text-xs font-medium text-[var(--sf-blue)] hover:text-[var(--sf-blue-hover)] whitespace-nowrap">
