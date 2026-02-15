@@ -508,30 +508,126 @@
 }
 
 /* ==========================================
-   Agentforce Panel (left side)
+   Left Navigation (vertical sidebar)
+   ========================================== */
+.sf-left-nav {
+  width: 220px;
+  min-width: 220px;
+  background: white;
+  border-right: 1px solid var(--sf-border);
+  display: flex;
+  flex-direction: column;
+  height: calc(100vh - 44px);
+}
+
+.sf-left-nav-app-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 12px;
+  border-bottom: 1px solid var(--sf-border);
+  flex-shrink: 0;
+}
+
+.sf-left-nav-waffle {
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  color: var(--sf-text-secondary);
+  cursor: pointer;
+  transition: background 0.15s ease;
+  flex-shrink: 0;
+}
+
+.sf-left-nav-waffle:hover {
+  background: #F3F3F3;
+}
+
+.sf-left-nav-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 8px 0;
+}
+
+.sf-left-nav-group {
+  margin-bottom: 4px;
+}
+
+.sf-left-nav-group-title {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  color: var(--sf-text-tertiary);
+  padding: 12px 16px 4px;
+}
+
+.sf-left-nav-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 7px 16px;
+  font-size: 13px;
+  color: var(--sf-text-secondary);
+  cursor: pointer;
+  transition: background 0.1s ease, color 0.1s ease;
+  border: none;
+  background: none;
+  text-align: left;
+  position: relative;
+}
+
+.sf-left-nav-item:hover {
+  background: #F3F3F3;
+  color: var(--sf-text-primary);
+}
+
+.sf-left-nav-item.active {
+  background: #EEF4FF;
+  color: var(--sf-blue);
+  font-weight: 600;
+}
+
+.sf-left-nav-item.active::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  background: var(--sf-blue);
+  border-radius: 0 3px 3px 0;
+}
+
+/* ==========================================
+   Agentforce Panel (right side)
    ========================================== */
 .sf-agent-panel {
   width: 320px;
   min-width: 320px;
   background: linear-gradient(180deg, #F0F4FF 0%, #E8EEFF 40%, #F5F7FF 100%);
-  border-right: 1px solid var(--sf-border);
+  border-left: 1px solid var(--sf-border);
   display: flex;
   flex-direction: column;
   position: relative;
-  height: calc(100vh - 84px); /* below both header rows */
+  height: calc(100vh - 44px);
 }
 
 .sf-agent-collapsed {
   width: 24px;
   min-width: 24px;
   background: white;
-  border-right: 1px solid var(--sf-border);
+  border-left: 1px solid var(--sf-border);
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
   transition: background 0.15s ease;
-  height: calc(100vh - 84px);
+  height: calc(100vh - 44px);
 }
 
 .sf-agent-collapsed:hover {
