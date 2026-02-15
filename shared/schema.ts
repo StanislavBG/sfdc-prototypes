@@ -19,7 +19,7 @@ export interface Document {
   content: string;
   metadata: Record<string, unknown>;
   embedding: number[] | null;
-  created_at: Date | null;
+  created_at: string | null;
 }
 
 export interface InsertDocument {

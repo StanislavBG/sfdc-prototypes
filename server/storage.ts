@@ -12,6 +12,10 @@ export interface IStorage {
   deleteDocument(id: number): Promise<void>;
 }
 
+function toVectorLiteral(arr: number[]): string {
+  return `[${arr.join(",")}]`;
+}
+
 export class DatabaseStorage implements IStorage {
   async getGreeting(): Promise<Greeting | undefined> {
     const allGreetings = await db.select().from(greetings);
@@ -25,29 +29,31 @@ export class DatabaseStorage implements IStorage {
 
   async insertDocument(doc: InsertDocument): Promise<Document> {
     const embedding = await generateEmbedding(doc.content);
+    const vectorLiteral = toVectorLiteral(embedding);
     const result = await pool.query(
-      `INSERT INTO documents (content, metadata, embedding) VALUES ($1, $2, $3) RETURNING id, content, metadata, created_at`,
-      [doc.content, JSON.stringify(doc.metadata || {}), JSON.stringify(embedding)]
+      `INSERT INTO documents (content, metadata, embedding) VALUES ($1, $2, $3::vector) RETURNING id, content, metadata, created_at`,
+      [doc.content, JSON.stringify(doc.metadata || {}), vectorLiteral]
     );
     const row = result.rows[0];
     return {
       id: row.id,
       content: row.content,
       metadata: row.metadata,
-      embedding,
-      created_at: row.created_at,
+      embedding: null,
+      created_at: row.created_at instanceof Date ? row.created_at.toISOString() : row.created_at,
     };
   }
 
   async queryDocuments(query: string, limit: number = 5): Promise<QueryResult[]> {
     const embedding = await generateEmbedding(query);
+    const vectorLiteral = toVectorLiteral(embedding);
     const result = await pool.query(
       `SELECT id, content, metadata, 1 - (embedding <=> $1::vector) as similarity
        FROM documents
        WHERE embedding IS NOT NULL
        ORDER BY embedding <=> $1::vector
        LIMIT $2`,
-      [JSON.stringify(embedding), limit]
+      [vectorLiteral, limit]
     );
     return result.rows.map((row: any) => ({
       id: row.id,
@@ -66,7 +72,7 @@ export class DatabaseStorage implements IStorage {
       content: row.content,
       metadata: row.metadata,
       embedding: null,
-      created_at: row.created_at,
+      created_at: row.created_at instanceof Date ? row.created_at.toISOString() : row.created_at,
     }));
   }
 
