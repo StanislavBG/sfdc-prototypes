@@ -6,6 +6,7 @@ import HomeContent from './HomeContent';
 import WorkflowSidebar from './WorkflowSidebar';
 import WorkflowArea from './WorkflowArea';
 import WorkflowPlanner from './WorkflowPlanner';
+import ContextExplorer from './ContextExplorer';
 import TimeMachine from './TimeMachine';
 import type { Workflow } from '@/lib/mock-data';
 
@@ -75,6 +76,9 @@ export default function Layout({ children }: LayoutProps) {
             onToggleMinimize={() => setAgentMinimized(!agentMinimized)}
           />
         </div>
+      ) : currentTimeline === 'context' ? (
+        /* Context view: Vector DB explorer with crawler controls */
+        <ContextExplorer />
       ) : viewMode === 'planner' ? (
         /* 2 Years view – Planner mode */
         <WorkflowPlanner />
