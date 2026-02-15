@@ -1,5 +1,6 @@
 import {
-  Grid3X3,
+  Clock,
+  ChevronDown,
   Star,
   Bell,
   CircleHelp,
@@ -8,10 +9,12 @@ import {
   Pencil,
 } from 'lucide-react';
 import GlobalSearch from './GlobalSearch';
+import { timelines } from './TimeMachine';
 
 interface HeaderProps {
   appName: string;
-  onOpenAppLauncher: () => void;
+  currentTimeline: string;
+  onOpenTimeMachine: () => void;
   onSelectSearchResult: (id: string) => void;
 }
 
@@ -24,23 +27,32 @@ function SalesforceLogo() {
   );
 }
 
-export default function Header({ appName, onOpenAppLauncher, onSelectSearchResult }: HeaderProps) {
+export default function Header({ appName, currentTimeline, onOpenTimeMachine, onSelectSearchResult }: HeaderProps) {
+  const timelineData = timelines.find((t) => t.id === currentTimeline);
+
   return (
     <div className="sf-header-row1 flex items-center px-4">
-      {/* Left: Waffle + Logo + App Name */}
+      {/* Left: Time Machine trigger + Logo + App Name */}
       <div className="flex items-center gap-2 flex-shrink-0">
         <button
           className="sf-icon-btn"
-          onClick={onOpenAppLauncher}
-          title="App Launcher"
+          onClick={onOpenTimeMachine}
+          title="Time Machine"
         >
-          <Grid3X3 className="w-5 h-5" />
+          <Clock className="w-5 h-5" />
         </button>
         <SalesforceLogo />
         <div className="w-px h-5 bg-white/20 mx-1" />
         <span className="text-white text-sm font-semibold whitespace-nowrap">
           {appName}
         </span>
+        <button
+          onClick={onOpenTimeMachine}
+          className="flex items-center gap-1 ml-1 px-2 py-0.5 rounded text-xs font-medium text-white/90 bg-white/10 hover:bg-white/20 transition-colors"
+        >
+          {timelineData?.label || 'Today'}
+          <ChevronDown className="w-3 h-3" />
+        </button>
       </div>
 
       {/* Center: Search (pushed to center with flex) */}
