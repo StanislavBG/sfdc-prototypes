@@ -1,19 +1,22 @@
 import { useState } from 'react';
 import Header from './Header';
-import LeftNav from './LeftNav';
-import AgentPanel from './AgentPanel';
+import WorkflowSidebar from './WorkflowSidebar';
+import WorkflowArea from './WorkflowArea';
+import WorkflowPlanner from './WorkflowPlanner';
 import TimeMachine from './TimeMachine';
-import HomeContent from './HomeContent';
+import type { Workflow } from '@/lib/mock-data';
+
+export type ViewMode = 'home' | 'planner';
 
 interface LayoutProps {
   children?: React.ReactNode;
 }
 
 export default function Layout({ children }: LayoutProps) {
-  const [activeTab, setActiveTab] = useState('Home');
-  const [agentMinimized, setAgentMinimized] = useState(false);
+  const [activeWorkflow, setActiveWorkflow] = useState<Workflow | null>(null);
   const [timeMachineOpen, setTimeMachineOpen] = useState(false);
   const [currentTimeline, setCurrentTimeline] = useState('today');
+  const [viewMode, setViewMode] = useState<ViewMode>('home');
 
   const handleSelectSearchResult = (id: string) => {
     console.log('Selected search result:', id);
@@ -27,47 +30,27 @@ export default function Layout({ children }: LayoutProps) {
         currentTimeline={currentTimeline}
         onOpenTimeMachine={() => setTimeMachineOpen(!timeMachineOpen)}
         onSelectSearchResult={handleSelectSearchResult}
+        viewMode={viewMode}
+        onViewModeChange={setViewMode}
       />
 
-      {/* Body: LeftNav | Content | AgentPanel */}
-      <div className="flex flex-1 overflow-hidden">
-        {/* Far left: Vertical navigation */}
-        <LeftNav
-          currentApp="data-cloud"
-          activeTab={activeTab}
-          onChangeTab={setActiveTab}
-        />
+      {/* Body: switches between home view and planner view */}
+      {viewMode === 'planner' ? (
+        <WorkflowPlanner />
+      ) : (
+        <div className="flex flex-1 overflow-hidden">
+          {/* Region 1: Workflow sidebar (replaces LeftNav) */}
+          <WorkflowSidebar
+            activeWorkflow={activeWorkflow}
+            onSelectWorkflow={setActiveWorkflow}
+          />
 
-        {/* Main content area */}
-        <main className="flex-1 overflow-y-auto">
-          {children || (
-            activeTab === 'Home' ? (
-              <HomeContent />
-            ) : (
-              <div className="p-6">
-                <div className="sf-card">
-                  <div className="sf-card-header">
-                    <h1 className="text-base font-semibold text-[var(--sf-text-primary)]">
-                      {activeTab}
-                    </h1>
-                  </div>
-                  <div className="sf-card-body">
-                    <p className="text-sm text-[var(--sf-text-tertiary)]">
-                      Content area for {activeTab}
-                    </p>
-                  </div>
-                </div>
-              </div>
-            )
-          )}
-        </main>
-
-        {/* Far right: Agent panel */}
-        <AgentPanel
-          isMinimized={agentMinimized}
-          onToggleMinimize={() => setAgentMinimized(!agentMinimized)}
-        />
-      </div>
+          {/* Pointer 3 + Region 4 + Region 5: Workflow area */}
+          <main className="flex-1 overflow-y-auto">
+            {children || <WorkflowArea workflow={activeWorkflow} />}
+          </main>
+        </div>
+      )}
 
       {/* Time Machine overlay */}
       <TimeMachine
