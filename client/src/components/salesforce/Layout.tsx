@@ -1,17 +1,16 @@
 import { useState } from 'react';
 import Header from './Header';
-import LeftNav from './LeftNav';
-import AgentPanel from './AgentPanel';
+import WorkflowSidebar from './WorkflowSidebar';
+import WorkflowArea from './WorkflowArea';
 import TimeMachine from './TimeMachine';
-import HomeContent from './HomeContent';
+import type { Workflow } from '@/lib/mock-data';
 
 interface LayoutProps {
   children?: React.ReactNode;
 }
 
 export default function Layout({ children }: LayoutProps) {
-  const [activeTab, setActiveTab] = useState('Home');
-  const [agentMinimized, setAgentMinimized] = useState(false);
+  const [activeWorkflow, setActiveWorkflow] = useState<Workflow | null>(null);
   const [timeMachineOpen, setTimeMachineOpen] = useState(false);
   const [currentTimeline, setCurrentTimeline] = useState('today');
 
@@ -29,44 +28,18 @@ export default function Layout({ children }: LayoutProps) {
         onSelectSearchResult={handleSelectSearchResult}
       />
 
-      {/* Body: LeftNav | Content | AgentPanel */}
+      {/* Body: WorkflowSidebar | Main Content (WorkflowArea) */}
       <div className="flex flex-1 overflow-hidden">
-        {/* Far left: Vertical navigation */}
-        <LeftNav
-          currentApp="data-cloud"
-          activeTab={activeTab}
-          onChangeTab={setActiveTab}
+        {/* Region 1: Workflow sidebar (replaces LeftNav) */}
+        <WorkflowSidebar
+          activeWorkflow={activeWorkflow}
+          onSelectWorkflow={setActiveWorkflow}
         />
 
-        {/* Main content area */}
+        {/* Pointer 3 + Region 4 + Region 5: Workflow area */}
         <main className="flex-1 overflow-y-auto">
-          {children || (
-            activeTab === 'Home' ? (
-              <HomeContent />
-            ) : (
-              <div className="p-6">
-                <div className="sf-card">
-                  <div className="sf-card-header">
-                    <h1 className="text-base font-semibold text-[var(--sf-text-primary)]">
-                      {activeTab}
-                    </h1>
-                  </div>
-                  <div className="sf-card-body">
-                    <p className="text-sm text-[var(--sf-text-tertiary)]">
-                      Content area for {activeTab}
-                    </p>
-                  </div>
-                </div>
-              </div>
-            )
-          )}
+          {children || <WorkflowArea workflow={activeWorkflow} />}
         </main>
-
-        {/* Far right: Agent panel */}
-        <AgentPanel
-          isMinimized={agentMinimized}
-          onToggleMinimize={() => setAgentMinimized(!agentMinimized)}
-        />
       </div>
 
       {/* Time Machine overlay */}
