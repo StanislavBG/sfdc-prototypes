@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Unify Source Profiles - Salesforce Data Cloud Identity Resolution</title>
+    <meta name="source-url" content="https://help.salesforce.com/s/articleView?id=data.c360_a_identity_resolution_unify_source_profiles.htm&type=5">
+    <meta name="date-captured" content="2026-02-16">
+    <meta name="note" content="Content reconstructed from web search results. Original page at help.salesforce.com requires JavaScript rendering and blocks automated access.">
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif; max-width: 960px; margin: 0 auto; padding: 40px 20px; line-height: 1.7; color: #333; background: #fff; }
+        h1 { color: #032D60; border-bottom: 3px solid #0176D3; padding-bottom: 12px; font-size: 2em; }
+        h2 { color: #032D60; margin-top: 2em; border-bottom: 1px solid #e0e0e0; padding-bottom: 8px; }
+        h3 { color: #0176D3; margin-top: 1.5em; }
+        .banner { background: #f0f7ff; border-left: 4px solid #0176D3; padding: 12px 20px; margin: 20px 0; border-radius: 0 4px 4px 0; font-size: 0.9em; color: #555; }
+        table { border-collapse: collapse; width: 100%; margin: 1em 0; }
+        th, td { border: 1px solid #ddd; padding: 10px 14px; text-align: left; }
+        th { background: #032D60; color: #fff; }
+        tr:nth-child(even) { background: #f8f9fa; }
+        ul, ol { margin: 0.5em 0; padding-left: 2em; }
+        li { margin-bottom: 0.4em; }
+        .callout { background: #FFFBE6; border: 1px solid #FFD700; padding: 14px 18px; border-radius: 6px; margin: 1.2em 0; }
+        .callout-title { font-weight: bold; color: #856404; margin-bottom: 4px; }
+        .process-flow { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin: 1em 0; font-size: 1.1em; }
+        .process-step { background: #0176D3; color: #fff; padding: 10px 20px; border-radius: 6px; font-weight: 600; }
+        .process-arrow { font-size: 1.5em; color: #0176D3; }
+        code { background: #f4f4f4; padding: 2px 6px; border-radius: 3px; font-size: 0.9em; }
+    </style>
+</head>
+<body>
+
+<div class="banner">
+    <strong>Source:</strong> <a href="https://help.salesforce.com/s/articleView?id=data.c360_a_identity_resolution_unify_source_profiles.htm&language=en_US&type=5">Salesforce Help — Unify Source Profiles</a><br>
+    Content reconstructed from multiple Salesforce documentation sources on 2026-02-16.
+</div>
+
+<h1>Unify Source Profiles</h1>
+
+<p>Identity resolution in Salesforce Data Cloud is the process that links data about the same person (or account) across sources into a <strong>unified profile</strong> using an identity resolution <strong>ruleset</strong> (match rules + reconciliation rules).</p>
+
+<p>When you gather data from multiple sources like CRMs, marketing systems, or third-party tools, you may end up with duplicate or fragmented records for the same customer. Identity Resolution helps solve this by merging data from various sources into one complete, accurate profile for each customer or account.</p>
+
+<h2>Process Flow</h2>
+
+<div class="process-flow">
+    <div class="process-step">1. Identity Sources</div>
+    <div class="process-arrow">&rarr;</div>
+    <div class="process-step">2. Identity Resolution</div>
+    <div class="process-arrow">&rarr;</div>
+    <div class="process-step">3. Unified Profile</div>
+</div>
+
+<h2>Key Concepts</h2>
+
+<h3>Source Profiles &amp; Unified Profiles</h3>
+<ul>
+    <li><strong>Source profiles</strong> are the records from your source data streams that Data Cloud reviews during the identity resolution process to identify matching profiles.</li>
+    <li><strong>Unified profiles</strong> are profiles that have been processed by identity resolution. Each unified profile is created from one or more source profiles.</li>
+    <li>The unified profile is made up of both the <strong>Unified Link Individual DMO</strong> and <strong>Unified Individual DMO</strong>. With the unified profile, you have access to both source data and reconciled data.</li>
+</ul>
+
+<h3>Rulesets</h3>
+<p>Rulesets allow you to configure <strong>match rules</strong> and <strong>reconciliation rules</strong> about a specific object, such as Individual. The system follows these rules to link together multiple sources of data into a unified profile.</p>
+<ul>
+    <li>Rulesets allow you to have up to <strong>2 different Profile Unification sets</strong> per data space in a Data Cloud Org.</li>
+    <li>You can only have up to <strong>2 different Rulesets</strong> for Identity Resolution per data model and data space in a single Data Cloud Org.</li>
+</ul>
+
+<h3>Match Rules</h3>
+<p>Match rules tell Data Cloud which profiles to unify during identity resolution. They're built from one or more criteria.</p>
+<ul>
+    <li>Match rules are algorithms used to determine whether two or more records represent the same customer.</li>
+    <li>They can be <strong>exact</strong> (e.g., matching email addresses) or <strong>fuzzy</strong> (e.g., similar names or misspellings).</li>
+    <li>Salesforce allows businesses to customize these rules to align with their unique data patterns and customer identification requirements.</li>
+</ul>
+
+<h3>Reconciliation Rules</h3>
+<p>For certain fields, such as first name, identity resolution must select which data from multiple matched source records is stored in the output unified profile. Data can be reconciled based on:</p>
+<ul>
+    <li><strong>Frequency</strong> of a value</li>
+    <li><strong>Recency</strong> (most recent value)</li>
+    <li><strong>Source priority</strong> (based on the object it came from)</li>
+</ul>
+<p>You can select reconciliation rules at the <strong>object level</strong> and <strong>field level</strong>.</p>
+
+<h2>Output Objects</h2>
+<p>Once rulesets are run, unified individual profiles are created, along with the following objects:</p>
+
+<table>
+    <thead>
+        <tr>
+            <th>Object</th>
+            <th>Description</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td><strong>Unified Individual</strong></td>
+            <td>The main unified profile object containing reconciled data from all matched source profiles.</td>
+        </tr>
+        <tr>
+            <td><strong>Unified Contact Point Objects</strong></td>
+            <td>Individuals and businesses may have more than one valid address, phone number, or email address. Unified contact objects store information related to unified profiles. One unified profile record can be related to many unified contact points.</td>
+        </tr>
+        <tr>
+            <td><strong>Unified Link Objects</strong></td>
+            <td>These objects provide a bridge between your source data and your unified profile data, so that you can always track each piece of a unified profile back to where it came from.</td>
+        </tr>
+    </tbody>
+</table>
+
+<h2>Mutability of Profiles</h2>
+<p>Unified profiles are <strong>mutable</strong>, which means they change to improve the accuracy of the profile. A unified profile updates as:</p>
+<ul>
+    <li>The source data changes</li>
+    <li>New data sources are processed</li>
+    <li>You make changes to the identity resolution rules</li>
+</ul>
+<p>Profiles can get added or removed from the unified profile.</p>
+
+<h2>Implementation Steps</h2>
+<ol>
+    <li>From Data Cloud, select the <strong>Identity Resolutions</strong> tab and click <strong>New</strong>.</li>
+    <li>Select <strong>Create New Ruleset</strong> and click <strong>Next</strong>.</li>
+    <li>With the default Data Space selected, choose <strong>Individual</strong> from the Primary Data Model Object dropdown.</li>
+    <li>Configure your match rules and reconciliation rules.</li>
+    <li>Publish the ruleset.</li>
+</ol>
+
+<div class="callout">
+    <div class="callout-title">&#9201; Timing</div>
+    Once published for the first time, your account creates unified profiles within <strong>24 hours</strong>, based on the rules assigned. After the initial creation, any changes made to your rules are processed on a <strong>daily basis</strong>.
+</div>
+
+<h2>Important Notes</h2>
+<ul>
+    <li>The <strong>Unified ID</strong> of a Unified Profile is <em>not</em> meant to be used as a Golden Record ID. The Golden Record is one of the source IDs, selected when Activation takes place.</li>
+    <li>If a profile has two email addresses, regardless of which version is selected to be displayed, <strong>all unique emails are still stored</strong> for each customer. Important data is not deleted.</li>
+    <li>Only <strong>Known Unified Profiles</strong> count towards your entitlement limit in Data Cloud.</li>
+</ul>
+
+<h2>Best Practices</h2>
+<ul>
+    <li><strong>Use rulesets to compare and test</strong> match and reconciliation rules.</li>
+    <li>Unified profiles are only as trustworthy as the source system data. Identify which data source has the most <strong>up-to-date information</strong> and use this as a guide for your match and reconciliation rules.</li>
+    <li><strong>Add additional match rules only after</strong> you've measured match outcomes and confirmed you're improving consolidation without harming accuracy.</li>
+    <li>Create a <strong>"test" ruleset</strong> to experiment with Matching and Reconciliation rules and then delete this ruleset (only Known Unified Profiles count towards your entitlement limit).</li>
+    <li>Identity resolution quality is heavily driven by <strong>mapping, keys, and contact point completeness</strong>. If those are weak, no amount of "better match rules" will save the outcome.</li>
+    <li>Begin with <strong>high-confidence identifiers</strong> (party/customer IDs, stable contact points).</li>
+    <li>Validate unified profiles in <strong>Profile Explorer</strong> and verify you aren't over-merging.</li>
+</ul>
+
+<h2>Common Pitfalls</h2>
+<table>
+    <thead>
+        <tr>
+            <th>Pitfall</th>
+            <th>Description</th>
+            <th>Impact</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td><strong>Under-matching</strong></td>
+            <td>Identity resolution is under-built — same person split across multiple profiles</td>
+            <td>Duplicates, fragmented customer view</td>
+        </tr>
+        <tr>
+            <td><strong>Over-matching</strong></td>
+            <td>Identity resolution is over-built — different people combined into one profile</td>
+            <td>Incorrect merged profiles, privacy issues</td>
+        </tr>
+    </tbody>
+</table>
+<p>Either pitfall breaks segmentation, personalization, analytics, and ROI reporting.</p>
+
+<h2>Related Resources</h2>
+<ul>
+    <li><a href="https://help.salesforce.com/s/articleView?language=en_US&id=sf.c360_a_identity_resolution.htm&type=5">Salesforce Help: Identity Resolution (parent topic)</a></li>
+    <li><a href="https://help.salesforce.com/s/articleView?id=data.c360_a_identity_resolution_unify_individuals.htm&language=en_US&type=5">Salesforce Help: Unify Individuals</a></li>
+    <li><a href="https://trailhead.salesforce.com/content/learn/modules/data-and-identity-in-salesforce-cdp/get-to-know-unified-profiles">Trailhead: Get to Know Unified Profiles</a></li>
+    <li><a href="https://trailhead.salesforce.com/content/learn/modules/data-and-identity-in-salesforce-cdp/configure-identity-resolution-rules">Trailhead: Identity Resolution Rulesets — Rule Creation</a></li>
+    <li><a href="https://trailhead.salesforce.com/content/learn/projects/explore-data-cloud-core-functionality/unify-your-data">Trailhead: Unify Your Data with Effective Identity Resolution Strategies</a></li>
+    <li><a href="https://developer.salesforce.com/workshops/agentforce-workshop/data-cloud/5-create-unified-profile">Salesforce Developers: Exercise 5 — Create a Unified Profile</a></li>
+</ul>
+
+</body>
+</html>
