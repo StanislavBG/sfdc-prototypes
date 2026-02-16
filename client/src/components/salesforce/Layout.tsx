@@ -3,6 +3,7 @@ import Header from './Header';
 import LeftNav from './LeftNav';
 import AgentPanel from './AgentPanel';
 import HomeContent from './HomeContent';
+import HelpDocExplorer from './HelpDocExplorer';
 import WorkflowSidebar from './WorkflowSidebar';
 import WorkflowArea from './WorkflowArea';
 import TimeMachine from './TimeMachine';
@@ -46,6 +47,8 @@ export default function Layout({ children }: LayoutProps) {
             {children || (
               activeTab === 'Home' ? (
                 <HomeContent />
+              ) : activeTab === 'Help Documents' ? (
+                <HelpDocExplorer />
               ) : (
                 <div className="p-6">
                   <div className="sf-card">
