@@ -15,6 +15,9 @@ import {
   List,
   Eye,
   ExternalLink,
+  Download,
+  Save,
+  Globe,
 } from 'lucide-react';
 import { apiRequest } from '@/lib/queryClient';
 
@@ -55,6 +58,14 @@ interface QueryResult {
   similarity: number;
 }
 
+interface ExtractedArticle {
+  title: string;
+  url: string;
+  content: string;
+  sections: { heading: string; body: string }[];
+  wordCount: number;
+}
+
 // Default seed URL for Identity Resolution docs
 const IDENTITY_RESOLUTION_ROOT =
   'https://help.salesforce.com/s/articleView?id=data.c360_a_identity_resolution_unify_source_profiles.htm&type=5';
@@ -78,6 +89,13 @@ export default function ContextExplorer() {
   // Article detail / approval
   const [selectedArticle, setSelectedArticle] = useState<StoredArticle | null>(null);
   const [articleChunks, setArticleChunks] = useState<QueryResult[]>([]);
+
+  // Article extractor
+  const [extractUrl, setExtractUrl] = useState('');
+  const [extractedArticle, setExtractedArticle] = useState<ExtractedArticle | null>(null);
+  const [extracting, setExtracting] = useState(false);
+  const [extractError, setExtractError] = useState<string | null>(null);
+  const [saving, setSaving] = useState(false);
 
   // Search
   const [searchQuery, setSearchQuery] = useState('');
@@ -172,6 +190,42 @@ export default function ContextExplorer() {
     } catch { /* ignore */ }
   };
 
+  const extractArticle = async () => {
+    if (!extractUrl.trim()) return;
+    setExtracting(true);
+    setExtractError(null);
+    setExtractedArticle(null);
+    try {
+      const res = await apiRequest('POST', '/api/crawler/extract', { url: extractUrl });
+      const data: ExtractedArticle = await res.json();
+      setExtractedArticle(data);
+    } catch (err: any) {
+      setExtractError(err.message || 'Failed to extract article');
+    }
+    setExtracting(false);
+  };
+
+  const saveExtracted = async () => {
+    if (!extractedArticle) return;
+    setSaving(true);
+    try {
+      await apiRequest('POST', '/api/crawler/save-extracted', {
+        url: extractedArticle.url,
+        title: extractedArticle.title,
+        content: extractedArticle.content,
+        sections: extractedArticle.sections,
+      });
+      // Refresh articles list after saving
+      fetchArticles();
+      fetchTree();
+      setExtractedArticle(null);
+      setExtractUrl('');
+    } catch (err: any) {
+      setExtractError(err.message || 'Failed to save article');
+    }
+    setSaving(false);
+  };
+
   const doSearch = async () => {
     if (!searchQuery.trim()) return;
     setSearching(true);
@@ -233,6 +287,15 @@ export default function ContextExplorer() {
               articles={articles}
               onView={viewArticleChunks}
               onDelete={deleteArticle}
+              extractUrl={extractUrl}
+              setExtractUrl={setExtractUrl}
+              extractedArticle={extractedArticle}
+              extracting={extracting}
+              extractError={extractError}
+              saving={saving}
+              onExtract={extractArticle}
+              onSaveExtracted={saveExtracted}
+              onClearExtracted={() => { setExtractedArticle(null); setExtractError(null); }}
             />
           )}
           {tab === 'tree' && (
@@ -285,6 +348,9 @@ function CrawlTab({
   progress, loading,
   onStartCrawl, onRefresh,
   articles, onView, onDelete,
+  extractUrl, setExtractUrl,
+  extractedArticle, extracting, extractError, saving,
+  onExtract, onSaveExtracted, onClearExtracted,
 }: {
   seedUrl: string; setSeedUrl: (v: string) => void;
   maxDepth: number; setMaxDepth: (v: number) => void;
@@ -294,9 +360,109 @@ function CrawlTab({
   articles: StoredArticle[];
   onView: (a: StoredArticle) => void;
   onDelete: (id: string) => void;
+  extractUrl: string; setExtractUrl: (v: string) => void;
+  extractedArticle: ExtractedArticle | null;
+  extracting: boolean;
+  extractError: string | null;
+  saving: boolean;
+  onExtract: () => void;
+  onSaveExtracted: () => void;
+  onClearExtracted: () => void;
 }) {
   return (
     <div className="p-4 space-y-4">
+      {/* Article Extractor */}
+      <div className="sf-card">
+        <div className="sf-card-header">
+          <h2 className="text-sm font-semibold text-[var(--sf-text-primary)] flex items-center gap-1.5">
+            <Globe className="w-3.5 h-3.5" /> Extract Article
+          </h2>
+        </div>
+        <div className="p-4 space-y-3">
+          <div className="flex gap-2">
+            <input
+              type="url"
+              value={extractUrl}
+              onChange={(e) => setExtractUrl(e.target.value)}
+              onKeyDown={(e) => e.key === 'Enter' && onExtract()}
+              className="flex-1 px-3 py-1.5 text-xs border border-[var(--sf-border)] rounded focus:outline-none focus:border-[var(--sf-blue)] bg-white"
+              placeholder="Paste any article URL..."
+            />
+            <button
+              onClick={onExtract}
+              disabled={extracting || !extractUrl.trim()}
+              className="flex items-center gap-1.5 px-4 py-1.5 text-xs font-medium text-white bg-[#0176D3] hover:bg-[#0164B7] disabled:opacity-50 rounded transition-colors"
+            >
+              {extracting ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Download className="w-3.5 h-3.5" />}
+              Extract
+            </button>
+          </div>
+
+          {extractError && (
+            <div className="p-2 bg-red-50 rounded text-xs text-red-700 flex items-center gap-1.5">
+              <XCircle className="w-3.5 h-3.5 flex-shrink-0" />
+              {extractError}
+            </div>
+          )}
+
+          {extractedArticle && (
+            <div className="border border-[var(--sf-border)] rounded bg-[#FAFAF9]">
+              {/* Preview header */}
+              <div className="p-3 border-b border-[var(--sf-border-light)] flex items-start justify-between gap-2">
+                <div className="min-w-0">
+                  <h3 className="text-sm font-semibold text-[var(--sf-text-primary)] truncate">
+                    {extractedArticle.title || 'Untitled'}
+                  </h3>
+                  <p className="text-xs text-[var(--sf-text-tertiary)] mt-0.5 truncate">
+                    {extractedArticle.url}
+                  </p>
+                  <div className="flex items-center gap-3 mt-1 text-xs text-[var(--sf-text-tertiary)]">
+                    <span>{extractedArticle.wordCount.toLocaleString()} words</span>
+                    <span>{extractedArticle.sections.length} section{extractedArticle.sections.length !== 1 ? 's' : ''}</span>
+                  </div>
+                </div>
+                <button
+                  onClick={onClearExtracted}
+                  className="text-xs text-[var(--sf-text-tertiary)] hover:text-[var(--sf-text-primary)] flex-shrink-0"
+                >
+                  ✕
+                </button>
+              </div>
+
+              {/* Preview body */}
+              <div className="p-3 max-h-60 overflow-y-auto">
+                {extractedArticle.sections.length > 0 ? (
+                  <div className="space-y-2">
+                    {extractedArticle.sections.map((s, i) => (
+                      <div key={i}>
+                        <h4 className="text-xs font-semibold text-[var(--sf-text-primary)]">{s.heading}</h4>
+                        <p className="text-xs text-[var(--sf-text-tertiary)] leading-relaxed line-clamp-3">{s.body}</p>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="text-xs text-[var(--sf-text-tertiary)] leading-relaxed line-clamp-6">
+                    {extractedArticle.content.slice(0, 800)}{extractedArticle.content.length > 800 ? '...' : ''}
+                  </p>
+                )}
+              </div>
+
+              {/* Save button */}
+              <div className="p-3 border-t border-[var(--sf-border-light)] flex justify-end">
+                <button
+                  onClick={onSaveExtracted}
+                  disabled={saving}
+                  className="flex items-center gap-1.5 px-4 py-1.5 text-xs font-medium text-white bg-[#2E844A] hover:bg-[#246B3C] disabled:opacity-50 rounded transition-colors"
+                >
+                  {saving ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Save className="w-3.5 h-3.5" />}
+                  Save to Database
+                </button>
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+
       {/* Crawl controls */}
       <div className="sf-card">
         <div className="sf-card-header flex items-center justify-between">

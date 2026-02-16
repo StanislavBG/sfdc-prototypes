@@ -185,6 +185,47 @@ export const api = {
         200: z.object({ deleted: z.number() }),
       },
     },
+    /** Extract article content from a URL without storing it */
+    extract: {
+      method: 'POST' as const,
+      path: '/api/crawler/extract' as const,
+      input: z.object({
+        url: z.string().url(),
+      }),
+      responses: {
+        200: z.object({
+          title: z.string(),
+          url: z.string(),
+          content: z.string(),
+          sections: z.array(z.object({
+            heading: z.string(),
+            body: z.string(),
+          })),
+          wordCount: z.number(),
+        }),
+      },
+    },
+    /** Save previously extracted content to the database */
+    saveExtracted: {
+      method: 'POST' as const,
+      path: '/api/crawler/save-extracted' as const,
+      input: z.object({
+        url: z.string(),
+        title: z.string(),
+        content: z.string(),
+        sections: z.array(z.object({
+          heading: z.string(),
+          body: z.string(),
+        })),
+      }),
+      responses: {
+        200: z.object({
+          articleId: z.string(),
+          title: z.string(),
+          chunksStored: z.number(),
+        }),
+      },
+    },
   },
 };
 

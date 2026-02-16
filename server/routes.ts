@@ -3,7 +3,8 @@ import type { Server } from "http";
 import { storage } from "./storage";
 import { api } from "@shared/routes";
 import { z } from "zod";
-import { SalesforceCrawler, chunkArticleContent, parseArticleUrl } from "./crawler";
+import { SalesforceCrawler, chunkArticleContent, parseArticleUrl, extractArticleFromUrl } from "./crawler";
+import type { CrawledArticle } from "./crawler";
 
 // Shared crawler instance (persists across requests for progress tracking)
 let activeCrawler = new SalesforceCrawler();
@@ -188,6 +189,58 @@ export async function registerRoutes(
     const articleId = req.params.articleId;
     const deleted = await storage.deleteArticle(articleId);
     res.json({ deleted });
+  });
+
+  /** Extract article content from a URL (preview, no storage) */
+  app.post(api.crawler.extract.path, async (req, res) => {
+    try {
+      const input = api.crawler.extract.input.parse(req.body);
+      const extracted = await extractArticleFromUrl(input.url);
+      res.json(extracted);
+    } catch (err: any) {
+      if (err instanceof z.ZodError) {
+        return res.status(400).json({ message: err.errors[0].message });
+      }
+      console.error("Extract error:", err);
+      return res.status(500).json({ message: err.message || "Failed to extract article" });
+    }
+  });
+
+  /** Save previously extracted content to the database */
+  app.post(api.crawler.saveExtracted.path, async (req, res) => {
+    try {
+      const input = api.crawler.saveExtracted.input.parse(req.body);
+
+      // Generate a stable article ID from the URL
+      const urlHash = input.url.replace(/[^a-zA-Z0-9]/g, '_').slice(0, 80);
+      const articleId = `ext_${urlHash}`;
+
+      const article: CrawledArticle = {
+        articleId,
+        title: input.title,
+        url: input.url,
+        parentId: null,
+        breadcrumb: [],
+        children: [],
+        content: input.content,
+        sections: input.sections,
+      };
+
+      const chunks = chunkArticleContent(article);
+      const stored = await storage.upsertArticleChunks(articleId, chunks);
+
+      res.json({
+        articleId,
+        title: input.title,
+        chunksStored: stored,
+      });
+    } catch (err: any) {
+      if (err instanceof z.ZodError) {
+        return res.status(400).json({ message: err.errors[0].message });
+      }
+      console.error("Save extracted error:", err);
+      return res.status(500).json({ message: err.message || "Failed to save article" });
+    }
   });
 
   const existing = await storage.getGreeting();
