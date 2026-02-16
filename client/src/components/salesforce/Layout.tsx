@@ -5,12 +5,10 @@ import AgentPanel from './AgentPanel';
 import HomeContent from './HomeContent';
 import WorkflowSidebar from './WorkflowSidebar';
 import WorkflowArea from './WorkflowArea';
-import WorkflowPlanner from './WorkflowPlanner';
-import ContextExplorer from './ContextExplorer';
 import TimeMachine from './TimeMachine';
 import type { Workflow } from '@/lib/mock-data';
 
-export type ViewMode = 'home' | 'planner';
+export type ViewMode = 'home';
 
 interface LayoutProps {
   children?: React.ReactNode;
@@ -20,7 +18,6 @@ export default function Layout({ children }: LayoutProps) {
   const [activeWorkflow, setActiveWorkflow] = useState<Workflow | null>(null);
   const [timeMachineOpen, setTimeMachineOpen] = useState(false);
   const [currentTimeline, setCurrentTimeline] = useState('today');
-  const [viewMode, setViewMode] = useState<ViewMode>('home');
   const [activeTab, setActiveTab] = useState('Home');
   const [agentMinimized, setAgentMinimized] = useState(false);
 
@@ -36,8 +33,6 @@ export default function Layout({ children }: LayoutProps) {
         currentTimeline={currentTimeline}
         onOpenTimeMachine={() => setTimeMachineOpen(!timeMachineOpen)}
         onSelectSearchResult={handleSelectSearchResult}
-        viewMode={viewMode}
-        onViewModeChange={currentTimeline === '2-years' ? setViewMode : undefined}
       />
 
       {/* Body: conditionally render based on timeline */}
@@ -76,12 +71,6 @@ export default function Layout({ children }: LayoutProps) {
             onToggleMinimize={() => setAgentMinimized(!agentMinimized)}
           />
         </div>
-      ) : currentTimeline === 'context' ? (
-        /* Context view: Vector DB explorer with crawler controls */
-        <ContextExplorer />
-      ) : viewMode === 'planner' ? (
-        /* 2 Years view – Planner mode */
-        <WorkflowPlanner />
       ) : (
         /* 2 Years view – Home mode: WorkflowSidebar + WorkflowArea */
         <div className="flex flex-1 overflow-hidden">
