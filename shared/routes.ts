@@ -17,6 +17,7 @@ export const api = {
           articleId: z.string(),
           title: z.string(),
           content: z.string(),
+          html: z.string(),
           url: z.string(),
         }),
       },
@@ -37,6 +38,7 @@ export const api = {
             articleId: z.string(),
             title: z.string(),
             content: z.string(),
+            html: z.string(),
             url: z.string(),
           })),
           errors: z.array(z.object({

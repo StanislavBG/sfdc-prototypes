@@ -13,6 +13,8 @@
  * fwuid from DevTools (Network → sfsites/aura → Form Data → aura.context).
  */
 
+import * as cheerio from "cheerio";
+
 // ---------------------------------------------------------------------------
 // Config — paste fresh values from DevTools when they rotate
 // ---------------------------------------------------------------------------
@@ -43,9 +45,49 @@ const AURA_TOKEN = "undefined";
 export interface FetchedArticle {
   articleId: string;
   title: string;
-  /** Raw HTML body of the article */
+  /** Cleaned text content of the article */
   content: string;
+  /** Raw HTML body from div#content.slds-text-longform */
+  html: string;
   url: string;
+}
+
+// ---------------------------------------------------------------------------
+// HTML extraction — matches the rendered DOM structure
+// ---------------------------------------------------------------------------
+
+/**
+ * Extract title + body from article HTML.
+ *
+ * Rendered DOM structure (from DevTools):
+ *   div#content.slds-text-longform
+ *     h1.slds-text-heading_large   ← title
+ *     p, ul, div.slds-box, ...     ← body
+ */
+function extractFromHtml(html: string, fallbackTitle: string): { title: string; content: string; html: string } {
+  const $ = cheerio.load(html);
+
+  // Primary selector: the article content container
+  const container = $("div#content.slds-text-longform");
+  if (container.length === 0) {
+    // Fallback: try any .slds-text-longform or the full body
+    const fallback = $(".slds-text-longform").first();
+    const rawHtml = fallback.length ? fallback.html()! : html;
+    const rawText = fallback.length ? fallback.text().trim() : $.text().trim();
+    return { title: fallbackTitle, content: rawText, html: rawHtml };
+  }
+
+  const title = container.find("h1.slds-text-heading_large").first().text().trim() || fallbackTitle;
+
+  // Remove the h1 from the clone so content is body-only
+  const bodyClone = container.clone();
+  bodyClone.find("h1.slds-text-heading_large").remove();
+
+  return {
+    title,
+    content: bodyClone.text().replace(/\s+/g, " ").trim(),
+    html: bodyClone.html()?.trim() ?? "",
+  };
 }
 
 // ---------------------------------------------------------------------------
@@ -53,18 +95,11 @@ export interface FetchedArticle {
 // ---------------------------------------------------------------------------
 
 function articleUrl(articleId: string): string {
-  // Salesforce help articles follow this URL pattern
   return `https://help.salesforce.com/s/articleView?id=${articleId}.htm&type=5`;
 }
 
 /**
  * Build the `message` JSON for a KnowledgeArticle Aura action.
- *
- * The exact descriptor depends on the community's controllers.
- * Typical patterns seen in help.salesforce.com:
- *   - "apex://KnowledgeArticleController/ACTION$getArticleById"
- *   - "serviceComponent://ui.communities.components.aura.components.forceCommunity.controller.
- *      KnowledityArticleController/ACTION$getArticle"
  *
  * Replace the descriptor below with the one you capture from DevTools.
  */
@@ -84,6 +119,34 @@ function buildMessage(articleId: string): string {
   });
 }
 
+/**
+ * Walk an Aura response JSON deeply to find any string that looks like
+ * HTML containing our target selectors. Aura nests results in varying
+ * shapes — this brute-force walk handles all of them.
+ */
+function findHtmlInResponse(obj: unknown): string | null {
+  if (typeof obj === "string") {
+    if (obj.includes("slds-text-longform") || obj.includes('id="content"')) {
+      return obj;
+    }
+    return null;
+  }
+  if (Array.isArray(obj)) {
+    for (const item of obj) {
+      const found = findHtmlInResponse(item);
+      if (found) return found;
+    }
+    return null;
+  }
+  if (obj && typeof obj === "object") {
+    for (const val of Object.values(obj)) {
+      const found = findHtmlInResponse(val);
+      if (found) return found;
+    }
+  }
+  return null;
+}
+
 // ---------------------------------------------------------------------------
 // Public API
 // ---------------------------------------------------------------------------
@@ -92,8 +155,7 @@ function buildMessage(articleId: string): string {
  * Fetch a single Salesforce Help article via the Aura API.
  *
  * @param articleId  e.g. "sf.c360_a_identity_resolution"
- * @param overrides  Optional overrides for context/token (useful when
- *                   wiring up fresh values from DevTools)
+ * @param overrides  Optional overrides for context/token/descriptor
  */
 export async function fetchArticle(
   articleId: string,
@@ -135,34 +197,42 @@ export async function fetchArticle(
 
   const json = await res.json();
 
-  // Aura responses nest the result deeply. The exact path depends on the
-  // controller's return shape. Walk the common patterns:
+  // Strategy 1: walk actions[0].returnValue for known field names
   const actionResult = json?.actions?.[0]?.returnValue;
-  if (!actionResult) {
+
+  let rawHtml: string | null = null;
+
+  if (actionResult) {
+    // Check common field names for article HTML
+    rawHtml =
+      actionResult.body ??
+      actionResult.Body ??
+      actionResult.articleBody ??
+      actionResult.content ??
+      actionResult.Content ??
+      null;
+  }
+
+  // Strategy 2: deep-walk the entire response for HTML containing our selectors
+  if (!rawHtml) {
+    rawHtml = findHtmlInResponse(json);
+  }
+
+  if (!rawHtml) {
     throw new Error(
-      `No returnValue in Aura response. Raw keys: ${Object.keys(json).join(", ")}`
+      `Could not find article HTML in Aura response. Top-level keys: ${Object.keys(json).join(", ")}. ` +
+      `Dump first 500 chars: ${JSON.stringify(json).slice(0, 500)}`
     );
   }
 
-  // Extract title + body HTML from the return value.
-  // Adjust these property names once you see the real response shape.
-  const title: string =
-    actionResult.title ??
-    actionResult.Title ??
-    actionResult.articleTitle ??
-    articleId;
-
-  const content: string =
-    actionResult.body ??
-    actionResult.Body ??
-    actionResult.articleBody ??
-    actionResult.content ??
-    JSON.stringify(actionResult);
+  // Parse the HTML with cheerio to extract structured content
+  const extracted = extractFromHtml(rawHtml, articleId);
 
   return {
     articleId,
-    title,
-    content,
+    title: extracted.title,
+    content: extracted.content,
+    html: extracted.html,
     url: articleUrl(articleId),
   };
 }
