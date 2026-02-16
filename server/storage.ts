@@ -13,6 +13,8 @@ export interface IStorage {
   // Article / crawler operations
   upsertArticleChunks(articleId: string, chunks: { content: string; metadata: Record<string, unknown> }[]): Promise<number>;
   listArticles(): Promise<{ articleId: string; title: string; url: string; parentId: string | null; chunkCount: number }[]>;
+  /** Return just the article IDs that already exist in the DB (lightweight). */
+  listArticleIds(): Promise<string[]>;
   getArticleTree(): Promise<Record<string, { title: string; url: string; parentId: string | null; children: string[] }>>;
   deleteArticle(articleId: string): Promise<number>;
   queryArticles(query: string, limit?: number): Promise<QueryResult[]>;
@@ -118,6 +120,19 @@ export class DatabaseStorage implements IStorage {
       }
     }
     return stored;
+  }
+
+  /**
+   * Return just the distinct article IDs stored in the DB.
+   */
+  async listArticleIds(): Promise<string[]> {
+    const result = await pool.query(`
+      SELECT DISTINCT metadata->>'article_id' as article_id
+      FROM documents
+      WHERE metadata->>'type' = 'salesforce_doc'
+        AND metadata->>'article_id' IS NOT NULL
+    `);
+    return result.rows.map((r: any) => r.article_id);
   }
 
   /**

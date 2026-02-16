@@ -42,6 +42,7 @@ interface CrawlProgress {
   total: number;
   crawled: number;
   stored: number;
+  skipped: number;
   errors: string[];
   startedAt: string | null;
   completedAt: string | null;
@@ -388,7 +389,7 @@ function CrawlTab({
                 {progress.status}
               </span>
             </div>
-            <div className="grid grid-cols-3 gap-3 text-center">
+            <div className="grid grid-cols-4 gap-3 text-center">
               <div>
                 <div className="text-lg font-bold text-[var(--sf-text-primary)]">{progress.crawled}</div>
                 <div className="text-xs text-[var(--sf-text-tertiary)]">Crawled</div>
@@ -396,6 +397,10 @@ function CrawlTab({
               <div>
                 <div className="text-lg font-bold text-[var(--sf-text-primary)]">{progress.stored}</div>
                 <div className="text-xs text-[var(--sf-text-tertiary)]">Stored</div>
+              </div>
+              <div>
+                <div className="text-lg font-bold text-[var(--sf-text-primary)]">{progress.skipped}</div>
+                <div className="text-xs text-[var(--sf-text-tertiary)]">Skipped</div>
               </div>
               <div>
                 <div className="text-lg font-bold text-[var(--sf-text-primary)]">{progress.errors.length}</div>

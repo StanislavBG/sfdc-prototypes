@@ -39,6 +39,7 @@ export interface CrawlProgress {
   total: number;
   crawled: number;
   stored: number;
+  skipped: number;
   errors: string[];
   startedAt: string | null;
   completedAt: string | null;
@@ -271,6 +272,33 @@ export const fetchViaCache: FetchStrategy = async (url: string) => {
   return fetchDirect(cacheUrl);
 };
 
+/**
+ * Strategy 3: Try direct fetch first, fall back to Google cache if the
+ * response looks like a client-side rendered shell (short body, no article
+ * content). This is the recommended default for Salesforce Help pages.
+ */
+export const fetchWithFallback: FetchStrategy = async (url: string) => {
+  try {
+    const html = await fetchDirect(url);
+    // If the page has substantial content (>2 KB of text), use it directly
+    const textLength = html.replace(/<[^>]*>/g, "").trim().length;
+    if (textLength > 2000) {
+      return html;
+    }
+    // Looks like a client-side rendered shell — try Google cache
+    console.log(`Direct fetch for ${url} returned thin content (${textLength} chars), trying cache...`);
+  } catch (err: any) {
+    console.log(`Direct fetch failed for ${url}: ${err.message}, trying cache...`);
+  }
+
+  try {
+    return await fetchViaCache(url);
+  } catch {
+    // Cache also failed — return whatever direct fetch got us (re-fetch)
+    return fetchDirect(url);
+  }
+};
+
 // ---------------------------------------------------------------------------
 // Crawler class
 // ---------------------------------------------------------------------------
@@ -290,6 +318,7 @@ export class SalesforceCrawler {
     total: 0,
     crawled: 0,
     stored: 0,
+    skipped: 0,
     errors: [],
     startedAt: null,
     completedAt: null,
@@ -302,15 +331,50 @@ export class SalesforceCrawler {
     fetchStrategy?: FetchStrategy
   ) {
     this.options = { ...DEFAULT_OPTIONS, ...options };
-    this.fetchFn = fetchStrategy || fetchDirect;
+    this.fetchFn = fetchStrategy || fetchWithFallback;
   }
 
   getProgress(): CrawlProgress {
     return { ...this.progress };
   }
 
+  /** Increment the stored count (call from outside after persisting chunks). */
+  incrementStored(count: number): void {
+    this.progress.stored += count;
+  }
+
+  /** Increment the skipped count (articles already in DB). */
+  incrementSkipped(count: number): void {
+    this.progress.skipped += count;
+  }
+
+  /**
+   * Pre-load article IDs that already exist (e.g. from the DB) so the crawler
+   * skips them instead of re-fetching.
+   */
+  preloadVisited(articleIds: string[]): void {
+    for (const id of articleIds) {
+      if (!this.visited.has(id)) {
+        // Mark as visited with a stub so the crawler won't re-fetch
+        this.visited.set(id, {
+          articleId: id,
+          title: "",
+          url: articleIdToUrl(id),
+          parentId: null,
+          breadcrumb: [],
+          children: [],
+          content: "",
+          sections: [],
+        });
+      }
+    }
+  }
+
   getArticles(): CrawledArticle[] {
-    return Array.from(this.visited.values());
+    // Filter out preloaded stubs (no content and no title)
+    return Array.from(this.visited.values()).filter(
+      (a) => a.content || a.title
+    );
   }
 
   getTree(): ArticleNode[] {
@@ -329,6 +393,7 @@ export class SalesforceCrawler {
       total: seeds.length,
       crawled: 0,
       stored: 0,
+      skipped: 0,
       errors: [],
       startedAt: new Date().toISOString(),
       completedAt: null,

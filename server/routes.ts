@@ -70,16 +70,25 @@ export async function registerRoutes(
         articleIdPrefix: input.articleIdPrefix,
       });
 
+      // Pre-load article IDs already in the DB so the crawler skips them
+      const existingIds = await storage.listArticleIds();
+      if (existingIds.length > 0) {
+        activeCrawler.preloadVisited(existingIds);
+        activeCrawler.incrementSkipped(existingIds.length);
+        console.log(`Crawler: skipping ${existingIds.length} articles already in DB`);
+      }
+
       // Fire the crawl in the background — don't await
       (async () => {
         try {
           const articles = await activeCrawler.crawl(input.urls);
           // Store each article's chunks in the vector DB
+          // Only store articles that have real content (skip preloaded stubs)
           for (const article of articles) {
+            if (!article.content && !article.title) continue; // stub from preload
             const chunks = chunkArticleContent(article);
             const stored = await storage.upsertArticleChunks(article.articleId, chunks);
-            const progress = activeCrawler.getProgress();
-            progress.stored += stored;
+            activeCrawler.incrementStored(stored);
           }
         } catch (err: any) {
           console.error("Crawl error:", err);
