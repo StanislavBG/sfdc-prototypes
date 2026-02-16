@@ -82,6 +82,12 @@ export const appNavGroups: Record<string, NavGroup[]> = {
         { label: 'Activations', hasDropdown: true },
       ],
     },
+    {
+      title: 'Knowledge',
+      items: [
+        { label: 'Help Documents' },
+      ],
+    },
   ],
   sales: [
     { title: '', items: [{ label: 'Home' }] },

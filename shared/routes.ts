@@ -10,6 +10,32 @@ export const api = {
       },
     },
   },
+  helpDocs: {
+    upload: {
+      method: 'POST' as const,
+      path: '/api/help-documents/upload' as const,
+    },
+    list: {
+      method: 'GET' as const,
+      path: '/api/help-documents' as const,
+    },
+    get: {
+      method: 'GET' as const,
+      path: '/api/help-documents/:id' as const,
+    },
+    delete: {
+      method: 'DELETE' as const,
+      path: '/api/help-documents/:id' as const,
+    },
+    search: {
+      method: 'POST' as const,
+      path: '/api/help-documents/search' as const,
+      input: z.object({
+        query: z.string().min(1),
+        limit: z.number().min(1).max(20).optional(),
+      }),
+    },
+  },
 };
 
 export function buildUrl(path: string, params?: Record<string, string | number>): string {
