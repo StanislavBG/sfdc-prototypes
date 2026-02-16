@@ -13,6 +13,7 @@ import {
   Target,
   Zap,
   ChevronDown,
+  FileText,
 } from 'lucide-react';
 import { appNavGroups, type NavGroup } from '@/lib/mock-data';
 
@@ -31,6 +32,7 @@ const navIcons: Record<string, React.ElementType> = {
   Segments: Users,
   'Activation Targets': Target,
   Activations: Zap,
+  'Help Documents': FileText,
 };
 
 interface LeftNavProps {

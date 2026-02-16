@@ -1,4 +1,4 @@
-import { pgTable, text, serial } from "drizzle-orm/pg-core";
+import { pgTable, text, serial, timestamp } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
@@ -13,3 +13,22 @@ export const insertGreetingSchema = createInsertSchema(greetings).pick({
 
 export type Greeting = typeof greetings.$inferSelect;
 export type InsertGreeting = z.infer<typeof insertGreetingSchema>;
+
+// ---------------------------------------------------------------------------
+// Salesforce Help Documents
+// ---------------------------------------------------------------------------
+
+export const helpDocuments = pgTable("help_documents", {
+  id: serial("id").primaryKey(),
+  fileName: text("file_name").notNull(),
+  content: text("content").notNull(),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const insertHelpDocumentSchema = createInsertSchema(helpDocuments).pick({
+  fileName: true,
+  content: true,
+});
+
+export type HelpDocument = typeof helpDocuments.$inferSelect;
+export type InsertHelpDocument = z.infer<typeof insertHelpDocumentSchema>;
