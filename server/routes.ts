@@ -3,10 +3,49 @@ import type { Server } from "http";
 import { storage } from "./storage";
 import { api } from "@shared/routes";
 import { z } from "zod";
+import { fetchArticle, fetchArticles } from "./aura-fetch";
+
 export async function registerRoutes(
   httpServer: Server,
   app: Express
 ): Promise<Server> {
+  // ── Article fetch (Aura API) ──────────────────────────────────────────
+
+  app.post(api.articles.fetch.path, async (req, res) => {
+    try {
+      const input = api.articles.fetch.input.parse(req.body);
+      const article = await fetchArticle(input.articleId, {
+        context: input.context,
+        token: input.token,
+        descriptor: input.descriptor,
+      });
+      res.json(article);
+    } catch (err) {
+      if (err instanceof z.ZodError) {
+        return res.status(400).json({ message: err.errors[0].message });
+      }
+      const message = err instanceof Error ? err.message : String(err);
+      res.status(502).json({ message });
+    }
+  });
+
+  app.post(api.articles.fetchBatch.path, async (req, res) => {
+    try {
+      const input = api.articles.fetchBatch.input.parse(req.body);
+      const result = await fetchArticles(input.articleIds, input.delayMs, {
+        context: input.context,
+        token: input.token,
+        descriptor: input.descriptor,
+      });
+      res.json(result);
+    } catch (err) {
+      if (err instanceof z.ZodError) {
+        return res.status(400).json({ message: err.errors[0].message });
+      }
+      const message = err instanceof Error ? err.message : String(err);
+      res.status(502).json({ message });
+    }
+  });
   app.get(api.greeting.get.path, async (_req, res) => {
     const greeting = await storage.getGreeting();
     res.json({ message: greeting?.message || "Hello World" });
