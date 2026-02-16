@@ -32,6 +32,10 @@ export default function Layout({ children }: LayoutProps) {
         currentTimeline={currentTimeline}
         onOpenTimeMachine={() => setTimeMachineOpen(!timeMachineOpen)}
         onSelectSearchResult={handleSelectSearchResult}
+        onSetup={() => {
+          setCurrentTimeline('today');
+          setActiveTab('Help Documents');
+        }}
       />
 
       {/* Body: conditionally render based on timeline */}
