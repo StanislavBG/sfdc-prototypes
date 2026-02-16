@@ -650,9 +650,34 @@ export interface ExtractedArticle {
 /**
  * Fetch a URL and extract the article content from the HTML.
  * Works with general web pages (blogs, docs, news articles, etc.).
+ *
+ * For Salesforce Help URLs (client-side rendered via Lightning Web Runtime),
+ * uses `fetchWithFallback` (Google Cache fallback) and the SF-specific
+ * `parseArticleHtml` parser which handles shell HTML gracefully.
  */
 export async function extractArticleFromUrl(url: string): Promise<ExtractedArticle> {
-  const html = await fetchDirect(url);
+  const isSalesforceHelp = url.includes("help.salesforce.com");
+
+  // Use fetchWithFallback for SF Help pages (client-side rendered);
+  // fetchDirect is fine for normal pages.
+  const html = isSalesforceHelp
+    ? await fetchWithFallback(url)
+    : await fetchDirect(url);
+
+  // For Salesforce Help pages, use the specialised parser that handles
+  // shell HTML, JSON-LD fallback, and SF-specific content selectors.
+  if (isSalesforceHelp) {
+    const { article } = parseArticleHtml(html, url);
+    const content = article.content || "";
+    return {
+      title: article.title || "",
+      url,
+      content,
+      sections: article.sections || [],
+      wordCount: content.split(/\s+/).filter(Boolean).length,
+    };
+  }
+
   return extractArticleFromHtml(html, url);
 }
 
