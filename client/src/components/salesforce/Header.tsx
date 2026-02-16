@@ -16,6 +16,7 @@ interface HeaderProps {
   currentTimeline: string;
   onOpenTimeMachine: () => void;
   onSelectSearchResult: (id: string) => void;
+  onSetup?: () => void;
 }
 
 // Salesforce cloud logo SVG
@@ -27,7 +28,7 @@ function SalesforceLogo() {
   );
 }
 
-export default function Header({ appName, currentTimeline, onOpenTimeMachine, onSelectSearchResult }: HeaderProps) {
+export default function Header({ appName, currentTimeline, onOpenTimeMachine, onSelectSearchResult, onSetup }: HeaderProps) {
   const timelineData = timelines.find((t) => t.id === currentTimeline);
 
   return (
@@ -74,7 +75,7 @@ export default function Header({ appName, currentTimeline, onOpenTimeMachine, on
         <button className="sf-icon-btn" title="Help">
           <CircleHelp className="w-[18px] h-[18px]" />
         </button>
-        <button className="sf-icon-btn" title="Setup">
+        <button className="sf-icon-btn" title="Setup" onClick={onSetup}>
           <Settings className="w-[18px] h-[18px]" />
         </button>
 
