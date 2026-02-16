@@ -7,20 +7,15 @@ import {
   Settings,
   Smile,
   Pencil,
-  Workflow,
-  Home,
 } from 'lucide-react';
 import GlobalSearch from './GlobalSearch';
 import { timelines } from './TimeMachine';
-import type { ViewMode } from './Layout';
 
 interface HeaderProps {
   appName: string;
   currentTimeline: string;
   onOpenTimeMachine: () => void;
   onSelectSearchResult: (id: string) => void;
-  viewMode?: ViewMode;
-  onViewModeChange?: (mode: ViewMode) => void;
 }
 
 // Salesforce cloud logo SVG
@@ -32,7 +27,7 @@ function SalesforceLogo() {
   );
 }
 
-export default function Header({ appName, currentTimeline, onOpenTimeMachine, onSelectSearchResult, viewMode = 'home', onViewModeChange }: HeaderProps) {
+export default function Header({ appName, currentTimeline, onOpenTimeMachine, onSelectSearchResult }: HeaderProps) {
   const timelineData = timelines.find((t) => t.id === currentTimeline);
 
   return (
@@ -59,36 +54,6 @@ export default function Header({ appName, currentTimeline, onOpenTimeMachine, on
           <ChevronDown className="w-3 h-3" />
         </button>
 
-        {/* View mode toggle */}
-        {onViewModeChange && (
-          <>
-            <div className="w-px h-5 bg-white/20 mx-2" />
-            <div className="flex items-center bg-white/10 rounded overflow-hidden">
-              <button
-                onClick={() => onViewModeChange('home')}
-                className={`flex items-center gap-1.5 px-3 py-1 text-xs font-medium transition-colors ${
-                  viewMode === 'home'
-                    ? 'bg-white/20 text-white'
-                    : 'text-white/60 hover:text-white/90'
-                }`}
-              >
-                <Home className="w-3 h-3" />
-                Home
-              </button>
-              <button
-                onClick={() => onViewModeChange('planner')}
-                className={`flex items-center gap-1.5 px-3 py-1 text-xs font-medium transition-colors ${
-                  viewMode === 'planner'
-                    ? 'bg-white/20 text-white'
-                    : 'text-white/60 hover:text-white/90'
-                }`}
-              >
-                <Workflow className="w-3 h-3" />
-                Planner
-              </button>
-            </div>
-          </>
-        )}
       </div>
 
       {/* Center: Search (pushed to center with flex) */}
