@@ -3,6 +3,10 @@ import type { Server } from "http";
 import { storage } from "./storage";
 import { api } from "@shared/routes";
 import { z } from "zod";
+import { SalesforceCrawler, chunkArticleContent, parseArticleUrl } from "./crawler";
+
+// Shared crawler instance (persists across requests for progress tracking)
+let activeCrawler = new SalesforceCrawler();
 
 export async function registerRoutes(
   httpServer: Server,
@@ -47,6 +51,134 @@ export async function registerRoutes(
       }
       throw err;
     }
+  });
+
+  // =========================================================================
+  // Crawler / Article endpoints
+  // =========================================================================
+
+  /** Start a background crawl from seed URLs */
+  app.post(api.crawler.start.path, async (req, res) => {
+    try {
+      const input = api.crawler.start.input.parse(req.body);
+
+      // Create a fresh crawler with the given options
+      activeCrawler = new SalesforceCrawler({
+        maxDepth: input.maxDepth,
+        maxArticles: input.maxArticles,
+        delayMs: input.delayMs,
+        articleIdPrefix: input.articleIdPrefix,
+      });
+
+      // Fire the crawl in the background — don't await
+      (async () => {
+        try {
+          const articles = await activeCrawler.crawl(input.urls);
+          // Store each article's chunks in the vector DB
+          for (const article of articles) {
+            const chunks = chunkArticleContent(article);
+            const stored = await storage.upsertArticleChunks(article.articleId, chunks);
+            const progress = activeCrawler.getProgress();
+            progress.stored += stored;
+          }
+        } catch (err: any) {
+          console.error("Crawl error:", err);
+        }
+      })();
+
+      res.json({ message: `Crawl started for ${input.urls.length} seed URL(s)` });
+    } catch (err) {
+      if (err instanceof z.ZodError) {
+        return res.status(400).json({ message: err.errors[0].message });
+      }
+      throw err;
+    }
+  });
+
+  /** Import articles directly (structured data, no crawling) */
+  app.post(api.crawler.import.path, async (req, res) => {
+    try {
+      const input = api.crawler.import.input.parse(req.body);
+      let totalChunks = 0;
+
+      for (const data of input.articles) {
+        const article = activeCrawler.importArticle(data);
+        const chunks = chunkArticleContent(article);
+        const stored = await storage.upsertArticleChunks(article.articleId, chunks);
+        totalChunks += stored;
+      }
+
+      res.json({ imported: input.articles.length, chunksStored: totalChunks });
+    } catch (err) {
+      if (err instanceof z.ZodError) {
+        return res.status(400).json({ message: err.errors[0].message });
+      }
+      throw err;
+    }
+  });
+
+  /** Import raw HTML for a specific article URL */
+  app.post(api.crawler.importHtml.path, async (req, res) => {
+    try {
+      const input = api.crawler.importHtml.input.parse(req.body);
+      const article = activeCrawler.importHtml(input.url, input.html);
+
+      if (!article) {
+        return res.status(400).json({ message: "Could not parse article URL" });
+      }
+
+      const chunks = chunkArticleContent(article);
+      const stored = await storage.upsertArticleChunks(article.articleId, chunks);
+
+      res.json({
+        articleId: article.articleId,
+        title: article.title,
+        chunksStored: stored,
+      });
+    } catch (err) {
+      if (err instanceof z.ZodError) {
+        return res.status(400).json({ message: err.errors[0].message });
+      }
+      throw err;
+    }
+  });
+
+  /** Get crawl progress */
+  app.get(api.crawler.progress.path, async (_req, res) => {
+    res.json(activeCrawler.getProgress());
+  });
+
+  /** List all stored articles (from DB) */
+  app.get(api.crawler.articles.path, async (_req, res) => {
+    const articles = await storage.listArticles();
+    res.json(articles);
+  });
+
+  /** Get article tree structure (from DB) */
+  app.get(api.crawler.tree.path, async (_req, res) => {
+    const tree = await storage.getArticleTree();
+    res.json(tree);
+  });
+
+  /** Semantic search across Salesforce docs */
+  app.post(api.crawler.query.path, async (req, res) => {
+    try {
+      const input = api.crawler.query.input.parse(req.body);
+      const results = await storage.queryArticles(input.query, input.limit);
+      res.json(results);
+    } catch (err) {
+      if (err instanceof z.ZodError) {
+        return res.status(400).json({ message: err.errors[0].message });
+      }
+      throw err;
+    }
+  });
+
+  /** Delete an article and all its chunks */
+  app.delete(api.crawler.deleteArticle.path, async (req, res) => {
+    const articleId = req.params.articleId;
+    const deleted = await storage.deleteArticle(articleId);
+    res.json({ deleted });
   });
 
   const existing = await storage.getGreeting();
