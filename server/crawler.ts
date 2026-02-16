@@ -635,6 +635,98 @@ export function chunkArticleContent(
   return chunks;
 }
 
+// ---------------------------------------------------------------------------
+// Generic article extraction — works with any URL, not just Salesforce Help
+// ---------------------------------------------------------------------------
+
+export interface ExtractedArticle {
+  title: string;
+  url: string;
+  content: string;
+  sections: ArticleSection[];
+  wordCount: number;
+}
+
+/**
+ * Fetch a URL and extract the article content from the HTML.
+ * Works with general web pages (blogs, docs, news articles, etc.).
+ */
+export async function extractArticleFromUrl(url: string): Promise<ExtractedArticle> {
+  const html = await fetchDirect(url);
+  return extractArticleFromHtml(html, url);
+}
+
+/**
+ * Parse arbitrary HTML and extract readable article content.
+ * Uses a priority list of content selectors, then falls back to <body>.
+ */
+export function extractArticleFromHtml(html: string, sourceUrl: string): ExtractedArticle {
+  const $ = cheerio.load(html);
+
+  // Remove noise elements
+  $('script, style, nav, header, footer, aside, iframe, noscript, .sidebar, .nav, .menu, .ad, .advertisement, .comment, .comments, [role="navigation"], [role="banner"], [role="complementary"]').remove();
+
+  // Extract title
+  let title =
+    $('h1').first().text().trim() ||
+    $('meta[property="og:title"]').attr('content')?.trim() ||
+    $('title').text().trim() ||
+    '';
+
+  // Try to find the main article content using common selectors
+  const contentSelectors = [
+    'article',
+    '[role="main"]',
+    'main',
+    '.article-content',
+    '.article-body',
+    '.post-content',
+    '.entry-content',
+    '.content-body',
+    '.story-body',
+    '#article-body',
+    '#content',
+    '.articleBody',
+    '.post-body',
+  ];
+
+  let $content = $('body'); // fallback
+  for (const sel of contentSelectors) {
+    const el = $(sel).first();
+    if (el.length && el.text().trim().length > 200) {
+      $content = el;
+      break;
+    }
+  }
+
+  // Extract sections by headings
+  const sections: ArticleSection[] = [];
+  $content.find('h2, h3, h4').each((_i, heading) => {
+    const headingText = $(heading).text().trim();
+    let sectionBody = '';
+    let sibling = $(heading).next();
+    while (sibling.length && !sibling.is('h2, h3, h4')) {
+      sectionBody += sibling.text().trim() + '\n';
+      sibling = sibling.next();
+    }
+    if (headingText && sectionBody.trim()) {
+      sections.push({ heading: headingText, body: sectionBody.trim() });
+    }
+  });
+
+  // Get the full text content
+  const content = $content.text().replace(/\s+/g, ' ').trim();
+  const wordCount = content.split(/\s+/).filter(Boolean).length;
+
+  return {
+    title,
+    url: sourceUrl,
+    content,
+    sections,
+    wordCount,
+  };
+}
+
 function splitTextWithOverlap(
   text: string,
   maxChars: number,
