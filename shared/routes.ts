@@ -1,6 +1,52 @@
 import { z } from 'zod';
 
 export const api = {
+  articles: {
+    fetch: {
+      method: 'POST' as const,
+      path: '/api/articles/fetch' as const,
+      input: z.object({
+        articleId: z.string().min(1),
+        /** Optional overrides for Aura context/token/descriptor from DevTools */
+        context: z.string().optional(),
+        token: z.string().optional(),
+        descriptor: z.string().optional(),
+      }),
+      responses: {
+        200: z.object({
+          articleId: z.string(),
+          title: z.string(),
+          content: z.string(),
+          url: z.string(),
+        }),
+      },
+    },
+    fetchBatch: {
+      method: 'POST' as const,
+      path: '/api/articles/fetch-batch' as const,
+      input: z.object({
+        articleIds: z.array(z.string().min(1)).min(1).max(50),
+        delayMs: z.number().min(0).max(5000).optional(),
+        context: z.string().optional(),
+        token: z.string().optional(),
+        descriptor: z.string().optional(),
+      }),
+      responses: {
+        200: z.object({
+          results: z.array(z.object({
+            articleId: z.string(),
+            title: z.string(),
+            content: z.string(),
+            url: z.string(),
+          })),
+          errors: z.array(z.object({
+            id: z.string(),
+            error: z.string(),
+          })),
+        }),
+      },
+    },
+  },
   greeting: {
     get: {
       method: 'GET' as const,
