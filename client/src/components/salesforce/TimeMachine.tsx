@@ -1,5 +1,5 @@
 import { useRef } from 'react';
-import { Clock, Calendar, Sparkles, Check, Database } from 'lucide-react';
+import { Clock, Calendar, Sparkles, Check } from 'lucide-react';
 
 export interface TimelineOption {
   id: string;
@@ -23,13 +23,6 @@ export const timelines: TimelineOption[] = [
     description: 'Projected future state with planned capabilities',
     icon: Calendar,
     color: '#9B8BF4',
-  },
-  {
-    id: 'context',
-    label: 'Context',
-    description: 'Explore & manage Salesforce documentation in vector DB',
-    icon: Database,
-    color: '#2E844A',
   },
 ];
 
