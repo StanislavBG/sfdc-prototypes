@@ -88,12 +88,6 @@ export const appNavGroups: Record<string, NavGroup[]> = {
         { label: 'Help Documents' },
       ],
     },
-    {
-      title: 'Create',
-      items: [
-        { label: 'Provocations' },
-      ],
-    },
   ],
   sales: [
     { title: '', items: [{ label: 'Home' }] },
