@@ -1,8 +1,8 @@
 import { pool } from "./db";
 
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY || process.env.GOOGLE_API_KEY;
-const EMBEDDING_MODEL = "text-embedding-004";
-const EMBEDDING_DIM = 768;
+const EMBEDDING_MODEL = "gemini-embedding-001";
+const EMBEDDING_DIM = 3072;
 
 /**
  * Generate a vector embedding for the given text using Google Gemini.

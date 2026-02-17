@@ -35,6 +35,10 @@ export const api = {
         limit: z.number().min(1).max(20).optional(),
       }),
     },
+    reprocess: {
+      method: 'POST' as const,
+      path: '/api/help-documents/:id/reprocess' as const,
+    },
   },
 };
 
