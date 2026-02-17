@@ -133,6 +133,12 @@ export const appNavGroups: Record<string, NavGroup[]> = {
       { label: 'Dashboards', hasDropdown: true },
     ]},
   ],
+  admin: [
+    {
+      title: '',
+      items: [{ label: 'Help Documents' }],
+    },
+  ],
 };
 
 // Flat nav items (kept for backward compat)
@@ -151,6 +157,7 @@ export const salesforceApps: SalesforceApp[] = [
   { id: 'marketing', name: 'Marketing', description: 'Campaign management', color: '#E8788A', icon: 'Megaphone' },
   { id: 'commerce', name: 'Commerce', description: 'Commerce management', color: '#56B1F0', icon: 'ShoppingCart' },
   { id: 'platform', name: 'Platform', description: 'App development', color: '#9B8BF4', icon: 'Code' },
+  { id: 'admin', name: 'Admin', description: 'System administration & setup', color: '#54698D', icon: 'Settings' },
 ];
 
 // Mock Data360 records
