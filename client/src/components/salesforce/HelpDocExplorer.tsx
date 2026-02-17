@@ -1,4 +1,4 @@
-import { useState, useCallback, useRef } from 'react';
+import { useState, useCallback, useRef, useEffect } from 'react';
 import {
   Upload,
   Search,
@@ -8,7 +8,6 @@ import {
   X,
   Eye,
   Database,
-  ChevronRight,
 } from 'lucide-react';
 import { apiRequest } from '@/lib/queryClient';
 
@@ -68,19 +67,20 @@ export default function HelpDocExplorer() {
     setDocsLoading(true);
     try {
       const res = await fetch('/api/help-documents');
-      const data = await res.json();
-      setDocs(data);
+      if (res.ok) {
+        const data = await res.json();
+        if (Array.isArray(data)) setDocs(data);
+      }
       setDocsLoaded(true);
     } catch {
-      /* ignore */
+      setDocsLoaded(true);
     }
     setDocsLoading(false);
   }, []);
 
-  // Load on first render
-  if (!docsLoaded && !docsLoading) {
+  useEffect(() => {
     loadDocs();
-  }
+  }, [loadDocs]);
 
   // ------ Upload ------
 
