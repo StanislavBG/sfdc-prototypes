@@ -6,6 +6,7 @@ import {
   Database,
   ShoppingCart,
   Code,
+  Settings,
   Search,
 } from 'lucide-react';
 import { type SalesforceApp, salesforceApps } from '@/lib/mock-data';
@@ -17,6 +18,7 @@ const iconMap: Record<string, React.ElementType> = {
   Database,
   ShoppingCart,
   Code,
+  Settings,
 };
 
 interface AppLauncherProps {
