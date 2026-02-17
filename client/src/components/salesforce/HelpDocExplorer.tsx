@@ -98,8 +98,14 @@ export default function HelpDocExplorer() {
           body: form,
         });
         if (!res.ok) {
-          const err = await res.json();
-          throw new Error(err.message || 'Upload failed');
+          let message = 'Upload failed';
+          try {
+            const err = await res.json();
+            message = err.message || message;
+          } catch {
+            // Server returned non-JSON (e.g. plain text "Internal Server Error")
+          }
+          throw new Error(message);
         }
       } catch (err: any) {
         setUploadError(err.message);
