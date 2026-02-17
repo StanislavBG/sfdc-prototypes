@@ -69,16 +69,15 @@ export class DatabaseStorage {
   async insertHelpDocument(
     fileName: string,
     content: string,
-  ): Promise<{ document: HelpDocument; chunksStored: number }> {
-    // 1. Store the master document row
+  ): Promise<{ document: HelpDocument; chunksStored: number; totalChunks: number; errors: string[] }> {
     const [doc] = await db
       .insert(helpDocuments)
       .values({ fileName, content })
       .returning();
 
-    // 2. Chunk and embed
     const chunks = chunkText(content);
     let stored = 0;
+    const errors: string[] = [];
     for (let i = 0; i < chunks.length; i++) {
       try {
         const embedding = await generateEmbedding(chunks[i]);
@@ -100,11 +99,55 @@ export class DatabaseStorage {
         );
         stored++;
       } catch (err: any) {
+        const msg = `Chunk ${i}: ${err.message}`;
         console.error(`Chunk ${i} embedding failed for ${fileName}:`, err.message);
+        errors.push(msg);
       }
     }
 
-    return { document: doc, chunksStored: stored };
+    return { document: doc, chunksStored: stored, totalChunks: chunks.length, errors };
+  }
+
+  async reprocessHelpDocument(id: number): Promise<{ chunksStored: number; totalChunks: number; errors: string[] }> {
+    const doc = await this.getHelpDocument(id);
+    if (!doc) throw new Error("Document not found");
+
+    await pool.query(
+      `DELETE FROM documents WHERE metadata->>'document_id' = $1 AND metadata->>'type' = 'salesforce_help'`,
+      [String(id)],
+    );
+
+    const chunks = chunkText(doc.content);
+    let stored = 0;
+    const errors: string[] = [];
+    for (let i = 0; i < chunks.length; i++) {
+      try {
+        const embedding = await generateEmbedding(chunks[i]);
+        const vectorLiteral = toVectorLiteral(embedding);
+        await pool.query(
+          `INSERT INTO documents (content, metadata, embedding)
+           VALUES ($1, $2, $3::vector)`,
+          [
+            chunks[i],
+            JSON.stringify({
+              type: "salesforce_help",
+              document_id: doc.id,
+              file_name: doc.fileName,
+              chunk_index: i,
+              total_chunks: chunks.length,
+            }),
+            vectorLiteral,
+          ],
+        );
+        stored++;
+      } catch (err: any) {
+        const msg = `Chunk ${i}: ${err.message}`;
+        console.error(`Reprocess chunk ${i} failed for ${doc.fileName}:`, err.message);
+        errors.push(msg);
+      }
+    }
+
+    return { chunksStored: stored, totalChunks: chunks.length, errors };
   }
 
   /** List all help documents (without full content). */
