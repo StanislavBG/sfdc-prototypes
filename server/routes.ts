@@ -38,14 +38,19 @@ export async function registerRoutes(
 
       const { title, content } = parseMhtml(file.buffer);
       const fileName = file.originalname || title;
-      const { document, chunksStored } = await storage.insertHelpDocument(fileName, content);
+      const { document, chunksStored, totalChunks, errors } = await storage.insertHelpDocument(fileName, content);
 
-      res.status(201).json({
+      const response: Record<string, unknown> = {
         id: document.id,
         fileName: document.fileName,
         contentLength: content.length,
         chunksStored,
-      });
+        totalChunks,
+      };
+      if (errors.length > 0) {
+        response.warnings = errors;
+      }
+      res.status(201).json(response);
     } catch (err: any) {
       console.error("Upload error:", err);
       res.status(500).json({ message: err.message || "Upload failed" });
@@ -83,6 +88,25 @@ export async function registerRoutes(
     } catch (err) {
       console.error("Delete help document error:", err);
       res.status(500).json({ message: "Failed to delete document" });
+    }
+  });
+
+  /** Re-process a help document — re-chunk and re-embed. */
+  app.post(api.helpDocs.reprocess.path, async (req, res) => {
+    try {
+      const doc = await storage.getHelpDocument(Number(req.params.id));
+      if (!doc) return res.status(404).json({ message: "Document not found" });
+      const result = await storage.reprocessHelpDocument(Number(req.params.id));
+      const response: Record<string, unknown> = {
+        ...result,
+      };
+      if (result.errors.length > 0) {
+        response.warnings = result.errors;
+      }
+      res.json(response);
+    } catch (err: any) {
+      console.error("Reprocess error:", err);
+      res.status(500).json({ message: err.message || "Reprocess failed" });
     }
   });
 
