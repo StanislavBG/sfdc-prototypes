@@ -43,6 +43,10 @@ export const api = {
       method: 'POST' as const,
       path: '/api/help-documents/:id/republish' as const,
     },
+    reprocess: {
+      method: 'POST' as const,
+      path: '/api/help-documents/:id/reprocess' as const,
+    },
   },
 };
 
