@@ -35,6 +35,14 @@ export const api = {
         limit: z.number().min(1).max(20).optional(),
       }),
     },
+    diagnose: {
+      method: 'POST' as const,
+      path: '/api/help-documents/diagnose' as const,
+    },
+    republish: {
+      method: 'POST' as const,
+      path: '/api/help-documents/:id/republish' as const,
+    },
     reprocess: {
       method: 'POST' as const,
       path: '/api/help-documents/:id/reprocess' as const,

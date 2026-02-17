@@ -29,8 +29,8 @@ export function chunkText(
   while (start < text.length) {
     const end = Math.min(start + maxChars, text.length);
     chunks.push(text.slice(start, end));
+    if (end === text.length) break; // Reached the end
     start = end - overlap;
-    if (start >= text.length) break;
   }
   return chunks;
 }
