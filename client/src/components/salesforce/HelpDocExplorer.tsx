@@ -142,10 +142,22 @@ export default function HelpDocExplorer() {
 
   // ------ Delete ------
 
+  const [deleteError, setDeleteError] = useState<string | null>(null);
+
   const deleteDoc = async (id: number) => {
-    await apiRequest('DELETE', `/api/help-documents/${id}`);
-    setDocs((prev) => prev.filter((d) => d.id !== id));
-    if (preview?.id === id) setPreview(null);
+    setDeleteError(null);
+    try {
+      const res = await fetch(`/api/help-documents/${id}`, { method: 'DELETE' });
+      if (!res.ok) {
+        const body = await res.text();
+        throw new Error(body || `Delete failed (${res.status})`);
+      }
+      if (preview?.id === id) setPreview(null);
+      // Reload from server to ensure consistency
+      await loadDocs();
+    } catch (err: any) {
+      setDeleteError(err.message || 'Failed to delete document');
+    }
   };
 
   // ------ Search ------
@@ -232,6 +244,12 @@ export default function HelpDocExplorer() {
           {uploadError && (
             <div className="text-xs text-red-600 bg-red-50 border border-red-200 rounded px-3 py-2">
               {uploadError}
+            </div>
+          )}
+
+          {deleteError && (
+            <div className="text-xs text-red-600 bg-red-50 border border-red-200 rounded px-3 py-2">
+              Delete failed: {deleteError}
             </div>
           )}
 

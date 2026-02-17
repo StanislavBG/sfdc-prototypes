@@ -186,10 +186,16 @@ export class DatabaseStorage {
 
   /** Delete a help document and all its chunks. */
   async deleteHelpDocument(id: number): Promise<number> {
-    await pool.query(
-      `DELETE FROM documents WHERE metadata->>'document_id' = $1 AND metadata->>'type' = 'salesforce_help'`,
-      [String(id)],
-    );
+    // Delete chunks first (may not exist if embeddings failed)
+    try {
+      await pool.query(
+        `DELETE FROM documents WHERE metadata->>'document_id' = $1 AND metadata->>'type' = 'salesforce_help'`,
+        [String(id)],
+      );
+    } catch (err: any) {
+      console.warn(`Could not delete chunks for doc ${id}:`, err.message);
+    }
+    // Always delete the master document row
     await db.delete(helpDocuments).where(eq(helpDocuments.id, id));
     return 1;
   }

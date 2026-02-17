@@ -24,48 +24,61 @@ export default function Layout({ children }: LayoutProps) {
   const [currentApp, setCurrentApp] = useState('data-cloud');
   const [appLauncherOpen, setAppLauncherOpen] = useState(false);
 
-  const currentAppData = salesforceApps.find((a) => a.id === currentApp);
+  const isAdmin = currentTimeline === 'context-explorer';
+  const effectiveApp = isAdmin ? 'admin' : currentApp;
+  const currentAppData = salesforceApps.find((a) => a.id === effectiveApp);
   const appName = currentAppData?.name || 'Data 360';
 
   const handleSelectSearchResult = (id: string) => {
     console.log('Selected search result:', id);
   };
 
-  const handleSelectApp = (appId: string) => {
-    setCurrentApp(appId);
-    setCurrentTimeline('today');
-    if (appId === 'admin') {
+  const handleSelectTimeline = (id: string) => {
+    setCurrentTimeline(id);
+    if (id === 'context-explorer') {
       setActiveTab('Help Documents');
-    } else {
+    } else if (id === 'today' && activeTab === 'Help Documents' && currentApp !== 'data-cloud') {
+      // Switching back from admin, reset to Home
       setActiveTab('Home');
     }
   };
+
+  const handleSelectApp = (appId: string) => {
+    setCurrentApp(appId);
+    if (appId === 'admin') {
+      setCurrentTimeline('context-explorer');
+      setActiveTab('Help Documents');
+    } else {
+      setCurrentTimeline('today');
+      setActiveTab('Home');
+    }
+  };
+
+  // Determine layout based on timeline
+  const showTodayLayout = currentTimeline === 'today' || currentTimeline === 'context-explorer';
 
   return (
     <div className="min-h-screen flex flex-col bg-[var(--sf-content-bg)]">
       {/* Single-row header */}
       <Header
         appName={appName}
-        currentApp={currentApp}
+        currentApp={effectiveApp}
         currentTimeline={currentTimeline}
         onOpenTimeMachine={() => setTimeMachineOpen(!timeMachineOpen)}
         onSelectSearchResult={handleSelectSearchResult}
         onSetup={() => {
-          setCurrentApp('admin');
-          setCurrentTimeline('today');
+          setCurrentTimeline('context-explorer');
           setActiveTab('Help Documents');
         }}
         onOpenAppLauncher={() => setAppLauncherOpen(!appLauncherOpen)}
-        onChangeTab={setActiveTab}
-        activeTab={activeTab}
       />
 
       {/* Body: conditionally render based on timeline */}
-      {currentTimeline === 'today' ? (
-        /* Today view: original LeftNav + HomeContent + AgentPanel layout */
+      {showTodayLayout ? (
+        /* Today / Context Explorer view: LeftNav + Content + AgentPanel */
         <div className="flex flex-1 overflow-hidden">
           <LeftNav
-            currentApp={currentApp}
+            currentApp={effectiveApp}
             activeTab={activeTab}
             onChangeTab={setActiveTab}
           />
@@ -95,7 +108,7 @@ export default function Layout({ children }: LayoutProps) {
               )
             )}
           </main>
-          {currentApp !== 'admin' && (
+          {!isAdmin && (
             <AgentPanel
               isMinimized={agentMinimized}
               onToggleMinimize={() => setAgentMinimized(!agentMinimized)}
@@ -119,7 +132,7 @@ export default function Layout({ children }: LayoutProps) {
       <TimeMachine
         isOpen={timeMachineOpen}
         onClose={() => setTimeMachineOpen(false)}
-        onSelectTimeline={setCurrentTimeline}
+        onSelectTimeline={handleSelectTimeline}
         currentTimeline={currentTimeline}
       />
 
@@ -128,7 +141,7 @@ export default function Layout({ children }: LayoutProps) {
         isOpen={appLauncherOpen}
         onClose={() => setAppLauncherOpen(false)}
         onSelectApp={handleSelectApp}
-        currentApp={currentApp}
+        currentApp={effectiveApp}
       />
     </div>
   );

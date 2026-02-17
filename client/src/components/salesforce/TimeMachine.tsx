@@ -1,5 +1,5 @@
 import { useRef } from 'react';
-import { Clock, Calendar, Sparkles, Check } from 'lucide-react';
+import { Clock, Calendar, Sparkles, Check, Compass } from 'lucide-react';
 
 export interface TimelineOption {
   id: string;
@@ -23,6 +23,13 @@ export const timelines: TimelineOption[] = [
     description: 'Projected future state with planned capabilities',
     icon: Calendar,
     color: '#9B8BF4',
+  },
+  {
+    id: 'context-explorer',
+    label: 'Context Explorer',
+    description: 'Admin view for help documents & setup',
+    icon: Compass,
+    color: '#54698D',
   },
 ];
 
