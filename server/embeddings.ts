@@ -36,7 +36,7 @@ export async function generateEmbedding(text: string): Promise<number[]> {
 }
 
 /**
- * Ensure the documents table and pgvector extension exist.
+ * Ensure the documents table, help_documents table, and pgvector extension exist.
  */
 export async function ensureVectorTable(): Promise<void> {
   await pool.query(`CREATE EXTENSION IF NOT EXISTS vector`);
@@ -46,6 +46,14 @@ export async function ensureVectorTable(): Promise<void> {
       content TEXT NOT NULL,
       metadata JSONB NOT NULL DEFAULT '{}',
       embedding vector(${EMBEDDING_DIM}),
+      created_at TIMESTAMPTZ DEFAULT NOW()
+    )
+  `);
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS help_documents (
+      id SERIAL PRIMARY KEY,
+      file_name TEXT NOT NULL,
+      content TEXT NOT NULL,
       created_at TIMESTAMPTZ DEFAULT NOW()
     )
   `);
