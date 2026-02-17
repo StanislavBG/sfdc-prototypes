@@ -4,6 +4,7 @@ import LeftNav from './LeftNav';
 import AgentPanel from './AgentPanel';
 import HomeContent from './HomeContent';
 import HelpDocExplorer from './HelpDocExplorer';
+import Provocations from './Provocations';
 import WorkflowSidebar from './WorkflowSidebar';
 import WorkflowArea from './WorkflowArea';
 import TimeMachine from './TimeMachine';
@@ -53,6 +54,8 @@ export default function Layout({ children }: LayoutProps) {
                 <HomeContent />
               ) : activeTab === 'Help Documents' ? (
                 <HelpDocExplorer />
+              ) : activeTab === 'Provocations' ? (
+                <Provocations />
               ) : (
                 <div className="p-6">
                   <div className="sf-card">
