@@ -52,21 +52,36 @@ export async function registerRoutes(
 
   /** List all help documents. */
   app.get(api.helpDocs.list.path, async (_req, res) => {
-    const docs = await storage.listHelpDocuments();
-    res.json(docs);
+    try {
+      const docs = await storage.listHelpDocuments();
+      res.json(docs);
+    } catch (err) {
+      console.error("List help documents error:", err);
+      res.json([]);
+    }
   });
 
   /** Get a single help document (with full content for preview). */
   app.get(api.helpDocs.get.path, async (req, res) => {
-    const doc = await storage.getHelpDocument(Number(req.params.id));
-    if (!doc) return res.status(404).json({ message: "Not found" });
-    res.json(doc);
+    try {
+      const doc = await storage.getHelpDocument(Number(req.params.id));
+      if (!doc) return res.status(404).json({ message: "Not found" });
+      res.json(doc);
+    } catch (err) {
+      console.error("Get help document error:", err);
+      res.status(500).json({ message: "Failed to load document" });
+    }
   });
 
   /** Delete a help document and its chunks. */
   app.delete(api.helpDocs.delete.path, async (req, res) => {
-    await storage.deleteHelpDocument(Number(req.params.id));
-    res.json({ deleted: true });
+    try {
+      await storage.deleteHelpDocument(Number(req.params.id));
+      res.json({ deleted: true });
+    } catch (err) {
+      console.error("Delete help document error:", err);
+      res.status(500).json({ message: "Failed to delete document" });
+    }
   });
 
   /** Semantic search across help documents. */
