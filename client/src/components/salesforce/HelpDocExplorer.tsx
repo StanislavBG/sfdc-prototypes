@@ -8,6 +8,10 @@ import {
   X,
   Eye,
   Database,
+  RefreshCw,
+  Stethoscope,
+  CheckCircle2,
+  XCircle,
 } from 'lucide-react';
 import { apiRequest } from '@/lib/queryClient';
 
@@ -36,6 +40,12 @@ interface SearchResult {
   similarity: number;
 }
 
+interface DiagStep {
+  step: string;
+  status: 'ok' | 'error';
+  detail: string;
+}
+
 // ---------------------------------------------------------------------------
 // Component
 // ---------------------------------------------------------------------------
@@ -51,6 +61,7 @@ export default function HelpDocExplorer() {
   const [uploadError, setUploadError] = useState<string | null>(null);
   const [dragOver, setDragOver] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
+  const diagFileRef = useRef<HTMLInputElement>(null);
 
   // Preview
   const [preview, setPreview] = useState<HelpDocFull | null>(null);
@@ -60,6 +71,15 @@ export default function HelpDocExplorer() {
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState<SearchResult[]>([]);
   const [searching, setSearching] = useState(false);
+
+  // Diagnostics
+  const [diagSteps, setDiagSteps] = useState<DiagStep[] | null>(null);
+  const [diagRunning, setDiagRunning] = useState(false);
+  const [diagContentPreview, setDiagContentPreview] = useState<string | null>(null);
+
+  // Republish
+  const [republishing, setRepublishing] = useState<number | null>(null);
+  const [republishResult, setRepublishResult] = useState<string | null>(null);
 
   // ------ Data fetching ------
 
@@ -153,11 +173,55 @@ export default function HelpDocExplorer() {
         throw new Error(body || `Delete failed (${res.status})`);
       }
       if (preview?.id === id) setPreview(null);
-      // Reload from server to ensure consistency
       await loadDocs();
     } catch (err: any) {
       setDeleteError(err.message || 'Failed to delete document');
     }
+  };
+
+  // ------ Diagnose ------
+
+  const runDiagnose = async (files: FileList | null) => {
+    setDiagRunning(true);
+    setDiagSteps(null);
+    setDiagContentPreview(null);
+
+    const form = new FormData();
+    if (files && files.length > 0) {
+      form.append('file', files[0]);
+    }
+
+    try {
+      const res = await fetch('/api/help-documents/diagnose', {
+        method: 'POST',
+        body: form,
+      });
+      const data = await res.json();
+      setDiagSteps(data.steps || []);
+      setDiagContentPreview(data.contentPreview || null);
+    } catch (err: any) {
+      setDiagSteps([{ step: 'Request failed', status: 'error', detail: err.message }]);
+    }
+    setDiagRunning(false);
+  };
+
+  // ------ Republish ------
+
+  const republishDoc = async (id: number) => {
+    setRepublishing(id);
+    setRepublishResult(null);
+
+    try {
+      const res = await fetch(`/api/help-documents/${id}/republish`, { method: 'POST' });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message || 'Republish failed');
+      const msg = `Stored ${data.chunksStored}/${data.totalChunks} chunks`;
+      setRepublishResult(data.errors ? `${msg} | Errors: ${data.errors.join('; ')}` : msg);
+      await loadDocs();
+    } catch (err: any) {
+      setRepublishResult(`Error: ${err.message}`);
+    }
+    setRepublishing(null);
   };
 
   // ------ Search ------
@@ -197,10 +261,101 @@ export default function HelpDocExplorer() {
             </p>
           </div>
         </div>
-        <span className="text-xs text-[var(--sf-text-tertiary)]">
-          {docs.length} document{docs.length !== 1 ? 's' : ''}
-        </span>
+        <div className="flex items-center gap-2">
+          <span className="text-xs text-[var(--sf-text-tertiary)]">
+            {docs.length} document{docs.length !== 1 ? 's' : ''}
+          </span>
+          <button
+            onClick={() => {
+              // Run diagnose without file to check env
+              runDiagnose(null);
+            }}
+            disabled={diagRunning}
+            className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-white bg-[#54698D] rounded hover:bg-[#4a5f7d] disabled:opacity-50 transition-colors"
+            title="Run pipeline diagnostics"
+          >
+            {diagRunning ? (
+              <Loader2 className="w-3.5 h-3.5 animate-spin" />
+            ) : (
+              <Stethoscope className="w-3.5 h-3.5" />
+            )}
+            Diagnose
+          </button>
+          <input
+            ref={diagFileRef}
+            type="file"
+            accept=".mhtml,.mht"
+            className="hidden"
+            onChange={(e) => {
+              runDiagnose(e.target.files);
+              e.target.value = '';
+            }}
+          />
+          <button
+            onClick={() => diagFileRef.current?.click()}
+            disabled={diagRunning}
+            className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-white bg-[#54698D] rounded hover:bg-[#4a5f7d] disabled:opacity-50 transition-colors"
+            title="Diagnose with a file upload"
+          >
+            {diagRunning ? (
+              <Loader2 className="w-3.5 h-3.5 animate-spin" />
+            ) : (
+              <Stethoscope className="w-3.5 h-3.5" />
+            )}
+            Diagnose with File
+          </button>
+        </div>
       </div>
+
+      {/* Diagnostic results */}
+      {diagSteps && (
+        <div className="sf-card overflow-hidden">
+          <div className="sf-card-header flex items-center justify-between">
+            <h2 className="text-sm font-semibold text-[var(--sf-text-primary)] flex items-center gap-1.5">
+              <Stethoscope className="w-4 h-4" />
+              Pipeline Diagnostics
+            </h2>
+            <button
+              onClick={() => { setDiagSteps(null); setDiagContentPreview(null); }}
+              className="p-1 rounded hover:bg-[#E5E5E5] text-[var(--sf-text-tertiary)]"
+            >
+              <X className="w-3.5 h-3.5" />
+            </button>
+          </div>
+          <div className="p-4 space-y-2">
+            {diagSteps.map((s, i) => (
+              <div
+                key={i}
+                className={`flex items-start gap-2 p-2.5 rounded border text-xs ${
+                  s.status === 'ok'
+                    ? 'bg-green-50 border-green-200'
+                    : 'bg-red-50 border-red-200'
+                }`}
+              >
+                {s.status === 'ok' ? (
+                  <CheckCircle2 className="w-4 h-4 text-green-600 flex-shrink-0 mt-0.5" />
+                ) : (
+                  <XCircle className="w-4 h-4 text-red-600 flex-shrink-0 mt-0.5" />
+                )}
+                <div>
+                  <span className="font-semibold">{s.step}:</span>{' '}
+                  <span className={s.status === 'ok' ? 'text-green-800' : 'text-red-800'}>
+                    {s.detail}
+                  </span>
+                </div>
+              </div>
+            ))}
+            {diagContentPreview && (
+              <div className="mt-3 p-3 bg-[#FAFAF9] rounded border border-[var(--sf-border-light)] text-xs text-[var(--sf-text-secondary)] whitespace-pre-wrap max-h-[200px] overflow-y-auto">
+                <div className="text-xs font-semibold text-[var(--sf-text-tertiary)] uppercase tracking-wide mb-1">
+                  Parsed Content Preview
+                </div>
+                {diagContentPreview}
+              </div>
+            )}
+          </div>
+        </div>
+      )}
 
       <div className="grid grid-cols-3 gap-6">
         {/* ---- Left 2/3: Drop zone + Document table ---- */}
@@ -253,6 +408,16 @@ export default function HelpDocExplorer() {
             </div>
           )}
 
+          {republishResult && (
+            <div className={`text-xs rounded px-3 py-2 border ${
+              republishResult.startsWith('Error')
+                ? 'text-red-600 bg-red-50 border-red-200'
+                : 'text-green-700 bg-green-50 border-green-200'
+            }`}>
+              {republishResult}
+            </div>
+          )}
+
           {/* Document table */}
           <div className="sf-card overflow-hidden">
             <div className="sf-card-header flex items-center justify-between">
@@ -302,11 +467,27 @@ export default function HelpDocExplorer() {
                           </span>
                         </div>
                       </td>
-                      <td className="px-4 py-2.5 text-[var(--sf-text-tertiary)]">
-                        {doc.chunkCount}
+                      <td className="px-4 py-2.5">
+                        <span className={doc.chunkCount === 0 ? 'text-[var(--sf-warning)] font-medium' : 'text-[var(--sf-text-tertiary)]'}>
+                          {doc.chunkCount}
+                        </span>
                       </td>
                       <td className="px-4 py-2.5 text-right">
                         <div className="flex items-center justify-end gap-1">
+                          {doc.chunkCount === 0 && (
+                            <button
+                              onClick={() => republishDoc(doc.id)}
+                              disabled={republishing === doc.id}
+                              className="p-1.5 rounded hover:bg-[#EEF4FF] text-[var(--sf-warning)] hover:text-[var(--sf-blue)] transition-colors disabled:opacity-50"
+                              title="Re-publish (re-chunk and re-embed)"
+                            >
+                              {republishing === doc.id ? (
+                                <Loader2 className="w-4 h-4 animate-spin" />
+                              ) : (
+                                <RefreshCw className="w-4 h-4" />
+                              )}
+                            </button>
+                          )}
                           <button
                             onClick={() => openPreview(doc.id)}
                             className="p-1.5 rounded hover:bg-[#E5E5E5] text-[var(--sf-text-tertiary)] hover:text-[var(--sf-blue)] transition-colors"
