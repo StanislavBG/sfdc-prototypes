@@ -14,7 +14,6 @@ import {
   Zap,
   ChevronDown,
   FileText,
-  PenTool,
 } from 'lucide-react';
 import { appNavGroups, type NavGroup } from '@/lib/mock-data';
 
@@ -34,7 +33,6 @@ const navIcons: Record<string, React.ElementType> = {
   'Activation Targets': Target,
   Activations: Zap,
   'Help Documents': FileText,
-  Provocations: PenTool,
 };
 
 interface LeftNavProps {
