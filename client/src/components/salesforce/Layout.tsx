@@ -8,7 +8,8 @@ import Provocations from './Provocations';
 import WorkflowSidebar from './WorkflowSidebar';
 import WorkflowArea from './WorkflowArea';
 import TimeMachine from './TimeMachine';
-import type { Workflow } from '@/lib/mock-data';
+import AppLauncher from './AppLauncher';
+import { salesforceApps, type Workflow } from '@/lib/mock-data';
 
 interface LayoutProps {
   children?: React.ReactNode;
@@ -20,23 +21,43 @@ export default function Layout({ children }: LayoutProps) {
   const [currentTimeline, setCurrentTimeline] = useState('today');
   const [activeTab, setActiveTab] = useState('Home');
   const [agentMinimized, setAgentMinimized] = useState(false);
+  const [currentApp, setCurrentApp] = useState('data-cloud');
+  const [appLauncherOpen, setAppLauncherOpen] = useState(false);
+
+  const currentAppData = salesforceApps.find((a) => a.id === currentApp);
+  const appName = currentAppData?.name || 'Data 360';
 
   const handleSelectSearchResult = (id: string) => {
     console.log('Selected search result:', id);
+  };
+
+  const handleSelectApp = (appId: string) => {
+    setCurrentApp(appId);
+    setCurrentTimeline('today');
+    if (appId === 'admin') {
+      setActiveTab('Help Documents');
+    } else {
+      setActiveTab('Home');
+    }
   };
 
   return (
     <div className="min-h-screen flex flex-col bg-[var(--sf-content-bg)]">
       {/* Single-row header */}
       <Header
-        appName="Data 360"
+        appName={appName}
+        currentApp={currentApp}
         currentTimeline={currentTimeline}
         onOpenTimeMachine={() => setTimeMachineOpen(!timeMachineOpen)}
         onSelectSearchResult={handleSelectSearchResult}
         onSetup={() => {
+          setCurrentApp('admin');
           setCurrentTimeline('today');
           setActiveTab('Help Documents');
         }}
+        onOpenAppLauncher={() => setAppLauncherOpen(!appLauncherOpen)}
+        onChangeTab={setActiveTab}
+        activeTab={activeTab}
       />
 
       {/* Body: conditionally render based on timeline */}
@@ -44,7 +65,7 @@ export default function Layout({ children }: LayoutProps) {
         /* Today view: original LeftNav + HomeContent + AgentPanel layout */
         <div className="flex flex-1 overflow-hidden">
           <LeftNav
-            currentApp="data-cloud"
+            currentApp={currentApp}
             activeTab={activeTab}
             onChangeTab={setActiveTab}
           />
@@ -74,10 +95,12 @@ export default function Layout({ children }: LayoutProps) {
               )
             )}
           </main>
-          <AgentPanel
-            isMinimized={agentMinimized}
-            onToggleMinimize={() => setAgentMinimized(!agentMinimized)}
-          />
+          {currentApp !== 'admin' && (
+            <AgentPanel
+              isMinimized={agentMinimized}
+              onToggleMinimize={() => setAgentMinimized(!agentMinimized)}
+            />
+          )}
         </div>
       ) : (
         /* 2 Years view: WorkflowSidebar + WorkflowArea */
@@ -98,6 +121,14 @@ export default function Layout({ children }: LayoutProps) {
         onClose={() => setTimeMachineOpen(false)}
         onSelectTimeline={setCurrentTimeline}
         currentTimeline={currentTimeline}
+      />
+
+      {/* App Launcher overlay */}
+      <AppLauncher
+        isOpen={appLauncherOpen}
+        onClose={() => setAppLauncherOpen(false)}
+        onSelectApp={handleSelectApp}
+        currentApp={currentApp}
       />
     </div>
   );
