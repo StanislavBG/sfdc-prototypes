@@ -2,6 +2,10 @@ import express, { type Request, Response, NextFunction } from "express";
 import { registerRoutes } from "./routes";
 import { serveStatic } from "./static";
 import { createServer } from "http";
+import cookieParser from "cookie-parser";
+
+const APP_PASSWORD = "D36026";
+const AUTH_COOKIE = "sfdc_auth";
 
 const app = express();
 const httpServer = createServer(app);
@@ -21,6 +25,28 @@ app.use(
 );
 
 app.use(express.urlencoded({ extended: false }));
+app.use(cookieParser());
+
+// --- Auth endpoint (must come before the auth guard) ---
+app.post("/api/auth", (req: Request, res: Response) => {
+  const { password } = req.body || {};
+  if (password === APP_PASSWORD) {
+    res.cookie(AUTH_COOKIE, "granted", {
+      httpOnly: true,
+      sameSite: "lax",
+      maxAge: 24 * 60 * 60 * 1000, // 24 hours
+    });
+    return res.json({ ok: true });
+  }
+  return res.status(401).json({ message: "Invalid password" });
+});
+
+// --- Auth guard: block all /api/* unless authenticated ---
+app.use("/api", (req: Request, res: Response, next: NextFunction) => {
+  if (req.path === "/auth") return next(); // allow the login endpoint itself
+  if (req.cookies?.[AUTH_COOKIE] === "granted") return next();
+  return res.status(401).json({ message: "Unauthorized" });
+});
 
 export function log(message: string, source = "express") {
   const formattedTime = new Date().toLocaleTimeString("en-US", {
