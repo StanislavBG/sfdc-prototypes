@@ -408,6 +408,9 @@ export default function DataCloudSetupContent({ onBack }: DataCloudSetupContentP
                       {item.id === 'informatica-mdm-sf' && (
                         <span className="ml-auto px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wider bg-[#FF4A00] text-white rounded">New</span>
                       )}
+                      {item.id === 'solution-manager' && (
+                        <span className="ml-auto px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wider bg-[#0070D2] text-white rounded">New</span>
+                      )}
                     </button>
                     {item.hasChildren && expandedNavItems.has(item.id) && item.children?.map((child) => (
                       <button
@@ -648,7 +651,7 @@ export default function DataCloudSetupContent({ onBack }: DataCloudSetupContentP
           ) : (activeNavItem === 'salesforce-crm' || activeNavItem === 'informatica-mdm' || activeNavItem === 'informatica-mdm-sf') ? (
             <div className="p-6">
               {/* Page header */}
-              <div className={`sf-card mb-6 relative ${isInformatica ? 'ring-2 ring-[#FF4A00]/50 border-[#FF4A00]/40' : ''}`}>
+              <div className="sf-card mb-6 relative">
                 {isInformatica && (
                   <div className="absolute top-0 right-0 px-2.5 py-0.5 bg-[#FF4A00] text-white text-[10px] font-bold uppercase tracking-wider rounded-bl-lg rounded-tr-[7px]">
                     New to Salesforce
@@ -674,7 +677,7 @@ export default function DataCloudSetupContent({ onBack }: DataCloudSetupContentP
               </div>
 
               {/* Standard Connections */}
-              <div className={`sf-card mb-6 ${isInformatica ? 'ring-2 ring-[#FF4A00]/50 border-[#FF4A00]/40' : ''}`}>
+              <div className="sf-card mb-6">
                 <div className="sf-card-header">
                   <div className="flex items-center gap-1.5">
                     <h2 className="text-sm font-semibold text-[var(--sf-text-primary)]">Standard Connections</h2>
@@ -738,7 +741,7 @@ export default function DataCloudSetupContent({ onBack }: DataCloudSetupContentP
               </div>
 
               {/* Standard Data Bundles */}
-              <div className={`sf-card ${isInformatica ? 'ring-2 ring-[#FF4A00]/50 border-[#FF4A00]/40' : ''}`}>
+              <div className="sf-card">
                 <div className="sf-card-header">
                   <div className="flex items-center gap-1.5">
                     <h2 className="text-sm font-semibold text-[var(--sf-text-primary)]">Standard Data Bundles</h2>
