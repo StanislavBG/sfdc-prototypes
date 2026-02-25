@@ -12,6 +12,13 @@ import {
   Zap,
   Plus,
   ArrowLeft,
+  Play,
+  FileText,
+  BookOpen,
+  LayoutGrid,
+  Cloud,
+  Cog,
+  ArrowRight,
 } from 'lucide-react';
 
 // ── Types ────────────────────────────────────────────────────────────
@@ -54,6 +61,7 @@ const setupNavSections: { title: string; items: SetupPage[] }[] = [
   {
     title: 'FEATURE MANAGEMENT',
     items: [
+      { id: 'solution-manager', label: 'Solution Manager', section: '' },
       { id: 'data-spaces', label: 'Data Spaces', section: '' },
       { id: 'notebook-ai', label: 'Notebook AI', section: '' },
       {
@@ -175,6 +183,13 @@ export default function DataCloudSetupContent({ onBack }: DataCloudSetupContentP
   const [loginPassword, setLoginPassword] = useState('');
   const [rememberMe, setRememberMe] = useState(true);
 
+  // Solution Manager state
+  const [smActiveSolution, setSmActiveSolution] = useState<string | null>(null);
+  const [smActiveStep, setSmActiveStep] = useState(0);
+  const [smStepProgress, setSmStepProgress] = useState<Record<string, Record<number, 'not-started' | 'in-progress' | 'completed'>>>({
+    'Phase-1': {}, 'Phase-2-A': {}, 'Phase-2-B': {}, 'CH': {},
+  });
+
   const isInformatica = activeNavItem === 'informatica-mdm' || activeNavItem === 'informatica-mdm-sf';
 
   const toggleNavExpand = (id: string) => {
@@ -245,7 +260,79 @@ export default function DataCloudSetupContent({ onBack }: DataCloudSetupContentP
       })).filter((s) => s.items.length > 0)
     : setupNavSections;
 
-  const currentPageLabel = activeNavItem === 'salesforce-crm' ? 'Salesforce CRM' : (activeNavItem === 'informatica-mdm' || activeNavItem === 'informatica-mdm-sf') ? 'Informatica MDM' : setupNavSections.flatMap((s) => s.items).find((i) => i.id === activeNavItem)?.label || 'Setup';
+  // ── Solution Manager data ────────────────────────────────────────────
+  const smTiles = [
+    { id: 'Phase-1', badge: 'Phase 1', title: 'Integrate Business Entities from Informatica', description: 'Realize the full potential of the curated and enriched business entities from Informatica directly in D360. In this step by step guide, we will work through the steps required to operationalize business entities created in Informatica in D360.' },
+    { id: 'Phase-2-A', badge: 'Phase 2', title: 'Integrate Business Entities from Informatica', description: 'Configure your Informatica connection and data integration settings. Interactive step-by-step guide with forms, entity selection, identity resolution, mappings, sync, and experience setup.' },
+  ];
+
+  interface SmStep { title: string; headline: string; system?: 'D360' | 'Informatica'; description: string; actionLabel: string }
+  const smSolutions: Record<string, { title: string; headline: string; steps: SmStep[] }> = {
+    'Phase-1': {
+      title: 'Integrate Business Entities [Phase 1]',
+      headline: 'Follow the steps below to configure your Informatica integration with Data 360',
+      steps: [
+        { title: 'Create Ingestion End-Point', headline: 'API Configuration', system: 'D360', description: 'Setup Ingestion-API end-point via D360-Setup.', actionLabel: 'Configure End-Point' },
+        { title: 'Create Schema', headline: 'Schema Registration', system: 'Informatica', description: 'Register business entities with predefined schema.', actionLabel: 'Define Schema' },
+        { title: 'Business Entity to Lake', headline: 'Extensibility Packages', system: 'Informatica', description: 'Install Informatica Extensibility Packages.', actionLabel: 'Install Packages' },
+        { title: 'Publish Data: Day 0 & 1', headline: 'Initial Load & Change Data Capture', system: 'Informatica', description: 'Day 0: Initial data load from Informatica to D360. Day 1: Enable CDC (Change Data Capture) feed for ongoing synchronization.', actionLabel: 'Configure Data Publishing' },
+        { title: 'BYO-MDM Definition', headline: 'Create BYO-MDM Ruleset from MDM-DataKit', system: 'D360', description: 'Define BYO-MDM ruleset configuration using MDM-DataKit.', actionLabel: 'Configure Ruleset' },
+        { title: 'Business Entity Mappings', headline: 'Create Business Entity to Unified DMO Mappings from DataKit', system: 'D360', description: 'Configure mappings between business entities and unified DMO using DataKit.', actionLabel: 'Configure Mappings' },
+      ],
+    },
+    'Phase-2-A': {
+      title: 'Integrate Business Entities [Phase 2]',
+      headline: 'Configure your Informatica connection and data integration settings',
+      steps: [
+        { title: 'Connect to Informatica System', headline: 'Establish connection with credentials', description: 'Configure Connection Name, Tenant URL, Username, and Password. Ensure API access is enabled.', actionLabel: 'Configure Connection' },
+        { title: 'Choose Business Entity', headline: 'Select entities to integrate', description: 'Select from available Tenants (USA-1, Europe-1) and Entities (Customer, Product, Supplier).', actionLabel: 'Select Entities' },
+        { title: 'Choose Identity Resolution', headline: 'Select resolution method', description: 'Choose between Direct Mapping (clean data) or Golden Key-Ring (complex multi-source data).', actionLabel: 'Configure Resolution' },
+        { title: 'Review Mappings', headline: 'Validate data object mappings', description: 'Review and validate mappings for Customer_Base, Customer_Address, Product_Master, and other data objects.', actionLabel: 'Review Mappings' },
+        { title: 'Validate Connected Data', headline: 'Preview integrated data', description: 'Preview Customer Data, Product Data, and Supplier Data to verify integration.', actionLabel: 'Validate Data' },
+        { title: 'Set up Identity Rules', headline: 'Configure match rules', description: 'Configure Fuzzy Name Match, Email Exact Match, Phone Number Match, and Address Similarity rules.', actionLabel: 'Configure Rules' },
+        { title: 'Enable Sync', headline: 'Configure synchronization', description: 'Enable automatic synchronization between Informatica and Data 360. Configure sync frequency and conflict resolution.', actionLabel: 'Enable Sync' },
+        { title: 'Setup Experiences', headline: 'Configure user experiences', description: 'Setup Search Before Create, Copy Field Values, and Add Related List experiences.', actionLabel: 'Setup Experiences' },
+      ],
+    },
+  };
+
+  const smHandleStepClick = (stepIdx: number) => {
+    if (!smActiveSolution) return;
+    setSmActiveStep(stepIdx);
+    setSmStepProgress((prev) => {
+      const sol = prev[smActiveSolution] || {};
+      if (sol[stepIdx] === 'completed') return prev;
+      return { ...prev, [smActiveSolution]: { ...sol, [stepIdx]: 'in-progress' } };
+    });
+  };
+
+  const smHandleCompleteStep = () => {
+    if (!smActiveSolution) return;
+    const sol = smSolutions[smActiveSolution];
+    if (!sol) return;
+    setSmStepProgress((prev) => {
+      const updated = { ...prev, [smActiveSolution]: { ...prev[smActiveSolution], [smActiveStep]: 'completed' as const } };
+      return updated;
+    });
+    if (smActiveStep < sol.steps.length - 1) {
+      const nextStep = smActiveStep + 1;
+      setSmActiveStep(nextStep);
+      setSmStepProgress((prev) => ({
+        ...prev,
+        [smActiveSolution]: { ...prev[smActiveSolution], [smActiveStep]: 'completed' as const, [nextStep]: 'in-progress' as const },
+      }));
+    }
+  };
+
+  const smGetProgress = (solutionId: string) => {
+    const sol = smSolutions[solutionId];
+    if (!sol) return 0;
+    const prog = smStepProgress[solutionId] || {};
+    const completed = Object.values(prog).filter((s) => s === 'completed').length;
+    return Math.round((completed / sol.steps.length) * 100);
+  };
+
+  const currentPageLabel = activeNavItem === 'salesforce-crm' ? 'Salesforce CRM' : (activeNavItem === 'informatica-mdm' || activeNavItem === 'informatica-mdm-sf') ? 'Informatica MDM' : activeNavItem === 'solution-manager' ? 'Solution Manager' : setupNavSections.flatMap((s) => s.items).find((i) => i.id === activeNavItem)?.label || 'Setup';
   const currentConnections = isInformatica ? informaticaConnections : sfdcConnections;
   const currentBundles = isInformatica ? informaticaBundles : sfdcBundles;
   const connectorName = isInformatica ? 'Informatica MDM' : 'Salesforce CRM';
@@ -302,10 +389,14 @@ export default function DataCloudSetupContent({ onBack }: DataCloudSetupContentP
                         activeNavItem === item.id
                           ? (item.id === 'informatica-mdm-sf' || item.id === 'informatica-mdm'
                               ? 'bg-[#FFF3ED] text-[#FF4A00] font-semibold'
-                              : 'bg-[#EEF4FF] text-[var(--sf-blue)] font-semibold')
+                              : item.id === 'solution-manager'
+                                ? 'bg-[#EEF4FF] text-[#0070D2] font-bold'
+                                : 'bg-[#EEF4FF] text-[var(--sf-blue)] font-semibold')
                           : (item.id === 'informatica-mdm-sf'
                               ? 'text-[#FF4A00] font-medium hover:bg-[#FFF3ED]'
-                              : 'text-[var(--sf-text-secondary)] hover:bg-[#F3F3F3]')
+                              : item.id === 'solution-manager'
+                                ? 'text-[#0070D2] font-semibold hover:bg-[#EEF4FF]'
+                                : 'text-[var(--sf-text-secondary)] hover:bg-[#F3F3F3]')
                       }`}
                     >
                       {item.hasChildren && (
@@ -313,7 +404,7 @@ export default function DataCloudSetupContent({ onBack }: DataCloudSetupContentP
                           ? <ChevronDown className="w-3 h-3 flex-shrink-0" />
                           : <ChevronRight className="w-3 h-3 flex-shrink-0" />
                       )}
-                      <span className={activeNavItem === item.id ? (item.id === 'informatica-mdm-sf' || item.id === 'informatica-mdm' ? 'text-[#FF4A00]' : 'sf-link') : ''}>{item.label}</span>
+                      <span className={activeNavItem === item.id ? (item.id === 'informatica-mdm-sf' || item.id === 'informatica-mdm' ? 'text-[#FF4A00]' : item.id === 'solution-manager' ? 'text-[#0070D2]' : 'sf-link') : item.id === 'solution-manager' ? 'text-[#0070D2]' : ''}>{item.label}</span>
                       {item.id === 'informatica-mdm-sf' && (
                         <span className="ml-auto px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wider bg-[#FF4A00] text-white rounded">New</span>
                       )}
@@ -338,7 +429,223 @@ export default function DataCloudSetupContent({ onBack }: DataCloudSetupContentP
 
         {/* ── Main Content ── */}
         <main className="flex-1 overflow-y-auto bg-[var(--sf-content-bg)]">
-          {(activeNavItem === 'salesforce-crm' || activeNavItem === 'informatica-mdm' || activeNavItem === 'informatica-mdm-sf') ? (
+          {activeNavItem === 'solution-manager' ? (
+            /* ═══════════════════════════════════════════════════════════
+               SOLUTION MANAGER CONTENT
+               ═══════════════════════════════════════════════════════════ */
+            smActiveSolution && smSolutions[smActiveSolution] ? (
+              /* ── Phase Detail Page ── */
+              (() => {
+                const sol = smSolutions[smActiveSolution];
+                const progress = smGetProgress(smActiveSolution);
+                const prog = smStepProgress[smActiveSolution] || {};
+                return (
+                  <div className="h-full flex flex-col">
+                    {/* Breadcrumb */}
+                    <div className="bg-white border-b border-[var(--sf-border)] px-6 py-2.5 flex items-center gap-2">
+                      <button onClick={() => setSmActiveSolution(null)} className="text-xs text-[var(--sf-link)] hover:underline">Solution Manager</button>
+                      <ChevronRight className="w-3 h-3 text-[var(--sf-text-tertiary)]" />
+                      <span className="text-xs font-medium text-[var(--sf-text-primary)]">{sol.title}</span>
+                    </div>
+
+                    {/* Progress bar */}
+                    <div className="bg-white border-b border-[var(--sf-border)] px-6 py-3">
+                      <div className="flex items-center justify-between mb-1.5">
+                        <span className="text-xs font-medium text-[var(--sf-text-secondary)]">Overall Progress</span>
+                        <span className="text-xs font-bold text-[#0070D2]">{progress}%</span>
+                      </div>
+                      <div className="w-full h-2 bg-[#DDDBDA] rounded-full overflow-hidden">
+                        <div
+                          className="h-full rounded-full transition-all duration-500"
+                          style={{ width: `${progress}%`, background: 'linear-gradient(90deg, #0070D2, #00A1E0)' }}
+                        />
+                      </div>
+                    </div>
+
+                    {/* Content: sidebar + steps */}
+                    <div className="flex flex-1 overflow-hidden">
+                      {/* Step sidebar */}
+                      <div className="w-[200px] min-w-[200px] bg-white border-r border-[var(--sf-border)] overflow-y-auto">
+                        <div className="px-4 py-3 border-b border-[var(--sf-border)]">
+                          <span className="text-[10px] font-bold uppercase tracking-wider text-[var(--sf-text-tertiary)]">Steps</span>
+                        </div>
+                        <nav className="py-2">
+                          {sol.steps.map((step, idx) => {
+                            const status = prog[idx] || 'not-started';
+                            const isActive = smActiveStep === idx;
+                            return (
+                              <button
+                                key={idx}
+                                onClick={() => smHandleStepClick(idx)}
+                                className={`w-full flex items-center gap-2.5 px-4 py-2.5 text-left transition-colors ${
+                                  isActive ? 'bg-[#EEF4FF]' : 'hover:bg-[#F3F3F3]'
+                                }`}
+                              >
+                                <div className={`w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0 text-xs font-medium ${
+                                  status === 'completed' ? 'bg-[#2E844A] text-white' :
+                                  status === 'in-progress' ? 'bg-[#0070D2] text-white' :
+                                  'border-2 border-[#DDDBDA] text-[var(--sf-text-tertiary)]'
+                                }`}>
+                                  {status === 'completed' ? <Check className="w-3 h-3" /> : idx + 1}
+                                </div>
+                                <span className={`text-xs leading-tight ${
+                                  status === 'completed' ? 'text-[#2E844A] font-medium' :
+                                  status === 'in-progress' ? 'text-[#0070D2] font-semibold' :
+                                  'text-[var(--sf-text-secondary)]'
+                                }`}>
+                                  {step.title}
+                                </span>
+                              </button>
+                            );
+                          })}
+                        </nav>
+                        {/* Tutorial video placeholder */}
+                        <div className="mx-4 mb-4 mt-2 rounded-lg border border-[var(--sf-border)] bg-[#F3F3F3] p-4 text-center">
+                          <Play className="w-8 h-8 mx-auto text-[var(--sf-text-tertiary)] mb-2" />
+                          <span className="text-xs text-[var(--sf-text-tertiary)]">Tutorial Video</span>
+                        </div>
+                      </div>
+
+                      {/* Step content */}
+                      <div className="flex-1 overflow-y-auto p-6">
+                        <div className="max-w-3xl">
+                          {/* Solution header */}
+                          <div className="mb-6">
+                            <h2 className="text-xl font-light text-[var(--sf-text-primary)] mb-1">Integrate Business Entities from Informatica</h2>
+                            <p className="text-sm text-[var(--sf-text-tertiary)]">{sol.headline}</p>
+                          </div>
+
+                          {/* Active step card */}
+                          {(() => {
+                            const step = sol.steps[smActiveStep];
+                            if (!step) return null;
+                            const status = prog[smActiveStep] || 'not-started';
+                            return (
+                              <div className={`sf-card mb-4 ${status === 'completed' ? 'ring-2 ring-[#2E844A]/30' : ''}`}>
+                                <div className="sf-card-header">
+                                  <div className="flex items-center gap-3">
+                                    <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold ${
+                                      status === 'completed' ? 'bg-[#2E844A] text-white' :
+                                      'bg-[#0070D2] text-white'
+                                    }`}>
+                                      {status === 'completed' ? <Check className="w-4 h-4" /> : smActiveStep + 1}
+                                    </div>
+                                    <div>
+                                      <h3 className="text-sm font-semibold text-[var(--sf-text-primary)]">{step.title}</h3>
+                                      <p className="text-xs text-[var(--sf-text-tertiary)]">{step.headline}</p>
+                                    </div>
+                                    {step.system && (
+                                      <span className={`ml-auto px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider rounded ${
+                                        step.system === 'D360'
+                                          ? 'bg-[#EEF4FF] text-[#0070D2]'
+                                          : 'bg-[#FFF3ED] text-[#D95800]'
+                                      }`}>
+                                        {step.system === 'D360' ? '☁ ' : '⚙ '}{step.system}
+                                      </span>
+                                    )}
+                                  </div>
+                                </div>
+                                <div className="sf-card-body">
+                                  <p className="text-sm text-[var(--sf-text-secondary)] mb-5 leading-relaxed">{step.description}</p>
+                                  {status !== 'completed' && (
+                                    <button
+                                      onClick={smHandleCompleteStep}
+                                      className="px-4 py-2 text-sm font-medium text-white bg-[#0070D2] rounded hover:bg-[#005FB2] transition-colors"
+                                    >
+                                      {step.actionLabel}
+                                    </button>
+                                  )}
+                                  {status === 'completed' && (
+                                    <div className="flex items-center gap-2 text-sm text-[#2E844A] font-medium">
+                                      <CheckCircle2 className="w-4 h-4" />
+                                      Step completed
+                                    </div>
+                                  )}
+                                </div>
+                                {/* Step footer */}
+                                <div className="flex items-center justify-between px-5 py-3 border-t border-[var(--sf-border)] bg-[#FAFAF9]">
+                                  <div className="flex items-center gap-3">
+                                    <button className="text-xs text-[var(--sf-link)] hover:underline flex items-center gap-1">
+                                      <FileText className="w-3 h-3" /> Documentation
+                                    </button>
+                                    <button className="text-xs text-[var(--sf-link)] hover:underline flex items-center gap-1">
+                                      <BookOpen className="w-3 h-3" /> Tutorial
+                                    </button>
+                                  </div>
+                                  <div className="flex items-center gap-2">
+                                    {smActiveStep > 0 && (
+                                      <button
+                                        onClick={() => smHandleStepClick(smActiveStep - 1)}
+                                        className="px-3 py-1.5 text-xs font-medium text-[var(--sf-text-secondary)] border border-[var(--sf-border)] rounded hover:bg-[#F3F3F3]"
+                                      >
+                                        Previous
+                                      </button>
+                                    )}
+                                    {smActiveStep < sol.steps.length - 1 ? (
+                                      <button
+                                        onClick={() => { smHandleCompleteStep(); }}
+                                        className="px-3 py-1.5 text-xs font-medium text-white bg-[#0070D2] rounded hover:bg-[#005FB2]"
+                                      >
+                                        Next Step
+                                      </button>
+                                    ) : (
+                                      <button
+                                        onClick={smHandleCompleteStep}
+                                        className="px-3 py-1.5 text-xs font-medium text-white bg-[#2E844A] rounded hover:bg-[#256B3B]"
+                                      >
+                                        Complete
+                                      </button>
+                                    )}
+                                  </div>
+                                </div>
+                              </div>
+                            );
+                          })()}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })()
+            ) : (
+              /* ── Solution Manager Tiles ── */
+              <div className="p-6">
+                <div className="mb-6">
+                  <h1 className="text-2xl font-light text-[var(--sf-text-primary)] mb-1">Solution Manager</h1>
+                  <p className="text-sm text-[var(--sf-text-tertiary)]">Explore and implement data management solutions</p>
+                </div>
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
+                  {smTiles.map((tile) => {
+                    const progress = smGetProgress(tile.id);
+                    return (
+                      <button
+                        key={tile.id}
+                        onClick={() => { setSmActiveSolution(tile.id); setSmActiveStep(0); }}
+                        className="text-left bg-white border border-[var(--sf-border)] rounded-lg p-6 hover:shadow-lg hover:border-[#0070D2] hover:-translate-y-0.5 transition-all group"
+                      >
+                        <span className="inline-block px-2 py-1 text-[11px] font-bold text-[#0070D2] bg-[#EEF4FF] rounded mb-3">
+                          {tile.badge}
+                        </span>
+                        <h3 className="text-base font-semibold text-[#0070D2] mb-2 leading-snug group-hover:underline">{tile.title}</h3>
+                        <p className="text-sm text-[var(--sf-text-secondary)] leading-relaxed mb-3">{tile.description}</p>
+                        {smSolutions[tile.id] && (
+                          <div className="flex items-center gap-2">
+                            <div className="flex-1 h-1.5 bg-[#DDDBDA] rounded-full overflow-hidden">
+                              <div className="h-full rounded-full" style={{ width: `${progress}%`, background: 'linear-gradient(90deg, #0070D2, #00A1E0)' }} />
+                            </div>
+                            <span className="text-[10px] font-bold text-[#0070D2]">{progress}%</span>
+                          </div>
+                        )}
+                        {tile.id === 'CH' && (
+                          <div className="mt-2 text-xs text-[var(--sf-text-tertiary)] italic">Work in progress</div>
+                        )}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            )
+          ) : (activeNavItem === 'salesforce-crm' || activeNavItem === 'informatica-mdm' || activeNavItem === 'informatica-mdm-sf') ? (
             <div className="p-6">
               {/* Page header */}
               <div className={`sf-card mb-6 relative ${isInformatica ? 'ring-2 ring-[#FF4A00]/50 border-[#FF4A00]/40' : ''}`}>
