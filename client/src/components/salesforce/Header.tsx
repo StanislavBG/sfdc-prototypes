@@ -1,3 +1,4 @@
+import { useState, useRef, useEffect } from 'react';
 import {
   Clock,
   ChevronDown,
@@ -8,6 +9,9 @@ import {
   Smile,
   Pencil,
   Grid3X3,
+  X,
+  ExternalLink,
+  Zap,
 } from 'lucide-react';
 import GlobalSearch from './GlobalSearch';
 import { timelines } from './TimeMachine';
@@ -20,6 +24,7 @@ interface HeaderProps {
   onSelectSearchResult: (id: string) => void;
   onSetup?: () => void;
   onOpenAppLauncher?: () => void;
+  onOpenDataCloudSetup?: () => void;
 }
 
 // Salesforce cloud logo SVG
@@ -38,8 +43,23 @@ export default function Header({
   onSelectSearchResult,
   onSetup,
   onOpenAppLauncher,
+  onOpenDataCloudSetup,
 }: HeaderProps) {
   const timelineData = timelines.find((t) => t.id === currentTimeline);
+  const [setupMenuOpen, setSetupMenuOpen] = useState(false);
+  const setupMenuRef = useRef<HTMLDivElement>(null);
+
+  // Close on outside click
+  useEffect(() => {
+    if (!setupMenuOpen) return;
+    const handler = (e: MouseEvent) => {
+      if (setupMenuRef.current && !setupMenuRef.current.contains(e.target as Node)) {
+        setSetupMenuOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
+  }, [setupMenuOpen]);
 
   return (
     <div className="sf-header-row1 flex items-center px-4">
@@ -92,9 +112,48 @@ export default function Header({
         <button className="sf-icon-btn" title="Help">
           <CircleHelp className="w-[18px] h-[18px]" />
         </button>
-        <button className="sf-icon-btn" title="Setup" onClick={onSetup}>
-          <Settings className="w-[18px] h-[18px]" />
-        </button>
+
+        {/* Setup gear with dropdown */}
+        <div className="relative" ref={setupMenuRef}>
+          <button
+            className="sf-icon-btn"
+            title="Setup"
+            onClick={() => setSetupMenuOpen(!setupMenuOpen)}
+          >
+            <Settings className="w-[18px] h-[18px]" />
+          </button>
+
+          {setupMenuOpen && (
+            <div className="absolute right-0 top-full mt-1 w-[280px] bg-white rounded-lg shadow-xl border border-[var(--sf-border)] z-50">
+              {/* Dropdown header */}
+              <div className="flex items-center justify-between px-4 py-3 border-b border-[var(--sf-border)]">
+                <span className="text-sm font-semibold text-[var(--sf-text-primary)]">Setup Menu</span>
+                <button
+                  onClick={() => setSetupMenuOpen(false)}
+                  className="w-6 h-6 flex items-center justify-center rounded hover:bg-[#F3F3F3] text-[var(--sf-text-tertiary)]"
+                >
+                  <X className="w-3.5 h-3.5" />
+                </button>
+              </div>
+              {/* Menu items */}
+              <div className="py-1">
+                <button
+                  onClick={() => {
+                    setSetupMenuOpen(false);
+                    onOpenDataCloudSetup?.();
+                  }}
+                  className="w-full flex items-center gap-3 px-4 py-3 hover:bg-[#F3F3F3] transition-colors border-2 border-transparent hover:border-[var(--sf-blue)] rounded-lg mx-0"
+                >
+                  <div className="w-8 h-8 rounded bg-[#5A3E9E] flex items-center justify-center flex-shrink-0">
+                    <Zap className="w-4 h-4 text-white" />
+                  </div>
+                  <span className="text-sm font-medium text-[var(--sf-text-primary)] flex-1 text-left">Data Cloud Setup</span>
+                  <ExternalLink className="w-3.5 h-3.5 text-[var(--sf-text-tertiary)]" />
+                </button>
+              </div>
+            </div>
+          )}
+        </div>
 
         {/* User avatar */}
         <button
