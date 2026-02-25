@@ -395,8 +395,12 @@ export default function DataStreamsContent() {
 
   // New Data Stream modal
   const [newModalOpen, setNewModalOpen] = useState(false);
-  const [newModalStep, setNewModalStep] = useState<1 | 2 | 3>(1);
+  const [newModalStep, setNewModalStep] = useState<1 | 2 | 3 | 4>(1);
   const [selectedSource, setSelectedSource] = useState<'salesforce' | 'informatica' | null>(null);
+
+  // Data Space selection (Step 4)
+  const [selectedDataSpace, setSelectedDataSpace] = useState('default');
+  const [dataSpaceDropdownOpen, setDataSpaceDropdownOpen] = useState(false);
 
   // Informatica bundle selection
   const [selectedTenant, setSelectedTenant] = useState('USA-1');
@@ -456,6 +460,8 @@ export default function DataStreamsContent() {
     setSelectedSfBundles(new Set());
     setSfBundleSearch('');
     setFocusedSfBundleId(null);
+    setSelectedDataSpace('default');
+    setDataSpaceDropdownOpen(false);
     setNewModalOpen(true);
   };
 
@@ -468,12 +474,15 @@ export default function DataStreamsContent() {
       } else if (selectedSource === 'salesforce') {
         setNewModalStep(3);
       }
+    } else if (newModalStep === 3) {
+      setNewModalStep(4);
     }
   };
 
   const handleNewBack = () => {
     if (newModalStep === 2) setNewModalStep(1);
     else if (newModalStep === 3) setNewModalStep(2);
+    else if (newModalStep === 4) setNewModalStep(3);
   };
 
   const toggleBundle = (id: string) => {
@@ -501,7 +510,7 @@ export default function DataStreamsContent() {
             recordsProcessed: 0,
             lastRefreshed: '—',
             refreshFrequency: 'Every 1 hour',
-            dataSpace: 'default',
+            dataSpace: selectedDataSpace,
             tenant: selectedTenant,
             fields: generateStreamFields(bundle.name),
           });
@@ -932,13 +941,13 @@ export default function DataStreamsContent() {
       {newModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center">
           <div className="absolute inset-0 bg-black/40" onClick={() => setNewModalOpen(false)} />
-          <div className={`relative bg-white rounded-lg shadow-2xl max-h-[90vh] flex flex-col transition-all ${newModalStep === 1 ? 'w-[900px]' : newModalStep === 2 ? 'w-[900px]' : 'w-[640px]'}`}>
+          <div className={`relative bg-white rounded-lg shadow-2xl max-h-[90vh] flex flex-col transition-all ${newModalStep === 1 || newModalStep === 2 ? 'w-[900px]' : newModalStep === 4 ? 'w-[960px]' : 'w-[640px]'}`}>
             {/* Header */}
             <div className="flex items-center justify-between px-6 py-4 border-b border-[var(--sf-border)]">
               <div>
                 <h2 className="text-base font-semibold text-[var(--sf-text-primary)]">New Data Stream</h2>
                 <p className="text-xs text-[var(--sf-text-tertiary)] mt-0.5">
-                  {newModalStep === 1 ? 'Select a data source to connect.' : newModalStep === 2 ? 'Configure your data stream.' : 'Review and create.'}
+                  {newModalStep === 1 ? 'Select a data source to connect.' : newModalStep === 2 ? 'Configure your data stream.' : newModalStep === 3 ? 'Review and confirm.' : 'Put the finishing touches on your data stream(s).'}
                 </p>
               </div>
               <button onClick={() => setNewModalOpen(false)} className="w-7 h-7 flex items-center justify-center rounded hover:bg-[#F3F3F3] text-[var(--sf-text-tertiary)]">
@@ -1337,7 +1346,7 @@ export default function DataStreamsContent() {
                   <div className="flex items-start gap-3 p-4 bg-[#E1F5FE] rounded-lg">
                     <Info className="w-5 h-5 text-[var(--sf-blue)] flex-shrink-0 mt-0.5" />
                     <div className="text-sm text-[var(--sf-text-secondary)]">
-                      Review the details below and click <strong>Create</strong> to set up your data stream{selectedBundles.size > 1 ? 's' : ''}.
+                      Review the details below and click <strong>Next</strong> to configure the data space.
                     </div>
                   </div>
                   <div className="sf-card">
@@ -1368,10 +1377,6 @@ export default function DataStreamsContent() {
                         </>
                       )}
                       <div className="sf-detail-field">
-                        <div className="sf-detail-label">Data Space</div>
-                        <div className="sf-detail-value">default</div>
-                      </div>
-                      <div className="sf-detail-field">
                         <div className="sf-detail-label">Refresh Frequency</div>
                         <div className="sf-detail-value">Every 1 hour</div>
                       </div>
@@ -1383,26 +1388,187 @@ export default function DataStreamsContent() {
                   </div>
                 </div>
               )}
+
+              {/* Step 4: Data Space selection */}
+              {newModalStep === 4 && (() => {
+                const dataSpaces = [
+                  { id: 'agentMemory', label: 'agentMemory', description: '' },
+                  { id: 'default', label: 'default', description: "Your org's default data space. It can be renamed, but not deleted." },
+                  { id: 'employee360', label: 'employee360', description: '' },
+                  { id: 'ethicsModelTest', label: 'Ethics Model Test', description: 'Use this data space only for dedicated testing of Ethics for Identity Modeling' },
+                ];
+                // Build objects list from selected bundles / source
+                const objectRows: { name: string; category: string }[] = [];
+                if (selectedSource === 'informatica') {
+                  selectedBundles.forEach((bundleId) => {
+                    const bundle = informaticaBundles.find((b) => b.id === bundleId);
+                    if (bundle) {
+                      bundle.entities.forEach((entity) => {
+                        objectRows.push({ name: `${entity.name}_Home`, category: 'MDM Entity' });
+                      });
+                    }
+                  });
+                } else if (selectedSource === 'salesforce') {
+                  selectedSfBundles.forEach((bundleId) => {
+                    const bundle = salesforceStandardBundles.find((b) => b.id === bundleId);
+                    if (bundle) {
+                      bundle.objects.forEach((obj) => {
+                        objectRows.push({ name: `${obj}_Home`, category: 'Other' });
+                      });
+                    }
+                  });
+                  if (objectRows.length === 0) {
+                    objectRows.push(
+                      { name: 'Account_Home', category: 'Other' },
+                      { name: 'Contact_Home', category: 'Other' },
+                    );
+                  }
+                }
+                return (
+                  <div className="flex gap-5">
+                    {/* Left content */}
+                    <div className="flex-1 min-w-0 space-y-4">
+                      {/* Data Space selector */}
+                      <div>
+                        <label className="flex items-center gap-1 text-xs font-medium text-[var(--sf-text-primary)] mb-1">
+                          <span className="text-[#C23934]">*</span> Data Space
+                          <Info className="w-3 h-3 text-[var(--sf-text-tertiary)]" />
+                        </label>
+                        <div className="relative">
+                          <button
+                            onClick={() => setDataSpaceDropdownOpen(!dataSpaceDropdownOpen)}
+                            className="w-full max-w-sm flex items-center justify-between px-3 py-2 text-sm border-2 border-[var(--sf-blue)] rounded bg-white focus:outline-none"
+                          >
+                            <span className={selectedDataSpace ? 'text-[var(--sf-text-primary)]' : 'text-[var(--sf-text-tertiary)]'}>
+                              {selectedDataSpace ? dataSpaces.find((d) => d.id === selectedDataSpace)?.label || selectedDataSpace : 'Select Data Space'}
+                            </span>
+                            <ChevronDown className="w-4 h-4 text-[var(--sf-text-tertiary)]" />
+                          </button>
+                          {dataSpaceDropdownOpen && (
+                            <div className="absolute z-10 top-full left-0 mt-1 w-full max-w-sm bg-white border border-[var(--sf-border)] rounded-lg shadow-lg overflow-hidden">
+                              {dataSpaces.map((ds) => (
+                                <button
+                                  key={ds.id}
+                                  onClick={() => { setSelectedDataSpace(ds.id); setDataSpaceDropdownOpen(false); }}
+                                  className={`w-full text-left px-4 py-2.5 hover:bg-[#EEF4FF] transition-colors border-b border-[var(--sf-border)] last:border-b-0 ${
+                                    selectedDataSpace === ds.id ? 'bg-[#EEF4FF]' : ''
+                                  }`}
+                                >
+                                  <div className="text-sm font-medium text-[var(--sf-text-primary)]">{ds.label}</div>
+                                  {ds.description && <div className="text-xs text-[var(--sf-text-tertiary)] mt-0.5">{ds.description}</div>}
+                                </button>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+                      </div>
+
+                      {/* Objects table */}
+                      {objectRows.length > 0 && (
+                        <div className="border border-[var(--sf-border)] rounded-lg overflow-hidden">
+                          <table className="w-full text-xs">
+                            <thead>
+                              <tr className="bg-[#FAFAF9] border-b border-[var(--sf-border)]">
+                                <th className="px-3 py-2 text-left font-medium text-[var(--sf-text-tertiary)] w-8">
+                                  <input type="checkbox" className="rounded border-[var(--sf-border)]" defaultChecked />
+                                </th>
+                                <th className="px-3 py-2 text-left font-medium text-[var(--sf-text-tertiary)]">
+                                  <div className="flex items-center gap-1">Object <ChevronDown className="w-3 h-3 opacity-50" /></div>
+                                </th>
+                                <th className="px-3 py-2 text-left font-medium text-[var(--sf-text-tertiary)]">
+                                  <div className="flex items-center gap-1">Category <ChevronDown className="w-3 h-3 opacity-50" /></div>
+                                </th>
+                                <th className="px-3 py-2 text-left font-medium text-[var(--sf-text-tertiary)]">
+                                  <div className="flex items-center gap-1">Refresh Mode <ChevronDown className="w-3 h-3 opacity-50" /></div>
+                                </th>
+                                <th className="px-3 py-2 text-left font-medium text-[var(--sf-text-tertiary)]">
+                                  <div className="flex items-center gap-1">Full Refresh Interval <ChevronDown className="w-3 h-3 opacity-50" /></div>
+                                </th>
+                                <th className="px-3 py-2 text-left font-medium text-[var(--sf-text-tertiary)]">
+                                  <div className="flex items-center gap-1">Data Space Filtering <ChevronDown className="w-3 h-3 opacity-50" /></div>
+                                </th>
+                              </tr>
+                            </thead>
+                            <tbody className="max-h-[220px] overflow-y-auto">
+                              {objectRows.map((obj, i) => (
+                                <tr key={i} className="border-b border-[var(--sf-border)] last:border-b-0 hover:bg-[#FAFAF9]">
+                                  <td className="px-3 py-2 text-center text-[var(--sf-text-tertiary)]">{i + 1}</td>
+                                  <td className="px-3 py-2">
+                                    <span className="text-[var(--sf-link)] hover:underline cursor-pointer font-medium">{obj.name}</span>
+                                  </td>
+                                  <td className="px-3 py-2 text-[var(--sf-text-secondary)]">{obj.category}</td>
+                                  <td className="px-3 py-2 text-[var(--sf-text-secondary)]">Upsert</td>
+                                  <td className="px-3 py-2 text-[var(--sf-text-secondary)]">None</td>
+                                  <td className="px-3 py-2">
+                                    <span className="text-[var(--sf-link)] hover:underline cursor-pointer">Set Filters</span>
+                                  </td>
+                                </tr>
+                              ))}
+                            </tbody>
+                          </table>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Right sidebar — FAQs */}
+                    <div className="w-[260px] flex-shrink-0">
+                      <div className="border border-[var(--sf-border)] rounded-lg bg-white overflow-hidden">
+                        <div className="px-4 py-3 border-b border-[var(--sf-border)] bg-[#FAFAF9]">
+                          <h4 className="text-sm font-semibold text-[var(--sf-text-primary)]">Frequently Asked Questions</h4>
+                        </div>
+                        <div className="p-4 space-y-4">
+                          <div>
+                            <h5 className="text-xs font-bold text-[var(--sf-text-primary)] mb-1">What are data space filters?</h5>
+                            <p className="text-[11px] text-[var(--sf-text-tertiary)] leading-relaxed">
+                              Data space filters let you determine which records from the data lake object are available in the context of a data space.
+                            </p>
+                          </div>
+                          <div>
+                            <h5 className="text-xs font-bold text-[var(--sf-text-primary)] mb-1">What is a refresh mode?</h5>
+                            <p className="text-[11px] text-[var(--sf-text-tertiary)] leading-relaxed">
+                              After the initial data ingestion, you can opt to replace only the fields for which new data was received (partial refresh) or to replace the entire record with the data received (incremental refresh). When refresh mode is incremental, existing values can be replaced by blank values.
+                            </p>
+                          </div>
+                          <div>
+                            <h5 className="text-xs font-bold text-[var(--sf-text-primary)] mb-1">What is the full refresh interval?</h5>
+                            <p className="text-[11px] text-[var(--sf-text-tertiary)] leading-relaxed">
+                              The full refresh interval helps determine when a periodic full refresh is triggered. By default it's disabled, but you can enable and configure it to a desired interval.
+                              <span className="text-[var(--sf-link)] hover:underline cursor-pointer ml-1">Learn more</span>
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })()}
             </div>
 
             {/* Footer with step indicator */}
             <div className="flex items-center justify-between px-6 py-4 border-t border-[var(--sf-border)] bg-[#FAFAF9]">
               <div className="flex items-center gap-2">
-                {[1, 2, 3].map((s) => (
-                  <div key={s} className="flex items-center gap-1.5">
-                    <div className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-medium ${
-                      s < newModalStep ? 'bg-[var(--sf-success)] text-white' :
-                      s === newModalStep ? 'bg-[var(--sf-blue)] text-white' :
-                      'bg-[#E5E5E5] text-[var(--sf-text-tertiary)]'
-                    }`}>
-                      {s < newModalStep ? <Check className="w-3 h-3" /> : s}
+                {newModalStep > 1 && (
+                  <button onClick={handleNewBack} className="px-4 py-2 text-sm font-medium text-[var(--sf-text-secondary)] border border-[var(--sf-border)] rounded hover:bg-[#F3F3F3]">
+                    Previous
+                  </button>
+                )}
+                <div className="flex items-center gap-1 ml-4">
+                  {[1, 2, 3, 4].map((s) => (
+                    <div key={s} className="flex items-center gap-1">
+                      <div className={`w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-medium ${
+                        s < newModalStep ? 'bg-[var(--sf-success)] text-white' :
+                        s === newModalStep ? 'bg-[var(--sf-blue)] text-white' :
+                        'bg-[#E5E5E5] text-[var(--sf-text-tertiary)]'
+                      }`}>
+                        {s < newModalStep ? <Check className="w-2.5 h-2.5" /> : s}
+                      </div>
+                      {s < 4 && <div className={`w-16 h-0.5 ${s < newModalStep ? 'bg-[var(--sf-success)]' : 'bg-[#E5E5E5]'}`} />}
                     </div>
-                    {s < 3 && <div className={`w-6 h-0.5 ${s < newModalStep ? 'bg-[var(--sf-success)]' : 'bg-[#E5E5E5]'}`} />}
-                  </div>
-                ))}
+                  ))}
+                </div>
               </div>
               <div className="flex items-center gap-3">
-                {newModalStep === 1 ? (
+                {newModalStep === 1 && (
                   <>
                     <button onClick={() => setNewModalOpen(false)} className="px-4 py-2 text-sm font-medium text-[var(--sf-text-secondary)] border border-[var(--sf-border)] rounded hover:bg-[#F3F3F3]">Cancel</button>
                     <button
@@ -1413,27 +1579,31 @@ export default function DataStreamsContent() {
                       Next
                     </button>
                   </>
-                ) : newModalStep === 2 ? (
-                  <>
-                    <button onClick={handleNewBack} className="px-4 py-2 text-sm font-medium text-[var(--sf-text-secondary)] border border-[var(--sf-border)] rounded hover:bg-[#F3F3F3]">Back</button>
-                    <button
-                      onClick={handleNewNext}
-                      disabled={selectedSource === 'informatica' && selectedBundles.size === 0}
-                      className="px-5 py-2 text-sm font-medium text-white bg-[var(--sf-blue)] rounded hover:bg-[var(--sf-blue-hover)] disabled:opacity-50 disabled:cursor-not-allowed"
-                    >
-                      Next
-                    </button>
-                  </>
-                ) : (
-                  <>
-                    <button onClick={handleNewBack} className="px-4 py-2 text-sm font-medium text-[var(--sf-text-secondary)] border border-[var(--sf-border)] rounded hover:bg-[#F3F3F3]">Back</button>
-                    <button
-                      onClick={handleCreateStreams}
-                      className="px-5 py-2 text-sm font-medium text-white bg-[var(--sf-blue)] rounded hover:bg-[var(--sf-blue-hover)]"
-                    >
-                      Create
-                    </button>
-                  </>
+                )}
+                {newModalStep === 2 && (
+                  <button
+                    onClick={handleNewNext}
+                    disabled={selectedSource === 'informatica' && selectedBundles.size === 0}
+                    className="px-5 py-2 text-sm font-medium text-white bg-[var(--sf-blue)] rounded hover:bg-[var(--sf-blue-hover)] disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    Next
+                  </button>
+                )}
+                {newModalStep === 3 && (
+                  <button
+                    onClick={handleNewNext}
+                    className="px-5 py-2 text-sm font-medium text-white bg-[var(--sf-blue)] rounded hover:bg-[var(--sf-blue-hover)]"
+                  >
+                    Next
+                  </button>
+                )}
+                {newModalStep === 4 && (
+                  <button
+                    onClick={handleCreateStreams}
+                    className="px-5 py-2 text-sm font-medium text-white bg-[var(--sf-blue)] rounded hover:bg-[var(--sf-blue-hover)]"
+                  >
+                    Deploy
+                  </button>
                 )}
               </div>
             </div>
