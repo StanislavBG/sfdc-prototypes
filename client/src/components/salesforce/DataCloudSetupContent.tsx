@@ -185,6 +185,10 @@ export default function DataCloudSetupContent({ onBack }: DataCloudSetupContentP
   const [loginPassword, setLoginPassword] = useState('');
   const [rememberMe, setRememberMe] = useState(true);
 
+  // Setup Home state
+  const [setupHomeLearnOpen, setSetupHomeLearnOpen] = useState(true);
+  const [setupHomeTab, setSetupHomeTab] = useState<'get-started' | 'plan-data' | 'monitor'>('get-started');
+
   // Solution Manager state
   const [smActiveSolution, setSmActiveSolution] = useState<string | null>(null);
   const [smActiveStep, setSmActiveStep] = useState(0);
@@ -593,60 +597,195 @@ export default function DataCloudSetupContent({ onBack }: DataCloudSetupContentP
         <main className="flex-1 overflow-y-auto bg-[var(--sf-content-bg)]">
           {activeNavItem === 'setup-home' ? (
             /* ═══════════════════════════════════════════════════════════
-               DATA CLOUD SETUP HOME — Landing page
+               DATA CLOUD SETUP HOME — Matches Salesforce reference layout
                ═══════════════════════════════════════════════════════════ */
-            <div className="p-6">
-              {/* Welcome banner */}
-              <div className="sf-card mb-6">
-                <div className="p-6 flex items-center gap-5">
-                  <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-[#032D60] to-[#0070D2] flex items-center justify-center flex-shrink-0">
-                    <Cloud className="w-7 h-7 text-white" />
+            <div>
+              {/* Page header — SETUP / Data Cloud Setup */}
+              <div className="bg-white border-b border-[var(--sf-border)] px-6 py-4 flex items-center justify-between">
+                <div className="flex items-center gap-4">
+                  <div className="w-10 h-10 rounded bg-[#F49756] flex items-center justify-center flex-shrink-0">
+                    <svg viewBox="0 0 24 24" className="w-5 h-5 text-white" fill="currentColor"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
                   </div>
-                  <div className="flex-1">
-                    <h1 className="text-xl font-bold text-[var(--sf-text-primary)]">Data Cloud Setup Home</h1>
-                    <p className="text-sm text-[var(--sf-text-tertiary)] mt-1">Configure connectors, manage data spaces, and set up your Data 360 environment.</p>
+                  <div>
+                    <div className="text-xs font-medium text-[var(--sf-blue)] uppercase tracking-wide">SETUP</div>
+                    <h1 className="text-lg font-bold text-[var(--sf-text-primary)]">Data Cloud Setup</h1>
                   </div>
+                </div>
+                <button className="px-4 py-1.5 text-sm font-medium text-white bg-[var(--sf-blue)] rounded hover:bg-[var(--sf-blue-hover)] flex items-center gap-1">
+                  Create <ChevronDown className="w-3.5 h-3.5" />
+                </button>
+              </div>
+
+              {/* Alert banner */}
+              <div className="bg-[#FFF3CD] border-b border-[#FFE69C] px-6 py-3 flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <Info className="w-4 h-4 text-[#856404] flex-shrink-0" />
+                  <p className="text-sm text-[#856404]">
+                    Data Cloud standard permission sets have changed. Some users must be assigned to new permission sets. Find out what's changed and what you should do next.
+                  </p>
+                </div>
+                <button className="text-sm font-medium text-[var(--sf-link)] hover:underline flex-shrink-0 ml-4">Learn More</button>
+              </div>
+
+              {/* Welcome to Data Cloud hero */}
+              <div className="relative bg-white border-b border-[var(--sf-border)] overflow-hidden">
+                <div className="px-6 py-8 max-w-3xl">
+                  <h2 className="text-3xl font-bold text-[var(--sf-text-primary)] mb-4">Welcome to Data Cloud</h2>
+                  <p className="text-sm text-[var(--sf-text-secondary)] leading-relaxed">
+                    Harness the power of Data Cloud to unify all your company's data into a holistic view of each customer. Data Cloud consolidates data from all your source systems into Customer 360 profiles to help you understand your customers, empower your teams, and drive business decisions. Use Data Cloud's unified profile data to drive automation and analytics, personalize engagements, and power trusted AI.
+                  </p>
+                </div>
+                {/* Mountain / sunset illustration */}
+                <div className="absolute right-0 top-0 bottom-0 w-[400px] pointer-events-none">
+                  <svg viewBox="0 0 400 180" className="w-full h-full" preserveAspectRatio="xMaxYMax slice">
+                    <defs>
+                      <linearGradient id="skyGrad" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="0%" stopColor="#87CEEB" />
+                        <stop offset="100%" stopColor="#E0F0FF" />
+                      </linearGradient>
+                      <linearGradient id="sunGrad" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="0%" stopColor="#FFD700" />
+                        <stop offset="100%" stopColor="#FF8C00" />
+                      </linearGradient>
+                    </defs>
+                    <rect width="400" height="180" fill="url(#skyGrad)" />
+                    <circle cx="320" cy="60" r="30" fill="url(#sunGrad)" opacity="0.6" />
+                    <path d="M0 180 L80 80 L120 120 L180 60 L240 110 L300 50 L400 130 L400 180 Z" fill="#2E844A" opacity="0.7" />
+                    <path d="M0 180 L60 120 L130 150 L200 90 L280 140 L350 100 L400 150 L400 180 Z" fill="#1B5E20" opacity="0.6" />
+                    <path d="M0 180 L100 150 L200 160 L300 140 L400 165 L400 180 Z" fill="#4A2800" opacity="0.5" />
+                  </svg>
                 </div>
               </div>
 
-              {/* Recommended Setup cards */}
-              <div className="mb-3">
-                <h2 className="text-sm font-bold text-[var(--sf-text-primary)] uppercase tracking-wider">Recommended Setup</h2>
-              </div>
-              <div className="grid grid-cols-3 gap-4">
-                {[
-                  { id: 'salesforce-crm', label: 'Salesforce CRM Connector', desc: 'Connect Salesforce CRM data to Data Cloud for unified profiles.', color: '#706E6B', icon: 'cloud' },
-                  { id: 'informatica-mdm-sf', label: 'Informatica MDM Connector', desc: 'Integrate Informatica MDM business entities into Data 360.', color: '#FF4A00', icon: 'cog', badge: 'New' },
-                  { id: 'solution-manager', label: 'Solution Manager', desc: 'Step-by-step guided setup for Informatica integration phases.', color: '#0070D2', icon: 'zap', badge: 'New' },
-                  { id: 'data-spaces', label: 'Data Spaces', desc: 'Manage data spaces and configure data isolation boundaries.', color: '#032D60', icon: 'grid' },
-                  { id: 'permission-sets', label: 'Permission Sets', desc: 'Assign and manage user permissions for Data Cloud features.', color: '#54698D', icon: 'settings' },
-                  { id: 'feature-manager', label: 'Feature Manager', desc: 'Enable and disable Data Cloud features for your org.', color: '#2E844A', icon: 'zap' },
-                ].map((card) => (
-                  <button
-                    key={card.id}
-                    onClick={() => setActiveNavItem(card.id)}
-                    className="sf-card text-left hover:shadow-md transition-shadow group relative"
-                  >
-                    {card.badge && (
-                      <div className={`absolute top-0 right-0 px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider text-white rounded-bl-lg rounded-tr-[7px] ${
-                        card.color === '#FF4A00' ? 'bg-[#FF4A00]' : 'bg-[#0070D2]'
-                      }`}>
-                        {card.badge}
+              {/* Learn About Data Cloud — collapsible */}
+              <div className="px-6 py-6">
+                <button
+                  onClick={() => setSetupHomeLearnOpen(!setupHomeLearnOpen)}
+                  className="flex items-center gap-2 mb-4"
+                >
+                  {setupHomeLearnOpen ? <ChevronDown className="w-5 h-5 text-[var(--sf-text-tertiary)]" /> : <ChevronRight className="w-5 h-5 text-[var(--sf-text-tertiary)]" />}
+                  <h3 className="text-base font-semibold text-[var(--sf-text-primary)]">Learn About Data Cloud</h3>
+                </button>
+
+                {setupHomeLearnOpen && (
+                  <div className="flex gap-6">
+                    {/* Left — tabs + content */}
+                    <div className="flex-1 min-w-0">
+                      {/* Tab bar */}
+                      <div className="flex border-b border-[var(--sf-border)] mb-5">
+                        {(['get-started', 'plan-data', 'monitor'] as const).map((tab) => {
+                          const labels = { 'get-started': 'Get Started', 'plan-data': 'Plan Data Strategy', monitor: 'Monitor Data Cloud' };
+                          return (
+                            <button
+                              key={tab}
+                              onClick={() => setSetupHomeTab(tab)}
+                              className={`px-4 py-2.5 text-sm font-medium border-b-2 transition-colors ${
+                                setupHomeTab === tab
+                                  ? 'border-[var(--sf-blue)] text-[var(--sf-blue)]'
+                                  : 'border-transparent text-[var(--sf-text-tertiary)] hover:text-[var(--sf-text-secondary)]'
+                              }`}
+                            >
+                              {labels[tab]}
+                            </button>
+                          );
+                        })}
                       </div>
-                    )}
-                    <div className="p-5">
-                      <div className="w-10 h-10 rounded-lg flex items-center justify-center mb-3" style={{ backgroundColor: card.color }}>
-                        {card.icon === 'cloud' && <Cloud className="w-5 h-5 text-white" />}
-                        {card.icon === 'cog' && <Cog className="w-5 h-5 text-white" />}
-                        {card.icon === 'zap' && <Zap className="w-5 h-5 text-white" />}
-                        {card.icon === 'grid' && <LayoutGrid className="w-5 h-5 text-white" />}
-                        {card.icon === 'settings' && <Settings className="w-5 h-5 text-white" />}
-                      </div>
-                      <h3 className="text-sm font-semibold text-[var(--sf-text-primary)] group-hover:text-[var(--sf-blue)] transition-colors">{card.label}</h3>
-                      <p className="text-xs text-[var(--sf-text-tertiary)] mt-1 leading-relaxed">{card.desc}</p>
+
+                      {/* Tab content */}
+                      {setupHomeTab === 'get-started' && (
+                        <div>
+                          <p className="text-sm text-[var(--sf-text-secondary)] leading-relaxed mb-2">
+                            Ensure that your org has all the necessary licenses to enable access to the features you need to use. Set up data spaces to organize and secure your data. Use permission sets to grant your users access to Data Cloud data and features.
+                          </p>
+                          <p className="text-sm text-[var(--sf-text-secondary)] leading-relaxed mb-6">
+                            Credits are consumed by usage of features and services. Use Digital Wallet to check your recent consumption and consumption trends.
+                          </p>
+
+                          <h4 className="text-sm font-bold text-[var(--sf-text-primary)] mb-3">Get Started</h4>
+                          <div className="border border-[var(--sf-border)] rounded-lg divide-y divide-[var(--sf-border)]">
+                            {[
+                              { label: 'Review or add licenses', action: 'Check Your Account', navId: '' },
+                              { label: 'Partition data with data spaces', action: 'Open Data Spaces Setup', navId: 'data-spaces' },
+                              { label: 'Set up Data Cloud users', action: 'Manage Your Users', navId: 'users' },
+                              { label: 'Check credit consumption', action: 'Open Digital Wallet', navId: '' },
+                            ].map((item, i) => (
+                              <div key={i} className="flex items-center justify-between px-4 py-3">
+                                <span className="text-sm text-[var(--sf-text-secondary)]">{item.label}</span>
+                                <button
+                                  onClick={() => item.navId && setActiveNavItem(item.navId)}
+                                  className="text-sm font-medium text-[var(--sf-link)] hover:underline"
+                                >
+                                  {item.action}
+                                </button>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+
+                      {setupHomeTab === 'plan-data' && (
+                        <div>
+                          <p className="text-sm text-[var(--sf-text-secondary)] leading-relaxed mb-4">
+                            Plan your data strategy by mapping your source systems, defining data models, and establishing data quality rules before connecting your data to Data Cloud.
+                          </p>
+                          <div className="border border-[var(--sf-border)] rounded-lg divide-y divide-[var(--sf-border)]">
+                            {[
+                              { label: 'Map source systems and data objects', action: 'View Data Model' },
+                              { label: 'Define identity resolution strategy', action: 'Identity Resolution' },
+                              { label: 'Set up calculated insights', action: 'Create Insights' },
+                            ].map((item, i) => (
+                              <div key={i} className="flex items-center justify-between px-4 py-3">
+                                <span className="text-sm text-[var(--sf-text-secondary)]">{item.label}</span>
+                                <button className="text-sm font-medium text-[var(--sf-link)] hover:underline">{item.action}</button>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+
+                      {setupHomeTab === 'monitor' && (
+                        <div>
+                          <p className="text-sm text-[var(--sf-text-secondary)] leading-relaxed mb-4">
+                            Monitor your Data Cloud usage, job statuses, and system health to ensure your data pipelines are running smoothly.
+                          </p>
+                          <div className="border border-[var(--sf-border)] rounded-lg divide-y divide-[var(--sf-border)]">
+                            {[
+                              { label: 'Check data stream health', action: 'View Data Streams' },
+                              { label: 'Monitor identity resolution jobs', action: 'View Jobs' },
+                              { label: 'Review error logs', action: 'View Logs' },
+                            ].map((item, i) => (
+                              <div key={i} className="flex items-center justify-between px-4 py-3">
+                                <span className="text-sm text-[var(--sf-text-secondary)]">{item.label}</span>
+                                <button className="text-sm font-medium text-[var(--sf-link)] hover:underline">{item.action}</button>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
                     </div>
-                  </button>
-                ))}
+
+                    {/* Right sidebar — Resources */}
+                    <div className="w-[260px] flex-shrink-0">
+                      <div className="border-l-2 border-[var(--sf-border)] pl-5">
+                        <h4 className="text-base font-semibold text-[var(--sf-text-primary)] mb-4">Resources</h4>
+                        <div className="space-y-3">
+                          {[
+                            { label: 'About Salesforce Data Cloud', icon: '📘' },
+                            { label: 'Unlock Your Data with Data Cloud', icon: '🔑' },
+                            { label: 'Plan Data Strategy', icon: '📋' },
+                            { label: 'Data Cloud Features and Learning Path', icon: '📚' },
+                            { label: 'Get Started Using Data Cloud', icon: '🚀' },
+                          ].map((res, i) => (
+                            <button key={i} className="flex items-center gap-2 text-sm text-[var(--sf-link)] hover:underline w-full text-left">
+                              <span className="text-base flex-shrink-0">{res.icon}</span>
+                              {res.label}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
           ) : activeNavItem === 'solution-manager' ? (
