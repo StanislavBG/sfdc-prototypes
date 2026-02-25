@@ -48,6 +48,28 @@ export const api = {
       path: '/api/help-documents/:id/reprocess' as const,
     },
   },
+  identityRulesets: {
+    list: {
+      method: 'GET' as const,
+      path: '/api/identity-rulesets' as const,
+    },
+    get: {
+      method: 'GET' as const,
+      path: '/api/identity-rulesets/:id' as const,
+    },
+    create: {
+      method: 'POST' as const,
+      path: '/api/identity-rulesets' as const,
+    },
+    update: {
+      method: 'PUT' as const,
+      path: '/api/identity-rulesets/:id' as const,
+    },
+    delete: {
+      method: 'DELETE' as const,
+      path: '/api/identity-rulesets/:id' as const,
+    },
+  },
 };
 
 export function buildUrl(path: string, params?: Record<string, string | number>): string {

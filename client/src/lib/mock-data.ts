@@ -85,7 +85,7 @@ export const appNavGroups: Record<string, NavGroup[]> = {
     {
       title: 'Knowledge',
       items: [
-        { label: 'Help Documents' },
+        { label: 'Context Manager' },
       ],
     },
   ],
@@ -130,7 +130,7 @@ export const appNavGroups: Record<string, NavGroup[]> = {
   admin: [
     {
       title: '',
-      items: [{ label: 'Help Documents' }],
+      items: [{ label: 'Context Manager' }],
     },
   ],
 };
