@@ -5,6 +5,7 @@ import AgentPanel from './AgentPanel';
 import HomeContent from './HomeContent';
 import HelpDocExplorer from './HelpDocExplorer';
 import IdentityResolutionContent from './IdentityResolutionContent';
+import DataCloudSetupContent from './DataCloudSetupContent';
 import WorkflowSidebar from './WorkflowSidebar';
 import WorkflowArea from './WorkflowArea';
 import TimeMachine from './TimeMachine';
@@ -23,6 +24,7 @@ export default function Layout({ children }: LayoutProps) {
   const [agentMinimized, setAgentMinimized] = useState(false);
   const [currentApp, setCurrentApp] = useState('data-cloud');
   const [appLauncherOpen, setAppLauncherOpen] = useState(false);
+  const [showDataCloudSetup, setShowDataCloudSetup] = useState(false);
 
   const isAdmin = currentTimeline === 'context-explorer';
   const effectiveApp = isAdmin ? 'admin' : currentApp;
@@ -35,19 +37,20 @@ export default function Layout({ children }: LayoutProps) {
 
   const handleSelectTimeline = (id: string) => {
     setCurrentTimeline(id);
+    setShowDataCloudSetup(false);
     if (id === 'context-explorer') {
-      setActiveTab('Help Documents');
-    } else if (id === 'today' && activeTab === 'Help Documents' && currentApp !== 'data-cloud') {
-      // Switching back from admin, reset to Home
+      setActiveTab('Context Manager');
+    } else if (id === 'today' && activeTab === 'Context Manager' && currentApp !== 'data-cloud') {
       setActiveTab('Home');
     }
   };
 
   const handleSelectApp = (appId: string) => {
     setCurrentApp(appId);
+    setShowDataCloudSetup(false);
     if (appId === 'admin') {
       setCurrentTimeline('context-explorer');
-      setActiveTab('Help Documents');
+      setActiveTab('Context Manager');
     } else {
       setCurrentTimeline('today');
       setActiveTab('Home');
@@ -56,6 +59,45 @@ export default function Layout({ children }: LayoutProps) {
 
   // Determine layout based on timeline
   const showTodayLayout = currentTimeline === 'today' || currentTimeline === 'context-explorer';
+
+  // Data Cloud Setup takes over the whole content area
+  if (showDataCloudSetup) {
+    return (
+      <div className="min-h-screen flex flex-col bg-[var(--sf-content-bg)]">
+        <Header
+          appName="Data Cloud Setup"
+          currentApp={effectiveApp}
+          currentTimeline={currentTimeline}
+          onOpenTimeMachine={() => setTimeMachineOpen(!timeMachineOpen)}
+          onSelectSearchResult={handleSelectSearchResult}
+          onSetup={() => {
+            setShowDataCloudSetup(false);
+            setCurrentTimeline('context-explorer');
+            setActiveTab('Context Manager');
+          }}
+          onOpenAppLauncher={() => setAppLauncherOpen(!appLauncherOpen)}
+          onOpenDataCloudSetup={() => {}}
+        />
+        <div className="flex flex-1 overflow-hidden">
+          <main className="flex-1 overflow-y-auto">
+            <DataCloudSetupContent onBack={() => setShowDataCloudSetup(false)} />
+          </main>
+        </div>
+        <TimeMachine
+          isOpen={timeMachineOpen}
+          onClose={() => setTimeMachineOpen(false)}
+          onSelectTimeline={(id) => { setShowDataCloudSetup(false); handleSelectTimeline(id); }}
+          currentTimeline={currentTimeline}
+        />
+        <AppLauncher
+          isOpen={appLauncherOpen}
+          onClose={() => setAppLauncherOpen(false)}
+          onSelectApp={handleSelectApp}
+          currentApp={effectiveApp}
+        />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen flex flex-col bg-[var(--sf-content-bg)]">
@@ -68,9 +110,10 @@ export default function Layout({ children }: LayoutProps) {
         onSelectSearchResult={handleSelectSearchResult}
         onSetup={() => {
           setCurrentTimeline('context-explorer');
-          setActiveTab('Help Documents');
+          setActiveTab('Context Manager');
         }}
         onOpenAppLauncher={() => setAppLauncherOpen(!appLauncherOpen)}
+        onOpenDataCloudSetup={() => setShowDataCloudSetup(true)}
       />
 
       {/* Body: conditionally render based on timeline */}
@@ -86,7 +129,7 @@ export default function Layout({ children }: LayoutProps) {
             {children || (
               activeTab === 'Home' ? (
                 <HomeContent />
-              ) : activeTab === 'Help Documents' ? (
+              ) : activeTab === 'Context Manager' ? (
                 <HelpDocExplorer />
               ) : activeTab === 'Identity Resolutions' ? (
                 <IdentityResolutionContent />

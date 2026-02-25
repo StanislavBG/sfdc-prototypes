@@ -301,5 +301,120 @@ export async function registerRoutes(
     }
   });
 
+  // =========================================================================
+  // Identity Resolution Rulesets
+  // =========================================================================
+
+  /** Ensure table exists */
+  try {
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS identity_rulesets (
+        id SERIAL PRIMARY KEY,
+        ruleset_id TEXT NOT NULL UNIQUE,
+        data TEXT NOT NULL,
+        created_at TIMESTAMP DEFAULT NOW(),
+        updated_at TIMESTAMP DEFAULT NOW()
+      )
+    `);
+  } catch (err) {
+    console.error("Failed to create identity_rulesets table:", err);
+  }
+
+  /** List all rulesets */
+  app.get(api.identityRulesets.list.path, async (_req, res) => {
+    try {
+      const result = await pool.query("SELECT * FROM identity_rulesets ORDER BY id");
+      const rulesets = result.rows.map((row: any) => ({
+        id: row.id,
+        rulesetId: row.ruleset_id,
+        ...JSON.parse(row.data),
+        createdAt: row.created_at,
+        updatedAt: row.updated_at,
+      }));
+      res.json(rulesets);
+    } catch (err) {
+      console.error("List identity rulesets error:", err);
+      res.json([]);
+    }
+  });
+
+  /** Get single ruleset */
+  app.get(api.identityRulesets.get.path, async (req, res) => {
+    try {
+      const result = await pool.query("SELECT * FROM identity_rulesets WHERE id = $1", [Number(req.params.id)]);
+      if (result.rows.length === 0) return res.status(404).json({ message: "Not found" });
+      const row = result.rows[0];
+      res.json({
+        id: row.id,
+        rulesetId: row.ruleset_id,
+        ...JSON.parse(row.data),
+        createdAt: row.created_at,
+        updatedAt: row.updated_at,
+      });
+    } catch (err: any) {
+      console.error("Get identity ruleset error:", err);
+      res.status(500).json({ message: err.message });
+    }
+  });
+
+  /** Create ruleset */
+  app.post(api.identityRulesets.create.path, async (req, res) => {
+    try {
+      const { rulesetId, ...rest } = req.body;
+      const data = JSON.stringify(rest);
+      const result = await pool.query(
+        "INSERT INTO identity_rulesets (ruleset_id, data) VALUES ($1, $2) RETURNING *",
+        [rulesetId, data]
+      );
+      const row = result.rows[0];
+      res.status(201).json({
+        id: row.id,
+        rulesetId: row.ruleset_id,
+        ...JSON.parse(row.data),
+        createdAt: row.created_at,
+        updatedAt: row.updated_at,
+      });
+    } catch (err: any) {
+      console.error("Create identity ruleset error:", err);
+      res.status(500).json({ message: err.message });
+    }
+  });
+
+  /** Update ruleset */
+  app.put(api.identityRulesets.update.path, async (req, res) => {
+    try {
+      const id = Number(req.params.id);
+      const { rulesetId, ...rest } = req.body;
+      const data = JSON.stringify(rest);
+      const result = await pool.query(
+        "UPDATE identity_rulesets SET data = $1, updated_at = NOW() WHERE id = $2 RETURNING *",
+        [data, id]
+      );
+      if (result.rows.length === 0) return res.status(404).json({ message: "Not found" });
+      const row = result.rows[0];
+      res.json({
+        id: row.id,
+        rulesetId: row.ruleset_id,
+        ...JSON.parse(row.data),
+        createdAt: row.created_at,
+        updatedAt: row.updated_at,
+      });
+    } catch (err: any) {
+      console.error("Update identity ruleset error:", err);
+      res.status(500).json({ message: err.message });
+    }
+  });
+
+  /** Delete ruleset */
+  app.delete(api.identityRulesets.delete.path, async (req, res) => {
+    try {
+      await pool.query("DELETE FROM identity_rulesets WHERE id = $1", [Number(req.params.id)]);
+      res.json({ deleted: true });
+    } catch (err: any) {
+      console.error("Delete identity ruleset error:", err);
+      res.status(500).json({ message: err.message });
+    }
+  });
+
   return httpServer;
 }
