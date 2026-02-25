@@ -17,6 +17,11 @@ import {
   Check,
   Pencil,
   Loader2,
+  Download,
+  Eye,
+  Camera,
+  Search,
+  RefreshCw,
 } from 'lucide-react';
 import {
   useIdentityRulesets,
@@ -95,6 +100,8 @@ interface IdentityRuleset {
   matchRules: MatchRule[];
   reconciliationGroups: ReconciliationGroup[];
   processingHistory: ProcessingHistoryEntry[];
+  isBYOM?: boolean; // "Bring Your Own MDM" mode — installed from datakit
+  byomSource?: string; // datakit source name e.g. "Informatica MDM"
 }
 
 // ── Data Model Objects / Fields for dropdowns ────────────────────────
@@ -319,6 +326,8 @@ function apiToLocal(d: IdentityRulesetData): IdentityRuleset {
     matchRules: d.matchRules ?? [],
     reconciliationGroups: d.reconciliationGroups ?? [],
     processingHistory: d.processingHistory ?? [],
+    isBYOM: d.description?.startsWith('Installed from ') || false,
+    byomSource: d.description?.startsWith('Installed from ') ? d.description.replace('Installed from ', '').replace(' datakit', '') : undefined,
   };
 }
 
@@ -409,6 +418,113 @@ export default function IdentityResolutionContent() {
   const [editReconUseDefault, setEditReconUseDefault] = useState(false);
   const [editReconRuleValue, setEditReconRuleValue] = useState('');
   const [editReconIgnoreEmpty, setEditReconIgnoreEmpty] = useState(false);
+
+  // BYOM detail view
+  const [byomDetailsOpen, setByomDetailsOpen] = useState(false);
+
+  // New Ruleset wizard
+  const [newRulesetOpen, setNewRulesetOpen] = useState(false);
+  const [newRulesetStep, setNewRulesetStep] = useState<1 | 2 | 3>(1);
+  const [newRulesetOption, setNewRulesetOption] = useState<'create' | 'datakit' | null>(null);
+  const [newRulesetName, setNewRulesetName] = useState('');
+  const [newRulesetPrimaryDMO, setNewRulesetPrimaryDMO] = useState('Individual');
+  const [newRulesetDataSpace, setNewRulesetDataSpace] = useState('default');
+  // Datakit selection state
+  const [datakitSearch, setDatakitSearch] = useState('');
+  const [selectedDatakit, setSelectedDatakit] = useState('Informatica MDM');
+  const [selectedDatakitRuleset, setSelectedDatakitRuleset] = useState<string | null>(null);
+
+  const datakitCategories = ['Knowledge Space', 'Billing Analytics', 'Informatica MDM', 'Agentforce Analytics', 'Pricing', 'Content Kit'];
+  const datakitRulesets: Record<string, { name: string; id: string; dataSpace: string; primaryDMO: string; realTime?: boolean }[]> = {
+    'Knowledge Space': [
+      { name: 'Customer Dedup', id: 'KS-001', dataSpace: 'default', primaryDMO: 'Individual' },
+    ],
+    'Billing Analytics': [
+      { name: 'Billing Account Match', id: 'BA-001', dataSpace: 'default', primaryDMO: 'Account' },
+    ],
+    'Informatica MDM': [
+      { name: 'Customer 360', id: 'INFA-C360', dataSpace: 'default', primaryDMO: 'Individual' },
+      { name: 'Customer 360', id: 'INFA-C360-RT', dataSpace: 'default', primaryDMO: 'Individual', realTime: true },
+      { name: 'Reference 360', id: 'INFA-R360', dataSpace: 'default', primaryDMO: 'Account' },
+      { name: 'Supplies 360', id: 'INFA-S360', dataSpace: 'default', primaryDMO: 'Account' },
+      { name: 'Reporter 360', id: 'INFA-RP360', dataSpace: 'default', primaryDMO: 'Individual' },
+      { name: 'Organization 360', id: 'INFA-O360', dataSpace: 'default', primaryDMO: 'Individual' },
+    ],
+    'Agentforce Analytics': [
+      { name: 'Agent Contact Resolution', id: 'AF-001', dataSpace: 'default', primaryDMO: 'Individual' },
+    ],
+    'Pricing': [],
+    'Content Kit': [],
+  };
+
+  const handleOpenNewRuleset = () => {
+    setNewRulesetStep(1);
+    setNewRulesetOption(null);
+    setNewRulesetName('');
+    setNewRulesetPrimaryDMO('Individual');
+    setNewRulesetDataSpace('default');
+    setDatakitSearch('');
+    setSelectedDatakit('Informatica MDM');
+    setSelectedDatakitRuleset(null);
+    setNewRulesetOpen(true);
+  };
+
+  const handleNewRulesetNext = () => {
+    if (newRulesetStep === 1 && newRulesetOption) {
+      setNewRulesetStep(2);
+    } else if (newRulesetStep === 2) {
+      if (newRulesetOption === 'create' && newRulesetName.trim()) {
+        setNewRulesetStep(3);
+      } else if (newRulesetOption === 'datakit' && selectedDatakitRuleset) {
+        // Populate name/DMO from selected datakit ruleset
+        const currentRulesets = datakitRulesets[selectedDatakit] || [];
+        const picked = currentRulesets.find((r) => r.id === selectedDatakitRuleset);
+        if (picked) {
+          setNewRulesetName(picked.name);
+          setNewRulesetPrimaryDMO(picked.primaryDMO);
+          setNewRulesetDataSpace(picked.dataSpace);
+        }
+        setNewRulesetStep(3);
+      }
+    }
+  };
+
+  const handleNewRulesetBack = () => {
+    if (newRulesetStep === 2) setNewRulesetStep(1);
+    else if (newRulesetStep === 3) setNewRulesetStep(2);
+  };
+
+  const handleNewRulesetSave = () => {
+    if (!newRulesetName.trim()) return;
+    const isFromDatakit = newRulesetOption === 'datakit';
+    const newRs: IdentityRuleset = {
+      id: `rs-new-${Date.now()}`,
+      rulesetName: newRulesetName,
+      rulesetId: isFromDatakit && selectedDatakitRuleset ? selectedDatakitRuleset : `IDR-${new Date().getFullYear()}-${String(rulesets.length + 1).padStart(3, '0')}`,
+      dataSpace: newRulesetDataSpace,
+      primaryDataModelObject: newRulesetPrimaryDMO,
+      secondaryDataModelObject: newRulesetPrimaryDMO,
+      rulesetStatus: 'Draft',
+      lastJobStatus: 'Not Run',
+      lastJobCompleted: '—',
+      description: isFromDatakit ? `Installed from ${selectedDatakit} datakit` : '',
+      createdBy: 'Data Cloud',
+      createdDate: new Date().toLocaleString(),
+      lastModifiedBy: 'Data Cloud',
+      isScheduled: false,
+      sourceProfiles: 0,
+      matchedSourceProfiles: 0,
+      totalUnifiedProfiles: 0,
+      consolidationRate: 0,
+      matchRules: [],
+      reconciliationGroups: [],
+      processingHistory: [],
+      isBYOM: isFromDatakit,
+      byomSource: isFromDatakit ? selectedDatakit : undefined,
+    };
+    createMutation.mutate(localToApi(newRs));
+    setNewRulesetOpen(false);
+  };
 
   // ── Match Rules handlers ────────────────────────────────────────
   const handleOpenEditMatchRules = () => {
@@ -579,7 +695,252 @@ export default function IdentityResolutionContent() {
   const advancedCriterion = editingRule?.criteria.find((c) => c.id === advancedCriterionId) || null;
 
   // ──────────────────────────────────────────────────────────────────
-  // DETAIL VIEW
+  // BYOM DETAIL VIEW — "Bring Your Own MDM" mode
+  // ──────────────────────────────────────────────────────────────────
+  if (selectedRuleset && selectedRuleset.isBYOM) {
+    return (
+      <div className="h-full flex flex-col">
+        {/* Breadcrumb */}
+        <div className="bg-white border-b border-[var(--sf-border)] px-6 py-2 flex items-center gap-2">
+          <button onClick={() => setSelectedRuleset(null)} className="flex items-center gap-1 text-xs text-[var(--sf-link)] hover:underline">
+            <ArrowLeft className="w-3.5 h-3.5" />
+            Identity Resolutions
+          </button>
+          <ChevronRight className="w-3 h-3 text-[var(--sf-text-tertiary)]" />
+          <span className="text-xs font-medium text-[var(--sf-text-primary)]">{selectedRuleset.rulesetName}</span>
+        </div>
+
+        {/* BYOM Header */}
+        <div className="bg-white border-b border-[var(--sf-border)] px-6 py-4">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-xs text-[var(--sf-text-tertiary)]">Identity Resolution</p>
+              <h1 className="text-xl font-bold text-[var(--sf-text-primary)] flex items-center gap-3">
+                <div className="w-9 h-9 rounded-full bg-[#032D60] flex items-center justify-center flex-shrink-0">
+                  <Fingerprint className="w-4.5 h-4.5 text-white" />
+                </div>
+                NTO Pro-North America
+              </h1>
+            </div>
+            <div className="flex items-center gap-2">
+              <button className="px-3 py-1.5 text-xs font-medium border border-[var(--sf-border)] rounded hover:bg-[#F3F3F3] text-[var(--sf-text-secondary)]">Open Page</button>
+              <button className="px-3 py-1.5 text-xs font-medium border border-[var(--sf-border)] rounded hover:bg-[#F3F3F3] text-[var(--sf-text-secondary)]">Publish...</button>
+              <button className="px-3 py-1.5 text-xs font-medium border border-[var(--sf-border)] rounded hover:bg-[#F3F3F3] text-[var(--sf-text-secondary)]">Edit Properties</button>
+              <button className="px-3 py-1.5 text-xs font-medium border border-[var(--sf-border)] rounded hover:bg-[#F3F3F3] text-[var(--sf-text-secondary)]">Clone</button>
+              <button className="w-7 h-7 flex items-center justify-center border border-[var(--sf-border)] rounded hover:bg-[#F3F3F3] text-[var(--sf-text-tertiary)]">
+                <ChevronDown className="w-3.5 h-3.5" />
+              </button>
+            </div>
+          </div>
+
+          {/* Info bar */}
+          <div className="flex items-center gap-8 mt-4">
+            <div>
+              <p className="text-[10px] uppercase tracking-wider text-[var(--sf-text-tertiary)]">Primary DMO</p>
+              <p className="text-sm font-medium text-[var(--sf-text-primary)]">{selectedRuleset.primaryDataModelObject}</p>
+            </div>
+            <div>
+              <p className="text-[10px] uppercase tracking-wider text-[var(--sf-text-tertiary)]">Ruleset ID</p>
+              <p className="text-sm font-medium text-[var(--sf-text-primary)]">{selectedRuleset.rulesetId}</p>
+            </div>
+            <div>
+              <p className="text-[10px] uppercase tracking-wider text-[var(--sf-text-tertiary)]">Data Space</p>
+              <p className="text-sm font-medium text-[var(--sf-text-primary)] capitalize">{selectedRuleset.dataSpace}</p>
+            </div>
+          </div>
+        </div>
+
+        {/* BYOM Content */}
+        <div className="flex-1 overflow-y-auto bg-[var(--sf-content-bg)]">
+          <div className="flex gap-4 p-6">
+            {/* Left column */}
+            <div className="flex-1 space-y-4">
+              {/* "Bring Your Own Identity" — Verification cards */}
+              <div className="sf-card">
+                <div className="sf-card-header">
+                  <h2 className="text-base font-bold text-[var(--sf-text-primary)]">&ldquo;Bring Your Own Identity&rdquo;</h2>
+                </div>
+                <div className="sf-card-body space-y-4">
+                  {/* Verify Unified Link DMO */}
+                  <div className="border border-[var(--sf-border)] rounded-lg p-4 flex items-start justify-between">
+                    <div>
+                      <h3 className="text-sm font-bold text-[var(--sf-text-primary)] mb-1">Verify Unified Link DMO</h3>
+                      <p className="text-xs text-[var(--sf-text-tertiary)] leading-relaxed">
+                        Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. To Data Explorer
+                      </p>
+                    </div>
+                    <button className="flex-shrink-0 ml-4 px-4 py-1.5 text-xs font-medium border border-[var(--sf-border)] rounded hover:bg-[#F3F3F3] text-[var(--sf-text-secondary)] flex items-center gap-1.5">
+                      <Eye className="w-3.5 h-3.5" />
+                      View
+                    </button>
+                  </div>
+
+                  {/* Verify Primary Unified DMO */}
+                  <div className="border border-[var(--sf-border)] rounded-lg p-4 flex items-start justify-between">
+                    <div>
+                      <h3 className="text-sm font-bold text-[var(--sf-text-primary)] mb-1">Verify Primary Unified DMO</h3>
+                      <p className="text-xs text-[var(--sf-text-tertiary)] leading-relaxed">
+                        Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+                      </p>
+                    </div>
+                    <button className="flex-shrink-0 ml-4 px-4 py-1.5 text-xs font-medium border border-[var(--sf-border)] rounded hover:bg-[#F3F3F3] text-[var(--sf-text-secondary)] flex items-center gap-1.5">
+                      <Eye className="w-3.5 h-3.5" />
+                      View
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              {/* "Bring Your Own Identity" — Mapping status */}
+              <div className="sf-card">
+                <div className="sf-card-header">
+                  <h2 className="text-base font-bold text-[var(--sf-text-primary)]">&ldquo;Bring Your Own Identity&rdquo;</h2>
+                </div>
+                <div className="sf-card-body">
+                  <div className="flex items-center justify-between mb-4">
+                    <div className="flex items-center gap-2">
+                      <CheckCircle2 className="w-5 h-5 text-[var(--sf-success)]" />
+                      <p className="text-sm text-[var(--sf-text-secondary)]">
+                        <span className="sf-link font-medium">Your Mapping</span> is complete. 3rd party rules active [CX change].
+                      </p>
+                    </div>
+                    <button className="px-4 py-1.5 text-xs font-medium border border-[var(--sf-border)] rounded hover:bg-[#F3F3F3] text-[var(--sf-text-secondary)]">
+                      Convert to Regular IR
+                    </button>
+                  </div>
+
+                  {/* Collapsible Details */}
+                  <div className="border-t border-[var(--sf-border)] pt-3">
+                    <button
+                      onClick={() => setByomDetailsOpen(!byomDetailsOpen)}
+                      className="flex items-center gap-1.5 text-sm font-medium text-[var(--sf-text-primary)] mb-3"
+                    >
+                      {byomDetailsOpen ? <ChevronDown className="w-4 h-4" /> : <ChevronRight className="w-4 h-4" />}
+                      Details
+                    </button>
+                    {byomDetailsOpen && (
+                      <div className="sf-detail-grid pl-5">
+                        <div className="sf-detail-field">
+                          <div className="sf-detail-label">Source</div>
+                          <div className="sf-detail-value">{selectedRuleset.byomSource || 'External MDM'}</div>
+                        </div>
+                        <div className="sf-detail-field">
+                          <div className="sf-detail-label">Mapping Type</div>
+                          <div className="sf-detail-value">Direct</div>
+                        </div>
+                        <div className="sf-detail-field">
+                          <div className="sf-detail-label">Unified Link DMO</div>
+                          <div className="sf-detail-value">ssot__UnifiedLink__dlm</div>
+                        </div>
+                        <div className="sf-detail-field">
+                          <div className="sf-detail-label">Primary Unified DMO</div>
+                          <div className="sf-detail-value">ssot__Individual__dlm</div>
+                        </div>
+                        <div className="sf-detail-field">
+                          <div className="sf-detail-label">Created Date</div>
+                          <div className="sf-detail-value">{selectedRuleset.createdDate}</div>
+                        </div>
+                        <div className="sf-detail-field">
+                          <div className="sf-detail-label">Last Modified</div>
+                          <div className="sf-detail-value">{selectedRuleset.createdDate}</div>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Right column */}
+            <div className="w-[320px] flex-shrink-0 space-y-4">
+              {/* Resolution Summary */}
+              <div className="sf-card">
+                <div className="px-4 py-3 border-b-2 border-[var(--sf-blue)]">
+                  <h3 className="text-sm font-semibold text-[var(--sf-blue)]">Resolution Summary</h3>
+                </div>
+                <div className="p-6 text-center">
+                  {/* Desert/cactus illustration placeholder */}
+                  <div className="mx-auto mb-4 w-32 h-24 flex items-center justify-center">
+                    <svg viewBox="0 0 128 96" className="w-full h-full text-[#B0C4DE]" fill="none" stroke="currentColor" strokeWidth="1.5">
+                      <circle cx="80" cy="30" r="18" strokeDasharray="4 3" />
+                      <circle cx="90" cy="25" r="10" strokeDasharray="3 2" />
+                      <path d="M20 80 Q35 20 40 40 Q42 50 44 40 Q48 20 50 80" />
+                      <path d="M30 55 Q20 50 25 45" />
+                      <path d="M44 50 Q54 45 50 40" />
+                      <line x1="5" y1="80" x2="125" y2="80" />
+                      <path d="M60 80 Q70 70 80 80" />
+                      <path d="M90 80 Q95 75 100 80" />
+                    </svg>
+                  </div>
+                  <p className="text-xs text-[var(--sf-text-tertiary)] leading-relaxed mb-4">
+                    Nothing here yet. If you enable, you can see summaries of your last run job to help you analyze further configurations etc.{' '}
+                    <span className="sf-link">Learn More</span>
+                  </p>
+                  <div className="flex items-center justify-center gap-3">
+                    <button className="px-4 py-1.5 text-xs font-medium border border-[var(--sf-border)] rounded hover:bg-[#F3F3F3] text-[var(--sf-text-secondary)]">
+                      Enable
+                    </button>
+                    <button className="w-7 h-7 flex items-center justify-center border border-[var(--sf-border)] rounded hover:bg-[#F3F3F3] text-[var(--sf-text-tertiary)]">
+                      <Camera className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              {/* Post / Poll / Question activity card */}
+              <div className="sf-card">
+                <div className="flex border-b border-[var(--sf-border)]">
+                  {['Post', 'Poll', 'Question'].map((tab) => (
+                    <button
+                      key={tab}
+                      className={`px-4 py-2.5 text-xs font-medium border-b-2 transition-colors ${
+                        tab === 'Post'
+                          ? 'border-[var(--sf-blue)] text-[var(--sf-blue)]'
+                          : 'border-transparent text-[var(--sf-text-tertiary)] hover:text-[var(--sf-text-secondary)]'
+                      }`}
+                    >
+                      {tab}
+                    </button>
+                  ))}
+                </div>
+                <div className="p-3">
+                  <div className="flex items-center gap-2">
+                    <input
+                      type="text"
+                      placeholder="Share an update..."
+                      className="flex-1 px-3 py-1.5 text-xs border border-[var(--sf-border)] rounded focus:outline-none focus:border-[var(--sf-blue-light)]"
+                    />
+                    <button className="px-3 py-1.5 text-xs font-medium text-white bg-[var(--sf-blue)] rounded hover:bg-[var(--sf-blue-hover)]">
+                      Share
+                    </button>
+                  </div>
+                </div>
+                <div className="px-3 pb-3 flex items-center justify-between">
+                  <button className="flex items-center gap-1 text-xs text-[var(--sf-text-tertiary)] hover:text-[var(--sf-text-secondary)]">
+                    <RefreshCw className="w-3 h-3" />
+                  </button>
+                  <div className="flex items-center gap-1.5">
+                    <Search className="w-3.5 h-3.5 text-[var(--sf-text-tertiary)]" />
+                    <input
+                      type="text"
+                      placeholder="Search..."
+                      className="w-28 px-2 py-1 text-xs border border-[var(--sf-border)] rounded focus:outline-none"
+                    />
+                    <button className="w-6 h-6 flex items-center justify-center rounded hover:bg-[#F3F3F3] text-[var(--sf-text-tertiary)]">
+                      <RefreshCw className="w-3 h-3" />
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // ──────────────────────────────────────────────────────────────────
+  // DETAIL VIEW (standard / non-BYOM)
   // ──────────────────────────────────────────────────────────────────
   if (selectedRuleset) {
     return (
@@ -1295,7 +1656,7 @@ export default function IdentityResolutionContent() {
           <h1 className="text-lg font-bold text-[var(--sf-text-primary)]">Identity Resolutions</h1>
           <p className="text-xs text-[var(--sf-text-tertiary)] mt-0.5">Manage rulesets that match and unify source profiles into unified profiles.</p>
         </div>
-        <button className="flex items-center gap-1.5 px-4 py-2 text-sm font-medium text-white bg-[var(--sf-blue)] rounded hover:bg-[var(--sf-blue-hover)] transition-colors">
+        <button onClick={handleOpenNewRuleset} className="flex items-center gap-1.5 px-4 py-2 text-sm font-medium text-white bg-[var(--sf-blue)] rounded hover:bg-[var(--sf-blue-hover)] transition-colors">
           <Plus className="w-4 h-4" /> New Ruleset
         </button>
       </div>
@@ -1340,6 +1701,287 @@ export default function IdentityResolutionContent() {
           </table>
         </div>
       </div>
+
+      {/* ═══════════════════════════════════════════════════════════
+          MODAL: New Ruleset Wizard (3 steps)
+         ═══════════════════════════════════════════════════════════ */}
+      {newRulesetOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center">
+          <div className="absolute inset-0 bg-black/40" onClick={() => setNewRulesetOpen(false)} />
+          <div className={`relative bg-white rounded-lg shadow-2xl max-h-[85vh] flex flex-col transition-all ${newRulesetStep === 2 && newRulesetOption === 'datakit' ? 'w-[860px]' : 'w-[640px]'}`}>
+            {/* Header */}
+            <div className="flex items-center justify-between px-6 py-4 border-b border-[var(--sf-border)]">
+              <div>
+                <h2 className="text-base font-semibold text-[var(--sf-text-primary)]">New Ruleset</h2>
+                <p className="text-xs text-[var(--sf-text-tertiary)] mt-0.5">
+                  {newRulesetStep === 1 ? 'Select an option to continue.' : newRulesetStep === 2 ? 'Configure your new ruleset.' : 'Review and confirm.'}
+                </p>
+              </div>
+              <button onClick={() => setNewRulesetOpen(false)} className="w-7 h-7 flex items-center justify-center rounded hover:bg-[#F3F3F3] text-[var(--sf-text-tertiary)]">
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            {/* Body */}
+            <div className="flex-1 overflow-y-auto px-6 py-6">
+              {newRulesetStep === 1 && (
+                <div className="grid grid-cols-2 gap-4">
+                  {([
+                    { key: 'create' as const, icon: Plus, label: 'Create New Ruleset', desc: 'Build a custom identity resolution ruleset from scratch.' },
+                    { key: 'datakit' as const, icon: Download, label: 'Install from Datakits', desc: 'Install a pre-built ruleset from available datakits.' },
+                  ]).map((opt) => {
+                    const selected = newRulesetOption === opt.key;
+                    return (
+                      <button
+                        key={opt.key}
+                        onClick={() => setNewRulesetOption(opt.key)}
+                        className={`relative flex flex-col items-center justify-center h-40 rounded-lg border-2 transition-all text-center px-4 ${
+                          selected
+                            ? 'border-[var(--sf-blue)] bg-white shadow-sm'
+                            : 'border-[#D8DDE6] bg-white hover:border-[#B0B0B0]'
+                        }`}
+                      >
+                        {selected && (
+                          <div className="absolute top-0 right-0 w-7 h-7 bg-[var(--sf-blue)] flex items-center justify-center" style={{ clipPath: 'polygon(0 0, 100% 0, 100% 100%)' }}>
+                            <Check className="w-3 h-3 text-white absolute top-0.5 right-0.5" />
+                          </div>
+                        )}
+                        <div className={`w-10 h-10 rounded-full flex items-center justify-center mb-3 ${selected ? 'bg-[#EEF4FF]' : 'bg-[#F3F3F3]'}`}>
+                          <opt.icon className={`w-5 h-5 ${selected ? 'text-[var(--sf-blue)]' : 'text-[var(--sf-text-tertiary)]'}`} />
+                        </div>
+                        <span className="text-sm font-medium text-[var(--sf-text-primary)]">{opt.label}</span>
+                        <span className="text-xs text-[var(--sf-text-tertiary)] mt-1">{opt.desc}</span>
+                      </button>
+                    );
+                  })}
+                </div>
+              )}
+
+              {newRulesetStep === 2 && newRulesetOption === 'create' && (
+                <div className="space-y-5">
+                  <div>
+                    <label className="block text-xs font-medium text-[var(--sf-text-tertiary)] uppercase tracking-wide mb-1">
+                      <span className="text-[var(--sf-error)]">*</span> Ruleset Name
+                    </label>
+                    <input
+                      type="text"
+                      value={newRulesetName}
+                      onChange={(e) => setNewRulesetName(e.target.value)}
+                      placeholder="e.g., Individual (Main)"
+                      className="w-full px-3 py-2 text-sm border border-[var(--sf-border)] rounded focus:outline-none focus:border-[var(--sf-blue-light)] focus:ring-2 focus:ring-[rgba(27,150,255,0.2)]"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-medium text-[var(--sf-text-tertiary)] uppercase tracking-wide mb-1">
+                      <span className="text-[var(--sf-error)]">*</span> Primary Data Model Object
+                    </label>
+                    <select
+                      value={newRulesetPrimaryDMO}
+                      onChange={(e) => setNewRulesetPrimaryDMO(e.target.value)}
+                      className="w-full px-3 py-2 text-sm border border-[var(--sf-border)] rounded bg-white focus:outline-none focus:border-[var(--sf-blue-light)] focus:ring-2 focus:ring-[rgba(27,150,255,0.2)]"
+                    >
+                      {dataModelObjects.map((dmo) => (
+                        <option key={dmo} value={dmo}>{dmo}</option>
+                      ))}
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-xs font-medium text-[var(--sf-text-tertiary)] uppercase tracking-wide mb-1">Data Space</label>
+                    <select
+                      value={newRulesetDataSpace}
+                      onChange={(e) => setNewRulesetDataSpace(e.target.value)}
+                      className="w-full px-3 py-2 text-sm border border-[var(--sf-border)] rounded bg-white focus:outline-none focus:border-[var(--sf-blue-light)] focus:ring-2 focus:ring-[rgba(27,150,255,0.2)]"
+                    >
+                      <option value="default">default</option>
+                    </select>
+                  </div>
+                </div>
+              )}
+
+              {newRulesetStep === 2 && newRulesetOption === 'datakit' && (
+                <div className="flex gap-0 -mx-6 -my-6 h-[420px]">
+                  {/* Left sidebar: datakit categories */}
+                  <div className="w-[220px] flex-shrink-0 border-r border-[var(--sf-border)] bg-[#FAFAF9] overflow-y-auto">
+                    <div className="px-3 py-3">
+                      <input
+                        type="text"
+                        value={datakitSearch}
+                        onChange={(e) => setDatakitSearch(e.target.value)}
+                        placeholder="Search datakits..."
+                        className="w-full px-2.5 py-1.5 text-xs border border-[var(--sf-border)] rounded focus:outline-none focus:border-[var(--sf-blue-light)]"
+                      />
+                    </div>
+                    <nav className="px-1 pb-3">
+                      {datakitCategories
+                        .filter((cat) => cat.toLowerCase().includes(datakitSearch.toLowerCase()))
+                        .map((cat) => {
+                          const isInformatica = cat === 'Informatica MDM';
+                          const isActive = selectedDatakit === cat;
+                          return (
+                            <button
+                              key={cat}
+                              onClick={() => { setSelectedDatakit(cat); setSelectedDatakitRuleset(null); }}
+                              className={`w-full text-left px-3 py-2 text-sm rounded-md mb-0.5 transition-colors ${
+                                isActive && isInformatica
+                                  ? 'bg-[#FFF3ED] text-[#FF4A00] font-semibold'
+                                  : isActive
+                                    ? 'bg-[#EEF4FF] text-[var(--sf-blue)] font-semibold'
+                                    : isInformatica
+                                      ? 'text-[#FF4A00] font-medium hover:bg-[#FFF8F5]'
+                                      : 'text-[var(--sf-text-secondary)] hover:bg-white'
+                              }`}
+                            >
+                              {cat}
+                              {isInformatica && !isActive && (
+                                <span className="ml-1.5 inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-bold bg-[#FF4A00] text-white">NEW</span>
+                              )}
+                            </button>
+                          );
+                        })}
+                    </nav>
+                  </div>
+
+                  {/* Right side: rulesets table */}
+                  <div className="flex-1 overflow-y-auto">
+                    <div className="px-4 py-3 border-b border-[var(--sf-border)]">
+                      <h3 className="text-sm font-semibold text-[var(--sf-text-primary)]">Datakit Selection</h3>
+                      <p className="text-xs text-[var(--sf-text-tertiary)] mt-0.5">{selectedDatakit} — select a ruleset to install</p>
+                    </div>
+                    {(datakitRulesets[selectedDatakit] || []).length === 0 ? (
+                      <div className="flex items-center justify-center h-48 text-sm text-[var(--sf-text-tertiary)]">
+                        No rulesets available for {selectedDatakit}.
+                      </div>
+                    ) : (
+                      <table className="sf-table">
+                        <thead>
+                          <tr>
+                            <th className="w-10"></th>
+                            <th>Ruleset Name</th>
+                            <th>Description</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {(datakitRulesets[selectedDatakit] || []).map((rs) => (
+                            <tr
+                              key={rs.id}
+                              className={`cursor-pointer ${selectedDatakitRuleset === rs.id ? 'bg-[#EEF4FF]' : 'hover:bg-[#FAFAF9]'}`}
+                              onClick={() => setSelectedDatakitRuleset(rs.id)}
+                            >
+                              <td>
+                                <input
+                                  type="radio"
+                                  name="datakit-ruleset"
+                                  checked={selectedDatakitRuleset === rs.id}
+                                  onChange={() => setSelectedDatakitRuleset(rs.id)}
+                                  className="w-4 h-4 accent-[var(--sf-blue)]"
+                                />
+                              </td>
+                              <td>
+                                <div className="flex items-center gap-2">
+                                  <span className="text-sm font-medium text-[var(--sf-text-primary)]">{rs.name}</span>
+                                  {rs.realTime && (
+                                    <span className="sf-badge sf-badge-info">Real Time</span>
+                                  )}
+                                </div>
+                              </td>
+                              <td className="text-sm text-[var(--sf-text-tertiary)]">
+                                {rs.primaryDMO} resolution — {rs.dataSpace} data space
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    )}
+                  </div>
+                </div>
+              )}
+
+              {newRulesetStep === 3 && (
+                <div className="space-y-4">
+                  <div className="flex items-start gap-3 p-4 bg-[#E1F5FE] rounded-lg">
+                    <Info className="w-5 h-5 text-[var(--sf-blue)] flex-shrink-0 mt-0.5" />
+                    <div className="text-sm text-[var(--sf-text-secondary)]">
+                      {newRulesetOption === 'datakit'
+                        ? <>Your ruleset will be created with defaults from <strong>{selectedDatakit}</strong>. Review and click <strong>Save</strong>.</>
+                        : <>Review the details below and click <strong>Save</strong> to create your new ruleset.</>
+                      }
+                    </div>
+                  </div>
+                  <div className="sf-card">
+                    <div className="sf-detail-grid">
+                      <div className="sf-detail-field"><div className="sf-detail-label">Ruleset Name</div><div className="sf-detail-value font-medium">{newRulesetName}</div></div>
+                      <div className="sf-detail-field"><div className="sf-detail-label">Primary DMO</div><div className="sf-detail-value">{newRulesetPrimaryDMO}</div></div>
+                      <div className="sf-detail-field"><div className="sf-detail-label">Data Space</div><div className="sf-detail-value">{newRulesetDataSpace}</div></div>
+                      <div className="sf-detail-field"><div className="sf-detail-label">Status</div><div className="sf-detail-value"><span className="sf-badge sf-badge-warning">Draft</span></div></div>
+                      {newRulesetOption === 'datakit' && (
+                        <>
+                          <div className="sf-detail-field"><div className="sf-detail-label">Source</div><div className="sf-detail-value">{selectedDatakit}</div></div>
+                          <div className="sf-detail-field"><div className="sf-detail-label">Mode</div><div className="sf-detail-value">Bring Your Own MDM</div></div>
+                          <div className="sf-detail-field"><div className="sf-detail-label">Ruleset ID</div><div className="sf-detail-value">{selectedDatakitRuleset}</div></div>
+                          <div className="sf-detail-field"><div className="sf-detail-label">Created By</div><div className="sf-detail-value">Data Cloud</div></div>
+                        </>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Footer with step indicator */}
+            <div className="flex items-center justify-between px-6 py-4 border-t border-[var(--sf-border)] bg-[#FAFAF9]">
+              <div className="flex items-center gap-2">
+                {[1, 2, 3].map((s) => (
+                  <div key={s} className="flex items-center gap-1.5">
+                    <div className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-medium ${
+                      s < newRulesetStep ? 'bg-[var(--sf-success)] text-white' :
+                      s === newRulesetStep ? 'bg-[var(--sf-blue)] text-white' :
+                      'bg-[#E5E5E5] text-[var(--sf-text-tertiary)]'
+                    }`}>
+                      {s < newRulesetStep ? <Check className="w-3 h-3" /> : s}
+                    </div>
+                    {s < 3 && <div className={`w-6 h-0.5 ${s < newRulesetStep ? 'bg-[var(--sf-success)]' : 'bg-[#E5E5E5]'}`} />}
+                  </div>
+                ))}
+              </div>
+              <div className="flex items-center gap-3">
+                {newRulesetStep === 1 ? (
+                  <>
+                    <button onClick={() => setNewRulesetOpen(false)} className="px-4 py-2 text-sm font-medium text-[var(--sf-text-secondary)] border border-[var(--sf-border)] rounded hover:bg-[#F3F3F3]">Cancel</button>
+                    <button
+                      onClick={handleNewRulesetNext}
+                      disabled={!newRulesetOption}
+                      className="px-5 py-2 text-sm font-medium text-white bg-[var(--sf-blue)] rounded hover:bg-[var(--sf-blue-hover)] disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      Next
+                    </button>
+                  </>
+                ) : newRulesetStep === 2 ? (
+                  <>
+                    <button onClick={handleNewRulesetBack} className="px-4 py-2 text-sm font-medium text-[var(--sf-text-secondary)] border border-[var(--sf-border)] rounded hover:bg-[#F3F3F3]">Back</button>
+                    <button
+                      onClick={handleNewRulesetNext}
+                      disabled={newRulesetOption === 'create' ? !newRulesetName.trim() : !selectedDatakitRuleset}
+                      className="px-5 py-2 text-sm font-medium text-white bg-[var(--sf-blue)] rounded hover:bg-[var(--sf-blue-hover)] disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      Next
+                    </button>
+                  </>
+                ) : (
+                  <>
+                    <button onClick={handleNewRulesetBack} className="px-4 py-2 text-sm font-medium text-[var(--sf-text-secondary)] border border-[var(--sf-border)] rounded hover:bg-[#F3F3F3]">Back</button>
+                    <button
+                      onClick={handleNewRulesetSave}
+                      className="px-5 py-2 text-sm font-medium text-white bg-[var(--sf-blue)] rounded hover:bg-[var(--sf-blue-hover)]"
+                    >
+                      Save
+                    </button>
+                  </>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
