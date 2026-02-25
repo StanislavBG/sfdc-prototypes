@@ -10,6 +10,7 @@ import {
   Check,
   Info,
   Zap,
+  Plus,
   ArrowLeft,
 } from 'lucide-react';
 
@@ -71,6 +72,7 @@ const setupNavSections: { title: string; items: SetupPage[] }[] = [
     items: [
       { id: 'data-cloud-one', label: 'Data Cloud One', section: '' },
       { id: 'salesforce-crm', label: 'Salesforce CRM', section: '' },
+      { id: 'informatica-mdm-sf', label: 'Informatica MDM', section: '' },
       { id: 'hierarchy-ingestion', label: 'Hierarchy Ingestion', section: '' },
       { id: 'data-360-org-allowlist', label: 'Data 360 Org Allowlist', section: '' },
       {
@@ -98,8 +100,8 @@ const setupNavSections: { title: string; items: SetupPage[] }[] = [
   },
 ];
 
-// ── Mock Data ────────────────────────────────────────────────────────
-const sfdcConnections: Connection[] = [
+// ── Initial Mock Data ─────────────────────────────────────────────────
+const initialSfdcConnections: Connection[] = [
   { id: 'conn-1', connectionName: 'Data Cloud SG', alias: 'Home', connectionStatus: 'Active', lastUpdated: 'Apr 30, 2025, 11:17 AM', orgId: '00Dfo000001QldR' },
 ];
 
@@ -109,7 +111,7 @@ const sfdcBundles: DataBundle[] = [
   { name: 'Service Cloud', installedVersion: '--', latestVersion: '7.0' },
 ];
 
-const informaticaConnections: Connection[] = [];
+const initialInformaticaConnections: Connection[] = [];
 
 const informaticaBundles: DataBundle[] = [
   { name: 'Informatica MDM Cloud', installedVersion: '--', latestVersion: '2.1' },
@@ -160,16 +162,20 @@ export default function DataCloudSetupContent({ onBack }: DataCloudSetupContentP
   const [quickFindQuery, setQuickFindQuery] = useState('');
   const [expandedNavItems, setExpandedNavItems] = useState<Set<string>>(new Set(['feature-manager']));
 
+  // Persisted connections state
+  const [sfdcConnections, setSfdcConnections] = useState<Connection[]>(initialSfdcConnections);
+  const [informaticaConnections, setInformaticaConnections] = useState<Connection[]>(initialInformaticaConnections);
+
   // Connect Org wizard
   const [connectOrgOpen, setConnectOrgOpen] = useState(false);
   const [wizardStep, setWizardStep] = useState<WizardStep>('select-type');
   const [selectedOrgType, setSelectedOrgType] = useState<'salesforce' | 'sandbox' | null>(null);
-  const [connectionAlias, setConnectionAlias] = useState('');
+  const [connectionAlias, setConnectionAlias] = useState('INFA_MDM_01');
   const [loginUsername, setLoginUsername] = useState('entity_resolution_demo@datacloud.com');
   const [loginPassword, setLoginPassword] = useState('');
   const [rememberMe, setRememberMe] = useState(true);
 
-  const isInformatica = activeNavItem === 'informatica-mdm';
+  const isInformatica = activeNavItem === 'informatica-mdm' || activeNavItem === 'informatica-mdm-sf';
 
   const toggleNavExpand = (id: string) => {
     setExpandedNavItems((prev) => {
@@ -183,7 +189,8 @@ export default function DataCloudSetupContent({ onBack }: DataCloudSetupContentP
   const handleOpenConnectOrg = () => {
     setWizardStep('select-type');
     setSelectedOrgType(null);
-    setConnectionAlias('');
+    setConnectionAlias(isInformatica ? 'INFA_MDM_01' : '');
+    setLoginUsername(isInformatica ? 'admin@informatica-mdm.com' : 'entity_resolution_demo@datacloud.com');
     setLoginPassword('');
     setConnectOrgOpen(true);
   };
@@ -205,6 +212,25 @@ export default function DataCloudSetupContent({ onBack }: DataCloudSetupContentP
   };
 
   const handleAllowAccess = () => {
+    // Create a new connection from wizard data
+    const newConnection: Connection = {
+      id: `conn-${Date.now()}`,
+      connectionName: isInformatica
+        ? `Informatica MDM ${selectedOrgType === 'sandbox' ? 'Sandbox' : 'Org'}`
+        : `Salesforce ${selectedOrgType === 'sandbox' ? 'Sandbox' : 'Org'}`,
+      alias: connectionAlias || (isInformatica ? 'INFA_MDM_01' : 'NewOrg'),
+      connectionStatus: 'Active',
+      lastUpdated: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric', hour: 'numeric', minute: '2-digit' }),
+      orgId: isInformatica
+        ? `INFA${Math.random().toString(36).substring(2, 12).toUpperCase()}`
+        : `00D${Math.random().toString(36).substring(2, 15)}`,
+    };
+
+    if (isInformatica) {
+      setInformaticaConnections((prev) => [...prev, newConnection]);
+    } else {
+      setSfdcConnections((prev) => [...prev, newConnection]);
+    }
     setConnectOrgOpen(false);
   };
 
@@ -219,7 +245,7 @@ export default function DataCloudSetupContent({ onBack }: DataCloudSetupContentP
       })).filter((s) => s.items.length > 0)
     : setupNavSections;
 
-  const currentPageLabel = activeNavItem === 'salesforce-crm' ? 'Salesforce CRM' : activeNavItem === 'informatica-mdm' ? 'Informatica MDM' : setupNavSections.flatMap((s) => s.items).find((i) => i.id === activeNavItem)?.label || 'Setup';
+  const currentPageLabel = activeNavItem === 'salesforce-crm' ? 'Salesforce CRM' : (activeNavItem === 'informatica-mdm' || activeNavItem === 'informatica-mdm-sf') ? 'Informatica MDM' : setupNavSections.flatMap((s) => s.items).find((i) => i.id === activeNavItem)?.label || 'Setup';
   const currentConnections = isInformatica ? informaticaConnections : sfdcConnections;
   const currentBundles = isInformatica ? informaticaBundles : sfdcBundles;
   const connectorName = isInformatica ? 'Informatica MDM' : 'Salesforce CRM';
@@ -273,7 +299,13 @@ export default function DataCloudSetupContent({ onBack }: DataCloudSetupContentP
                         else setActiveNavItem(item.id);
                       }}
                       className={`w-full flex items-center gap-1.5 px-4 py-1.5 text-xs text-left transition-colors ${
-                        activeNavItem === item.id ? 'bg-[#EEF4FF] text-[var(--sf-blue)] font-semibold' : 'text-[var(--sf-text-secondary)] hover:bg-[#F3F3F3]'
+                        activeNavItem === item.id
+                          ? (item.id === 'informatica-mdm-sf' || item.id === 'informatica-mdm'
+                              ? 'bg-[#FFF3ED] text-[#FF4A00] font-semibold'
+                              : 'bg-[#EEF4FF] text-[var(--sf-blue)] font-semibold')
+                          : (item.id === 'informatica-mdm-sf'
+                              ? 'text-[#FF4A00] font-medium hover:bg-[#FFF3ED]'
+                              : 'text-[var(--sf-text-secondary)] hover:bg-[#F3F3F3]')
                       }`}
                     >
                       {item.hasChildren && (
@@ -281,7 +313,10 @@ export default function DataCloudSetupContent({ onBack }: DataCloudSetupContentP
                           ? <ChevronDown className="w-3 h-3 flex-shrink-0" />
                           : <ChevronRight className="w-3 h-3 flex-shrink-0" />
                       )}
-                      <span className={activeNavItem === item.id ? 'sf-link' : ''}>{item.label}</span>
+                      <span className={activeNavItem === item.id ? (item.id === 'informatica-mdm-sf' || item.id === 'informatica-mdm' ? 'text-[#FF4A00]' : 'sf-link') : ''}>{item.label}</span>
+                      {item.id === 'informatica-mdm-sf' && (
+                        <span className="ml-auto px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wider bg-[#FF4A00] text-white rounded">New</span>
+                      )}
                     </button>
                     {item.hasChildren && expandedNavItems.has(item.id) && item.children?.map((child) => (
                       <button
@@ -303,12 +338,17 @@ export default function DataCloudSetupContent({ onBack }: DataCloudSetupContentP
 
         {/* ── Main Content ── */}
         <main className="flex-1 overflow-y-auto bg-[var(--sf-content-bg)]">
-          {(activeNavItem === 'salesforce-crm' || activeNavItem === 'informatica-mdm') ? (
+          {(activeNavItem === 'salesforce-crm' || activeNavItem === 'informatica-mdm' || activeNavItem === 'informatica-mdm-sf') ? (
             <div className="p-6">
               {/* Page header */}
-              <div className="sf-card mb-6">
+              <div className={`sf-card mb-6 relative ${isInformatica ? 'ring-2 ring-[#FF4A00]/50 border-[#FF4A00]/40' : ''}`}>
+                {isInformatica && (
+                  <div className="absolute top-0 right-0 px-2.5 py-0.5 bg-[#FF4A00] text-white text-[10px] font-bold uppercase tracking-wider rounded-bl-lg rounded-tr-[7px]">
+                    New to Salesforce
+                  </div>
+                )}
                 <div className="p-5 flex items-center gap-4">
-                  <div className="w-12 h-12 rounded-lg bg-[#706E6B] flex items-center justify-center flex-shrink-0">
+                  <div className={`w-12 h-12 rounded-lg flex items-center justify-center flex-shrink-0 ${isInformatica ? 'bg-[#FF4A00]' : 'bg-[#706E6B]'}`}>
                     <Settings className="w-6 h-6 text-white" />
                   </div>
                   <div className="flex-1">
@@ -317,7 +357,9 @@ export default function DataCloudSetupContent({ onBack }: DataCloudSetupContentP
                   </div>
                   <button
                     onClick={handleOpenConnectOrg}
-                    className="px-4 py-2 text-sm font-medium text-white bg-[var(--sf-blue)] rounded hover:bg-[var(--sf-blue-hover)] transition-colors"
+                    className={`px-4 py-2 text-sm font-medium text-white rounded transition-colors ${
+                      isInformatica ? 'bg-[#FF4A00] hover:bg-[#E54300]' : 'bg-[var(--sf-blue)] hover:bg-[var(--sf-blue-hover)]'
+                    }`}
                   >
                     New
                   </button>
@@ -325,7 +367,7 @@ export default function DataCloudSetupContent({ onBack }: DataCloudSetupContentP
               </div>
 
               {/* Standard Connections */}
-              <div className="sf-card mb-6">
+              <div className={`sf-card mb-6 ${isInformatica ? 'ring-2 ring-[#FF4A00]/50 border-[#FF4A00]/40' : ''}`}>
                 <div className="sf-card-header">
                   <div className="flex items-center gap-1.5">
                     <h2 className="text-sm font-semibold text-[var(--sf-text-primary)]">Standard Connections</h2>
@@ -333,8 +375,24 @@ export default function DataCloudSetupContent({ onBack }: DataCloudSetupContentP
                   </div>
                 </div>
                 {currentConnections.length === 0 ? (
-                  <div className="sf-card-body text-center py-8 text-sm text-[var(--sf-text-tertiary)]">
-                    No connections configured. Click "New" to add a connection.
+                  <div className="sf-card-body text-center py-12">
+                    <div className={`w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 ${isInformatica ? 'bg-[#FFF3ED]' : 'bg-[#F3F3F3]'}`}>
+                      <Zap className={`w-7 h-7 ${isInformatica ? 'text-[#FF4A00]' : 'text-[var(--sf-text-tertiary)]'}`} />
+                    </div>
+                    <p className="text-sm font-medium text-[var(--sf-text-primary)] mb-1">No connections configured</p>
+                    <p className="text-xs text-[var(--sf-text-tertiary)] mb-4">
+                      {isInformatica
+                        ? 'Connect your Informatica MDM instance to start syncing master data with Data Cloud.'
+                        : 'Click "New" to connect a Salesforce org.'}
+                    </p>
+                    <button
+                      onClick={handleOpenConnectOrg}
+                      className={`inline-flex items-center gap-1.5 px-4 py-2 text-sm font-medium text-white rounded transition-colors ${
+                        isInformatica ? 'bg-[#FF4A00] hover:bg-[#E54300]' : 'bg-[var(--sf-blue)] hover:bg-[var(--sf-blue-hover)]'
+                      }`}
+                    >
+                      <Plus className="w-4 h-4" /> Connect {isInformatica ? 'Informatica MDM' : 'an Org'}
+                    </button>
                   </div>
                 ) : (
                   <div className="overflow-x-auto">
@@ -373,7 +431,7 @@ export default function DataCloudSetupContent({ onBack }: DataCloudSetupContentP
               </div>
 
               {/* Standard Data Bundles */}
-              <div className="sf-card">
+              <div className={`sf-card ${isInformatica ? 'ring-2 ring-[#FF4A00]/50 border-[#FF4A00]/40' : ''}`}>
                 <div className="sf-card-header">
                   <div className="flex items-center gap-1.5">
                     <h2 className="text-sm font-semibold text-[var(--sf-text-primary)]">Standard Data Bundles</h2>
@@ -545,12 +603,12 @@ export default function DataCloudSetupContent({ onBack }: DataCloudSetupContentP
                 {wizardStep === 'select-type' ? (
                   <div className="space-y-6">
                     {/* Existing connection info */}
-                    {sfdcConnections.length > 0 && (
-                      <div className="flex items-center gap-3 p-4 bg-[#FAFAF9] rounded-lg">
-                        <CheckCircle2 className="w-6 h-6 text-[var(--sf-success)] flex-shrink-0" />
+                    {currentConnections.length > 0 && (
+                      <div className={`flex items-center gap-3 p-4 rounded-lg ${isInformatica ? 'bg-[#FFF8F5]' : 'bg-[#FAFAF9]'}`}>
+                        <CheckCircle2 className={`w-6 h-6 flex-shrink-0 ${isInformatica ? 'text-[#FF4A00]' : 'text-[var(--sf-success)]'}`} />
                         <div>
-                          <div className="text-sm font-semibold text-[var(--sf-text-primary)]">Data Cloud SG</div>
-                          <div className="text-xs text-[var(--sf-text-tertiary)]">Org ID: 00Dfo000001QldR</div>
+                          <div className="text-sm font-semibold text-[var(--sf-text-primary)]">{currentConnections[0].connectionName}</div>
+                          <div className="text-xs text-[var(--sf-text-tertiary)]">Org ID: {currentConnections[0].orgId}</div>
                         </div>
                       </div>
                     )}
