@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import {
   ArrowLeft,
   ChevronRight,
@@ -16,7 +16,14 @@ import {
   Fingerprint,
   Check,
   Pencil,
+  Loader2,
 } from 'lucide-react';
+import {
+  useIdentityRulesets,
+  useCreateIdentityRuleset,
+  useUpdateIdentityRuleset,
+  type IdentityRulesetData,
+} from '@/hooks/use-identity-rulesets';
 
 // ── Types ────────────────────────────────────────────────────────────
 
@@ -67,6 +74,7 @@ interface ProcessingHistoryEntry {
 
 interface IdentityRuleset {
   id: string;
+  _dbId?: number; // database primary key for API calls
   rulesetName: string;
   rulesetId: string;
   dataSpace: string;
@@ -286,11 +294,94 @@ const mockRulesets: IdentityRuleset[] = [
   },
 ];
 
+// ── Helper: convert API data to local IdentityRuleset ──────────────
+function apiToLocal(d: IdentityRulesetData): IdentityRuleset {
+  return {
+    id: String(d.id ?? ''),
+    _dbId: d.id,
+    rulesetName: d.rulesetName,
+    rulesetId: d.rulesetId,
+    dataSpace: d.dataSpace,
+    primaryDataModelObject: d.primaryDataModelObject,
+    secondaryDataModelObject: d.secondaryDataModelObject,
+    rulesetStatus: d.rulesetStatus as IdentityRuleset['rulesetStatus'],
+    lastJobStatus: d.lastJobStatus as IdentityRuleset['lastJobStatus'],
+    lastJobCompleted: d.lastJobCompleted,
+    description: d.description,
+    createdBy: d.createdBy,
+    createdDate: d.createdDate,
+    lastModifiedBy: d.lastModifiedBy,
+    isScheduled: d.isScheduled,
+    sourceProfiles: d.sourceProfiles,
+    matchedSourceProfiles: d.matchedSourceProfiles,
+    totalUnifiedProfiles: d.totalUnifiedProfiles,
+    consolidationRate: d.consolidationRate,
+    matchRules: d.matchRules ?? [],
+    reconciliationGroups: d.reconciliationGroups ?? [],
+    processingHistory: d.processingHistory ?? [],
+  };
+}
+
+function localToApi(rs: IdentityRuleset): IdentityRulesetData {
+  return {
+    rulesetId: rs.rulesetId,
+    rulesetName: rs.rulesetName,
+    dataSpace: rs.dataSpace,
+    primaryDataModelObject: rs.primaryDataModelObject,
+    secondaryDataModelObject: rs.secondaryDataModelObject,
+    rulesetStatus: rs.rulesetStatus,
+    lastJobStatus: rs.lastJobStatus,
+    lastJobCompleted: rs.lastJobCompleted,
+    description: rs.description,
+    createdBy: rs.createdBy,
+    createdDate: rs.createdDate,
+    lastModifiedBy: rs.lastModifiedBy,
+    isScheduled: rs.isScheduled,
+    sourceProfiles: rs.sourceProfiles,
+    matchedSourceProfiles: rs.matchedSourceProfiles,
+    totalUnifiedProfiles: rs.totalUnifiedProfiles,
+    consolidationRate: rs.consolidationRate,
+    matchRules: rs.matchRules,
+    reconciliationGroups: rs.reconciliationGroups,
+    processingHistory: rs.processingHistory,
+  };
+}
+
 // ── Component ────────────────────────────────────────────────────────
 export default function IdentityResolutionContent() {
+  // ── API hooks ─────────────────────────────────────────────────────
+  const { data: apiRulesets, isLoading, isError } = useIdentityRulesets();
+  const createMutation = useCreateIdentityRuleset();
+  const updateMutation = useUpdateIdentityRuleset();
+
+  // Auto-seed: when DB is empty, insert mock data once
+  const seeded = useRef(false);
+  useEffect(() => {
+    if (seeded.current || isLoading || isError) return;
+    if (apiRulesets && apiRulesets.length === 0) {
+      seeded.current = true;
+      mockRulesets.forEach((rs) => {
+        createMutation.mutate(localToApi(rs));
+      });
+    }
+  }, [apiRulesets, isLoading, isError]);
+
+  // Convert API data → local typed rulesets
+  const rulesets: IdentityRuleset[] = (apiRulesets ?? []).map(apiToLocal);
+
   // Navigation state
   const [selectedRuleset, setSelectedRuleset] = useState<IdentityRuleset | null>(null);
   const [detailTab, setDetailTab] = useState<'properties' | 'details' | 'history'>('details');
+
+  // Keep selectedRuleset in sync with API data after mutations
+  useEffect(() => {
+    if (selectedRuleset && rulesets.length > 0) {
+      const fresh = rulesets.find((r) => r._dbId === selectedRuleset._dbId);
+      if (fresh && JSON.stringify(fresh) !== JSON.stringify(selectedRuleset)) {
+        setSelectedRuleset(fresh);
+      }
+    }
+  }, [rulesets]);
 
   // Collapsible sections
   const [resolutionSummaryOpen, setResolutionSummaryOpen] = useState(true);
@@ -329,8 +420,13 @@ export default function IdentityResolutionContent() {
 
   const handleSaveMatchRules = () => {
     if (!selectedRuleset) return;
-    setSelectedRuleset({ ...selectedRuleset, matchRules: localMatchRules });
+    const updated = { ...selectedRuleset, matchRules: localMatchRules };
+    setSelectedRuleset(updated);
     setEditMatchRulesOpen(false);
+    // Persist to API
+    if (updated._dbId) {
+      updateMutation.mutate({ id: updated._dbId, data: localToApi(updated) });
+    }
   };
 
   const handleDeleteMatchRule = (ruleId: string) => {
@@ -438,10 +534,15 @@ export default function IdentityResolutionContent() {
           : f
       ),
     }));
-    setSelectedRuleset({ ...selectedRuleset, reconciliationGroups: updatedGroups });
+    const updated = { ...selectedRuleset, reconciliationGroups: updatedGroups };
+    setSelectedRuleset(updated);
     setEditReconRuleOpen(false);
     setEditingReconField(null);
     setSelectedReconFields(new Set());
+    // Persist to API
+    if (updated._dbId) {
+      updateMutation.mutate({ id: updated._dbId, data: localToApi(updated) });
+    }
   };
 
   const handleUpdateSelected = () => {
@@ -1178,6 +1279,15 @@ export default function IdentityResolutionContent() {
   // ──────────────────────────────────────────────────────────────────
   // LIST VIEW
   // ──────────────────────────────────────────────────────────────────
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <Loader2 className="w-6 h-6 animate-spin text-[var(--sf-blue)]" />
+        <span className="ml-2 text-sm text-[var(--sf-text-secondary)]">Loading rulesets...</span>
+      </div>
+    );
+  }
+
   return (
     <div className="p-6">
       <div className="flex items-center justify-between mb-4">
@@ -1192,7 +1302,7 @@ export default function IdentityResolutionContent() {
       <div className="sf-card">
         <div className="sf-card-header">
           <h2 className="text-sm font-semibold text-[var(--sf-text-primary)]">
-            All Identity Resolution Rulesets <span className="text-xs font-normal text-[var(--sf-text-tertiary)]">({mockRulesets.length})</span>
+            All Identity Resolution Rulesets <span className="text-xs font-normal text-[var(--sf-text-tertiary)]">({rulesets.length})</span>
           </h2>
         </div>
         <div className="overflow-x-auto">
@@ -1212,7 +1322,7 @@ export default function IdentityResolutionContent() {
               </tr>
             </thead>
             <tbody>
-              {mockRulesets.map((rs) => (
+              {rulesets.map((rs) => (
                 <tr key={rs.id}>
                   <td><button onClick={() => { setSelectedRuleset(rs); setDetailTab('details'); }} className="sf-link font-medium">{rs.rulesetName}</button></td>
                   <td>{rs.rulesetId}</td>
