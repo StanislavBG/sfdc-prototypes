@@ -5,6 +5,7 @@ import AgentPanel from './AgentPanel';
 import HomeContent from './HomeContent';
 import HelpDocExplorer from './HelpDocExplorer';
 import IdentityResolutionContent from './IdentityResolutionContent';
+import DataStreamsContent from './DataStreamsContent';
 import DataCloudSetupContent from './DataCloudSetupContent';
 import WorkflowSidebar from './WorkflowSidebar';
 import WorkflowArea from './WorkflowArea';
@@ -133,6 +134,8 @@ export default function Layout({ children }: LayoutProps) {
                 <HelpDocExplorer />
               ) : activeTab === 'Identity Resolutions' ? (
                 <IdentityResolutionContent />
+              ) : activeTab === 'Data Streams' ? (
+                <DataStreamsContent />
               ) : (
                 <div className="p-6">
                   <div className="sf-card">
