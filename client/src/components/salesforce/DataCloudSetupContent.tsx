@@ -19,6 +19,8 @@ import {
   Cloud,
   Cog,
   ArrowRight,
+  Eye,
+  EyeOff,
 } from 'lucide-react';
 
 // ── Types ────────────────────────────────────────────────────────────
@@ -189,6 +191,11 @@ export default function DataCloudSetupContent({ onBack }: DataCloudSetupContentP
   const [smStepProgress, setSmStepProgress] = useState<Record<string, Record<number, 'not-started' | 'in-progress' | 'completed'>>>({
     'Phase-1': {}, 'Phase-2-A': {}, 'Phase-2-B': {}, 'CH': {},
   });
+  // Interactive step state for Phase 1 rich controls
+  const [smFormPasswordVisible, setSmFormPasswordVisible] = useState<Record<string, boolean>>({});
+  const [smMultiselectState, setSmMultiselectState] = useState<Record<string, boolean>>({});
+  const [smRadioState, setSmRadioState] = useState<Record<string, number>>({});
+  const [smToggleState, setSmToggleState] = useState<Record<string, boolean>>({});
 
   const isInformatica = activeNavItem === 'informatica-mdm' || activeNavItem === 'informatica-mdm-sf';
 
@@ -266,32 +273,184 @@ export default function DataCloudSetupContent({ onBack }: DataCloudSetupContentP
     { id: 'Phase-2-A', badge: 'Phase 2', title: 'Integrate Business Entities from Informatica', description: 'Configure your Informatica connection and data integration settings. Interactive step-by-step guide with forms, entity selection, identity resolution, mappings, sync, and experience setup.' },
   ];
 
-  interface SmStep { title: string; headline: string; system?: 'D360' | 'Informatica'; description: string; actionLabel: string }
+  // ── Rich Step Types (matching reference repo Phase-2-A / Phase-2-B) ──
+  type SmStepBase = { title: string; headline: string };
+  type SmStepAction = SmStepBase & { type: 'action'; system?: 'D360' | 'Informatica'; description: string; actionLabel: string };
+  type SmStepForm = SmStepBase & { type: 'form'; fields: { name: string; inputType: string; placeholder: string; required: boolean }[] };
+  type SmStepMultiselect = SmStepBase & { type: 'multiselect'; groups: { name: string; options: string[] }[] };
+  type SmStepRadio = SmStepBase & { type: 'radio'; options: { label: string; description: string }[] };
+  type SmStepTableList = SmStepBase & { type: 'table-list'; tables: string[] };
+  type SmStepPreview = SmStepBase & { type: 'preview'; items: { name: string; description: string }[] };
+  type SmStepRulesList = SmStepBase & { type: 'rules-list'; rules: { name: string; description: string }[] };
+  type SmStepToggle = SmStepBase & { type: 'toggle'; description: string };
+  type SmStepSubsteps = SmStepBase & { type: 'substeps'; substeps: { name: string; link: string; description: string }[] };
+  type SmStepTextLinks = SmStepBase & { type: 'text-links'; description: string; links: { label: string; url: string }[] };
+  type SmStep = SmStepAction | SmStepForm | SmStepMultiselect | SmStepRadio | SmStepTableList | SmStepPreview | SmStepRulesList | SmStepToggle | SmStepSubsteps | SmStepTextLinks;
+
   const smSolutions: Record<string, { title: string; headline: string; steps: SmStep[] }> = {
     'Phase-1': {
       title: 'Integrate Business Entities [Phase 1]',
-      headline: 'Follow the steps below to configure your Informatica integration with Data 360',
+      headline: 'Configure your Informatica connection and data integration settings',
       steps: [
-        { title: 'Create Ingestion End-Point', headline: 'API Configuration', system: 'D360', description: 'Setup Ingestion-API end-point via D360-Setup.', actionLabel: 'Configure End-Point' },
-        { title: 'Create Schema', headline: 'Schema Registration', system: 'Informatica', description: 'Register business entities with predefined schema.', actionLabel: 'Define Schema' },
-        { title: 'Business Entity to Lake', headline: 'Extensibility Packages', system: 'Informatica', description: 'Install Informatica Extensibility Packages.', actionLabel: 'Install Packages' },
-        { title: 'Publish Data: Day 0 & 1', headline: 'Initial Load & Change Data Capture', system: 'Informatica', description: 'Day 0: Initial data load from Informatica to D360. Day 1: Enable CDC (Change Data Capture) feed for ongoing synchronization.', actionLabel: 'Configure Data Publishing' },
-        { title: 'BYO-MDM Definition', headline: 'Create BYO-MDM Ruleset from MDM-DataKit', system: 'D360', description: 'Define BYO-MDM ruleset configuration using MDM-DataKit.', actionLabel: 'Configure Ruleset' },
-        { title: 'Business Entity Mappings', headline: 'Create Business Entity to Unified DMO Mappings from DataKit', system: 'D360', description: 'Configure mappings between business entities and unified DMO using DataKit.', actionLabel: 'Configure Mappings' },
+        {
+          title: 'Connect to Informatica System',
+          headline: 'Establish connection with credentials',
+          type: 'form',
+          fields: [
+            { name: 'Connection Name', inputType: 'text', placeholder: 'Enter connection name', required: true },
+            { name: 'Tenant URL', inputType: 'text', placeholder: 'https://your-tenant.informatica.com', required: true },
+            { name: 'Username', inputType: 'text', placeholder: 'Enter username', required: true },
+            { name: 'Password', inputType: 'password', placeholder: 'Enter password', required: true },
+          ],
+        },
+        {
+          title: 'Choose Business Entity',
+          headline: 'Select entities to integrate',
+          type: 'multiselect',
+          groups: [
+            { name: 'Tenants', options: ['USA-1', 'Europe-1'] },
+            { name: 'Entities', options: ['Customer', 'Product', 'Supplier'] },
+          ],
+        },
+        {
+          title: 'Choose Identity Resolution',
+          headline: 'Select resolution method',
+          type: 'radio',
+          options: [
+            { label: 'Direct Mapping', description: 'Use direct field mapping for identity resolution. Best for clean, well-structured data with consistent identifiers.' },
+            { label: 'Golden Key-Ring', description: 'Use Golden Key-Ring approach for advanced identity resolution. Recommended for complex data with multiple source systems.' },
+          ],
+        },
+        {
+          title: 'Review Mappings',
+          headline: 'Validate data object mappings',
+          type: 'table-list',
+          tables: ['Customer_Base', 'Customer_Address', 'Customer_Contact', 'Product_Master', 'Product_Category', 'Product_Pricing', 'Supplier_Base', 'Supplier_Location', 'Order_Header', 'Order_Line', 'Payment_Info', 'Inventory_Stock'],
+        },
+        {
+          title: 'Validate Connected Data',
+          headline: 'Preview integrated data',
+          type: 'preview',
+          items: [
+            { name: 'Customer Data Preview', description: 'Preview customer records from Informatica' },
+            { name: 'Product Data Preview', description: 'Preview product catalog data' },
+            { name: 'Supplier Data Preview', description: 'Preview supplier information' },
+          ],
+        },
+        {
+          title: 'Set up Identity Rules',
+          headline: 'Configure match rules',
+          type: 'rules-list',
+          rules: [
+            { name: 'Fuzzy Name Match', description: 'Match records based on similar names' },
+            { name: 'Email Exact Match', description: 'Match records with identical email addresses' },
+            { name: 'Phone Number Match', description: 'Match records by phone number normalization' },
+            { name: 'Address Similarity', description: 'Match records by address components' },
+          ],
+        },
+        {
+          title: 'Enable Sync',
+          headline: 'Configure synchronization',
+          type: 'toggle',
+          description: 'Enable automatic synchronization with Informatica. When enabled, changes in your Informatica system will be automatically reflected in Data 360.',
+        },
+        {
+          title: 'Setup Experiences',
+          headline: 'Configure user experiences',
+          type: 'substeps',
+          substeps: [
+            { name: 'Search Before Create', link: 'https://trailhead.salesforce.com/sbc', description: 'Enable duplicate checking before record creation' },
+            { name: 'Copy Field Values', link: 'https://trailhead.salesforce.com/copy', description: 'Configure automatic field value population' },
+            { name: 'Add Related List', link: 'https://trailhead.salesforce.com/related', description: 'Display related records from Informatica' },
+          ],
+        },
       ],
     },
     'Phase-2-A': {
       title: 'Integrate Business Entities [Phase 2]',
-      headline: 'Configure your Informatica connection and data integration settings',
+      headline: 'Documentation and guidance for each integration step',
       steps: [
-        { title: 'Connect to Informatica System', headline: 'Establish connection with credentials', description: 'Configure Connection Name, Tenant URL, Username, and Password. Ensure API access is enabled.', actionLabel: 'Configure Connection' },
-        { title: 'Choose Business Entity', headline: 'Select entities to integrate', description: 'Select from available Tenants (USA-1, Europe-1) and Entities (Customer, Product, Supplier).', actionLabel: 'Select Entities' },
-        { title: 'Choose Identity Resolution', headline: 'Select resolution method', description: 'Choose between Direct Mapping (clean data) or Golden Key-Ring (complex multi-source data).', actionLabel: 'Configure Resolution' },
-        { title: 'Review Mappings', headline: 'Validate data object mappings', description: 'Review and validate mappings for Customer_Base, Customer_Address, Product_Master, and other data objects.', actionLabel: 'Review Mappings' },
-        { title: 'Validate Connected Data', headline: 'Preview integrated data', description: 'Preview Customer Data, Product Data, and Supplier Data to verify integration.', actionLabel: 'Validate Data' },
-        { title: 'Set up Identity Rules', headline: 'Configure match rules', description: 'Configure Fuzzy Name Match, Email Exact Match, Phone Number Match, and Address Similarity rules.', actionLabel: 'Configure Rules' },
-        { title: 'Enable Sync', headline: 'Configure synchronization', description: 'Enable automatic synchronization between Informatica and Data 360. Configure sync frequency and conflict resolution.', actionLabel: 'Enable Sync' },
-        { title: 'Setup Experiences', headline: 'Configure user experiences', description: 'Setup Search Before Create, Copy Field Values, and Add Related List experiences.', actionLabel: 'Setup Experiences' },
+        {
+          title: 'Connect to Informatica System',
+          headline: 'Establish connection with credentials',
+          type: 'text-links',
+          description: 'To connect to your Informatica system, you will need to provide a <strong>Connection Name</strong>, the <strong>Tenant URL</strong> (e.g. https://your-tenant.informatica.com), your <strong>Username</strong>, and <strong>Password</strong>. Ensure that your Informatica tenant has API access enabled and that the credentials have sufficient permissions for data integration operations.',
+          links: [
+            { label: 'Informatica Connection Setup Guide', url: 'https://docs.informatica.com/cloud-common-services/administrator/current-version/connection-configuration.html' },
+            { label: 'API Access Configuration', url: 'https://docs.informatica.com/cloud-common-services/administrator/current-version/api-access.html' },
+          ],
+        },
+        {
+          title: 'Choose Business Entity',
+          headline: 'Select entities to integrate',
+          type: 'text-links',
+          description: 'Select the business entities you want to integrate from Informatica into D360. Available <strong>Tenants</strong> include USA-1 and Europe-1. Available <strong>Entities</strong> include Customer, Product, and Supplier. Choose the tenants and entities that match your integration requirements.',
+          links: [
+            { label: 'Business Entity Overview', url: 'https://docs.informatica.com/master-data-management/multidomain-mdm/current-version/business-entity-services-guide.html' },
+            { label: 'Entity Selection Best Practices', url: 'https://docs.informatica.com/master-data-management/multidomain-mdm/current-version/best-practices.html' },
+          ],
+        },
+        {
+          title: 'Choose Identity Resolution',
+          headline: 'Select resolution method',
+          type: 'text-links',
+          description: 'Two identity resolution methods are available:<br/><br/><strong>Direct Mapping</strong> — Use direct field mapping for identity resolution. Best for clean, well-structured data with consistent identifiers.<br/><br/><strong>Golden Key-Ring</strong> — Use the Golden Key-Ring approach for advanced identity resolution. Recommended for complex data with multiple source systems.',
+          links: [
+            { label: 'Identity Resolution Methods', url: 'https://docs.informatica.com/data-quality-and-governance/data-as-a-service/current-version/identity-resolution.html' },
+            { label: 'Golden Key-Ring Documentation', url: 'https://docs.informatica.com/master-data-management/multidomain-mdm/current-version/match-merge.html' },
+          ],
+        },
+        {
+          title: 'Review Mappings',
+          headline: 'Validate data object mappings',
+          type: 'text-links',
+          description: 'Review and validate the mappings for the following data objects: <strong>Customer_Base</strong>, <strong>Customer_Address</strong>, <strong>Customer_Contact</strong>, <strong>Product_Master</strong>, <strong>Product_Category</strong>, <strong>Product_Pricing</strong>, <strong>Supplier_Base</strong>, <strong>Supplier_Location</strong>, <strong>Order_Header</strong>, <strong>Order_Line</strong>, <strong>Payment_Info</strong>, and <strong>Inventory_Stock</strong>. Ensure all field mappings are correctly aligned between Informatica and D360 before proceeding.',
+          links: [
+            { label: 'Data Object Mapping Guide', url: 'https://docs.informatica.com/cloud-common-services/data-integration/current-version/mappings.html' },
+            { label: 'Field Mapping Reference', url: 'https://docs.informatica.com/cloud-common-services/data-integration/current-version/field-mapping.html' },
+          ],
+        },
+        {
+          title: 'Validate Connected Data',
+          headline: 'Preview integrated data',
+          type: 'text-links',
+          description: 'After configuring mappings, validate the connected data by previewing records from each integrated entity. Verify <strong>Customer Data</strong> (customer records from Informatica), <strong>Product Data</strong> (product catalog data), and <strong>Supplier Data</strong> (supplier information). Confirm that records are correctly transformed and loaded before enabling synchronization.',
+          links: [
+            { label: 'Data Validation Guide', url: 'https://docs.informatica.com/cloud-common-services/data-integration/current-version/data-preview.html' },
+            { label: 'Troubleshooting Data Issues', url: 'https://docs.informatica.com/cloud-common-services/data-integration/current-version/troubleshooting.html' },
+          ],
+        },
+        {
+          title: 'Set up Identity Rules',
+          headline: 'Configure match rules',
+          type: 'text-links',
+          description: 'Configure identity match rules to define how records are matched across systems:<br/><br/><strong>Fuzzy Name Match</strong> — Match records based on similar names<br/><strong>Email Exact Match</strong> — Match records with identical email addresses<br/><strong>Phone Number Match</strong> — Match records by phone number normalization<br/><strong>Address Similarity</strong> — Match records by address components',
+          links: [
+            { label: 'Match Rule Configuration', url: 'https://docs.informatica.com/master-data-management/multidomain-mdm/current-version/match-rules.html' },
+            { label: 'Identity Rule Best Practices', url: 'https://docs.informatica.com/master-data-management/multidomain-mdm/current-version/identity-best-practices.html' },
+          ],
+        },
+        {
+          title: 'Enable Sync',
+          headline: 'Configure synchronization',
+          type: 'text-links',
+          description: 'Enable automatic synchronization between Informatica and Data 360. When sync is enabled, changes in your Informatica system will be automatically reflected in Data 360. Configure sync frequency, conflict resolution settings, and error handling policies to match your operational requirements.',
+          links: [
+            { label: 'Synchronization Setup Guide', url: 'https://docs.informatica.com/cloud-common-services/data-integration/current-version/synchronization.html' },
+            { label: 'D360 Setup Documentation', url: 'https://help.salesforce.com/s/articleView?id=sf.data360_setup.htm' },
+          ],
+        },
+        {
+          title: 'Setup Experiences',
+          headline: 'Configure user experiences',
+          type: 'text-links',
+          description: 'Configure the end-user experiences for working with integrated data in D360:<br/><br/><strong>Search Before Create</strong> — Enable duplicate checking before record creation<br/><strong>Copy Field Values</strong> — Configure automatic field value population<br/><strong>Add Related List</strong> — Display related records from Informatica',
+          links: [
+            { label: 'Search Before Create', url: 'https://trailhead.salesforce.com/sbc' },
+            { label: 'Copy Field Values', url: 'https://trailhead.salesforce.com/copy' },
+            { label: 'Add Related List', url: 'https://trailhead.salesforce.com/related' },
+          ],
+        },
       ],
     },
   };
@@ -523,6 +682,225 @@ export default function DataCloudSetupContent({ onBack }: DataCloudSetupContentP
                             const step = sol.steps[smActiveStep];
                             if (!step) return null;
                             const status = prog[smActiveStep] || 'not-started';
+
+                            // ── Step body renderer based on type ──
+                            const renderStepBody = () => {
+                              switch (step.type) {
+                                case 'action':
+                                  return (
+                                    <>
+                                      <p className="text-sm text-[var(--sf-text-secondary)] mb-5 leading-relaxed">{step.description}</p>
+                                      {status !== 'completed' && (
+                                        <button onClick={smHandleCompleteStep} className="px-4 py-2 text-sm font-medium text-white bg-[#0070D2] rounded hover:bg-[#005FB2] transition-colors">
+                                          {step.actionLabel}
+                                        </button>
+                                      )}
+                                    </>
+                                  );
+
+                                case 'form':
+                                  return (
+                                    <div className="space-y-4">
+                                      {step.fields.map((field, fi) => (
+                                        <div key={fi}>
+                                          <label className="block text-sm font-medium text-[var(--sf-text-primary)] mb-1">
+                                            {field.name} {field.required && <span className="text-[var(--sf-error)]">*</span>}
+                                          </label>
+                                          <div className="relative">
+                                            <input
+                                              type={field.inputType === 'password' ? (smFormPasswordVisible[`${smActiveSolution}-${smActiveStep}-${fi}`] ? 'text' : 'password') : field.inputType}
+                                              placeholder={field.placeholder}
+                                              className="w-full px-3 py-2 text-sm border border-[var(--sf-border)] rounded focus:outline-none focus:border-[var(--sf-blue-light)] focus:ring-1 focus:ring-[rgba(27,150,255,0.2)]"
+                                            />
+                                            {field.inputType === 'password' && (
+                                              <button
+                                                type="button"
+                                                onClick={() => setSmFormPasswordVisible(prev => ({ ...prev, [`${smActiveSolution}-${smActiveStep}-${fi}`]: !prev[`${smActiveSolution}-${smActiveStep}-${fi}`] }))}
+                                                className="absolute right-2.5 top-1/2 -translate-y-1/2 text-[var(--sf-text-tertiary)] hover:text-[var(--sf-text-primary)]"
+                                              >
+                                                {smFormPasswordVisible[`${smActiveSolution}-${smActiveStep}-${fi}`] ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                                              </button>
+                                            )}
+                                          </div>
+                                        </div>
+                                      ))}
+                                      {status !== 'completed' && (
+                                        <button onClick={smHandleCompleteStep} className="px-4 py-2 text-sm font-medium text-white bg-[#0070D2] rounded hover:bg-[#005FB2] transition-colors mt-2">
+                                          Validate Connection
+                                        </button>
+                                      )}
+                                    </div>
+                                  );
+
+                                case 'multiselect':
+                                  return (
+                                    <div className="space-y-5">
+                                      {step.groups.map((group, gi) => (
+                                        <div key={gi}>
+                                          <div className="text-sm font-semibold text-[var(--sf-text-primary)] mb-2">{group.name}</div>
+                                          <div className="flex flex-wrap gap-2">
+                                            {group.options.map((option, oi) => {
+                                              const key = `${smActiveSolution}-${smActiveStep}-${gi}-${oi}`;
+                                              const selected = smMultiselectState[key] || false;
+                                              return (
+                                                <button
+                                                  key={oi}
+                                                  onClick={() => setSmMultiselectState(prev => ({ ...prev, [key]: !prev[key] }))}
+                                                  className={`px-3 py-2 text-sm rounded border transition-colors ${
+                                                    selected
+                                                      ? 'bg-[#EEF4FF] border-[#0070D2] text-[#0070D2] font-medium'
+                                                      : 'bg-white border-[var(--sf-border)] text-[var(--sf-text-secondary)] hover:border-[#0070D2]'
+                                                  }`}
+                                                >
+                                                  {selected && <Check className="w-3 h-3 inline mr-1.5" />}
+                                                  {option}
+                                                </button>
+                                              );
+                                            })}
+                                          </div>
+                                        </div>
+                                      ))}
+                                    </div>
+                                  );
+
+                                case 'radio':
+                                  return (
+                                    <div className="space-y-3">
+                                      {step.options.map((option, oi) => {
+                                        const key = `${smActiveSolution}-${smActiveStep}`;
+                                        const selected = (smRadioState[key] ?? 0) === oi;
+                                        return (
+                                          <button
+                                            key={oi}
+                                            onClick={() => setSmRadioState(prev => ({ ...prev, [key]: oi }))}
+                                            className={`w-full text-left p-4 rounded-lg border-2 transition-all ${
+                                              selected
+                                                ? 'border-[#0070D2] bg-[#EEF4FF]'
+                                                : 'border-[var(--sf-border)] bg-white hover:border-[#B0B0B0]'
+                                            }`}
+                                          >
+                                            <div className="flex items-start gap-3">
+                                              <div className={`w-4 h-4 rounded-full border-2 flex-shrink-0 mt-0.5 flex items-center justify-center ${
+                                                selected ? 'border-[#0070D2]' : 'border-[#DDDBDA]'
+                                              }`}>
+                                                {selected && <div className="w-2 h-2 rounded-full bg-[#0070D2]" />}
+                                              </div>
+                                              <div>
+                                                <div className="text-sm font-semibold text-[var(--sf-text-primary)]">{option.label}</div>
+                                                <p className="text-xs text-[var(--sf-text-secondary)] mt-1 leading-relaxed">{option.description}</p>
+                                              </div>
+                                            </div>
+                                          </button>
+                                        );
+                                      })}
+                                    </div>
+                                  );
+
+                                case 'table-list':
+                                  return (
+                                    <div className="space-y-2">
+                                      {step.tables.map((table, ti) => (
+                                        <div key={ti} className="flex items-center justify-between p-3 bg-[#FAFAF9] border border-[var(--sf-border)] rounded">
+                                          <span className="text-sm font-mono text-[var(--sf-text-primary)]">{table}</span>
+                                          <button className="px-3 py-1.5 text-xs font-medium text-[var(--sf-link)] border border-[var(--sf-border)] rounded hover:bg-white transition-colors">
+                                            Review Mappings & Create Fields
+                                          </button>
+                                        </div>
+                                      ))}
+                                    </div>
+                                  );
+
+                                case 'preview':
+                                  return (
+                                    <div className="space-y-4">
+                                      {step.items.map((item, pi) => (
+                                        <div key={pi}>
+                                          <p className="text-sm text-[var(--sf-text-secondary)] mb-2">{item.description}</p>
+                                          <button className="px-3 py-1.5 text-xs font-medium text-[var(--sf-link)] border border-[var(--sf-border)] rounded hover:bg-[#F3F3F3] transition-colors">
+                                            {item.name} &rarr;
+                                          </button>
+                                        </div>
+                                      ))}
+                                    </div>
+                                  );
+
+                                case 'rules-list':
+                                  return (
+                                    <div className="space-y-2">
+                                      {step.rules.map((rule, ri) => (
+                                        <div key={ri} className="flex items-center justify-between p-3 bg-[#FAFAF9] border border-[var(--sf-border)] rounded">
+                                          <div>
+                                            <div className="text-sm font-medium text-[var(--sf-text-primary)]">{rule.name}</div>
+                                            <p className="text-xs text-[var(--sf-text-tertiary)] mt-0.5">{rule.description}</p>
+                                          </div>
+                                          <button className="px-3 py-1.5 text-xs font-medium text-[var(--sf-link)] border border-[var(--sf-border)] rounded hover:bg-white transition-colors flex-shrink-0 ml-4">
+                                            Configure
+                                          </button>
+                                        </div>
+                                      ))}
+                                    </div>
+                                  );
+
+                                case 'toggle': {
+                                  const toggleKey = `${smActiveSolution}-${smActiveStep}`;
+                                  const isOn = smToggleState[toggleKey] || false;
+                                  return (
+                                    <>
+                                      <p className="text-sm text-[var(--sf-text-secondary)] mb-5 leading-relaxed">{step.description}</p>
+                                      <div className="flex items-center gap-3 mb-4">
+                                        <button
+                                          onClick={() => setSmToggleState(prev => ({ ...prev, [toggleKey]: !prev[toggleKey] }))}
+                                          className={`relative w-12 h-6 rounded-full transition-colors ${isOn ? 'bg-[#0070D2]' : 'bg-[#DDDBDA]'}`}
+                                        >
+                                          <div className={`absolute top-0.5 w-5 h-5 rounded-full bg-white shadow transition-transform ${isOn ? 'left-[26px]' : 'left-0.5'}`} />
+                                        </button>
+                                        <span className="text-sm font-medium text-[var(--sf-text-primary)]">
+                                          {isOn ? 'Sync Enabled' : 'Sync Disabled'}
+                                        </span>
+                                      </div>
+                                    </>
+                                  );
+                                }
+
+                                case 'substeps':
+                                  return (
+                                    <div className="space-y-2">
+                                      {step.substeps.map((substep, si) => (
+                                        <div key={si} className="flex items-center justify-between p-3 bg-[#FAFAF9] border border-[var(--sf-border)] rounded">
+                                          <div>
+                                            <div className="text-sm font-medium text-[var(--sf-text-primary)]">{substep.name}</div>
+                                            <p className="text-xs text-[var(--sf-text-tertiary)] mt-0.5">{substep.description}</p>
+                                          </div>
+                                          <a href={substep.link} target="_blank" rel="noopener noreferrer" className="text-xs font-medium text-[var(--sf-link)] hover:underline flex-shrink-0 ml-4 flex items-center gap-1">
+                                            View Trailhead <ExternalLink className="w-3 h-3" />
+                                          </a>
+                                        </div>
+                                      ))}
+                                    </div>
+                                  );
+
+                                case 'text-links':
+                                  return (
+                                    <>
+                                      <div className="text-sm text-[var(--sf-text-secondary)] leading-relaxed mb-5" dangerouslySetInnerHTML={{ __html: step.description }} />
+                                      {step.links.length > 0 && (
+                                        <div className="space-y-2">
+                                          {step.links.map((link, li) => (
+                                            <a key={li} href={link.url} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-sm text-[var(--sf-link)] hover:underline">
+                                              <ExternalLink className="w-3.5 h-3.5 flex-shrink-0" />
+                                              {link.label}
+                                            </a>
+                                          ))}
+                                        </div>
+                                      )}
+                                    </>
+                                  );
+
+                                default:
+                                  return null;
+                              }
+                            };
+
                             return (
                               <div className={`sf-card mb-4 ${status === 'completed' ? 'ring-2 ring-[#2E844A]/30' : ''}`}>
                                 <div className="sf-card-header">
@@ -537,29 +915,21 @@ export default function DataCloudSetupContent({ onBack }: DataCloudSetupContentP
                                       <h3 className="text-sm font-semibold text-[var(--sf-text-primary)]">{step.title}</h3>
                                       <p className="text-xs text-[var(--sf-text-tertiary)]">{step.headline}</p>
                                     </div>
-                                    {step.system && (
+                                    {step.type === 'action' && step.system && (
                                       <span className={`ml-auto px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider rounded ${
                                         step.system === 'D360'
                                           ? 'bg-[#EEF4FF] text-[#0070D2]'
                                           : 'bg-[#FFF3ED] text-[#D95800]'
                                       }`}>
-                                        {step.system === 'D360' ? '☁ ' : '⚙ '}{step.system}
+                                        {step.system === 'D360' ? '\u2601 ' : '\u2699 '}{step.system}
                                       </span>
                                     )}
                                   </div>
                                 </div>
                                 <div className="sf-card-body">
-                                  <p className="text-sm text-[var(--sf-text-secondary)] mb-5 leading-relaxed">{step.description}</p>
-                                  {status !== 'completed' && (
-                                    <button
-                                      onClick={smHandleCompleteStep}
-                                      className="px-4 py-2 text-sm font-medium text-white bg-[#0070D2] rounded hover:bg-[#005FB2] transition-colors"
-                                    >
-                                      {step.actionLabel}
-                                    </button>
-                                  )}
+                                  {renderStepBody()}
                                   {status === 'completed' && (
-                                    <div className="flex items-center gap-2 text-sm text-[#2E844A] font-medium">
+                                    <div className="flex items-center gap-2 text-sm text-[#2E844A] font-medium mt-4">
                                       <CheckCircle2 className="w-4 h-4" />
                                       Step completed
                                     </div>
@@ -581,22 +951,22 @@ export default function DataCloudSetupContent({ onBack }: DataCloudSetupContentP
                                         onClick={() => smHandleStepClick(smActiveStep - 1)}
                                         className="px-3 py-1.5 text-xs font-medium text-[var(--sf-text-secondary)] border border-[var(--sf-border)] rounded hover:bg-[#F3F3F3]"
                                       >
-                                        Previous
+                                        &larr; Previous
                                       </button>
                                     )}
                                     {smActiveStep < sol.steps.length - 1 ? (
                                       <button
-                                        onClick={() => { smHandleCompleteStep(); }}
+                                        onClick={smHandleCompleteStep}
                                         className="px-3 py-1.5 text-xs font-medium text-white bg-[#0070D2] rounded hover:bg-[#005FB2]"
                                       >
-                                        Next Step
+                                        Next Step &rarr;
                                       </button>
                                     ) : (
                                       <button
                                         onClick={smHandleCompleteStep}
                                         className="px-3 py-1.5 text-xs font-medium text-white bg-[#2E844A] rounded hover:bg-[#256B3B]"
                                       >
-                                        Complete
+                                        Complete &#10003;
                                       </button>
                                     )}
                                   </div>
