@@ -3,13 +3,18 @@ import {
   Plus,
   Search,
   ChevronDown,
+  ChevronRight,
   X,
   Check,
   Info,
   Database,
   RefreshCw,
   ArrowRight,
+  ArrowLeft,
   Filter,
+  CheckCircle2,
+  Eye,
+  Edit3,
 } from 'lucide-react';
 
 // ── Types ────────────────────────────────────────────────────────────
@@ -24,6 +29,17 @@ interface DataStream {
   lastRefreshed: string;
   refreshFrequency: string;
   dataSpace: string;
+  tenant?: string;
+  fields?: StreamField[];
+}
+
+interface StreamField {
+  id: string;
+  fieldName: string;
+  dataType: string;
+  targetDMO: string;
+  targetField: string;
+  mappingStatus: 'Auto-Mapped' | 'Manual' | 'Unmapped';
 }
 
 interface InformaticaBundle {
@@ -55,11 +71,88 @@ const informaticaBundles: InformaticaBundle[] = [
   { id: 'ib-6', name: 'Finance 360', description: 'Chart of accounts, GL codes, and financial instruments', objectCount: 11, installed: false },
 ];
 
+// ── Field Templates per Bundle ───────────────────────────────────────
+const bundleFieldTemplates: Record<string, { fieldName: string; dataType: string; targetDMO: string; targetField: string }[]> = {
+  'Customer 360': [
+    { fieldName: 'customer_id', dataType: 'Text(18)', targetDMO: 'ssot__Individual__dlm', targetField: 'ssot__Id__c' },
+    { fieldName: 'first_name', dataType: 'Text(80)', targetDMO: 'ssot__Individual__dlm', targetField: 'ssot__FirstName__c' },
+    { fieldName: 'last_name', dataType: 'Text(80)', targetDMO: 'ssot__Individual__dlm', targetField: 'ssot__LastName__c' },
+    { fieldName: 'email', dataType: 'Email', targetDMO: 'ContactPointEmail', targetField: 'ssot__EmailAddress__c' },
+    { fieldName: 'phone', dataType: 'Phone', targetDMO: 'ContactPointPhone', targetField: 'ssot__TelephoneNumber__c' },
+    { fieldName: 'address_line_1', dataType: 'Text(255)', targetDMO: 'ContactPointAddress', targetField: 'ssot__AddressLine1__c' },
+    { fieldName: 'city', dataType: 'Text(100)', targetDMO: 'ContactPointAddress', targetField: 'ssot__CityName__c' },
+    { fieldName: 'state', dataType: 'Text(50)', targetDMO: 'ContactPointAddress', targetField: 'ssot__StateName__c' },
+    { fieldName: 'postal_code', dataType: 'Text(20)', targetDMO: 'ContactPointAddress', targetField: 'ssot__PostalCodeId__c' },
+    { fieldName: 'country', dataType: 'Text(50)', targetDMO: 'ContactPointAddress', targetField: 'ssot__CountryName__c' },
+    { fieldName: 'date_of_birth', dataType: 'Date', targetDMO: 'ssot__Individual__dlm', targetField: 'ssot__BirthDate__c' },
+    { fieldName: 'loyalty_tier', dataType: 'Text(20)', targetDMO: 'ssot__Individual__dlm', targetField: 'ssot__PersonLifeStage__c' },
+    { fieldName: 'account_status', dataType: 'Picklist', targetDMO: 'ssot__Individual__dlm', targetField: 'ssot__Status__c' },
+    { fieldName: 'created_date', dataType: 'DateTime', targetDMO: 'ssot__Individual__dlm', targetField: 'ssot__CreatedDate__c' },
+    { fieldName: 'last_modified', dataType: 'DateTime', targetDMO: 'ssot__Individual__dlm', targetField: 'ssot__LastModifiedDate__c' },
+  ],
+  'Product 360': [
+    { fieldName: 'product_id', dataType: 'Text(18)', targetDMO: 'Product__dlm', targetField: 'ssot__Id__c' },
+    { fieldName: 'product_name', dataType: 'Text(255)', targetDMO: 'Product__dlm', targetField: 'ssot__Name__c' },
+    { fieldName: 'sku', dataType: 'Text(50)', targetDMO: 'Product__dlm', targetField: 'ssot__SKU__c' },
+    { fieldName: 'category', dataType: 'Text(100)', targetDMO: 'Product__dlm', targetField: 'ssot__Category__c' },
+    { fieldName: 'price', dataType: 'Currency', targetDMO: 'Product__dlm', targetField: 'ssot__UnitPrice__c' },
+    { fieldName: 'description', dataType: 'LongText', targetDMO: 'Product__dlm', targetField: 'ssot__Description__c' },
+    { fieldName: 'status', dataType: 'Picklist', targetDMO: 'Product__dlm', targetField: 'ssot__Status__c' },
+    { fieldName: 'brand', dataType: 'Text(100)', targetDMO: 'Product__dlm', targetField: 'ssot__Brand__c' },
+  ],
+  'Supplier 360': [
+    { fieldName: 'supplier_id', dataType: 'Text(18)', targetDMO: 'Supplier__dlm', targetField: 'ssot__Id__c' },
+    { fieldName: 'supplier_name', dataType: 'Text(255)', targetDMO: 'Supplier__dlm', targetField: 'ssot__Name__c' },
+    { fieldName: 'contact_name', dataType: 'Text(150)', targetDMO: 'Supplier__dlm', targetField: 'ssot__ContactName__c' },
+    { fieldName: 'contact_email', dataType: 'Email', targetDMO: 'Supplier__dlm', targetField: 'ssot__ContactEmail__c' },
+    { fieldName: 'region', dataType: 'Text(50)', targetDMO: 'Supplier__dlm', targetField: 'ssot__Region__c' },
+    { fieldName: 'rating', dataType: 'Number', targetDMO: 'Supplier__dlm', targetField: 'ssot__Rating__c' },
+  ],
+  'Reference 360': [
+    { fieldName: 'ref_code', dataType: 'Text(50)', targetDMO: 'ReferenceData__dlm', targetField: 'ssot__Code__c' },
+    { fieldName: 'ref_value', dataType: 'Text(255)', targetDMO: 'ReferenceData__dlm', targetField: 'ssot__Value__c' },
+    { fieldName: 'ref_type', dataType: 'Picklist', targetDMO: 'ReferenceData__dlm', targetField: 'ssot__Type__c' },
+    { fieldName: 'hierarchy_level', dataType: 'Number', targetDMO: 'ReferenceData__dlm', targetField: 'ssot__Level__c' },
+    { fieldName: 'parent_code', dataType: 'Text(50)', targetDMO: 'ReferenceData__dlm', targetField: 'ssot__ParentCode__c' },
+  ],
+  'Organization 360': [
+    { fieldName: 'org_id', dataType: 'Text(18)', targetDMO: 'Organization__dlm', targetField: 'ssot__Id__c' },
+    { fieldName: 'org_name', dataType: 'Text(255)', targetDMO: 'Organization__dlm', targetField: 'ssot__Name__c' },
+    { fieldName: 'department', dataType: 'Text(100)', targetDMO: 'Organization__dlm', targetField: 'ssot__Department__c' },
+    { fieldName: 'parent_org_id', dataType: 'Text(18)', targetDMO: 'Organization__dlm', targetField: 'ssot__ParentId__c' },
+    { fieldName: 'cost_center', dataType: 'Text(50)', targetDMO: 'Organization__dlm', targetField: 'ssot__CostCenter__c' },
+  ],
+  'Finance 360': [
+    { fieldName: 'account_code', dataType: 'Text(30)', targetDMO: 'FinancialAccount__dlm', targetField: 'ssot__AccountCode__c' },
+    { fieldName: 'account_name', dataType: 'Text(255)', targetDMO: 'FinancialAccount__dlm', targetField: 'ssot__Name__c' },
+    { fieldName: 'gl_code', dataType: 'Text(20)', targetDMO: 'FinancialAccount__dlm', targetField: 'ssot__GLCode__c' },
+    { fieldName: 'balance', dataType: 'Currency', targetDMO: 'FinancialAccount__dlm', targetField: 'ssot__Balance__c' },
+    { fieldName: 'currency_code', dataType: 'Text(3)', targetDMO: 'FinancialAccount__dlm', targetField: 'ssot__CurrencyIso__c' },
+  ],
+};
+
+function generateStreamFields(bundleName: string): StreamField[] {
+  const template = bundleFieldTemplates[bundleName];
+  if (!template) return [];
+  return template.map((t, i) => ({
+    id: `sf-${bundleName.replace(/\s+/g, '-').toLowerCase()}-${i}`,
+    fieldName: t.fieldName,
+    dataType: t.dataType,
+    targetDMO: t.targetDMO,
+    targetField: t.targetField,
+    mappingStatus: 'Auto-Mapped' as const,
+  }));
+}
+
 // ── Component ────────────────────────────────────────────────────────
 export default function DataStreamsContent() {
   const [dataStreams, setDataStreams] = useState<DataStream[]>(mockDataStreams);
   const [searchQuery, setSearchQuery] = useState('');
   const [filterSource, setFilterSource] = useState<string>('all');
+
+  // Detail view state
+  const [selectedStream, setSelectedStream] = useState<DataStream | null>(null);
+  const [reviewFieldId, setReviewFieldId] = useState<string | null>(null);
 
   // New Data Stream modal
   const [newModalOpen, setNewModalOpen] = useState(false);
@@ -150,6 +243,8 @@ export default function DataStreamsContent() {
             lastRefreshed: '—',
             refreshFrequency: 'Every 1 hour',
             dataSpace: 'default',
+            tenant: selectedTenant,
+            fields: generateStreamFields(bundle.name),
           });
         }
       });
@@ -158,6 +253,310 @@ export default function DataStreamsContent() {
     setNewModalOpen(false);
   };
 
+  // ── Helper: get the reviewing field ──
+  const reviewingField = selectedStream?.fields?.find((f) => f.id === reviewFieldId) || null;
+
+  // ──────────────────────────────────────────────────────────────────
+  // VISUAL MAPPING REVIEW SCREEN
+  // ──────────────────────────────────────────────────────────────────
+  if (selectedStream && reviewingField) {
+    const allFields = selectedStream.fields || [];
+    const sourceName = selectedStream.source;
+    const objectName = selectedStream.object;
+    // Group target fields by DMO for the right side
+    const dmoGroups: Record<string, StreamField[]> = {};
+    allFields.forEach((f) => { (dmoGroups[f.targetDMO] = dmoGroups[f.targetDMO] || []).push(f); });
+
+    return (
+      <div className="h-full flex flex-col">
+        {/* Breadcrumb */}
+        <div className="bg-white border-b border-[var(--sf-border)] px-6 py-2 flex items-center gap-2">
+          <button onClick={() => setReviewFieldId(null)} className="flex items-center gap-1 text-xs text-[var(--sf-link)] hover:underline">
+            <ArrowLeft className="w-3.5 h-3.5" />
+            {selectedStream.name}
+          </button>
+          <ChevronRight className="w-3 h-3 text-[var(--sf-text-tertiary)]" />
+          <span className="text-xs font-medium text-[var(--sf-text-primary)]">Data Mapping Review</span>
+        </div>
+
+        {/* Mapping header */}
+        <div className="bg-white border-b border-[var(--sf-border)] px-6 py-4">
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-lg font-bold text-[var(--sf-text-primary)]">Data Mapping — {objectName}</h1>
+              <p className="text-xs text-[var(--sf-text-tertiary)] mt-0.5">
+                Source: <span className="font-medium text-[#FF4A00]">{sourceName}</span>
+                {' '}&rarr;{' '}
+                Target: <span className="font-medium text-[var(--sf-blue)]">Data Cloud DMOs</span>
+              </p>
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="flex items-center gap-1 text-xs text-[var(--sf-success)] font-medium">
+                <CheckCircle2 className="w-3.5 h-3.5" />
+                {allFields.filter((f) => f.mappingStatus === 'Auto-Mapped').length}/{allFields.length} fields auto-mapped
+              </span>
+            </div>
+          </div>
+        </div>
+
+        {/* Visual mapper */}
+        <div className="flex-1 overflow-y-auto bg-[var(--sf-content-bg)]">
+          <div className="p-6">
+            <div className="flex gap-6">
+              {/* LEFT: Source fields */}
+              <div className="w-[340px] flex-shrink-0">
+                <div className="sf-card">
+                  <div className="px-4 py-3 border-b-2 border-[#FF4A00]">
+                    <div className="flex items-center gap-2">
+                      <svg viewBox="0 0 24 24" className="w-4 h-4 flex-shrink-0">
+                        <rect x="2" y="2" width="20" height="20" rx="3" fill="#FF4A00" />
+                        <text x="12" y="16" textAnchor="middle" fill="white" fontSize="9" fontWeight="bold">INFA</text>
+                      </svg>
+                      <h3 className="text-sm font-semibold text-[var(--sf-text-primary)]">{objectName}</h3>
+                      <span className="text-[10px] text-[var(--sf-text-tertiary)] ml-auto">{selectedStream.tenant}</span>
+                    </div>
+                  </div>
+                  <div className="divide-y divide-[var(--sf-border)]">
+                    {allFields.map((field) => (
+                      <div key={field.id} className={`px-4 py-2.5 flex items-center gap-2 text-xs transition-colors ${field.id === reviewFieldId ? 'bg-[#FFF3ED]' : 'hover:bg-[#FAFAF9]'}`}>
+                        <div className={`w-2 h-2 rounded-full flex-shrink-0 ${field.mappingStatus === 'Auto-Mapped' ? 'bg-[var(--sf-success)]' : field.mappingStatus === 'Unmapped' ? 'bg-[var(--sf-error)]' : 'bg-[#FFB75D]'}`} />
+                        <span className="font-mono text-[var(--sf-text-primary)]">{field.fieldName}</span>
+                        <span className="text-[var(--sf-text-tertiary)] ml-auto">{field.dataType}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+
+              {/* CENTER: Connector lines */}
+              <div className="flex-shrink-0 flex items-center justify-center" style={{ width: 100 }}>
+                <svg className="w-full" viewBox="0 0 100 600" style={{ height: Math.max(allFields.length * 36, 400) }}>
+                  {allFields.map((field, i) => {
+                    // Find the target field's position in the right side
+                    const dmoKeys = Object.keys(dmoGroups);
+                    let rightY = 0;
+                    let found = false;
+                    let offset = 0;
+                    for (const dmo of dmoKeys) {
+                      offset += 36; // header
+                      for (const f of dmoGroups[dmo]) {
+                        if (f.id === field.id) {
+                          rightY = offset + 14;
+                          found = true;
+                          break;
+                        }
+                        offset += 30;
+                      }
+                      if (found) break;
+                      offset += 8; // gap
+                    }
+                    const leftY = i * 36 + 50;
+                    const color = field.mappingStatus === 'Auto-Mapped' ? '#2E844A' : '#FFB75D';
+                    return (
+                      <path
+                        key={field.id}
+                        d={`M 0 ${leftY} C 50 ${leftY}, 50 ${rightY}, 100 ${rightY}`}
+                        stroke={color}
+                        strokeWidth={field.id === reviewFieldId ? 2.5 : 1.5}
+                        fill="none"
+                        opacity={field.id === reviewFieldId ? 1 : 0.4}
+                      />
+                    );
+                  })}
+                </svg>
+              </div>
+
+              {/* RIGHT: Target DMOs */}
+              <div className="w-[340px] flex-shrink-0 space-y-3">
+                {Object.entries(dmoGroups).map(([dmoName, fields]) => (
+                  <div key={dmoName} className="sf-card">
+                    <div className="px-4 py-2.5 border-b-2 border-[var(--sf-blue)]">
+                      <h4 className="text-xs font-semibold text-[var(--sf-blue)]">{dmoName}</h4>
+                    </div>
+                    <div className="divide-y divide-[var(--sf-border)]">
+                      {fields.map((field) => (
+                        <div key={field.id} className={`px-4 py-2 flex items-center gap-2 text-xs transition-colors ${field.id === reviewFieldId ? 'bg-[#EEF4FF]' : 'hover:bg-[#FAFAF9]'}`}>
+                          <div className={`w-2 h-2 rounded-full flex-shrink-0 ${field.mappingStatus === 'Auto-Mapped' ? 'bg-[var(--sf-success)]' : 'bg-[#FFB75D]'}`} />
+                          <span className="font-mono text-[var(--sf-text-primary)]">{field.targetField}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Legend */}
+            <div className="mt-6 flex items-center gap-6 text-xs text-[var(--sf-text-tertiary)]">
+              <div className="flex items-center gap-1.5"><div className="w-3 h-0.5 bg-[#2E844A]" /> Auto-Mapped</div>
+              <div className="flex items-center gap-1.5"><div className="w-3 h-0.5 bg-[#FFB75D]" /> Manual / Review Needed</div>
+              <div className="flex items-center gap-1.5"><div className="w-2 h-2 rounded-full bg-[var(--sf-error)]" /> Unmapped</div>
+            </div>
+          </div>
+        </div>
+
+        {/* Footer */}
+        <div className="bg-white border-t border-[var(--sf-border)] px-6 py-3 flex items-center justify-between">
+          <button onClick={() => setReviewFieldId(null)} className="px-4 py-1.5 text-sm font-medium text-[var(--sf-text-secondary)] border border-[var(--sf-border)] rounded hover:bg-[#F3F3F3]">
+            &larr; Back to Fields
+          </button>
+          <button className="px-4 py-1.5 text-sm font-medium text-white bg-[var(--sf-blue)] rounded hover:bg-[var(--sf-blue-hover)]">
+            Approve Mapping
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  // ──────────────────────────────────────────────────────────────────
+  // DATA STREAM DETAIL VIEW — Fields panel
+  // ──────────────────────────────────────────────────────────────────
+  if (selectedStream) {
+    const fields = selectedStream.fields || [];
+    const autoMapped = fields.filter((f) => f.mappingStatus === 'Auto-Mapped').length;
+
+    return (
+      <div className="h-full flex flex-col">
+        {/* Breadcrumb */}
+        <div className="bg-white border-b border-[var(--sf-border)] px-6 py-2 flex items-center gap-2">
+          <button onClick={() => setSelectedStream(null)} className="flex items-center gap-1 text-xs text-[var(--sf-link)] hover:underline">
+            <ArrowLeft className="w-3.5 h-3.5" />
+            Data Streams
+          </button>
+          <ChevronRight className="w-3 h-3 text-[var(--sf-text-tertiary)]" />
+          <span className="text-xs font-medium text-[var(--sf-text-primary)]">{selectedStream.name}</span>
+        </div>
+
+        {/* Header */}
+        <div className="bg-white border-b border-[var(--sf-border)] px-6 py-4">
+          <div className="flex items-start gap-4">
+            <div className={`w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0 ${selectedStream.sourceType === 'informatica' ? 'bg-[#FF4A00]' : 'bg-[#032D60]'}`}>
+              <Database className="w-5 h-5 text-white" />
+            </div>
+            <div className="flex-1">
+              <h1 className="text-lg font-bold text-[var(--sf-text-primary)]">{selectedStream.name}</h1>
+              <p className="text-xs text-[var(--sf-text-tertiary)] mt-0.5">Data Stream from {selectedStream.source}</p>
+            </div>
+            <div className="flex items-center gap-2">
+              <button className="px-3 py-1.5 text-xs font-medium border border-[var(--sf-border)] rounded hover:bg-[#F3F3F3] text-[var(--sf-text-secondary)]">Refresh Now</button>
+              <button className="px-3 py-1.5 text-xs font-medium border border-[var(--sf-border)] rounded hover:bg-[#F3F3F3] text-[var(--sf-text-secondary)]">Edit</button>
+            </div>
+          </div>
+
+          {/* Metadata bar */}
+          <div className="flex flex-wrap items-center gap-x-8 gap-y-2 mt-4">
+            <div>
+              <p className="text-[10px] uppercase tracking-wider text-[var(--sf-text-tertiary)]">Source</p>
+              <p className="text-sm font-medium text-[var(--sf-text-primary)]">{selectedStream.source}</p>
+            </div>
+            <div>
+              <p className="text-[10px] uppercase tracking-wider text-[var(--sf-text-tertiary)]">Object</p>
+              <p className="text-sm font-medium text-[var(--sf-text-primary)]">{selectedStream.object}</p>
+            </div>
+            <div>
+              <p className="text-[10px] uppercase tracking-wider text-[var(--sf-text-tertiary)]">Status</p>
+              <p className="text-sm">{statusBadge(selectedStream.status)}</p>
+            </div>
+            <div>
+              <p className="text-[10px] uppercase tracking-wider text-[var(--sf-text-tertiary)]">Records Processed</p>
+              <p className="text-sm font-medium text-[var(--sf-text-primary)]">{fmt(selectedStream.recordsProcessed)}</p>
+            </div>
+            <div>
+              <p className="text-[10px] uppercase tracking-wider text-[var(--sf-text-tertiary)]">Last Refreshed</p>
+              <p className="text-sm font-medium text-[var(--sf-text-primary)]">{selectedStream.lastRefreshed}</p>
+            </div>
+            <div>
+              <p className="text-[10px] uppercase tracking-wider text-[var(--sf-text-tertiary)]">Data Space</p>
+              <p className="text-sm font-medium text-[var(--sf-text-primary)] capitalize">{selectedStream.dataSpace}</p>
+            </div>
+          </div>
+        </div>
+
+        {/* Fields table */}
+        <div className="flex-1 overflow-y-auto bg-[var(--sf-content-bg)]">
+          <div className="p-6">
+            {fields.length > 0 ? (
+              <div className="sf-card">
+                <div className="sf-card-header">
+                  <div className="flex items-center gap-3">
+                    <h2 className="text-sm font-semibold text-[var(--sf-text-primary)]">
+                      Fields <span className="text-xs font-normal text-[var(--sf-text-tertiary)]">({fields.length})</span>
+                    </h2>
+                    <span className="flex items-center gap-1 text-xs text-[var(--sf-success)] font-medium">
+                      <CheckCircle2 className="w-3.5 h-3.5" />
+                      {autoMapped} auto-mapped
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <button
+                      onClick={() => setReviewFieldId(fields[0]?.id || null)}
+                      className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-white bg-[var(--sf-blue)] rounded hover:bg-[var(--sf-blue-hover)] transition-colors"
+                    >
+                      <Eye className="w-3.5 h-3.5" />
+                      Review All Mappings
+                    </button>
+                  </div>
+                </div>
+                <div className="overflow-x-auto">
+                  <table className="sf-table">
+                    <thead>
+                      <tr>
+                        <th>Field Name</th>
+                        <th>Data Type</th>
+                        <th>Target DMO</th>
+                        <th>Target Field</th>
+                        <th>Mapping Status</th>
+                        <th className="w-24 text-center">Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {fields.map((field) => (
+                        <tr key={field.id}>
+                          <td>
+                            <span className="font-mono text-sm">{field.fieldName}</span>
+                          </td>
+                          <td>
+                            <span className="text-xs px-1.5 py-0.5 bg-[#F3F3F3] rounded font-mono">{field.dataType}</span>
+                          </td>
+                          <td className="sf-link text-xs">{field.targetDMO}</td>
+                          <td><span className="font-mono text-xs">{field.targetField}</span></td>
+                          <td>
+                            <span className={`sf-badge ${field.mappingStatus === 'Auto-Mapped' ? 'sf-badge-success' : field.mappingStatus === 'Unmapped' ? 'sf-badge-error' : 'sf-badge-warning'}`}>
+                              {field.mappingStatus}
+                            </span>
+                          </td>
+                          <td className="text-center">
+                            <button
+                              onClick={(e) => { e.stopPropagation(); setReviewFieldId(field.id); }}
+                              className="px-2.5 py-1 text-[11px] font-medium text-[var(--sf-link)] border border-[var(--sf-border)] rounded hover:bg-[#EEF4FF] transition-colors"
+                            >
+                              Review
+                            </button>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            ) : (
+              <div className="sf-card">
+                <div className="sf-card-body text-center py-12">
+                  <Database className="w-10 h-10 text-[var(--sf-text-tertiary)] mx-auto mb-3 opacity-40" />
+                  <p className="text-sm text-[var(--sf-text-tertiary)]">No field mappings available for this data stream.</p>
+                  <p className="text-xs text-[var(--sf-text-tertiary)] mt-1">Field mappings are auto-created for Informatica MDM data streams.</p>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // ──────────────────────────────────────────────────────────────────
+  // LIST VIEW
+  // ──────────────────────────────────────────────────────────────────
   return (
     <div className="h-full flex flex-col">
       {/* Page header */}
@@ -238,7 +637,7 @@ export default function DataStreamsContent() {
                 </thead>
                 <tbody>
                   {filteredStreams.map((ds) => (
-                    <tr key={ds.id}>
+                    <tr key={ds.id} className="cursor-pointer hover:bg-[#F3F3F3]" onClick={() => setSelectedStream(ds)}>
                       <td>
                         <div className="flex items-center gap-2">
                           <span>{sourceIcon(ds.sourceType)}</span>
