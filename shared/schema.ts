@@ -32,3 +32,23 @@ export const insertHelpDocumentSchema = createInsertSchema(helpDocuments).pick({
 
 export type HelpDocument = typeof helpDocuments.$inferSelect;
 export type InsertHelpDocument = z.infer<typeof insertHelpDocumentSchema>;
+
+// ---------------------------------------------------------------------------
+// Identity Resolution Rulesets (persisted as JSON)
+// ---------------------------------------------------------------------------
+
+export const identityRulesets = pgTable("identity_rulesets", {
+  id: serial("id").primaryKey(),
+  rulesetId: text("ruleset_id").notNull().unique(),
+  data: text("data").notNull(), // JSON blob of the full ruleset
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const insertIdentityRulesetSchema = createInsertSchema(identityRulesets).pick({
+  rulesetId: true,
+  data: true,
+});
+
+export type IdentityRuleset = typeof identityRulesets.$inferSelect;
+export type InsertIdentityRuleset = z.infer<typeof insertIdentityRulesetSchema>;

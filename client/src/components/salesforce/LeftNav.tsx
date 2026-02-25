@@ -32,7 +32,7 @@ const navIcons: Record<string, React.ElementType> = {
   Segments: Users,
   'Activation Targets': Target,
   Activations: Zap,
-  'Help Documents': FileText,
+  'Context Manager': FileText,
 };
 
 interface LeftNavProps {
