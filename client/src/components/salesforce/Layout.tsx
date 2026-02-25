@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import { useState, useRef, useCallback } from 'react';
+import { toSvg } from 'html-to-image';
 import Header from './Header';
 import LeftNav from './LeftNav';
 import AgentPanel from './AgentPanel';
@@ -26,6 +27,8 @@ export default function Layout({ children }: LayoutProps) {
   const [currentApp, setCurrentApp] = useState('data-cloud');
   const [appLauncherOpen, setAppLauncherOpen] = useState(false);
   const [showDataCloudSetup, setShowDataCloudSetup] = useState(false);
+  const [exportToast, setExportToast] = useState<string | null>(null);
+  const mainRef = useRef<HTMLElement>(null);
 
   const isAdmin = currentTimeline === 'context-explorer';
   const effectiveApp = isAdmin ? 'admin' : currentApp;
@@ -58,6 +61,42 @@ export default function Layout({ children }: LayoutProps) {
     }
   };
 
+  // ── Figma export handlers ──
+  const showToast = useCallback((msg: string) => {
+    setExportToast(msg);
+    setTimeout(() => setExportToast(null), 3000);
+  }, []);
+
+  const handleExportSvg = useCallback(async () => {
+    const el = mainRef.current;
+    if (!el) return;
+    try {
+      const dataUrl = await toSvg(el, { backgroundColor: '#F3F3F3' });
+      const link = document.createElement('a');
+      link.download = `${activeTab.replace(/\s+/g, '-').toLowerCase()}-export.svg`;
+      link.href = dataUrl;
+      link.click();
+      showToast('SVG downloaded — drag into Figma to import');
+    } catch {
+      showToast('Export failed — try again');
+    }
+  }, [activeTab, showToast]);
+
+  const handleExportHtml = useCallback(async () => {
+    const el = mainRef.current;
+    if (!el) return;
+    try {
+      const styles = Array.from(document.querySelectorAll('style, link[rel="stylesheet"]'))
+        .map((s) => s.outerHTML)
+        .join('\n');
+      const html = `<!DOCTYPE html>\n<html><head><meta charset="utf-8">\n${styles}\n</head><body>\n${el.outerHTML}\n</body></html>`;
+      await navigator.clipboard.writeText(html);
+      showToast('HTML copied — paste into html.to.design Figma plugin');
+    } catch {
+      showToast('Copy failed — check clipboard permissions');
+    }
+  }, [showToast]);
+
   // Determine layout based on timeline
   const showTodayLayout = currentTimeline === 'today' || currentTimeline === 'context-explorer';
 
@@ -78,9 +117,11 @@ export default function Layout({ children }: LayoutProps) {
           }}
           onOpenAppLauncher={() => setAppLauncherOpen(!appLauncherOpen)}
           onOpenDataCloudSetup={() => {}}
+          onExportSvg={handleExportSvg}
+          onExportHtml={handleExportHtml}
         />
         <div className="flex flex-1 overflow-hidden">
-          <main className="flex-1 overflow-y-auto">
+          <main ref={mainRef} className="flex-1 overflow-y-auto">
             <DataCloudSetupContent onBack={() => setShowDataCloudSetup(false)} />
           </main>
         </div>
@@ -96,6 +137,11 @@ export default function Layout({ children }: LayoutProps) {
           onSelectApp={handleSelectApp}
           currentApp={effectiveApp}
         />
+        {exportToast && (
+          <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-[100] px-5 py-3 bg-[#032D60] text-white text-sm font-medium rounded-lg shadow-xl animate-[fadeIn_0.2s_ease-out]">
+            {exportToast}
+          </div>
+        )}
       </div>
     );
   }
@@ -115,6 +161,8 @@ export default function Layout({ children }: LayoutProps) {
         }}
         onOpenAppLauncher={() => setAppLauncherOpen(!appLauncherOpen)}
         onOpenDataCloudSetup={() => setShowDataCloudSetup(true)}
+        onExportSvg={handleExportSvg}
+        onExportHtml={handleExportHtml}
       />
 
       {/* Body: conditionally render based on timeline */}
@@ -126,7 +174,7 @@ export default function Layout({ children }: LayoutProps) {
             activeTab={activeTab}
             onChangeTab={setActiveTab}
           />
-          <main className="flex-1 overflow-y-auto">
+          <main ref={mainRef} className="flex-1 overflow-y-auto">
             {children || (
               activeTab === 'Home' ? (
                 <HomeContent />
@@ -189,6 +237,13 @@ export default function Layout({ children }: LayoutProps) {
         onSelectApp={handleSelectApp}
         currentApp={effectiveApp}
       />
+
+      {/* Export toast notification */}
+      {exportToast && (
+        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-[100] px-5 py-3 bg-[#032D60] text-white text-sm font-medium rounded-lg shadow-xl animate-[fadeIn_0.2s_ease-out]">
+          {exportToast}
+        </div>
+      )}
     </div>
   );
 }
