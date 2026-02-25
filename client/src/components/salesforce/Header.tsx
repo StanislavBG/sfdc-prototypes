@@ -12,6 +12,8 @@ import {
   X,
   ExternalLink,
   Zap,
+  Download,
+  Clipboard,
 } from 'lucide-react';
 import GlobalSearch from './GlobalSearch';
 import { timelines } from './TimeMachine';
@@ -25,6 +27,8 @@ interface HeaderProps {
   onSetup?: () => void;
   onOpenAppLauncher?: () => void;
   onOpenDataCloudSetup?: () => void;
+  onExportSvg?: () => void;
+  onExportHtml?: () => void;
 }
 
 // Salesforce cloud logo SVG
@@ -44,22 +48,29 @@ export default function Header({
   onSetup,
   onOpenAppLauncher,
   onOpenDataCloudSetup,
+  onExportSvg,
+  onExportHtml,
 }: HeaderProps) {
   const timelineData = timelines.find((t) => t.id === currentTimeline);
   const [setupMenuOpen, setSetupMenuOpen] = useState(false);
   const setupMenuRef = useRef<HTMLDivElement>(null);
+  const [figmaMenuOpen, setFigmaMenuOpen] = useState(false);
+  const figmaMenuRef = useRef<HTMLDivElement>(null);
 
-  // Close on outside click
+  // Close dropdowns on outside click
   useEffect(() => {
-    if (!setupMenuOpen) return;
+    if (!setupMenuOpen && !figmaMenuOpen) return;
     const handler = (e: MouseEvent) => {
-      if (setupMenuRef.current && !setupMenuRef.current.contains(e.target as Node)) {
+      if (setupMenuOpen && setupMenuRef.current && !setupMenuRef.current.contains(e.target as Node)) {
         setSetupMenuOpen(false);
+      }
+      if (figmaMenuOpen && figmaMenuRef.current && !figmaMenuRef.current.contains(e.target as Node)) {
+        setFigmaMenuOpen(false);
       }
     };
     document.addEventListener('mousedown', handler);
     return () => document.removeEventListener('mousedown', handler);
-  }, [setupMenuOpen]);
+  }, [setupMenuOpen, figmaMenuOpen]);
 
   return (
     <div className="sf-header-row1 flex items-center px-4">
@@ -112,6 +123,59 @@ export default function Header({
         <button className="sf-icon-btn" title="Help">
           <CircleHelp className="w-[18px] h-[18px]" />
         </button>
+
+        {/* Figma export dropdown */}
+        <div className="relative" ref={figmaMenuRef}>
+          <button
+            className="sf-icon-btn"
+            title="Export to Figma"
+            onClick={() => setFigmaMenuOpen(!figmaMenuOpen)}
+          >
+            <svg viewBox="0 0 38 57" className="w-[14px] h-[18px]" fill="currentColor">
+              <path d="M19 28.5a9.5 9.5 0 1 1 19 0 9.5 9.5 0 0 1-19 0z" />
+              <path d="M0 47.5A9.5 9.5 0 0 1 9.5 38H19v9.5a9.5 9.5 0 0 1-19 0z" />
+              <path d="M19 0v19h9.5a9.5 9.5 0 0 0 0-19H19z" />
+              <path d="M0 9.5A9.5 9.5 0 0 0 9.5 19H19V0H9.5A9.5 9.5 0 0 0 0 9.5z" />
+              <path d="M0 28.5A9.5 9.5 0 0 0 9.5 38H19V19H9.5A9.5 9.5 0 0 0 0 28.5z" />
+            </svg>
+          </button>
+
+          {figmaMenuOpen && (
+            <div className="absolute right-0 top-full mt-1 w-[260px] bg-white rounded-lg shadow-xl border border-[var(--sf-border)] z-50">
+              <div className="flex items-center justify-between px-4 py-3 border-b border-[var(--sf-border)]">
+                <span className="text-sm font-semibold text-[var(--sf-text-primary)]">Export to Figma</span>
+                <button
+                  onClick={() => setFigmaMenuOpen(false)}
+                  className="w-6 h-6 flex items-center justify-center rounded hover:bg-[#F3F3F3] text-[var(--sf-text-tertiary)]"
+                >
+                  <X className="w-3.5 h-3.5" />
+                </button>
+              </div>
+              <div className="py-1">
+                <button
+                  onClick={() => { setFigmaMenuOpen(false); onExportSvg?.(); }}
+                  className="w-full flex items-center gap-3 px-4 py-3 hover:bg-[#F3F3F3] transition-colors"
+                >
+                  <Download className="w-4 h-4 text-[var(--sf-text-tertiary)]" />
+                  <div className="flex-1 text-left">
+                    <span className="text-sm font-medium text-[var(--sf-text-primary)] block">Download as SVG</span>
+                    <span className="text-[10px] text-[var(--sf-text-tertiary)]">Editable vectors in Figma</span>
+                  </div>
+                </button>
+                <button
+                  onClick={() => { setFigmaMenuOpen(false); onExportHtml?.(); }}
+                  className="w-full flex items-center gap-3 px-4 py-3 hover:bg-[#F3F3F3] transition-colors"
+                >
+                  <Clipboard className="w-4 h-4 text-[var(--sf-text-tertiary)]" />
+                  <div className="flex-1 text-left">
+                    <span className="text-sm font-medium text-[var(--sf-text-primary)] block">Copy HTML for Figma Plugin</span>
+                    <span className="text-[10px] text-[var(--sf-text-tertiary)]">Paste into html.to.design</span>
+                  </div>
+                </button>
+              </div>
+            </div>
+          )}
+        </div>
 
         {/* Setup gear with dropdown */}
         <div className="relative" ref={setupMenuRef}>
