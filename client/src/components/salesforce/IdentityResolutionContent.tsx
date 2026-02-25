@@ -102,6 +102,7 @@ interface IdentityRuleset {
   processingHistory: ProcessingHistoryEntry[];
   isBYOM?: boolean; // "Bring Your Own MDM" mode — installed from datakit
   byomSource?: string; // datakit source name e.g. "Informatica MDM"
+  isCX?: boolean; // Customer 360 / Real Time — uses standard IR detail view
 }
 
 // ── Data Model Objects / Fields for dropdowns ────────────────────────
@@ -327,7 +328,8 @@ function apiToLocal(d: IdentityRulesetData): IdentityRuleset {
     reconciliationGroups: d.reconciliationGroups ?? [],
     processingHistory: d.processingHistory ?? [],
     isBYOM: d.description?.startsWith('Installed from ') || false,
-    byomSource: d.description?.startsWith('Installed from ') ? d.description.replace('Installed from ', '').replace(' datakit', '') : undefined,
+    byomSource: d.description?.startsWith('Installed from ') ? d.description.replace('Installed from ', '').replace(' datakit', '').replace(' (CX)', '') : undefined,
+    isCX: d.description?.includes('(CX)') || false,
   };
 }
 
@@ -435,7 +437,7 @@ export default function IdentityResolutionContent() {
   const [selectedDatakitRuleset, setSelectedDatakitRuleset] = useState<string | null>(null);
 
   const datakitCategories = ['Knowledge Space', 'Billing Analytics', 'Informatica MDM', 'Agentforce Analytics', 'Pricing', 'Content Kit'];
-  const datakitRulesets: Record<string, { name: string; id: string; dataSpace: string; primaryDMO: string; realTime?: boolean }[]> = {
+  const datakitRulesets: Record<string, { name: string; id: string; dataSpace: string; primaryDMO: string; realTime?: boolean; cx?: boolean }[]> = {
     'Knowledge Space': [
       { name: 'Customer Dedup', id: 'KS-001', dataSpace: 'default', primaryDMO: 'Individual' },
     ],
@@ -443,8 +445,8 @@ export default function IdentityResolutionContent() {
       { name: 'Billing Account Match', id: 'BA-001', dataSpace: 'default', primaryDMO: 'Account' },
     ],
     'Informatica MDM': [
-      { name: 'Customer 360', id: 'INFA-C360', dataSpace: 'default', primaryDMO: 'Individual' },
-      { name: 'Customer 360', id: 'INFA-C360-RT', dataSpace: 'default', primaryDMO: 'Individual', realTime: true },
+      { name: 'Customer 360', id: 'INFA-C360', dataSpace: 'default', primaryDMO: 'Individual', cx: true },
+      { name: 'Customer 360', id: 'INFA-C360-RT', dataSpace: 'default', primaryDMO: 'Individual', realTime: true, cx: true },
       { name: 'Reference 360', id: 'INFA-R360', dataSpace: 'default', primaryDMO: 'Account' },
       { name: 'Supplies 360', id: 'INFA-S360', dataSpace: 'default', primaryDMO: 'Account' },
       { name: 'Reporter 360', id: 'INFA-RP360', dataSpace: 'default', primaryDMO: 'Individual' },
@@ -497,6 +499,61 @@ export default function IdentityResolutionContent() {
   const handleNewRulesetSave = () => {
     if (!newRulesetName.trim()) return;
     const isFromDatakit = newRulesetOption === 'datakit';
+    // Check if the selected datakit ruleset is a CX (Customer 360) type
+    const currentDkRulesets = datakitRulesets[selectedDatakit] || [];
+    const pickedDk = currentDkRulesets.find((r) => r.id === selectedDatakitRuleset);
+    const isCXDatakit = isFromDatakit && pickedDk?.cx === true;
+    // CX datakits get pre-populated with match rules and reconciliation data
+    const cxMatchRules: MatchRule[] = isCXDatakit ? [
+      { id: 'mr-cx-1', ruleName: 'Fuzzy Name and Normalized Email', priority: 1, criteria: [
+        { id: 'mc-cx-1', dataModelObject: 'Individual', field: 'First Name', matchMethod: 'Fuzzy: First Name', crossFieldDMO: '', crossFieldMatchField: '', matchOnBlank: false, caseSensitive: false },
+        { id: 'mc-cx-2', dataModelObject: 'Individual', field: 'Last Name', matchMethod: 'Fuzzy: Last Name', crossFieldDMO: '', crossFieldMatchField: '', matchOnBlank: false, caseSensitive: false },
+        { id: 'mc-cx-3', dataModelObject: 'Contact Point Email', field: 'Email Address', matchMethod: 'Normalized', crossFieldDMO: '', crossFieldMatchField: '', matchOnBlank: false, caseSensitive: false },
+      ]},
+      { id: 'mr-cx-2', ruleName: 'Fuzzy Name and Normalized Phone', priority: 2, criteria: [
+        { id: 'mc-cx-4', dataModelObject: 'Individual', field: 'First Name', matchMethod: 'Fuzzy: First Name', crossFieldDMO: '', crossFieldMatchField: '', matchOnBlank: false, caseSensitive: false },
+        { id: 'mc-cx-5', dataModelObject: 'Individual', field: 'Last Name', matchMethod: 'Fuzzy: Last Name', crossFieldDMO: '', crossFieldMatchField: '', matchOnBlank: false, caseSensitive: false },
+        { id: 'mc-cx-6', dataModelObject: 'Contact Point Phone', field: 'Phone Number', matchMethod: 'Normalized', crossFieldDMO: '', crossFieldMatchField: '', matchOnBlank: false, caseSensitive: false },
+      ]},
+      { id: 'mr-cx-3', ruleName: 'Fuzzy Name and Normalized Address', priority: 3, criteria: [
+        { id: 'mc-cx-7', dataModelObject: 'Individual', field: 'First Name', matchMethod: 'Fuzzy: First Name', crossFieldDMO: '', crossFieldMatchField: '', matchOnBlank: false, caseSensitive: false },
+        { id: 'mc-cx-8', dataModelObject: 'Individual', field: 'Last Name', matchMethod: 'Fuzzy: Last Name', crossFieldDMO: '', crossFieldMatchField: '', matchOnBlank: false, caseSensitive: false },
+        { id: 'mc-cx-9', dataModelObject: 'Contact Point Address', field: 'Address Line 1', matchMethod: 'Normalized', crossFieldDMO: '', crossFieldMatchField: '', matchOnBlank: false, caseSensitive: false },
+      ]},
+      { id: 'mr-cx-4', ruleName: 'Unique Identifier 01', priority: 4, criteria: [
+        { id: 'mc-cx-10', dataModelObject: 'Party Identification', field: 'Identification Number', matchMethod: 'Exact', crossFieldDMO: '', crossFieldMatchField: '', matchOnBlank: false, caseSensitive: false },
+      ]},
+    ] : [];
+    const cxReconGroups: ReconciliationGroup[] = isCXDatakit ? [
+      { dmoName: 'Contact Point Address', defaultRule: 'Most Recent', fields: [
+        { id: 'rf-cx-1', fieldName: 'Address Line 1', reconciliationRule: 'Most Recent', usingDefault: true },
+        { id: 'rf-cx-2', fieldName: 'City', reconciliationRule: 'Most Recent', usingDefault: true },
+        { id: 'rf-cx-3', fieldName: 'State', reconciliationRule: 'Most Recent', usingDefault: true },
+        { id: 'rf-cx-4', fieldName: 'Postal Code', reconciliationRule: 'Most Recent', usingDefault: true },
+        { id: 'rf-cx-5', fieldName: 'Country', reconciliationRule: 'Most Recent', usingDefault: true },
+      ]},
+      { dmoName: 'Contact Point App', defaultRule: 'Most Recent', fields: [
+        { id: 'rf-cx-6', fieldName: 'App Id', reconciliationRule: 'Most Recent', usingDefault: true },
+        { id: 'rf-cx-7', fieldName: 'App Type', reconciliationRule: 'Most Recent', usingDefault: true },
+      ]},
+      { dmoName: 'Contact Point Email', defaultRule: 'Most Recent', fields: [
+        { id: 'rf-cx-8', fieldName: 'Email Address', reconciliationRule: 'Source Priority', usingDefault: false },
+        { id: 'rf-cx-9', fieldName: 'Email Domain', reconciliationRule: 'Most Recent', usingDefault: true },
+      ]},
+      { dmoName: 'Contact Point Phone', defaultRule: 'Most Recent', fields: [
+        { id: 'rf-cx-10', fieldName: 'Phone Number', reconciliationRule: 'Source Priority', usingDefault: false },
+        { id: 'rf-cx-11', fieldName: 'Phone Type', reconciliationRule: 'Most Recent', usingDefault: true },
+      ]},
+      { dmoName: 'Individual', defaultRule: 'Source Priority', fields: [
+        { id: 'rf-cx-12', fieldName: 'First Name', reconciliationRule: 'Source Priority', usingDefault: true },
+        { id: 'rf-cx-13', fieldName: 'Last Name', reconciliationRule: 'Source Priority', usingDefault: true },
+        { id: 'rf-cx-14', fieldName: 'Date of Birth', reconciliationRule: 'Most Recent', usingDefault: false },
+      ]},
+      { dmoName: 'Party Identification', defaultRule: 'Most Recent', fields: [
+        { id: 'rf-cx-15', fieldName: 'Identification Number', reconciliationRule: 'Most Recent', usingDefault: true },
+        { id: 'rf-cx-16', fieldName: 'Identification Type', reconciliationRule: 'Most Recent', usingDefault: true },
+      ]},
+    ] : [];
     const newRs: IdentityRuleset = {
       id: `rs-new-${Date.now()}`,
       rulesetName: newRulesetName,
@@ -504,23 +561,24 @@ export default function IdentityResolutionContent() {
       dataSpace: newRulesetDataSpace,
       primaryDataModelObject: newRulesetPrimaryDMO,
       secondaryDataModelObject: newRulesetPrimaryDMO,
-      rulesetStatus: 'Draft',
-      lastJobStatus: 'Not Run',
-      lastJobCompleted: '—',
-      description: isFromDatakit ? `Installed from ${selectedDatakit} datakit` : '',
+      rulesetStatus: isCXDatakit ? 'Published' : 'Draft',
+      lastJobStatus: isCXDatakit ? 'Completed' : 'Not Run',
+      lastJobCompleted: isCXDatakit ? new Date().toLocaleString() : '—',
+      description: isFromDatakit ? `Installed from ${selectedDatakit} datakit${isCXDatakit ? ' (CX)' : ''}` : '',
       createdBy: 'Data Cloud',
       createdDate: new Date().toLocaleString(),
-      lastModifiedBy: 'Data Cloud',
+      lastModifiedBy: isCXDatakit ? 'Automated Process' : 'Data Cloud',
       isScheduled: false,
-      sourceProfiles: 0,
-      matchedSourceProfiles: 0,
-      totalUnifiedProfiles: 0,
-      consolidationRate: 0,
-      matchRules: [],
-      reconciliationGroups: [],
-      processingHistory: [],
+      sourceProfiles: isCXDatakit ? 12061 : 0,
+      matchedSourceProfiles: isCXDatakit ? 93 : 0,
+      totalUnifiedProfiles: isCXDatakit ? 10594 : 0,
+      consolidationRate: isCXDatakit ? 12 : 0,
+      matchRules: cxMatchRules,
+      reconciliationGroups: cxReconGroups,
+      processingHistory: isCXDatakit ? generateProcessingHistory() : [],
       isBYOM: isFromDatakit,
       byomSource: isFromDatakit ? selectedDatakit : undefined,
+      isCX: isCXDatakit,
     };
     createMutation.mutate(localToApi(newRs));
     setNewRulesetOpen(false);
@@ -695,9 +753,10 @@ export default function IdentityResolutionContent() {
   const advancedCriterion = editingRule?.criteria.find((c) => c.id === advancedCriterionId) || null;
 
   // ──────────────────────────────────────────────────────────────────
-  // BYOM DETAIL VIEW — "Bring Your Own MDM" mode
+  // BYOM DETAIL VIEW — "Bring Your Own MDM" mode (non-CX only)
+  // CX datakits (Customer 360 / Real Time) use the standard detail view
   // ──────────────────────────────────────────────────────────────────
-  if (selectedRuleset && selectedRuleset.isBYOM) {
+  if (selectedRuleset && selectedRuleset.isBYOM && !selectedRuleset.isCX) {
     return (
       <div className="h-full flex flex-col">
         {/* Breadcrumb */}
@@ -801,7 +860,7 @@ export default function IdentityResolutionContent() {
                     <div className="flex items-center gap-2">
                       <CheckCircle2 className="w-5 h-5 text-[var(--sf-success)]" />
                       <p className="text-sm text-[var(--sf-text-secondary)]">
-                        <span className="sf-link font-medium">Your Mapping</span> is complete. 3rd party rules active [CX change].
+                        <span className="sf-link font-medium">Your Mapping</span> is complete. 3rd party rules active.
                       </p>
                     </div>
                     <button className="px-4 py-1.5 text-xs font-medium border border-[var(--sf-border)] rounded hover:bg-[#F3F3F3] text-[var(--sf-text-secondary)]">
@@ -962,8 +1021,36 @@ export default function IdentityResolutionContent() {
               <Fingerprint className="w-5 h-5 text-white" />
             </div>
             <div className="flex-1">
+              <p className="text-xs text-[var(--sf-text-tertiary)]">Identity Resolution</p>
               <h1 className="text-lg font-bold text-[var(--sf-text-primary)]">{selectedRuleset.rulesetName}</h1>
-              <p className="text-xs text-[var(--sf-text-tertiary)] mt-0.5">Identity Resolution Ruleset</p>
+            </div>
+          </div>
+
+          {/* Metadata bar */}
+          <div className="flex flex-wrap items-center gap-x-8 gap-y-2 mt-4">
+            <div>
+              <p className="text-[10px] uppercase tracking-wider text-[var(--sf-text-tertiary)]">Data Space</p>
+              <p className="text-sm font-medium text-[var(--sf-text-primary)] capitalize">{selectedRuleset.dataSpace}</p>
+            </div>
+            <div>
+              <p className="text-[10px] uppercase tracking-wider text-[var(--sf-text-tertiary)]">Primary Data Model Object</p>
+              <p className="text-sm font-medium text-[var(--sf-text-primary)]">{selectedRuleset.primaryDataModelObject}</p>
+            </div>
+            <div>
+              <p className="text-[10px] uppercase tracking-wider text-[var(--sf-text-tertiary)]">Ruleset ID</p>
+              <p className="text-sm font-medium text-[var(--sf-text-primary)]">{selectedRuleset.rulesetId}</p>
+            </div>
+            <div>
+              <p className="text-[10px] uppercase tracking-wider text-[var(--sf-text-tertiary)]">Ruleset Status</p>
+              <p className="text-sm">{statusBadge(selectedRuleset.rulesetStatus)}</p>
+            </div>
+            <div>
+              <p className="text-[10px] uppercase tracking-wider text-[var(--sf-text-tertiary)]">Last Job Status</p>
+              <p className="text-sm">{statusBadge(selectedRuleset.lastJobStatus === 'Completed' ? 'Succeeded' : selectedRuleset.lastJobStatus)}</p>
+            </div>
+            <div>
+              <p className="text-[10px] uppercase tracking-wider text-[var(--sf-text-tertiary)]">Last Job Completed</p>
+              <p className="text-sm font-medium text-[var(--sf-text-primary)]">{selectedRuleset.lastJobCompleted}</p>
             </div>
           </div>
         </div>
@@ -985,176 +1072,195 @@ export default function IdentityResolutionContent() {
 
           {/* ── DETAILS TAB ── */}
           {detailTab === 'details' && (
-            <div className="p-6 space-y-4">
-              {/* Resolution Summary collapsible */}
-              <div className="sf-card">
-                <button onClick={() => setResolutionSummaryOpen(!resolutionSummaryOpen)} className="w-full sf-card-header cursor-pointer hover:bg-[#FAFAF9]">
-                  <div className="flex items-center gap-2">
-                    {resolutionSummaryOpen ? <ChevronDown className="w-4 h-4 text-[var(--sf-text-tertiary)]" /> : <ChevronRight className="w-4 h-4 text-[var(--sf-text-tertiary)]" />}
-                    <h2 className="text-sm font-semibold text-[var(--sf-text-primary)]">Resolution Summary</h2>
-                  </div>
-                </button>
-                {resolutionSummaryOpen && (
-                  <div className="sf-detail-grid">
-                    <div className="sf-detail-field"><div className="sf-detail-label">Total Unified Profiles</div><div className="sf-detail-value font-semibold">{fmt(selectedRuleset.totalUnifiedProfiles)}</div></div>
-                    <div className="sf-detail-field"><div className="sf-detail-label">Source Profiles</div><div className="sf-detail-value font-semibold">{fmt(selectedRuleset.sourceProfiles)}</div></div>
-                    <div className="sf-detail-field"><div className="sf-detail-label">Consolidation Rate</div><div className="sf-detail-value font-semibold">{selectedRuleset.consolidationRate}%</div></div>
-                    <div className="sf-detail-field"><div className="sf-detail-label">Matched Source Profiles</div><div className="sf-detail-value font-semibold">{fmt(selectedRuleset.matchedSourceProfiles)}</div></div>
-                  </div>
-                )}
-              </div>
-
-              {/* Properties collapsible */}
-              <div className="sf-card">
-                <button onClick={() => setPropertiesOpen(!propertiesOpen)} className="w-full sf-card-header cursor-pointer hover:bg-[#FAFAF9]">
-                  <div className="flex items-center gap-2">
-                    {propertiesOpen ? <ChevronDown className="w-4 h-4 text-[var(--sf-text-tertiary)]" /> : <ChevronRight className="w-4 h-4 text-[var(--sf-text-tertiary)]" />}
-                    <h2 className="text-sm font-semibold text-[var(--sf-text-primary)]">Properties</h2>
-                  </div>
-                </button>
-                {propertiesOpen && (
-                  <div className="sf-detail-grid">
-                    <div className="sf-detail-field"><div className="sf-detail-label">Ruleset Name</div><div className="sf-detail-value">{selectedRuleset.rulesetName}</div></div>
-                    <div className="sf-detail-field"><div className="sf-detail-label">Ruleset Status</div><div className="sf-detail-value">{selectedRuleset.rulesetStatus}</div></div>
-                    <div className="sf-detail-field"><div className="sf-detail-label">Data Space</div><div className="sf-detail-value sf-link">{selectedRuleset.dataSpace}</div></div>
-                    <div className="sf-detail-field"><div className="sf-detail-label">Description</div><div className="sf-detail-value text-[var(--sf-text-tertiary)]">{selectedRuleset.description || '—'}</div></div>
-                    <div className="sf-detail-field"><div className="sf-detail-label">Primary Data Model Object</div><div className="sf-detail-value">{selectedRuleset.primaryDataModelObject}</div></div>
-                    <div className="sf-detail-field"><div className="sf-detail-label">Secondary Data Model Object</div><div className="sf-detail-value">{selectedRuleset.secondaryDataModelObject}</div></div>
-                    <div className="sf-detail-field">
-                      <div className="sf-detail-label">Created By</div>
-                      <div className="sf-detail-value flex items-center gap-1.5">
-                        <div className="w-5 h-5 rounded-full bg-[#706E6B] flex items-center justify-center flex-shrink-0"><Fingerprint className="w-3 h-3 text-white" /></div>
-                        <span className="sf-link">{selectedRuleset.createdBy}</span><span className="text-[var(--sf-text-tertiary)]">, {selectedRuleset.createdDate}</span>
-                      </div>
-                    </div>
-                    <div className="sf-detail-field"><div className="sf-detail-label">Created Date</div><div className="sf-detail-value">{selectedRuleset.createdDate}</div></div>
-                    <div className="sf-detail-field">
-                      <div className="sf-detail-label">Last Modified By</div>
-                      <div className="sf-detail-value flex items-center gap-1.5">
-                        <div className="w-5 h-5 rounded-full bg-[#706E6B] flex items-center justify-center flex-shrink-0"><Fingerprint className="w-3 h-3 text-white" /></div>
-                        <span className="sf-link">{selectedRuleset.lastModifiedBy}</span><span className="text-[var(--sf-text-tertiary)]">, 1/13/2026, 11:38 PM</span>
-                      </div>
-                    </div>
-                    <div className="sf-detail-field">
-                      <div className="sf-detail-label">Is Scheduled</div>
-                      <div className="sf-detail-value">
-                        <input type="checkbox" checked={selectedRuleset.isScheduled} readOnly className="w-4 h-4 rounded border-[var(--sf-border)]" />
-                      </div>
-                    </div>
-                  </div>
-                )}
-              </div>
-
-              {/* Match Rules card */}
-              <div className="sf-card">
-                <div className="sf-card-header">
-                  <h2 className="text-sm font-semibold text-[var(--sf-text-primary)]">
-                    Match Rules <span className="text-xs font-normal text-[var(--sf-text-tertiary)]">({selectedRuleset.matchRules.length})</span>
-                  </h2>
-                  <button onClick={handleOpenEditMatchRules} className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-white bg-[var(--sf-blue)] rounded hover:bg-[var(--sf-blue-hover)] transition-colors">
-                    <Edit3 className="w-3.5 h-3.5" />
-                    Edit
-                  </button>
-                </div>
-                {selectedRuleset.matchRules.length === 0 ? (
-                  <div className="sf-card-body text-center py-8 text-sm text-[var(--sf-text-tertiary)]">No match rules configured.</div>
-                ) : (
-                  <table className="sf-table">
-                    <thead><tr><th>Priority</th><th>Rule Name</th><th>Match Criteria</th></tr></thead>
-                    <tbody>
-                      {selectedRuleset.matchRules.map((rule) => (
-                        <tr key={rule.id}>
-                          <td className="font-medium">{rule.priority}</td>
-                          <td className="sf-link">{rule.ruleName}</td>
-                          <td>
-                            <div className="flex flex-wrap gap-1">
-                              {rule.criteria.map((c) => (
-                                <span key={c.id} className="sf-badge sf-badge-info">{c.field} ({c.matchMethod})</span>
-                              ))}
-                            </div>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                )}
-              </div>
-
-              {/* Reconciliation Rules card */}
-              <div className="sf-card">
-                <div className="sf-card-header">
-                  <div>
-                    <h2 className="text-sm font-semibold text-[var(--sf-text-primary)]">Reconciliation Rules</h2>
-                    <p className="text-xs text-[var(--sf-text-tertiary)] mt-0.5">Reconciliation rules determine which field value to keep when source profiles are merged into a unified profile.</p>
-                  </div>
-                  {selectedReconFields.size > 0 && (
-                    <button onClick={handleUpdateSelected} className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-white bg-[var(--sf-blue)] rounded hover:bg-[var(--sf-blue-hover)] transition-colors">
-                      Update Selected ({selectedReconFields.size})
+            <div className="flex gap-4 p-6">
+              {/* Left column — Match Rules + Reconciliation Rules */}
+              <div className="flex-1 space-y-4 min-w-0">
+                {/* Match Rules card */}
+                <div className="sf-card">
+                  <div className="sf-card-header">
+                    <h2 className="text-sm font-semibold text-[var(--sf-text-primary)]">
+                      Match Rules <span className="text-xs font-normal text-[var(--sf-text-tertiary)]">({selectedRuleset.matchRules.length})</span>
+                    </h2>
+                    <button onClick={handleOpenEditMatchRules} className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-white bg-[var(--sf-blue)] rounded hover:bg-[var(--sf-blue-hover)] transition-colors">
+                      <Edit3 className="w-3.5 h-3.5" />
+                      Edit
                     </button>
+                  </div>
+                  {selectedRuleset.matchRules.length === 0 ? (
+                    <div className="sf-card-body text-center py-8 text-sm text-[var(--sf-text-tertiary)]">No match rules configured.</div>
+                  ) : (
+                    <div className="sf-card-body space-y-2">
+                      {selectedRuleset.matchRules.map((rule, ri) => (
+                        <div key={rule.id} className="flex items-start gap-3">
+                          {ri > 0 && <span className="text-xs font-bold text-[var(--sf-text-tertiary)] mt-1 w-6 text-center flex-shrink-0">OR</span>}
+                          {ri === 0 && <span className="w-6 flex-shrink-0" />}
+                          <div className={`flex-1 flex items-center gap-2 px-3 py-2.5 rounded-lg border ${
+                            rule.ruleName === 'Unique Identifier 01' ? 'border-[#FFB75D] bg-[#FFFBF5]' : 'border-[var(--sf-border)] bg-[#FAFAF9]'
+                          }`}>
+                            {rule.ruleName === 'Unique Identifier 01' && (
+                              <AlertTriangle className="w-4 h-4 text-[#FFB75D] flex-shrink-0" />
+                            )}
+                            <span className="text-sm text-[var(--sf-text-primary)]">{rule.ruleName}</span>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
                   )}
                 </div>
-                <div>
-                  {selectedRuleset.reconciliationGroups.map((group) => {
-                    const isOpen = reconGroupsOpen[group.dmoName] !== false; // default open
-                    return (
-                      <div key={group.dmoName} className="border-b border-[var(--sf-border-light)] last:border-b-0">
-                        {/* Group header */}
-                        <button onClick={() => toggleReconGroup(group.dmoName)} className="w-full flex items-center justify-between px-4 py-3 hover:bg-[#FAFAF9] transition-colors">
-                          <div className="flex items-center gap-2">
-                            {isOpen ? <ChevronDown className="w-4 h-4 text-[var(--sf-text-tertiary)]" /> : <ChevronRight className="w-4 h-4 text-[var(--sf-text-tertiary)]" />}
-                            <span className="text-sm font-semibold text-[var(--sf-text-primary)]">{group.dmoName}</span>
-                          </div>
-                          <div className="flex items-center gap-2 text-xs text-[var(--sf-text-tertiary)]">
-                            <span>Default Reconciliation Rule:</span>
-                            <span className="font-medium text-[var(--sf-text-secondary)]">{group.defaultRule}</span>
-                            <button
-                              onClick={(e) => { e.stopPropagation(); }}
-                              className="w-6 h-6 flex items-center justify-center rounded hover:bg-[#E5E5E5] text-[var(--sf-text-tertiary)]"
-                              title="Edit Default Reconciliation Rule"
-                            >
-                              <Pencil className="w-3 h-3" />
-                            </button>
-                          </div>
-                        </button>
-                        {/* Group fields */}
-                        {isOpen && (
-                          <table className="sf-table">
-                            <thead>
-                              <tr>
-                                <th className="w-10"></th>
-                                <th>Field</th>
-                                <th>Reconciliation Rule</th>
-                                <th className="w-24 text-center">Using Default?</th>
-                              </tr>
-                            </thead>
-                            <tbody>
-                              {group.fields.map((field) => (
-                                <tr key={field.id}>
-                                  <td>
-                                    <input
-                                      type="checkbox"
-                                      checked={selectedReconFields.has(field.id)}
-                                      onChange={() => toggleReconFieldSelection(field.id)}
-                                      className="w-4 h-4 rounded border-[var(--sf-border)]"
-                                    />
-                                  </td>
-                                  <td>
-                                    <button onClick={() => handleOpenEditReconRule(field)} className="sf-link">
-                                      {field.fieldName}
-                                    </button>
-                                  </td>
-                                  <td>{field.reconciliationRule}</td>
-                                  <td className="text-center">
-                                    {field.usingDefault && <Check className="w-4 h-4 text-[var(--sf-success)] mx-auto" />}
-                                  </td>
+
+                {/* Reconciliation Rules card */}
+                <div className="sf-card">
+                  <div className="sf-card-header">
+                    <div>
+                      <h2 className="text-sm font-semibold text-[var(--sf-text-primary)]">Reconciliation Rules</h2>
+                      <p className="text-xs text-[var(--sf-text-tertiary)] mt-0.5">Reconciliation rules determine which field value to keep when source profiles are merged into a unified profile.</p>
+                    </div>
+                    {selectedReconFields.size > 0 && (
+                      <button onClick={handleUpdateSelected} className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-white bg-[var(--sf-blue)] rounded hover:bg-[var(--sf-blue-hover)] transition-colors">
+                        Update Selected ({selectedReconFields.size})
+                      </button>
+                    )}
+                  </div>
+                  <div>
+                    {selectedRuleset.reconciliationGroups.map((group) => {
+                      const isOpen = reconGroupsOpen[group.dmoName] !== false;
+                      return (
+                        <div key={group.dmoName} className="border-b border-[var(--sf-border-light)] last:border-b-0">
+                          <button onClick={() => toggleReconGroup(group.dmoName)} className="w-full flex items-center justify-between px-4 py-3 hover:bg-[#FAFAF9] transition-colors">
+                            <div className="flex items-center gap-2">
+                              {isOpen ? <ChevronDown className="w-4 h-4 text-[var(--sf-text-tertiary)]" /> : <ChevronRight className="w-4 h-4 text-[var(--sf-text-tertiary)]" />}
+                              <span className="text-sm font-semibold text-[var(--sf-text-primary)]">{group.dmoName}</span>
+                            </div>
+                            <div className="flex items-center gap-2 text-xs text-[var(--sf-text-tertiary)]">
+                              <span>Default Reconciliation Rule:</span>
+                              <span className="font-medium text-[var(--sf-text-secondary)]">{group.defaultRule}</span>
+                              <button
+                                onClick={(e) => { e.stopPropagation(); }}
+                                className="w-6 h-6 flex items-center justify-center rounded hover:bg-[#E5E5E5] text-[var(--sf-text-tertiary)]"
+                                title="Edit Default Reconciliation Rule"
+                              >
+                                <Pencil className="w-3 h-3" />
+                              </button>
+                            </div>
+                          </button>
+                          {isOpen && (
+                            <table className="sf-table">
+                              <thead>
+                                <tr>
+                                  <th className="w-10"></th>
+                                  <th>Field</th>
+                                  <th>Reconciliation Rule</th>
+                                  <th className="w-24 text-center">Using Default?</th>
                                 </tr>
-                              ))}
-                            </tbody>
-                          </table>
-                        )}
-                      </div>
-                    );
-                  })}
+                              </thead>
+                              <tbody>
+                                {group.fields.map((field) => (
+                                  <tr key={field.id}>
+                                    <td>
+                                      <input
+                                        type="checkbox"
+                                        checked={selectedReconFields.has(field.id)}
+                                        onChange={() => toggleReconFieldSelection(field.id)}
+                                        className="w-4 h-4 rounded border-[var(--sf-border)]"
+                                      />
+                                    </td>
+                                    <td>
+                                      <button onClick={() => handleOpenEditReconRule(field)} className="sf-link">
+                                        {field.fieldName}
+                                      </button>
+                                    </td>
+                                    <td>{field.reconciliationRule}</td>
+                                    <td className="text-center">
+                                      {field.usingDefault && <Check className="w-4 h-4 text-[var(--sf-success)] mx-auto" />}
+                                    </td>
+                                  </tr>
+                                ))}
+                              </tbody>
+                            </table>
+                          )}
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              </div>
+
+              {/* Right sidebar — Resolution Summary + Warnings + Feed */}
+              <div className="w-[320px] flex-shrink-0 space-y-4">
+                {/* Resolution Summary */}
+                <div className="sf-card">
+                  <div className="px-4 py-3 border-b-2 border-[var(--sf-blue)]">
+                    <h3 className="text-sm font-semibold text-[var(--sf-blue)]">Resolution Summary</h3>
+                  </div>
+                  <div className="p-4 space-y-3">
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs text-[var(--sf-text-tertiary)]">Total Unified Profiles</span>
+                      <span className="text-sm font-bold text-[var(--sf-text-primary)]">{fmt(selectedRuleset.totalUnifiedProfiles)}</span>
+                    </div>
+                    <div className="text-xs text-[var(--sf-text-tertiary)]">/ {fmt(selectedRuleset.sourceProfiles)} Source Profiles</div>
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs text-[var(--sf-text-tertiary)]">Consolidation Rate</span>
+                      <span className="text-sm font-bold text-[var(--sf-text-primary)]">{selectedRuleset.consolidationRate}%</span>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs text-[var(--sf-text-tertiary)]">Known Unified Profiles</span>
+                      <span className="text-sm font-medium text-[var(--sf-text-primary)]">{fmt(selectedRuleset.totalUnifiedProfiles)}</span>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs text-[var(--sf-text-tertiary)]">Anonymous Unified Profiles</span>
+                      <span className="text-sm font-medium text-[var(--sf-text-primary)]">8</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Warnings */}
+                <div className="sf-card">
+                  <div className="px-4 py-3 border-b border-[var(--sf-border)]">
+                    <div className="flex items-center gap-2">
+                      <AlertTriangle className="w-4 h-4 text-[#FFB75D]" />
+                      <h3 className="text-sm font-semibold text-[var(--sf-text-primary)]">Warnings (2)</h3>
+                    </div>
+                  </div>
+                  <div className="p-4 space-y-2">
+                    <div className="flex items-start gap-2 text-xs text-[var(--sf-text-secondary)]">
+                      <AlertTriangle className="w-3.5 h-3.5 text-[#FFB75D] flex-shrink-0 mt-0.5" />
+                      <span>Match rule &ldquo;Unique Identifier 01&rdquo; may produce false positives with non-unique identifiers.</span>
+                    </div>
+                    <div className="flex items-start gap-2 text-xs text-[var(--sf-text-secondary)]">
+                      <AlertTriangle className="w-3.5 h-3.5 text-[#FFB75D] flex-shrink-0 mt-0.5" />
+                      <span>Consolidation rate below 15% — consider reviewing match rules for better coverage.</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Post / Poll / Question feed */}
+                <div className="sf-card">
+                  <div className="flex border-b border-[var(--sf-border)]">
+                    {['Post', 'Poll', 'Question'].map((tab) => (
+                      <button
+                        key={tab}
+                        className={`px-4 py-2.5 text-xs font-medium border-b-2 transition-colors ${
+                          tab === 'Post'
+                            ? 'border-[var(--sf-blue)] text-[var(--sf-blue)]'
+                            : 'border-transparent text-[var(--sf-text-tertiary)] hover:text-[var(--sf-text-secondary)]'
+                        }`}
+                      >
+                        {tab}
+                      </button>
+                    ))}
+                  </div>
+                  <div className="p-3">
+                    <div className="flex items-center gap-2">
+                      <input
+                        type="text"
+                        placeholder="Share an update..."
+                        className="flex-1 px-3 py-1.5 text-xs border border-[var(--sf-border)] rounded focus:outline-none focus:border-[var(--sf-blue-light)]"
+                      />
+                      <button className="px-3 py-1.5 text-xs font-medium text-white bg-[var(--sf-blue)] rounded hover:bg-[var(--sf-blue-hover)]">
+                        Share
+                      </button>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
