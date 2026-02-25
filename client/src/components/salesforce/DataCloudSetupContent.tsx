@@ -168,7 +168,7 @@ interface DataCloudSetupContentProps {
 
 // ── Component ────────────────────────────────────────────────────────
 export default function DataCloudSetupContent({ onBack }: DataCloudSetupContentProps) {
-  const [activeNavItem, setActiveNavItem] = useState('salesforce-crm');
+  const [activeNavItem, setActiveNavItem] = useState('setup-home');
   const [quickFindQuery, setQuickFindQuery] = useState('');
   const [expandedNavItems, setExpandedNavItems] = useState<Set<string>>(new Set(['feature-manager']));
 
@@ -491,7 +491,7 @@ export default function DataCloudSetupContent({ onBack }: DataCloudSetupContentP
     return Math.round((completed / sol.steps.length) * 100);
   };
 
-  const currentPageLabel = activeNavItem === 'salesforce-crm' ? 'Salesforce CRM' : (activeNavItem === 'informatica-mdm' || activeNavItem === 'informatica-mdm-sf') ? 'Informatica MDM' : activeNavItem === 'solution-manager' ? 'Solution Manager' : setupNavSections.flatMap((s) => s.items).find((i) => i.id === activeNavItem)?.label || 'Setup';
+  const currentPageLabel = activeNavItem === 'setup-home' ? 'Data Cloud Setup Home' : activeNavItem === 'salesforce-crm' ? 'Salesforce CRM' : (activeNavItem === 'informatica-mdm' || activeNavItem === 'informatica-mdm-sf') ? 'Informatica MDM' : activeNavItem === 'solution-manager' ? 'Solution Manager' : setupNavSections.flatMap((s) => s.items).find((i) => i.id === activeNavItem)?.label || 'Setup';
   const currentConnections = isInformatica ? informaticaConnections : sfdcConnections;
   const currentBundles = isInformatica ? informaticaBundles : sfdcBundles;
   const connectorName = isInformatica ? 'Informatica MDM' : 'Salesforce CRM';
@@ -591,7 +591,65 @@ export default function DataCloudSetupContent({ onBack }: DataCloudSetupContentP
 
         {/* ── Main Content ── */}
         <main className="flex-1 overflow-y-auto bg-[var(--sf-content-bg)]">
-          {activeNavItem === 'solution-manager' ? (
+          {activeNavItem === 'setup-home' ? (
+            /* ═══════════════════════════════════════════════════════════
+               DATA CLOUD SETUP HOME — Landing page
+               ═══════════════════════════════════════════════════════════ */
+            <div className="p-6">
+              {/* Welcome banner */}
+              <div className="sf-card mb-6">
+                <div className="p-6 flex items-center gap-5">
+                  <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-[#032D60] to-[#0070D2] flex items-center justify-center flex-shrink-0">
+                    <Cloud className="w-7 h-7 text-white" />
+                  </div>
+                  <div className="flex-1">
+                    <h1 className="text-xl font-bold text-[var(--sf-text-primary)]">Data Cloud Setup Home</h1>
+                    <p className="text-sm text-[var(--sf-text-tertiary)] mt-1">Configure connectors, manage data spaces, and set up your Data 360 environment.</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Recommended Setup cards */}
+              <div className="mb-3">
+                <h2 className="text-sm font-bold text-[var(--sf-text-primary)] uppercase tracking-wider">Recommended Setup</h2>
+              </div>
+              <div className="grid grid-cols-3 gap-4">
+                {[
+                  { id: 'salesforce-crm', label: 'Salesforce CRM Connector', desc: 'Connect Salesforce CRM data to Data Cloud for unified profiles.', color: '#706E6B', icon: 'cloud' },
+                  { id: 'informatica-mdm-sf', label: 'Informatica MDM Connector', desc: 'Integrate Informatica MDM business entities into Data 360.', color: '#FF4A00', icon: 'cog', badge: 'New' },
+                  { id: 'solution-manager', label: 'Solution Manager', desc: 'Step-by-step guided setup for Informatica integration phases.', color: '#0070D2', icon: 'zap', badge: 'New' },
+                  { id: 'data-spaces', label: 'Data Spaces', desc: 'Manage data spaces and configure data isolation boundaries.', color: '#032D60', icon: 'grid' },
+                  { id: 'permission-sets', label: 'Permission Sets', desc: 'Assign and manage user permissions for Data Cloud features.', color: '#54698D', icon: 'settings' },
+                  { id: 'feature-manager', label: 'Feature Manager', desc: 'Enable and disable Data Cloud features for your org.', color: '#2E844A', icon: 'zap' },
+                ].map((card) => (
+                  <button
+                    key={card.id}
+                    onClick={() => setActiveNavItem(card.id)}
+                    className="sf-card text-left hover:shadow-md transition-shadow group relative"
+                  >
+                    {card.badge && (
+                      <div className={`absolute top-0 right-0 px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider text-white rounded-bl-lg rounded-tr-[7px] ${
+                        card.color === '#FF4A00' ? 'bg-[#FF4A00]' : 'bg-[#0070D2]'
+                      }`}>
+                        {card.badge}
+                      </div>
+                    )}
+                    <div className="p-5">
+                      <div className="w-10 h-10 rounded-lg flex items-center justify-center mb-3" style={{ backgroundColor: card.color }}>
+                        {card.icon === 'cloud' && <Cloud className="w-5 h-5 text-white" />}
+                        {card.icon === 'cog' && <Cog className="w-5 h-5 text-white" />}
+                        {card.icon === 'zap' && <Zap className="w-5 h-5 text-white" />}
+                        {card.icon === 'grid' && <LayoutGrid className="w-5 h-5 text-white" />}
+                        {card.icon === 'settings' && <Settings className="w-5 h-5 text-white" />}
+                      </div>
+                      <h3 className="text-sm font-semibold text-[var(--sf-text-primary)] group-hover:text-[var(--sf-blue)] transition-colors">{card.label}</h3>
+                      <p className="text-xs text-[var(--sf-text-tertiary)] mt-1 leading-relaxed">{card.desc}</p>
+                    </div>
+                  </button>
+                ))}
+              </div>
+            </div>
+          ) : activeNavItem === 'solution-manager' ? (
             /* ═══════════════════════════════════════════════════════════
                SOLUTION MANAGER CONTENT
                ═══════════════════════════════════════════════════════════ */
