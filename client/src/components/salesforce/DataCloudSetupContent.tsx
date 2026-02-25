@@ -188,6 +188,7 @@ export default function DataCloudSetupContent({ onBack }: DataCloudSetupContentP
   // Setup Home state
   const [setupHomeLearnOpen, setSetupHomeLearnOpen] = useState(true);
   const [setupHomeTab, setSetupHomeTab] = useState<'get-started' | 'plan-data' | 'monitor'>('get-started');
+  const [mdsSimulatorVisible, setMdsSimulatorVisible] = useState(false);
 
   // Solution Manager state
   const [smActiveSolution, setSmActiveSolution] = useState<string | null>(null);
@@ -656,6 +657,68 @@ export default function DataCloudSetupContent({ onBack }: DataCloudSetupContentP
                   </svg>
                 </div>
               </div>
+
+              {/* ── Admin Toggle Panel ── */}
+              <div className="px-6 pt-6 pb-2">
+                <div className="border border-[var(--sf-border)] rounded-lg bg-white overflow-hidden">
+                  <div className="flex items-center justify-between px-5 py-3">
+                    <div className="flex items-center gap-3">
+                      <span className="text-2xl">😊</span>
+                      <div>
+                        <h4 className="text-sm font-semibold text-[var(--sf-text-primary)]">Prototype Controls</h4>
+                        <p className="text-[10px] text-[var(--sf-text-tertiary)]">Toggle visibility of simulator branding elements</p>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-4">
+                      <div className="flex items-center gap-2">
+                        <span className="text-lg">😄</span>
+                        <label className="text-xs font-medium text-[var(--sf-text-secondary)]">MDS Simulator</label>
+                        <button
+                          onClick={() => setMdsSimulatorVisible(!mdsSimulatorVisible)}
+                          className={`relative w-10 h-5 rounded-full transition-colors ${mdsSimulatorVisible ? 'bg-[var(--sf-blue)]' : 'bg-[#D8DDE6]'}`}
+                        >
+                          <div className={`absolute top-0.5 w-4 h-4 rounded-full bg-white shadow transition-transform ${mdsSimulatorVisible ? 'translate-x-5' : 'translate-x-0.5'}`} />
+                        </button>
+                      </div>
+                      <span className="text-2xl">😎</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* MDS Simulator thinking indicator — hidden by default */}
+              {mdsSimulatorVisible && (
+                <div className="px-6 pb-2">
+                  <div className="border-2 border-dashed border-[var(--sf-blue)]/30 rounded-lg bg-[#EEF4FF] p-4 flex items-center gap-4">
+                    {/* Thinking animation */}
+                    <div className="relative w-12 h-12 flex items-center justify-center flex-shrink-0">
+                      <div className="absolute inset-0 rounded-full border-2 border-[var(--sf-blue)]/20 border-t-[var(--sf-blue)] animate-spin" />
+                      <div className="absolute inset-1.5 rounded-full border-2 border-[#FF4A00]/20 border-b-[#FF4A00] animate-spin" style={{ animationDirection: 'reverse', animationDuration: '1.5s' }} />
+                      <span className="text-lg">🧠</span>
+                    </div>
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2 mb-1">
+                        <div className="flex gap-0.5">
+                          <div className="w-1.5 h-1.5 rounded-full bg-[var(--sf-blue)] animate-bounce" style={{ animationDelay: '0ms' }} />
+                          <div className="w-1.5 h-1.5 rounded-full bg-[var(--sf-blue)] animate-bounce" style={{ animationDelay: '150ms' }} />
+                          <div className="w-1.5 h-1.5 rounded-full bg-[var(--sf-blue)] animate-bounce" style={{ animationDelay: '300ms' }} />
+                        </div>
+                        <span className="text-xs font-medium text-[var(--sf-blue)]">Thinking...</span>
+                      </div>
+                      <div className="text-base font-bold text-[var(--sf-text-primary)] tracking-wide">
+                        MDS Simulator
+                      </div>
+                      <p className="text-[10px] text-[var(--sf-text-tertiary)] mt-0.5">
+                        Multi-Domain Simulator — Informatica MDM + Salesforce Data Cloud prototype environment
+                      </p>
+                    </div>
+                    <div className="flex flex-col items-center gap-1 flex-shrink-0">
+                      <span className="text-3xl">😃</span>
+                      <span className="text-[9px] text-[var(--sf-text-tertiary)] font-medium">Active</span>
+                    </div>
+                  </div>
+                </div>
+              )}
 
               {/* Learn About Data Cloud — collapsible */}
               <div className="px-6 py-6">
