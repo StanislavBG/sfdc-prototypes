@@ -429,7 +429,7 @@ export default function DataStreamsContent({ demoSession }: DataStreamsContentPr
   // New Data Stream modal
   const [newModalOpen, setNewModalOpen] = useState(false);
   const [newModalStep, setNewModalStep] = useState<1 | 2 | 3 | 4>(1);
-  const [selectedSource, setSelectedSource] = useState<'salesforce' | 'informatica' | null>(null);
+  const [selectedSource, setSelectedSource] = useState<string | null>(null);
 
   // Data Space selection (Step 4)
   const [selectedDataSpace, setSelectedDataSpace] = useState('default');
@@ -501,9 +501,26 @@ export default function DataStreamsContent({ demoSession }: DataStreamsContentPr
     setNewModalOpen(true);
   };
 
+  // Resolve any selectedSource to a display name/color
+  const allConnectorSources = [...otherSources, ...explorerConnectors];
+  const resolveSourceInfo = (src: string | null): { name: string; color: string; icon: string; category: string } => {
+    if (!src) return { name: '', color: '#706E6B', icon: '', category: '' };
+    if (src === 'salesforce') return { name: 'Salesforce CRM', color: '#0070D2', icon: 'sf', category: 'CRM' };
+    if (src === 'informatica') return { name: 'Informatica MDM', color: '#FF4A00', icon: 'INFA', category: 'MDM' };
+    const found = allConnectorSources.find((c) => c.id === src);
+    if (found) return { name: found.name, color: found.color, icon: found.icon, category: found.category };
+    return { name: src, color: '#706E6B', icon: '?', category: '' };
+  };
+  const isCoreSource = selectedSource === 'salesforce' || selectedSource === 'informatica';
+
   const handleNewNext = () => {
     if (newModalStep === 1 && selectedSource) {
-      setNewModalStep(2);
+      // Core sources go to Step 2 (bundle selection); others skip to Step 3
+      if (selectedSource === 'salesforce' || selectedSource === 'informatica') {
+        setNewModalStep(2);
+      } else {
+        setNewModalStep(3);
+      }
     } else if (newModalStep === 2) {
       if (selectedSource === 'informatica' && selectedBundles.size > 0) {
         setNewModalStep(3);
@@ -517,7 +534,14 @@ export default function DataStreamsContent({ demoSession }: DataStreamsContentPr
 
   const handleNewBack = () => {
     if (newModalStep === 2) setNewModalStep(1);
-    else if (newModalStep === 3) setNewModalStep(2);
+    else if (newModalStep === 3) {
+      // Non-core sources skip Step 2, go back to Step 1
+      if (selectedSource === 'salesforce' || selectedSource === 'informatica') {
+        setNewModalStep(2);
+      } else {
+        setNewModalStep(1);
+      }
+    }
     else if (newModalStep === 4) setNewModalStep(3);
   };
 
@@ -553,6 +577,22 @@ export default function DataStreamsContent({ demoSession }: DataStreamsContentPr
         }
       });
       setDataStreams((prev) => [...prev, ...newStreams]);
+    } else if (selectedSource && selectedSource !== 'salesforce') {
+      // Generic connector source — create a placeholder stream
+      const info = resolveSourceInfo(selectedSource);
+      const newStream: DataStream = {
+        id: `ds-gen-${Date.now()}`,
+        name: `${info.name} Stream`,
+        source: info.name,
+        sourceType: 'api',
+        object: info.name,
+        status: 'Pending',
+        recordsProcessed: 0,
+        lastRefreshed: '—',
+        refreshFrequency: 'Every 1 hour',
+        dataSpace: selectedDataSpace,
+      };
+      setDataStreams((prev) => [...prev, newStream]);
     }
     setNewModalOpen(false);
   };
@@ -1067,20 +1107,33 @@ export default function DataStreamsContent({ demoSession }: DataStreamsContentPr
                     <div>
                       <h3 className="text-xs font-semibold uppercase tracking-wider text-[var(--sf-text-tertiary)] mb-3">Other Sources</h3>
                       <div className="grid grid-cols-4 gap-2">
-                        {otherSources.map((src) => (
-                          <button
-                            key={src.id}
-                            className="flex flex-col items-center gap-2 p-3 rounded-lg border border-[var(--sf-border)] bg-white hover:border-[#B0B0B0] hover:bg-[#FAFAF9] transition-all text-center"
-                          >
-                            <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ backgroundColor: src.color + '18' }}>
-                              {src.icon === '↑' ? <Upload className="w-4 h-4" style={{ color: src.color }} /> :
-                               src.icon === 'API' ? <Server className="w-4 h-4" style={{ color: src.color }} /> :
-                               src.icon === 'S2S' ? <Globe className="w-4 h-4" style={{ color: src.color }} /> :
-                               <Database className="w-4 h-4" style={{ color: src.color }} />}
-                            </div>
-                            <span className="text-[11px] font-medium text-[var(--sf-text-primary)] leading-tight">{src.name}</span>
-                          </button>
-                        ))}
+                        {otherSources.map((src) => {
+                          const isSelected = selectedSource === src.id;
+                          return (
+                            <button
+                              key={src.id}
+                              onClick={() => setSelectedSource(src.id)}
+                              className={`relative flex flex-col items-center gap-2 p-3 rounded-lg border-2 transition-all text-center ${
+                                isSelected
+                                  ? 'border-[var(--sf-blue)] bg-[#EEF4FF] shadow-sm'
+                                  : 'border-[var(--sf-border)] bg-white hover:border-[#B0B0B0] hover:bg-[#FAFAF9]'
+                              }`}
+                            >
+                              {isSelected && (
+                                <div className="absolute top-0 right-0 w-5 h-5 bg-[var(--sf-blue)] flex items-center justify-center" style={{ clipPath: 'polygon(0 0, 100% 0, 100% 100%)' }}>
+                                  <Check className="w-2 h-2 text-white absolute top-0.5 right-0.5" />
+                                </div>
+                              )}
+                              <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ backgroundColor: src.color + '18' }}>
+                                {src.icon === '↑' ? <Upload className="w-4 h-4" style={{ color: src.color }} /> :
+                                 src.icon === 'API' ? <Server className="w-4 h-4" style={{ color: src.color }} /> :
+                                 src.icon === 'S2S' ? <Globe className="w-4 h-4" style={{ color: src.color }} /> :
+                                 <Database className="w-4 h-4" style={{ color: src.color }} />}
+                              </div>
+                              <span className="text-[11px] font-medium text-[var(--sf-text-primary)] leading-tight">{src.name}</span>
+                            </button>
+                          );
+                        })}
                       </div>
                     </div>
 
@@ -1117,20 +1170,33 @@ export default function DataStreamsContent({ demoSession }: DataStreamsContentPr
                       {/* Scrollable connector grid */}
                       <div className="max-h-[260px] overflow-y-auto border border-[var(--sf-border)] rounded-lg bg-[#FAFAF9] p-3">
                         <div className="grid grid-cols-4 gap-2">
-                          {filteredConnectors.map((conn) => (
-                            <button
-                              key={conn.id}
-                              className="flex items-center gap-2.5 p-2.5 rounded-lg border border-[var(--sf-border)] bg-white hover:border-[#B0B0B0] hover:shadow-sm transition-all text-left group"
-                            >
-                              <div className="w-8 h-8 rounded flex items-center justify-center flex-shrink-0" style={{ backgroundColor: conn.color }}>
-                                <span className="text-[9px] font-bold text-white leading-none">{conn.icon}</span>
-                              </div>
-                              <div className="flex-1 min-w-0">
-                                <div className="text-[11px] font-medium text-[var(--sf-text-primary)] truncate leading-tight">{conn.name}</div>
-                                <div className="text-[9px] text-[var(--sf-text-tertiary)] truncate">{conn.category}</div>
-                              </div>
-                            </button>
-                          ))}
+                          {filteredConnectors.map((conn) => {
+                            const isSelected = selectedSource === conn.id;
+                            return (
+                              <button
+                                key={conn.id}
+                                onClick={() => setSelectedSource(conn.id)}
+                                className={`relative flex items-center gap-2.5 p-2.5 rounded-lg border-2 transition-all text-left group ${
+                                  isSelected
+                                    ? 'border-[var(--sf-blue)] bg-[#EEF4FF] shadow-sm'
+                                    : 'border-[var(--sf-border)] bg-white hover:border-[#B0B0B0] hover:shadow-sm'
+                                }`}
+                              >
+                                {isSelected && (
+                                  <div className="absolute top-0 right-0 w-5 h-5 bg-[var(--sf-blue)] flex items-center justify-center" style={{ clipPath: 'polygon(0 0, 100% 0, 100% 100%)' }}>
+                                    <Check className="w-2 h-2 text-white absolute top-0.5 right-0.5" />
+                                  </div>
+                                )}
+                                <div className="w-8 h-8 rounded flex items-center justify-center flex-shrink-0" style={{ backgroundColor: conn.color }}>
+                                  <span className="text-[9px] font-bold text-white leading-none">{conn.icon}</span>
+                                </div>
+                                <div className="flex-1 min-w-0">
+                                  <div className="text-[11px] font-medium text-[var(--sf-text-primary)] truncate leading-tight">{conn.name}</div>
+                                  <div className="text-[9px] text-[var(--sf-text-tertiary)] truncate">{conn.category}</div>
+                                </div>
+                              </button>
+                            );
+                          })}
                           {filteredConnectors.length === 0 && (
                             <div className="col-span-4 py-8 text-center text-xs text-[var(--sf-text-tertiary)]">
                               No connectors match your search.
@@ -1398,7 +1464,7 @@ export default function DataStreamsContent({ demoSession }: DataStreamsContentPr
                     <div className="sf-detail-grid">
                       <div className="sf-detail-field">
                         <div className="sf-detail-label">Source</div>
-                        <div className="sf-detail-value font-medium">{selectedSource === 'informatica' ? 'Informatica MDM' : 'Salesforce CRM'}</div>
+                        <div className="sf-detail-value font-medium">{resolveSourceInfo(selectedSource).name}</div>
                       </div>
                       {selectedSource === 'informatica' && (
                         <>
@@ -1420,6 +1486,12 @@ export default function DataStreamsContent({ demoSession }: DataStreamsContentPr
                             </div>
                           </div>
                         </>
+                      )}
+                      {!isCoreSource && (
+                        <div className="sf-detail-field">
+                          <div className="sf-detail-label">Category</div>
+                          <div className="sf-detail-value">{resolveSourceInfo(selectedSource).category}</div>
+                        </div>
                       )}
                       <div className="sf-detail-field">
                         <div className="sf-detail-label">Refresh Frequency</div>
@@ -1468,6 +1540,13 @@ export default function DataStreamsContent({ demoSession }: DataStreamsContentPr
                       { name: 'Contact_Home', category: 'Other' },
                     );
                   }
+                } else {
+                  // Generic connector source — show placeholder objects
+                  const info = resolveSourceInfo(selectedSource);
+                  objectRows.push(
+                    { name: `${info.name.replace(/\s+/g, '')}_Record`, category: info.category || 'Connector' },
+                    { name: `${info.name.replace(/\s+/g, '')}_Event`, category: info.category || 'Connector' },
+                  );
                 }
                 return (
                   <div className="flex gap-5">
