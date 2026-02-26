@@ -477,8 +477,8 @@ export default function DataStreamsContent({ demoSession }: DataStreamsContentPr
     return '📄';
   };
 
-  // Combine user-created streams with session-derived Informatica streams
-  const allStreams = [...dataStreams, ...sessionStreams.filter((ss) => !dataStreams.some((ds) => ds.id === ss.id))];
+  // Combine streams: session-derived Informatica streams go on TOP, then user-created/base streams
+  const allStreams = [...sessionStreams.filter((ss) => !dataStreams.some((ds) => ds.id === ss.id)), ...dataStreams];
 
   // Filter streams
   const filteredStreams = allStreams.filter((ds) => {
@@ -584,7 +584,7 @@ export default function DataStreamsContent({ demoSession }: DataStreamsContentPr
           });
         }
       });
-      setDataStreams((prev) => [...prev, ...newStreams]);
+      setDataStreams((prev) => [...newStreams, ...prev]);
     } else if (selectedSource && selectedSource !== 'salesforce') {
       // Generic connector source — create a placeholder stream
       const info = resolveSourceInfo(selectedSource);
@@ -600,7 +600,7 @@ export default function DataStreamsContent({ demoSession }: DataStreamsContentPr
         refreshFrequency: 'Every 1 hour',
         dataSpace: selectedDataSpace,
       };
-      setDataStreams((prev) => [...prev, newStream]);
+      setDataStreams((prev) => [newStream, ...prev]);
     }
     setNewModalOpen(false);
   };
