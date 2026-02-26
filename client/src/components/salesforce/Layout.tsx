@@ -63,7 +63,7 @@ export default function Layout({ children }: LayoutProps) {
     setShowDataCloudSetup(false);
     if (id === 'context-explorer') {
       setActiveTab('Context Manager');
-    } else if (id === 'today' && activeTab === 'Context Manager' && currentApp !== 'data-cloud') {
+    } else if ((id === 'today' || id === '264-release') && activeTab === 'Context Manager' && currentApp !== 'data-cloud') {
       setActiveTab('Home');
     }
   };
@@ -117,7 +117,8 @@ export default function Layout({ children }: LayoutProps) {
   }, [showToast]);
 
   // Determine layout based on timeline
-  const showTodayLayout = currentTimeline === 'today' || currentTimeline === 'context-explorer';
+  // Today, 264 Release, and Context Explorer all use the LeftNav + Content layout
+  const showTodayLayout = currentTimeline === 'today' || currentTimeline === '264-release' || currentTimeline === 'context-explorer';
 
   // Data Cloud Setup takes over the whole content area
   if (showDataCloudSetup) {
@@ -141,7 +142,7 @@ export default function Layout({ children }: LayoutProps) {
         />
         <div className="flex flex-1 overflow-hidden">
           <main ref={mainRef} className="flex-1 overflow-y-auto">
-            <DataCloudSetupContent onBack={() => setShowDataCloudSetup(false)} demoSession={demoSession} onDemoSessionChange={setDemoSession} />
+            <DataCloudSetupContent onBack={() => setShowDataCloudSetup(false)} demoSession={demoSession} onDemoSessionChange={setDemoSession} currentTimeline={currentTimeline} />
           </main>
         </div>
         <TimeMachine
@@ -200,9 +201,9 @@ export default function Layout({ children }: LayoutProps) {
               ) : activeTab === 'Context Manager' ? (
                 <HelpDocExplorer />
               ) : activeTab === 'Identity Resolutions' ? (
-                <IdentityResolutionContent demoSession={demoSession} onDemoSessionChange={setDemoSession} />
+                <IdentityResolutionContent demoSession={demoSession} onDemoSessionChange={setDemoSession} currentTimeline={currentTimeline} />
               ) : activeTab === 'Data Streams' ? (
-                <DataStreamsContent demoSession={demoSession} />
+                <DataStreamsContent demoSession={demoSession} currentTimeline={currentTimeline} />
               ) : (
                 <div className="p-6">
                   <div className="sf-card">
