@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useMdsSimulator } from './MdsSimulatorContext';
 import {
   Plus,
   Search,
@@ -410,6 +411,7 @@ const bundleToStreams: Record<string, DataStream[]> = {
 
 // ── Component ────────────────────────────────────────────────────────
 export default function DataStreamsContent({ demoSession, currentTimeline }: DataStreamsContentProps) {
+  const { triggerDelay } = useMdsSimulator();
   const is264Release = currentTimeline === '264-release';
 
   // Compute session-aware data streams: base Salesforce streams + streams from installed bundles
@@ -526,20 +528,22 @@ export default function DataStreamsContent({ demoSession, currentTimeline }: Dat
     if (newModalStep === 1 && selectedSource) {
       // Core sources go to Step 2 (bundle selection); others skip to Step 3
       if (selectedSource === 'salesforce' || selectedSource === 'informatica') {
-        setStep2Loading(true);
-        setNewModalStep(2);
-        setTimeout(() => setStep2Loading(false), 1500);
+        triggerDelay(() => {
+          setStep2Loading(true);
+          setNewModalStep(2);
+          setTimeout(() => setStep2Loading(false), 1500);
+        });
       } else {
-        setNewModalStep(3);
+        triggerDelay(() => setNewModalStep(3));
       }
     } else if (newModalStep === 2) {
       if (selectedSource === 'informatica' && selectedBundles.size > 0) {
-        setNewModalStep(3);
+        triggerDelay(() => setNewModalStep(3));
       } else if (selectedSource === 'salesforce') {
-        setNewModalStep(3);
+        triggerDelay(() => setNewModalStep(3));
       }
     } else if (newModalStep === 3) {
-      setNewModalStep(4);
+      triggerDelay(() => setNewModalStep(4));
     }
   };
 
@@ -566,6 +570,10 @@ export default function DataStreamsContent({ demoSession, currentTimeline }: Dat
   };
 
   const handleCreateStreams = () => {
+    triggerDelay(() => handleCreateStreamsInner());
+  };
+
+  const handleCreateStreamsInner = () => {
     if (selectedSource === 'informatica') {
       const newStreams: DataStream[] = [];
       selectedBundles.forEach((bundleId) => {
