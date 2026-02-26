@@ -52,7 +52,10 @@ interface SetupPage {
 const setupNavSections: { title: string; items: SetupPage[] }[] = [
   {
     title: '',
-    items: [{ id: 'setup-home', label: 'Data Cloud Setup Home', section: '' }],
+    items: [
+      { id: 'setup-home', label: 'Data Cloud Setup Home', section: '' },
+      { id: 'installed-packages', label: 'Installed Packages', section: '' },
+    ],
   },
   {
     title: 'USER MANAGEMENT',
@@ -169,15 +172,39 @@ interface DemoSessionState {
   installedDatakits: string[];
 }
 
+// ── Installed Package type ──────────────────────────────────────────
+interface InstalledPackage {
+  name: string;
+  publisher: string;
+  versionNumber: string;
+  namespacePrefix: string;
+  installDate: string;
+  limits: boolean;
+  apps: number;
+  tabs: number;
+  objects: number;
+  appExchangeReady: 'Passed' | 'Not Passed';
+  description?: string;
+  versionName?: string;
+  packageType?: string;
+  packageId?: string;
+  language?: string;
+  isInformatica?: boolean;
+}
+
+const baseInstalledPackages: InstalledPackage[] = [
+  { name: 'Salesforce Standard Data Model', publisher: 'Salesforce', versionNumber: '1.126', namespacePrefix: 'ssot', installDate: '4/30/2025, 11:40 AM', limits: false, apps: 0, tabs: 0, objects: 0, appExchangeReady: 'Not Passed', description: 'This package contains the standard data model for Data Cloud. Visit the link (https://sfdc.co/dcssot) if you receive a version installation error.', versionName: 'Spring 2025', packageType: 'Managed', packageId: '033B0000000PulE', language: 'English' },
+  { name: 'CDPAdvertising', publisher: 'Salesforce', versionNumber: '3.21', namespacePrefix: 'cdpactvstrgptnr', installDate: '4/30/2025, 11:16 AM', limits: true, apps: 0, tabs: 0, objects: 0, appExchangeReady: 'Passed', versionName: 'Spring 2025', packageType: 'Managed', packageId: '033B0000000QxlF', language: 'English' },
+];
+
 interface DataCloudSetupContentProps {
   onBack?: () => void;
   demoSession?: DemoSessionState;
   onDemoSessionChange?: (session: DemoSessionState) => void;
-  onNavigateToDataStreamsBundles?: () => void;
 }
 
 // ── Component ────────────────────────────────────────────────────────
-export default function DataCloudSetupContent({ onBack, demoSession, onDemoSessionChange, onNavigateToDataStreamsBundles }: DataCloudSetupContentProps) {
+export default function DataCloudSetupContent({ onBack, demoSession, onDemoSessionChange }: DataCloudSetupContentProps) {
   const [activeNavItem, setActiveNavItem] = useState('setup-home');
   const [quickFindQuery, setQuickFindQuery] = useState('');
   const [expandedNavItems, setExpandedNavItems] = useState<Set<string>>(new Set(['feature-manager']));
@@ -185,6 +212,16 @@ export default function DataCloudSetupContent({ onBack, demoSession, onDemoSessi
   // Persisted connections state
   const [sfdcConnections, setSfdcConnections] = useState<Connection[]>(initialSfdcConnections);
   const [informaticaConnections, setInformaticaConnections] = useState<Connection[]>(initialInformaticaConnections);
+
+  // Install Bundle wizard modal
+  const [installModalOpen, setInstallModalOpen] = useState(false);
+  const [installModalBundle, setInstallModalBundle] = useState<DataBundle | null>(null);
+  const [installModalChoice, setInstallModalChoice] = useState<'admins' | 'all' | 'profiles'>('admins');
+  const [installModalLoading, setInstallModalLoading] = useState(false);
+
+  // Installed Packages state
+  const [installedPackages, setInstalledPackages] = useState<InstalledPackage[]>(baseInstalledPackages);
+  const [packageDetailName, setPackageDetailName] = useState<string | null>(null);
 
   // Connect Org wizard
   const [connectOrgOpen, setConnectOrgOpen] = useState(false);
@@ -253,7 +290,7 @@ export default function DataCloudSetupContent({ onBack, demoSession, onDemoSessi
     const newConnection: Connection = {
       id: `conn-${Date.now()}`,
       connectionName: isInformatica
-        ? `Informatica MDM ${selectedOrgType === 'sandbox' ? 'Sandbox' : 'Org'}`
+        ? `Informatica MDM ${selectedOrgType === 'sandbox' ? 'Sandbox Tenant' : 'Production Tenant'}`
         : `Salesforce ${selectedOrgType === 'sandbox' ? 'Sandbox' : 'Org'}`,
       alias: connectionAlias || (isInformatica ? 'INFA_MDM_01' : 'NewOrg'),
       connectionStatus: 'Active',
@@ -516,10 +553,86 @@ export default function DataCloudSetupContent({ onBack, demoSession, onDemoSessi
     return Math.round((completed / sol.steps.length) * 100);
   };
 
-  const currentPageLabel = activeNavItem === 'setup-home' ? 'Data Cloud Setup Home' : activeNavItem === 'salesforce-crm' ? 'Salesforce CRM' : (activeNavItem === 'informatica-mdm' || activeNavItem === 'informatica-mdm-sf') ? 'Informatica MDM' : activeNavItem === 'solution-manager' ? 'Solution Manager' : setupNavSections.flatMap((s) => s.items).find((i) => i.id === activeNavItem)?.label || 'Setup';
+  const currentPageLabel = activeNavItem === 'setup-home' ? 'Data Cloud Setup Home' : activeNavItem === 'salesforce-crm' ? 'Salesforce CRM' : (activeNavItem === 'informatica-mdm' || activeNavItem === 'informatica-mdm-sf') ? 'Informatica MDM' : activeNavItem === 'solution-manager' ? 'Solution Manager' : activeNavItem === 'installed-packages' ? 'Installed Packages' : setupNavSections.flatMap((s) => s.items).find((i) => i.id === activeNavItem)?.label || 'Setup';
   const currentConnections = isInformatica ? informaticaConnections : sfdcConnections;
   const currentBundles = isInformatica ? informaticaBundles : sfdcBundles;
   const connectorName = isInformatica ? 'Informatica MDM' : 'Salesforce CRM';
+
+  // ── Install Bundle handler ──
+  const handleInstallBundle = () => {
+    if (!installModalBundle) return;
+    setInstallModalLoading(true);
+    setTimeout(() => {
+      // Add bundle to session
+      if (onDemoSessionChange && demoSession) {
+        onDemoSessionChange({
+          ...demoSession,
+          selectedBundles: [...demoSession.selectedBundles, installModalBundle.name],
+        });
+      }
+      // Add to installed packages list
+      const now = new Date();
+      const dateStr = `${now.getMonth() + 1}/${now.getDate()}/${now.getFullYear()}, ${now.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })}`;
+      const isInfaBundle = informaticaBundles.some((b) => b.name === installModalBundle.name);
+      const displayName = installModalBundle.name === 'Informatica MDM Cloud' ? 'Customer 360' : installModalBundle.name === 'Informatica Data Quality' ? 'Organization 360' : installModalBundle.name;
+      const newPkg: InstalledPackage = {
+        name: displayName,
+        publisher: isInfaBundle ? 'Informatica' : 'CDP CRM 1',
+        versionNumber: installModalBundle.latestVersion,
+        namespacePrefix: isInfaBundle ? 'infa_mdm_dk' : 'cdp_crm_dk2',
+        installDate: dateStr,
+        limits: false,
+        apps: 0,
+        tabs: 0,
+        objects: 0,
+        appExchangeReady: 'Passed',
+        description: isInfaBundle
+          ? `Informatica MDM business entity bundle for ${displayName}. Contains master data objects, match rules, and data quality configurations.`
+          : '',
+        versionName: isInfaBundle ? 'Winter 2026' : 'Spring 2025',
+        packageType: 'Managed',
+        packageId: `033B${Math.random().toString(36).substring(2, 12).toUpperCase()}`,
+        language: 'English',
+        isInformatica: isInfaBundle,
+      };
+      setInstalledPackages((prev) => [...prev, newPkg]);
+      setInstallModalOpen(false);
+      setInstallModalLoading(false);
+      // Navigate to Installed Packages page
+      setActiveNavItem('installed-packages');
+      setPackageDetailName(null);
+    }, 2500);
+  };
+
+  // Informatica metadata components for View Components
+  const getInformaticaComponents = (pkgName: string) => {
+    const prefix = pkgName === 'Customer 360' ? 'C360' : pkgName === 'Organization 360' ? 'Org360' : pkgName.replace(/\s+/g, '');
+    return [
+      { name: `INFA_${prefix}_PersonEntityMasterRecordMatchRuleConfig`, parentObject: '', type: 'Data Package Kit Object' },
+      { name: `INFA_${prefix}_OrganizationEntityGoldenRecordMergePolicy`, parentObject: '', type: 'Data Package Kit Object' },
+      { name: `INFA_${prefix}_AddressStandardizationQualityRuleDefinition`, parentObject: '', type: 'Data Package Kit Object' },
+      { name: `INFA_${prefix}_PhoneNormalizationDataQualityTransform`, parentObject: '', type: 'Data Package Kit Object' },
+      { name: `INFA_${prefix}_EmailValidationDataQualityRuleExecution`, parentObject: '', type: 'Data Package Kit Object' },
+      { name: `INFA_${prefix}_CrossReferenceKeyRingResolutionMapping`, parentObject: '', type: 'Data Package Kit Object' },
+      { name: `INFA_${prefix}_BusinessEntityRelationshipHierarchyModel`, parentObject: '', type: 'Data Package Kit Object' },
+      { name: `INFA_${prefix}_TrustScoreCalculationWeightedAlgorithm`, parentObject: '', type: 'Data Package Kit Object' },
+      { name: `INFA_${prefix}_SurvivorshipRulePrioritySourceSystemRank`, parentObject: '', type: 'Data Package Kit Object' },
+      { name: `INFA_${prefix}_DataStewardTaskAssignmentWorkflowConfig`, parentObject: '', type: 'Data Package Kit Object' },
+      { name: `INFA_${prefix}_MasterDataSyncScheduleIncrementalDelta`, parentObject: '', type: 'Data Package Kit Object' },
+      { name: `INFA_${prefix}_ChangeDataCaptureEventNotificationStream`, parentObject: '', type: 'Data Package Kit Object' },
+      { name: `INFA_${prefix}_DataQualityProfileStatisticsAggregation`, parentObject: '', type: 'Data Package Kit Object' },
+      { name: `INFA_${prefix}_FuzzyMatchThresholdConfigurationSetting`, parentObject: '', type: 'Data Package Kit Object' },
+      { name: `INFA_${prefix}_DuplicateClusterIdentificationBatchJob`, parentObject: '', type: 'Data Package Kit Object' },
+      { name: `INFA_${prefix}_HierarchyManagerNodeRelationshipType`, parentObject: '', type: 'Data Package Kit Object' },
+      { name: `INFA_${prefix}_ReferenceDataCrossWalkMappingTransform`, parentObject: '', type: 'Data Package Kit Object' },
+      { name: `INFA_${prefix}_GoldenRecordConsolidationViewDefinition`, parentObject: '', type: 'Data Package Kit Object' },
+      { name: `INFA_${prefix}_SourceSystemRegistrationConnectorConfig`, parentObject: '', type: 'Data Package Kit Object' },
+      { name: `INFA_${prefix}_DataLineageTraceabilityAuditLogEntry`, parentObject: '', type: 'Data Package Kit Object' },
+    ];
+  };
+
+  // Detail package for the Package Details page
+  const detailPackage = packageDetailName ? installedPackages.find((p) => p.name === packageDetailName) : null;
 
   return (
     <div className="h-full flex flex-col">
@@ -1397,7 +1510,7 @@ export default function DataCloudSetupContent({ onBack, demoSession, onDemoSessi
                           <th><div className="flex items-center gap-1">Alias <ChevronDown className="w-3 h-3 opacity-50" /></div></th>
                           <th><div className="flex items-center gap-1">Connection Status <ChevronDown className="w-3 h-3 opacity-50" /></div></th>
                           <th><div className="flex items-center gap-1">Last Updated <ChevronDown className="w-3 h-3 opacity-50" /></div></th>
-                          <th><div className="flex items-center gap-1">Org Id <ChevronDown className="w-3 h-3 opacity-50" /></div></th>
+                          <th><div className="flex items-center gap-1">{isInformatica ? 'Tenant Id' : 'Org Id'} <ChevronDown className="w-3 h-3 opacity-50" /></div></th>
                           <th className="w-10"></th>
                         </tr>
                       </thead>
@@ -1465,16 +1578,10 @@ export default function DataCloudSetupContent({ onBack, demoSession, onDemoSessi
                             ) : (
                               <button
                                 onClick={() => {
-                                  if (onDemoSessionChange && demoSession) {
-                                    onDemoSessionChange({
-                                      ...demoSession,
-                                      selectedBundles: [...demoSession.selectedBundles, bundle.name],
-                                    });
-                                  }
-                                  // For Informatica bundles, navigate to Data Streams Bundles step
-                                  if (isInformatica && onNavigateToDataStreamsBundles) {
-                                    onNavigateToDataStreamsBundles();
-                                  }
+                                  setInstallModalBundle(bundle);
+                                  setInstallModalChoice('admins');
+                                  setInstallModalLoading(false);
+                                  setInstallModalOpen(true);
                                 }}
                                 className={`px-3 py-1 text-xs font-medium text-white rounded transition-colors ${
                                   isInformatica ? 'bg-[#FF4A00] hover:bg-[#E54300]' : 'bg-[var(--sf-blue)] hover:bg-[var(--sf-blue-hover)]'
@@ -1492,6 +1599,268 @@ export default function DataCloudSetupContent({ onBack, demoSession, onDemoSessi
                 </div>
               </div>
               )}
+            </div>
+          ) : activeNavItem === 'installed-packages' ? (
+            /* ═══════════════════════════════════════════════════════════
+               INSTALLED PACKAGES PAGE
+               ═══════════════════════════════════════════════════════════ */
+            <div>
+              {/* Page header */}
+              <div className="bg-white border-b border-[var(--sf-border)] px-6 py-4 flex items-center gap-4">
+                <div className="w-10 h-10 rounded bg-[#F49756] flex items-center justify-center flex-shrink-0">
+                  <LayoutGrid className="w-5 h-5 text-white" />
+                </div>
+                <div>
+                  <div className="text-xs font-medium text-[var(--sf-blue)] uppercase tracking-wide">SETUP</div>
+                  <h1 className="text-lg font-bold text-[var(--sf-text-primary)]">Installed Packages</h1>
+                </div>
+              </div>
+
+              <div className="p-6">
+                {/* Package Detail view */}
+                {detailPackage ? (
+                  <div>
+                    <div className="flex items-center justify-between mb-4">
+                      <div>
+                        <div className="text-xs text-[var(--sf-text-tertiary)] mb-0.5">Package Details</div>
+                        <h2 className="text-xl font-bold text-[var(--sf-text-primary)]">{detailPackage.name} (Managed)</h2>
+                      </div>
+                      <button className="text-sm text-[var(--sf-link)] hover:underline">Help for this Page</button>
+                    </div>
+
+                    {/* Installed Package Detail card */}
+                    <div className="border border-[var(--sf-border)] rounded mb-6">
+                      <div className={`px-4 py-2.5 border-b flex items-center justify-between ${detailPackage.isInformatica ? 'bg-[#FFF3ED] border-[#FFD6C0]' : 'bg-[#FAFAF9] border-[var(--sf-border)]'}`}>
+                        <span className="text-sm font-semibold text-[var(--sf-text-primary)]">Installed Package Detail</span>
+                        <div className="flex items-center gap-2">
+                          <button className="px-3 py-1 text-xs font-medium border border-[var(--sf-border)] rounded hover:bg-[#F3F3F3]">Uninstall</button>
+                          <button onClick={() => setPackageDetailName('__components__:' + detailPackage.name)} className="px-3 py-1 text-xs font-medium border border-[var(--sf-border)] rounded hover:bg-[#F3F3F3]">View Components</button>
+                          <button className="px-3 py-1 text-xs font-medium border border-[var(--sf-border)] rounded hover:bg-[#F3F3F3]">Become Primary Contact</button>
+                          <button className="px-3 py-1 text-xs font-medium border border-[var(--sf-border)] rounded hover:bg-[#F3F3F3]">View Dependencies</button>
+                        </div>
+                      </div>
+                      <div className="bg-white">
+                        <table className="w-full text-sm">
+                          <tbody>
+                            {[
+                              ['Package Name', detailPackage.name, 'Version Number', detailPackage.versionNumber],
+                              ['Language', detailPackage.language || 'English', 'First Installed Version Number', detailPackage.versionNumber],
+                              ['Version Name', detailPackage.versionName || '', 'Package Type', detailPackage.packageType || 'Managed'],
+                              ['Namespace Prefix', detailPackage.namespacePrefix, 'Modified By', `Data Cloud, ${detailPackage.installDate}`],
+                              ['Version Setting', 'namespace', '', ''],
+                              ['Package', detailPackage.packageId || '', '', ''],
+                              ['Publisher', detailPackage.publisher, '', ''],
+                              ['Description', detailPackage.description || '', '', ''],
+                              ['Installed By', `Data Cloud, ${detailPackage.installDate}`, '', ''],
+                            ].map(([label1, val1, label2, val2], i) => (
+                              <tr key={i} className="border-b border-[var(--sf-border)] last:border-0">
+                                <td className="px-4 py-2 text-right text-[var(--sf-text-tertiary)] font-medium w-[160px] whitespace-nowrap">{label1}</td>
+                                <td className="px-4 py-2 text-[var(--sf-text-primary)]">{val1}</td>
+                                {label2 && <td className="px-4 py-2 text-right text-[var(--sf-text-tertiary)] font-medium w-[200px] whitespace-nowrap">{label2}</td>}
+                                {label2 && <td className="px-4 py-2 text-[var(--sf-text-primary)]">{val2}</td>}
+                                {!label2 && <td colSpan={2}></td>}
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                        <div className="border-t border-[var(--sf-border)] px-4 py-3 flex items-center gap-8">
+                          <div className="flex items-center gap-2">
+                            <span className="text-sm text-[var(--sf-text-tertiary)] font-medium">Count Towards Limits</span>
+                            <input type="checkbox" checked={detailPackage.limits} readOnly className="w-4 h-4" />
+                          </div>
+                          <div className="flex items-center gap-8 ml-auto">
+                            <span className="text-sm"><span className="text-[var(--sf-text-tertiary)] font-medium">Tabs</span> {detailPackage.tabs}</span>
+                          </div>
+                        </div>
+                        <div className="border-t border-[var(--sf-border)] px-4 py-3 flex items-center gap-8">
+                          <span className="text-sm"><span className="text-[var(--sf-text-tertiary)] font-medium">Apps</span> {detailPackage.apps}</span>
+                          <span className="text-sm ml-auto"><span className="text-[var(--sf-text-tertiary)] font-medium">Objects</span> {detailPackage.objects}</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                ) : packageDetailName?.startsWith('__components__:') ? (
+                  /* ═══ VIEW COMPONENTS PAGE ═══ */
+                  (() => {
+                    const compPkgName = packageDetailName.replace('__components__:', '');
+                    const compPkg = installedPackages.find((p) => p.name === compPkgName);
+                    const components = compPkg?.isInformatica ? getInformaticaComponents(compPkgName) : [];
+                    return (
+                      <div>
+                        <div className="flex items-center justify-between mb-4">
+                          <div>
+                            <div className="text-xs text-[var(--sf-text-tertiary)] mb-0.5">Package Details</div>
+                            <h2 className="text-xl font-bold text-[var(--sf-text-primary)]">{compPkgName} (Managed)</h2>
+                          </div>
+                          <button className="text-sm text-[var(--sf-link)] hover:underline">Help for this Page</button>
+                        </div>
+
+                        {/* Installed Package Detail — compact (no View Components button) */}
+                        <div className="border border-[var(--sf-border)] rounded mb-6">
+                          <div className={`px-4 py-2.5 border-b flex items-center justify-between ${compPkg?.isInformatica ? 'bg-[#FFF3ED] border-[#FFD6C0]' : 'bg-[#FAFAF9] border-[var(--sf-border)]'}`}>
+                            <span className="text-sm font-semibold text-[var(--sf-text-primary)]">Installed Package Detail</span>
+                            <div className="flex items-center gap-2">
+                              <button className="px-3 py-1 text-xs font-medium border border-[var(--sf-border)] rounded hover:bg-[#F3F3F3]">Uninstall</button>
+                              <button className="px-3 py-1 text-xs font-medium border border-[var(--sf-border)] rounded hover:bg-[#F3F3F3]">Become Primary Contact</button>
+                              <button className="px-3 py-1 text-xs font-medium border border-[var(--sf-border)] rounded hover:bg-[#F3F3F3]">View Dependencies</button>
+                            </div>
+                          </div>
+                          <div className="bg-white">
+                            <table className="w-full text-sm">
+                              <tbody>
+                                {[
+                                  ['Package Name', compPkg?.name || '', 'Version Number', compPkg?.versionNumber || ''],
+                                  ['Language', compPkg?.language || 'English', 'First Installed Version Number', compPkg?.versionNumber || ''],
+                                  ['Version Name', compPkg?.versionName || '', 'Package Type', compPkg?.packageType || 'Managed'],
+                                  ['Namespace Prefix', compPkg?.namespacePrefix || '', 'Modified By', `Data Cloud, ${compPkg?.installDate || ''}`],
+                                  ['Version Setting', 'namespace', '', ''],
+                                  ['Package', compPkg?.packageId || '', '', ''],
+                                  ['Publisher', compPkg?.publisher || '', '', ''],
+                                  ['Description', compPkg?.description || '', '', ''],
+                                  ['Installed By', `Data Cloud, ${compPkg?.installDate || ''}`, '', ''],
+                                ].map(([label1, val1, label2, val2], i) => (
+                                  <tr key={i} className="border-b border-[var(--sf-border)] last:border-0">
+                                    <td className="px-4 py-2 text-right text-[var(--sf-text-tertiary)] font-medium w-[160px] whitespace-nowrap">{label1}</td>
+                                    <td className="px-4 py-2 text-[var(--sf-text-primary)]">{val1}</td>
+                                    {label2 && <td className="px-4 py-2 text-right text-[var(--sf-text-tertiary)] font-medium w-[200px] whitespace-nowrap">{label2}</td>}
+                                    {label2 && <td className="px-4 py-2 text-[var(--sf-text-primary)]">{val2}</td>}
+                                    {!label2 && <td colSpan={2}></td>}
+                                  </tr>
+                                ))}
+                              </tbody>
+                            </table>
+                            <div className="border-t border-[var(--sf-border)] px-4 py-3 flex items-center gap-8">
+                              <span className="text-sm"><span className="text-[var(--sf-text-tertiary)] font-medium">Count Towards Limits</span></span>
+                              <input type="checkbox" checked={compPkg?.limits || false} readOnly className="w-4 h-4" />
+                              <span className="text-sm ml-auto"><span className="text-[var(--sf-text-tertiary)] font-medium">Tabs</span> {compPkg?.tabs || 0}</span>
+                            </div>
+                            <div className="border-t border-[var(--sf-border)] px-4 py-3 flex items-center gap-8">
+                              <span className="text-sm"><span className="text-[var(--sf-text-tertiary)] font-medium">Apps</span> {compPkg?.apps || 0}</span>
+                              <span className="text-sm ml-auto"><span className="text-[var(--sf-text-tertiary)] font-medium">Objects</span> {compPkg?.objects || 0}</span>
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Metadata Components Included in Package */}
+                        <div className="border border-[var(--sf-border)] rounded">
+                          <div className={`px-4 py-2.5 border-b ${compPkg?.isInformatica ? 'bg-[#FFF3ED] border-[#FFD6C0]' : 'bg-[#FAFAF9] border-[var(--sf-border)]'}`}>
+                            <span className="text-sm font-semibold text-[var(--sf-text-primary)]">Metadata Components Included in Package</span>
+                          </div>
+                          <div className="overflow-x-auto bg-white">
+                            <table className="w-full text-sm">
+                              <thead>
+                                <tr className="border-b border-[var(--sf-border)] bg-[#FAFAF9]">
+                                  <th className="px-3 py-2 text-left text-xs font-semibold text-[var(--sf-text-primary)] w-10">Action</th>
+                                  <th className="px-3 py-2 text-left text-xs font-semibold text-[var(--sf-text-primary)]">Component Name</th>
+                                  <th className="px-3 py-2 text-left text-xs font-semibold text-[var(--sf-text-primary)] w-[120px]">Parent Object</th>
+                                  <th className="px-3 py-2 text-left text-xs font-semibold text-[var(--sf-text-primary)] w-[180px]">Type</th>
+                                </tr>
+                              </thead>
+                              <tbody>
+                                {components.map((comp, i) => (
+                                  <tr key={i} className="border-b border-[var(--sf-border)] last:border-0 hover:bg-[#F9F9F9]">
+                                    <td className="px-3 py-1.5"></td>
+                                    <td className="px-3 py-1.5 text-[var(--sf-link)] hover:underline cursor-pointer font-mono text-xs">{comp.name}</td>
+                                    <td className="px-3 py-1.5 text-[var(--sf-text-tertiary)]">{comp.parentObject}</td>
+                                    <td className="px-3 py-1.5 text-[var(--sf-text-primary)]">{comp.type}</td>
+                                  </tr>
+                                ))}
+                              </tbody>
+                            </table>
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })()
+
+                ) : (
+                  /* ═══ INSTALLED PACKAGES LIST ═══ */
+                  <div>
+                    {/* Intro text */}
+                    <div className="mb-6">
+                      <h2 className="text-base font-bold text-[var(--sf-text-primary)] mb-3">Installed Packages</h2>
+                      <div className="flex gap-6">
+                        <div className="flex-1 text-sm text-[var(--sf-text-secondary)] space-y-2">
+                          <p>On AppExchange you can browse, test drive, download, and install pre-built apps and components right into your salesforce.com environment. <button className="text-[var(--sf-link)] hover:underline">Learn More about Installing Packages</button>.</p>
+                          <p>Apps and components are installed in packages. Any custom apps, tabs, and custom objects are initially marked as "In Development" and are not deployed to your users. This allows you to test and customize before deploying. You can deploy the components individually using the other features in setup or as a group by clicking Deploy.</p>
+                          <p>Depending on the links next to an installed package, you can take different actions from this page.</p>
+                          <p>To remove a package, click <strong>Uninstall</strong>. To manage your package licenses, click <strong>Manage Licenses</strong>.</p>
+                        </div>
+                        <div className="w-[200px] flex-shrink-0 border border-[var(--sf-border)] rounded-lg p-4 text-center">
+                          <div className="w-full h-12 bg-gradient-to-r from-[#00A1E0] to-[#1B96FF] rounded flex items-center justify-center mb-2">
+                            <span className="text-white font-bold text-xs">salesforce appexchange</span>
+                          </div>
+                          <button className="text-sm text-[var(--sf-link)] font-medium hover:underline">Visit AppExchange &raquo;</button>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Installed Packages table */}
+                    <div className="border border-[var(--sf-border)] rounded mb-6">
+                      <div className="bg-[#FAFAF9] px-4 py-2.5 border-b border-[var(--sf-border)]">
+                        <span className="text-sm font-semibold text-[var(--sf-text-primary)]">Installed Packages</span>
+                      </div>
+                      <div className="overflow-x-auto bg-white">
+                        <table className="w-full text-sm">
+                          <thead>
+                            <tr className="border-b border-[var(--sf-border)]">
+                              <th className="px-3 py-2 text-left text-xs font-semibold text-[var(--sf-text-primary)] w-[70px]">Action</th>
+                              <th className="px-3 py-2 text-left text-xs font-semibold text-[var(--sf-text-primary)]">Package Name</th>
+                              <th className="px-3 py-2 text-left text-xs font-semibold text-[var(--sf-text-primary)]">Publisher</th>
+                              <th className="px-3 py-2 text-left text-xs font-semibold text-[var(--sf-text-primary)]">Version Number</th>
+                              <th className="px-3 py-2 text-left text-xs font-semibold text-[var(--sf-text-primary)]">Namespace Prefix</th>
+                              <th className="px-3 py-2 text-left text-xs font-semibold text-[var(--sf-text-primary)]">Install Date</th>
+                              <th className="px-3 py-2 text-center text-xs font-semibold text-[var(--sf-text-primary)] w-[50px]">Limits</th>
+                              <th className="px-3 py-2 text-center text-xs font-semibold text-[var(--sf-text-primary)] w-[40px]">Apps</th>
+                              <th className="px-3 py-2 text-center text-xs font-semibold text-[var(--sf-text-primary)] w-[40px]">Tabs</th>
+                              <th className="px-3 py-2 text-center text-xs font-semibold text-[var(--sf-text-primary)] w-[50px]">Objects</th>
+                              <th className="px-3 py-2 text-left text-xs font-semibold text-[var(--sf-text-primary)]">AppExchange Ready</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {installedPackages.map((pkg, i) => (
+                              <tr key={i} className="border-b border-[var(--sf-border)] last:border-0 hover:bg-[#F9F9F9]">
+                                <td className="px-3 py-2 text-[var(--sf-link)] hover:underline cursor-pointer text-xs">Uninstall</td>
+                                <td className="px-3 py-2">
+                                  <button
+                                    onClick={() => setPackageDetailName(pkg.name)}
+                                    className={`text-sm hover:underline ${pkg.isInformatica ? 'text-[#FF4A00] font-medium' : 'text-[var(--sf-link)]'}`}
+                                  >
+                                    {pkg.name}
+                                  </button>
+                                  {pkg.description && i === 0 && (
+                                    <div className="text-xs text-[var(--sf-text-tertiary)] mt-0.5 ml-4">{pkg.description}</div>
+                                  )}
+                                </td>
+                                <td className="px-3 py-2 text-[var(--sf-text-primary)]">{pkg.publisher}</td>
+                                <td className="px-3 py-2 text-[var(--sf-text-primary)]">{pkg.versionNumber}</td>
+                                <td className="px-3 py-2 text-[var(--sf-text-primary)]">{pkg.namespacePrefix}</td>
+                                <td className="px-3 py-2 text-[var(--sf-text-primary)] whitespace-nowrap">{pkg.installDate}</td>
+                                <td className="px-3 py-2 text-center">{pkg.limits ? <Check className="w-4 h-4 mx-auto text-[var(--sf-text-primary)]" /> : ''}</td>
+                                <td className="px-3 py-2 text-center text-[var(--sf-text-primary)]">{pkg.apps}</td>
+                                <td className="px-3 py-2 text-center text-[var(--sf-text-primary)]">{pkg.tabs}</td>
+                                <td className="px-3 py-2 text-center text-[var(--sf-text-primary)]">{pkg.objects}</td>
+                                <td className="px-3 py-2 text-[var(--sf-text-primary)]">{pkg.appExchangeReady}</td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
+
+                    {/* Uninstalled Packages */}
+                    <div className="border border-[var(--sf-border)] rounded">
+                      <div className="bg-[#FAFAF9] px-4 py-2.5 border-b border-[var(--sf-border)]">
+                        <span className="text-sm font-semibold text-[var(--sf-text-primary)]">Uninstalled Packages</span>
+                      </div>
+                      <div className="bg-white px-4 py-3 text-sm text-[var(--sf-text-tertiary)]">
+                        No uninstalled package data archives
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
             </div>
           ) : (
             /* Generic setup page placeholder */
@@ -1622,49 +1991,47 @@ export default function DataCloudSetupContent({ onBack, demoSession, onDemoSessi
             <div className="relative bg-white rounded-lg shadow-2xl w-[640px] max-h-[85vh] flex flex-col">
               {/* Header */}
               <div className="text-center py-6 border-b border-[var(--sf-border)]">
-                <h2 className="text-xl font-normal text-[var(--sf-text-primary)]">Connect an Org</h2>
+                <h2 className="text-xl font-normal text-[var(--sf-text-primary)]">
+                  {isInformatica ? 'Connect an Informatica Tenant' : 'Connect an Org'}
+                </h2>
               </div>
 
               {/* Body */}
               <div className="flex-1 overflow-y-auto px-8 py-6">
                 {wizardStep === 'select-type' ? (
                   <div className="space-y-6">
-                    {/* Existing connection info */}
-                    {currentConnections.length > 0 && (
-                      <div className={`flex items-center gap-3 p-4 rounded-lg ${isInformatica ? 'bg-[#FFF8F5]' : 'bg-[#FAFAF9]'}`}>
-                        <CheckCircle2 className={`w-6 h-6 flex-shrink-0 ${isInformatica ? 'text-[#FF4A00]' : 'text-[var(--sf-success)]'}`} />
-                        <div>
-                          <div className="text-sm font-semibold text-[var(--sf-text-primary)]">{currentConnections[0].connectionName}</div>
-                          <div className="text-xs text-[var(--sf-text-tertiary)]">Org ID: {currentConnections[0].orgId}</div>
-                        </div>
-                      </div>
-                    )}
-
                     <p className="text-sm text-[var(--sf-text-secondary)]">
-                      Choose what type of org you would like to connect to as a data source and data action target. <button className="text-[var(--sf-link)] hover:underline">Learn More</button>
+                      {isInformatica
+                        ? 'Choose what type of Informatica tenant you would like to connect to as a master data source. '
+                        : 'Choose what type of org you would like to connect to as a data source and data action target. '}
+                      <button className="text-[var(--sf-link)] hover:underline">Learn More</button>
                     </p>
 
                     {/* Org type cards */}
                     <div className="grid grid-cols-2 gap-4">
                       {(['salesforce', 'sandbox'] as const).map((type) => {
                         const selected = selectedOrgType === type;
+                        const accentColor = isInformatica ? '#FF4A00' : 'var(--sf-blue)';
                         return (
                           <button
                             key={type}
                             onClick={() => setSelectedOrgType(type)}
                             className={`relative flex items-center justify-center h-32 rounded-lg border-2 transition-all ${
                               selected
-                                ? 'border-[var(--sf-blue)] bg-white shadow-sm'
+                                ? `bg-white shadow-sm`
                                 : 'border-[#D8DDE6] bg-white hover:border-[#B0B0B0]'
                             }`}
+                            style={selected ? { borderColor: accentColor } : undefined}
                           >
                             {selected && (
-                              <div className="absolute top-0 right-0 w-7 h-7 bg-[var(--sf-blue)] flex items-center justify-center" style={{ clipPath: 'polygon(0 0, 100% 0, 100% 100%)' }}>
+                              <div className="absolute top-0 right-0 w-7 h-7 flex items-center justify-center" style={{ backgroundColor: accentColor, clipPath: 'polygon(0 0, 100% 0, 100% 100%)' }}>
                                 <Check className="w-3 h-3 text-white absolute top-0.5 right-0.5" />
                               </div>
                             )}
                             <span className="text-sm text-[var(--sf-text-primary)]">
-                              {type === 'salesforce' ? 'Connect to a Salesforce Org' : 'Connect to a Sandbox Org'}
+                              {isInformatica
+                                ? (type === 'salesforce' ? 'Connect to a Production Tenant' : 'Connect to a Sandbox Tenant')
+                                : (type === 'salesforce' ? 'Connect to a Salesforce Org' : 'Connect to a Sandbox Org')}
                             </span>
                           </button>
                         );
@@ -1675,11 +2042,13 @@ export default function DataCloudSetupContent({ onBack, demoSession, onDemoSessi
                   /* Alias step */
                   <div className="space-y-6">
                     <p className="text-sm text-[var(--sf-text-secondary)]">
-                      Assign an alias for your {connectorName} connector that contains up to 15 alphanumeric characters. You can't change the alias later. The alias is used in data stream names and helps you filter your connections.
+                      {isInformatica
+                        ? 'Assign an alias for your Informatica MDM tenant connection that contains up to 15 alphanumeric characters. You can\'t change the alias later. The alias is used in data stream names and helps you identify your tenants.'
+                        : `Assign an alias for your ${connectorName} connector that contains up to 15 alphanumeric characters. You can't change the alias later. The alias is used in data stream names and helps you filter your connections.`}
                     </p>
                     <div>
                       <label className="block text-sm text-[var(--sf-text-primary)] mb-1">
-                        <span className="text-[var(--sf-error)]">*</span> Connection Alias
+                        <span className="text-[var(--sf-error)]">*</span> {isInformatica ? 'Tenant Alias' : 'Connection Alias'}
                       </label>
                       <div className="flex items-center gap-2">
                         <input
@@ -1724,6 +2093,106 @@ export default function DataCloudSetupContent({ onBack, demoSession, onDemoSessi
                     </button>
                   </>
                 )}
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* ═══════════════════════════════════════════════════════════
+          MODAL: Install Bundle Wizard
+         ═══════════════════════════════════════════════════════════ */}
+      {installModalOpen && installModalBundle && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center">
+          <div className="absolute inset-0 bg-black/40" onClick={() => !installModalLoading && setInstallModalOpen(false)} />
+
+          {installModalLoading ? (
+            /* Loading state */
+            <div className="relative bg-white rounded-lg shadow-2xl w-[520px] py-16 px-8 flex flex-col items-center">
+              <div className="w-12 h-12 border-4 border-[#E0E0E0] border-t-[#FF4A00] rounded-full animate-spin mb-6" />
+              <p className="text-sm text-[var(--sf-text-primary)] font-medium">
+                Installing and granting access to {installModalChoice === 'admins' ? 'admins Only' : installModalChoice === 'all' ? 'all Users' : 'specific Profiles'}...
+              </p>
+            </div>
+          ) : (
+            /* Selection step */
+            <div className="relative bg-white rounded-lg shadow-2xl w-[600px] max-h-[85vh] flex flex-col">
+              <button onClick={() => setInstallModalOpen(false)} className="absolute top-3 right-3 w-7 h-7 flex items-center justify-center rounded hover:bg-[#F3F3F3] text-[var(--sf-text-tertiary)] z-10">
+                <X className="w-4 h-4" />
+              </button>
+
+              {/* Header */}
+              <div className="px-8 pt-6 pb-4 border-b border-[var(--sf-border)]">
+                <h2 className="text-xl font-bold text-[var(--sf-text-primary)]">
+                  Install {installModalBundle.name === 'Informatica MDM Cloud' ? 'Customer 360' : installModalBundle.name === 'Informatica Data Quality' ? 'Organization 360' : installModalBundle.name}
+                </h2>
+              </div>
+
+              {/* Body */}
+              <div className="flex-1 overflow-y-auto px-8 py-6 space-y-4">
+                {/* Radio cards */}
+                {([
+                  { key: 'admins' as const, label: 'Install for Admins Only', desc: 'The package will only be visible and accessible to system administrators. All custom objects, fields, and components will be restricted to admin profiles.' },
+                  { key: 'all' as const, label: 'Install for All Users', desc: 'The package components will be available to all user profiles. Custom tabs and objects will be visible across the organization.' },
+                  { key: 'profiles' as const, label: 'Install for Specific Profiles...', desc: 'Choose which security profiles should have access to the package components. You can customize visibility per profile after installation.' },
+                ]).map((opt) => {
+                  const selected = installModalChoice === opt.key;
+                  return (
+                    <button
+                      key={opt.key}
+                      onClick={() => setInstallModalChoice(opt.key)}
+                      className={`w-full text-left p-4 rounded-lg border-2 transition-all ${
+                        selected ? 'border-[#FF4A00] bg-[#FFF8F5]' : 'border-[#D8DDE6] bg-white hover:border-[#B0B0B0]'
+                      }`}
+                    >
+                      <div className="flex items-start gap-3">
+                        <div className={`w-5 h-5 mt-0.5 rounded-full border-2 flex items-center justify-center flex-shrink-0 ${
+                          selected ? 'border-[#FF4A00]' : 'border-[#D8DDE6]'
+                        }`}>
+                          {selected && <div className="w-2.5 h-2.5 rounded-full bg-[#FF4A00]" />}
+                        </div>
+                        <div>
+                          <div className="text-sm font-semibold text-[var(--sf-text-primary)]">{opt.label}</div>
+                          <div className="text-xs text-[var(--sf-text-tertiary)] mt-1">{opt.desc}</div>
+                        </div>
+                      </div>
+                    </button>
+                  );
+                })}
+
+                {/* Package details summary */}
+                <div className="mt-4 border-t border-[var(--sf-border)] pt-4">
+                  <div className="grid grid-cols-2 gap-y-2 text-sm">
+                    <div className="text-[var(--sf-text-tertiary)]">App Name</div>
+                    <div className="text-[var(--sf-text-primary)] font-medium">
+                      {installModalBundle.name === 'Informatica MDM Cloud' ? 'Customer 360' : installModalBundle.name === 'Informatica Data Quality' ? 'Organization 360' : installModalBundle.name}
+                    </div>
+                    <div className="text-[var(--sf-text-tertiary)]">Publisher</div>
+                    <div className="text-[var(--sf-text-primary)]">{informaticaBundles.some((b) => b.name === installModalBundle.name) ? 'Informatica' : 'CDP CRM 1'}</div>
+                    <div className="text-[var(--sf-text-tertiary)]">Version Name</div>
+                    <div className="text-[var(--sf-text-primary)]">Winter 2026</div>
+                    <div className="text-[var(--sf-text-tertiary)]">Version Number</div>
+                    <div className="text-[var(--sf-text-primary)]">{installModalBundle.latestVersion}</div>
+                    <div className="text-[var(--sf-text-tertiary)]">Additional Details</div>
+                    <div><button className="text-sm text-[var(--sf-link)] hover:underline">View Components</button></div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Footer */}
+              <div className="flex items-center justify-end gap-3 px-8 py-4 border-t border-[var(--sf-border)] bg-[#FAFAF9]">
+                <button
+                  onClick={() => setInstallModalOpen(false)}
+                  className="px-4 py-2 text-sm font-medium text-[var(--sf-link)] border border-[var(--sf-border)] rounded hover:bg-[#F3F3F3]"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleInstallBundle}
+                  className="px-5 py-2 text-sm font-medium text-white bg-[#FF4A00] rounded hover:bg-[#E54300] transition-colors"
+                >
+                  Install
+                </button>
               </div>
             </div>
           )}
