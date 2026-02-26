@@ -290,7 +290,7 @@ export default function DataCloudSetupContent({ onBack, demoSession, onDemoSessi
     const newConnection: Connection = {
       id: `conn-${Date.now()}`,
       connectionName: isInformatica
-        ? `Informatica MDM ${selectedOrgType === 'sandbox' ? 'Sandbox' : 'Org'}`
+        ? `Informatica MDM ${selectedOrgType === 'sandbox' ? 'Sandbox Tenant' : 'Production Tenant'}`
         : `Salesforce ${selectedOrgType === 'sandbox' ? 'Sandbox' : 'Org'}`,
       alias: connectionAlias || (isInformatica ? 'INFA_MDM_01' : 'NewOrg'),
       connectionStatus: 'Active',
@@ -1510,7 +1510,7 @@ export default function DataCloudSetupContent({ onBack, demoSession, onDemoSessi
                           <th><div className="flex items-center gap-1">Alias <ChevronDown className="w-3 h-3 opacity-50" /></div></th>
                           <th><div className="flex items-center gap-1">Connection Status <ChevronDown className="w-3 h-3 opacity-50" /></div></th>
                           <th><div className="flex items-center gap-1">Last Updated <ChevronDown className="w-3 h-3 opacity-50" /></div></th>
-                          <th><div className="flex items-center gap-1">Org Id <ChevronDown className="w-3 h-3 opacity-50" /></div></th>
+                          <th><div className="flex items-center gap-1">{isInformatica ? 'Tenant Id' : 'Org Id'} <ChevronDown className="w-3 h-3 opacity-50" /></div></th>
                           <th className="w-10"></th>
                         </tr>
                       </thead>
@@ -1991,49 +1991,47 @@ export default function DataCloudSetupContent({ onBack, demoSession, onDemoSessi
             <div className="relative bg-white rounded-lg shadow-2xl w-[640px] max-h-[85vh] flex flex-col">
               {/* Header */}
               <div className="text-center py-6 border-b border-[var(--sf-border)]">
-                <h2 className="text-xl font-normal text-[var(--sf-text-primary)]">Connect an Org</h2>
+                <h2 className="text-xl font-normal text-[var(--sf-text-primary)]">
+                  {isInformatica ? 'Connect an Informatica Tenant' : 'Connect an Org'}
+                </h2>
               </div>
 
               {/* Body */}
               <div className="flex-1 overflow-y-auto px-8 py-6">
                 {wizardStep === 'select-type' ? (
                   <div className="space-y-6">
-                    {/* Existing connection info */}
-                    {currentConnections.length > 0 && (
-                      <div className={`flex items-center gap-3 p-4 rounded-lg ${isInformatica ? 'bg-[#FFF8F5]' : 'bg-[#FAFAF9]'}`}>
-                        <CheckCircle2 className={`w-6 h-6 flex-shrink-0 ${isInformatica ? 'text-[#FF4A00]' : 'text-[var(--sf-success)]'}`} />
-                        <div>
-                          <div className="text-sm font-semibold text-[var(--sf-text-primary)]">{currentConnections[0].connectionName}</div>
-                          <div className="text-xs text-[var(--sf-text-tertiary)]">Org ID: {currentConnections[0].orgId}</div>
-                        </div>
-                      </div>
-                    )}
-
                     <p className="text-sm text-[var(--sf-text-secondary)]">
-                      Choose what type of org you would like to connect to as a data source and data action target. <button className="text-[var(--sf-link)] hover:underline">Learn More</button>
+                      {isInformatica
+                        ? 'Choose what type of Informatica tenant you would like to connect to as a master data source. '
+                        : 'Choose what type of org you would like to connect to as a data source and data action target. '}
+                      <button className="text-[var(--sf-link)] hover:underline">Learn More</button>
                     </p>
 
                     {/* Org type cards */}
                     <div className="grid grid-cols-2 gap-4">
                       {(['salesforce', 'sandbox'] as const).map((type) => {
                         const selected = selectedOrgType === type;
+                        const accentColor = isInformatica ? '#FF4A00' : 'var(--sf-blue)';
                         return (
                           <button
                             key={type}
                             onClick={() => setSelectedOrgType(type)}
                             className={`relative flex items-center justify-center h-32 rounded-lg border-2 transition-all ${
                               selected
-                                ? 'border-[var(--sf-blue)] bg-white shadow-sm'
+                                ? `bg-white shadow-sm`
                                 : 'border-[#D8DDE6] bg-white hover:border-[#B0B0B0]'
                             }`}
+                            style={selected ? { borderColor: accentColor } : undefined}
                           >
                             {selected && (
-                              <div className="absolute top-0 right-0 w-7 h-7 bg-[var(--sf-blue)] flex items-center justify-center" style={{ clipPath: 'polygon(0 0, 100% 0, 100% 100%)' }}>
+                              <div className="absolute top-0 right-0 w-7 h-7 flex items-center justify-center" style={{ backgroundColor: accentColor, clipPath: 'polygon(0 0, 100% 0, 100% 100%)' }}>
                                 <Check className="w-3 h-3 text-white absolute top-0.5 right-0.5" />
                               </div>
                             )}
                             <span className="text-sm text-[var(--sf-text-primary)]">
-                              {type === 'salesforce' ? 'Connect to a Salesforce Org' : 'Connect to a Sandbox Org'}
+                              {isInformatica
+                                ? (type === 'salesforce' ? 'Connect to a Production Tenant' : 'Connect to a Sandbox Tenant')
+                                : (type === 'salesforce' ? 'Connect to a Salesforce Org' : 'Connect to a Sandbox Org')}
                             </span>
                           </button>
                         );
@@ -2044,11 +2042,13 @@ export default function DataCloudSetupContent({ onBack, demoSession, onDemoSessi
                   /* Alias step */
                   <div className="space-y-6">
                     <p className="text-sm text-[var(--sf-text-secondary)]">
-                      Assign an alias for your {connectorName} connector that contains up to 15 alphanumeric characters. You can't change the alias later. The alias is used in data stream names and helps you filter your connections.
+                      {isInformatica
+                        ? 'Assign an alias for your Informatica MDM tenant connection that contains up to 15 alphanumeric characters. You can\'t change the alias later. The alias is used in data stream names and helps you identify your tenants.'
+                        : `Assign an alias for your ${connectorName} connector that contains up to 15 alphanumeric characters. You can't change the alias later. The alias is used in data stream names and helps you filter your connections.`}
                     </p>
                     <div>
                       <label className="block text-sm text-[var(--sf-text-primary)] mb-1">
-                        <span className="text-[var(--sf-error)]">*</span> Connection Alias
+                        <span className="text-[var(--sf-error)]">*</span> {isInformatica ? 'Tenant Alias' : 'Connection Alias'}
                       </label>
                       <div className="flex items-center gap-2">
                         <input
