@@ -1061,24 +1061,27 @@ export default function DataStreamsContent({ demoSession }: DataStreamsContentPr
                     {/* ─── Connected Sources ─── */}
                     <div>
                       <h3 className="text-sm font-semibold text-[var(--sf-text-primary)] mb-3">Connected Sources</h3>
-                      <div className={`grid gap-3 ${hasInformaticaConn ? 'grid-cols-4' : 'grid-cols-3'}`}>
+                      <div className="grid grid-cols-3 gap-4">
                         {/* Ingestion API */}
                         {(() => {
                           const isSelected = selectedSource === 'src-api';
                           return (
                             <button
                               onClick={() => setSelectedSource('src-api')}
-                              className={`relative flex items-start gap-3 rounded-lg border p-5 transition-all text-left min-h-[100px] ${
+                              className={`relative flex flex-col items-center text-center rounded-lg border-2 p-6 transition-all ${
                                 isSelected ? 'border-[var(--sf-blue)] bg-[#EEF4FF] shadow-sm' : 'border-[#D8DDE6] bg-white hover:border-[#B0B0B0]'
                               }`}
                             >
-                              <div className="w-10 h-10 flex items-center justify-center flex-shrink-0 text-[#706E6B]">
-                                <Server className="w-7 h-7" />
+                              {isSelected && (
+                                <div className="absolute top-0 right-0 w-6 h-6 bg-[var(--sf-blue)] flex items-center justify-center" style={{ clipPath: 'polygon(0 0, 100% 0, 100% 100%)' }}>
+                                  <Check className="w-2.5 h-2.5 text-white absolute top-0.5 right-0.5" />
+                                </div>
+                              )}
+                              <div className="w-14 h-14 rounded-lg flex items-center justify-center mb-3 bg-[#F3F3F3]">
+                                <Server className="w-8 h-8 text-[#706E6B]" />
                               </div>
-                              <div className="flex-1 min-w-0">
-                                <div className="text-sm font-semibold text-[var(--sf-text-primary)]">Ingestion API</div>
-                                <div className="text-xs text-[var(--sf-text-tertiary)] mt-1 leading-relaxed">Stream and/or bulk upload data from external sources</div>
-                              </div>
+                              <div className="text-sm font-semibold text-[var(--sf-text-primary)]">Ingestion API</div>
+                              <div className="text-xs text-[var(--sf-text-tertiary)] mt-1">Stream and/or bulk upload data from external sources</div>
                             </button>
                           );
                         })()}
@@ -1089,17 +1092,20 @@ export default function DataStreamsContent({ demoSession }: DataStreamsContentPr
                           return (
                             <button
                               onClick={() => setSelectedSource('salesforce')}
-                              className={`relative flex items-start gap-3 rounded-lg border p-5 transition-all text-left min-h-[100px] ${
+                              className={`relative flex flex-col items-center text-center rounded-lg border-2 p-6 transition-all ${
                                 isSelected ? 'border-[var(--sf-blue)] bg-[#EEF4FF] shadow-sm' : 'border-[#D8DDE6] bg-white hover:border-[#B0B0B0]'
                               }`}
                             >
-                              <div className="w-10 h-10 flex items-center justify-center flex-shrink-0 text-[#00A1E0]">
-                                <svg viewBox="0 0 48 48" className="w-8 h-8"><path fill="currentColor" d="M20.5 8.5c2.3-2.4 5.5-3.9 9-3.9 4.8 0 9 2.8 11 6.8 1.5-.6 3.1-1 4.8-1 7 0 12.7 5.7 12.7 12.7S52.3 35.8 45.3 35.8c-1.3 0-2.5-.2-3.7-.6-1.8 3.5-5.4 5.9-9.6 5.9-1.8 0-3.5-.4-5-1.2-1.8 2.8-4.9 4.6-8.5 4.6-4.5 0-8.3-3-9.6-7.1-.8.1-1.6.2-2.4.2C2.9 37.6 0 34.7 0 29.1s4.5-8.5 8.5-8.5c.6 0 1.2.1 1.8.2C11.2 14.7 15.4 10.3 20.5 8.5z" transform="scale(0.7) translate(2,5)"/></svg>
+                              {isSelected && (
+                                <div className="absolute top-0 right-0 w-6 h-6 bg-[var(--sf-blue)] flex items-center justify-center" style={{ clipPath: 'polygon(0 0, 100% 0, 100% 100%)' }}>
+                                  <Check className="w-2.5 h-2.5 text-white absolute top-0.5 right-0.5" />
+                                </div>
+                              )}
+                              <div className="w-14 h-14 rounded-lg flex items-center justify-center mb-3 bg-[#E8F4FD]">
+                                <svg viewBox="0 0 48 48" className="w-9 h-9 text-[#00A1E0]"><path fill="currentColor" d="M20.5 8.5c2.3-2.4 5.5-3.9 9-3.9 4.8 0 9 2.8 11 6.8 1.5-.6 3.1-1 4.8-1 7 0 12.7 5.7 12.7 12.7S52.3 35.8 45.3 35.8c-1.3 0-2.5-.2-3.7-.6-1.8 3.5-5.4 5.9-9.6 5.9-1.8 0-3.5-.4-5-1.2-1.8 2.8-4.9 4.6-8.5 4.6-4.5 0-8.3-3-9.6-7.1-.8.1-1.6.2-2.4.2C2.9 37.6 0 34.7 0 29.1s4.5-8.5 8.5-8.5c.6 0 1.2.1 1.8.2C11.2 14.7 15.4 10.3 20.5 8.5z" transform="scale(0.7) translate(2,5)"/></svg>
                               </div>
-                              <div className="flex-1 min-w-0">
-                                <div className="text-sm font-semibold text-[var(--sf-text-primary)]">Salesforce CRM</div>
-                                <div className="text-xs text-[var(--sf-text-tertiary)] mt-1 leading-relaxed">Import objects from Salesforce CRM</div>
-                              </div>
+                              <div className="text-sm font-semibold text-[var(--sf-text-primary)]">Salesforce CRM</div>
+                              <div className="text-xs text-[var(--sf-text-tertiary)] mt-1">Import objects from Salesforce CRM</div>
                             </button>
                           );
                         })()}
@@ -1110,53 +1116,61 @@ export default function DataStreamsContent({ demoSession }: DataStreamsContentPr
                           return (
                             <button
                               onClick={() => setSelectedSource('src-s2s')}
-                              className={`relative flex items-start gap-3 rounded-lg border p-5 transition-all text-left min-h-[100px] ${
+                              className={`relative flex flex-col items-center text-center rounded-lg border-2 p-6 transition-all ${
                                 isSelected ? 'border-[var(--sf-blue)] bg-[#EEF4FF] shadow-sm' : 'border-[#D8DDE6] bg-white hover:border-[#B0B0B0]'
                               }`}
                             >
-                              <div className="w-10 h-10 flex items-center justify-center flex-shrink-0 text-[#706E6B]">
-                                <svg viewBox="0 0 24 24" className="w-7 h-7" fill="none" stroke="currentColor" strokeWidth="1.5"><line x1="2" y1="4" x2="22" y2="4" /><line x1="2" y1="8" x2="22" y2="8" /><line x1="2" y1="12" x2="22" y2="12" /><rect x="4" y="2" width="16" height="12" rx="1" /><line x1="12" y1="14" x2="12" y2="18" /><circle cx="12" cy="20" r="2" /></svg>
+                              {isSelected && (
+                                <div className="absolute top-0 right-0 w-6 h-6 bg-[var(--sf-blue)] flex items-center justify-center" style={{ clipPath: 'polygon(0 0, 100% 0, 100% 100%)' }}>
+                                  <Check className="w-2.5 h-2.5 text-white absolute top-0.5 right-0.5" />
+                                </div>
+                              )}
+                              <div className="w-14 h-14 rounded-lg flex items-center justify-center mb-3 bg-[#F3F3F3]">
+                                <Globe className="w-8 h-8 text-[#706E6B]" />
                               </div>
-                              <div className="flex-1 min-w-0">
-                                <div className="text-sm font-semibold text-[var(--sf-text-primary)]">Server To Server</div>
-                                <div className="text-xs text-[var(--sf-text-tertiary)] mt-1 leading-relaxed">Manually configure an authenticated connection between your server and Data Cloud.</div>
-                              </div>
-                            </button>
-                          );
-                        })()}
-
-                        {/* Informatica MDM — only shown when connected */}
-                        {hasInformaticaConn && (() => {
-                          const isSelected = selectedSource === 'informatica';
-                          return (
-                            <button
-                              onClick={() => setSelectedSource('informatica')}
-                              className={`relative flex items-start gap-3 rounded-lg border p-5 transition-all text-left min-h-[100px] ${
-                                isSelected ? 'border-[var(--sf-blue)] bg-[#EEF4FF] shadow-sm' : 'border-[#D8DDE6] bg-white hover:border-[#B0B0B0]'
-                              }`}
-                            >
-                              <div className="w-10 h-10 flex items-center justify-center flex-shrink-0">
-                                <svg viewBox="0 0 40 40" className="w-8 h-8">
-                                  <rect width="40" height="40" rx="4" fill="#FF4A00" />
-                                  <text x="20" y="26" textAnchor="middle" fill="white" fontSize="11" fontWeight="bold">INFA</text>
-                                </svg>
-                              </div>
-                              <div className="flex-1 min-w-0">
-                                <div className="text-sm font-semibold text-[var(--sf-text-primary)]">Informatica MDM</div>
-                                <div className="text-xs text-[var(--sf-text-tertiary)] mt-1 leading-relaxed">Ingest or federate master data from Informatica MDM</div>
-                              </div>
-                              <span className="sf-badge sf-badge-success text-[9px] mt-1">Connected</span>
+                              <div className="text-sm font-semibold text-[var(--sf-text-primary)]">Server To Server</div>
+                              <div className="text-xs text-[var(--sf-text-tertiary)] mt-1">Manually configure an authenticated connection</div>
                             </button>
                           );
                         })()}
                       </div>
+
+                      {/* Informatica MDM — extra row, only when connected */}
+                      {hasInformaticaConn && (
+                        <div className="grid grid-cols-3 gap-4 mt-4">
+                          {(() => {
+                            const isSelected = selectedSource === 'informatica';
+                            return (
+                              <button
+                                onClick={() => setSelectedSource('informatica')}
+                                className={`relative flex flex-col items-center text-center rounded-lg border-2 p-6 transition-all ${
+                                  isSelected ? 'border-[var(--sf-blue)] bg-[#EEF4FF] shadow-sm' : 'border-[#D8DDE6] bg-white hover:border-[#B0B0B0]'
+                                }`}
+                              >
+                                {isSelected && (
+                                  <div className="absolute top-0 right-0 w-6 h-6 bg-[var(--sf-blue)] flex items-center justify-center" style={{ clipPath: 'polygon(0 0, 100% 0, 100% 100%)' }}>
+                                    <Check className="w-2.5 h-2.5 text-white absolute top-0.5 right-0.5" />
+                                  </div>
+                                )}
+                                <div className="w-14 h-14 rounded flex items-center justify-center mb-3 bg-[#FF4A00]">
+                                  <svg viewBox="0 0 40 40" className="w-9 h-9">
+                                    <text x="20" y="26" textAnchor="middle" fill="white" fontSize="12" fontWeight="bold">INFA</text>
+                                  </svg>
+                                </div>
+                                <div className="text-sm font-semibold text-[var(--sf-text-primary)]">Informatica MDM</div>
+                                <div className="text-xs text-[var(--sf-text-tertiary)] mt-1">Ingest master data entities from Informatica MDM</div>
+                              </button>
+                            );
+                          })()}
+                        </div>
+                      )}
                     </div>
 
                     {/* ─── Other Sources ─── */}
                     <div>
-                      <h3 className="text-xs font-semibold uppercase tracking-wider text-[var(--sf-text-tertiary)] mb-1">Other Sources</h3>
-                      <p className="text-[10px] text-[var(--sf-text-tertiary)] mb-3">Load a sample file in order to teach the system about your file&apos;s structure, or connect additional data sources.</p>
-                      <div className="grid grid-cols-3 gap-3">
+                      <h3 className="text-sm font-semibold text-[var(--sf-text-primary)] mb-1">Other Sources</h3>
+                      <p className="text-xs text-[var(--sf-text-tertiary)] mb-3">Load a sample file in order to teach the system about your file&apos;s structure, or connect additional data sources.</p>
+                      <div className="grid grid-cols-3 gap-4">
                         {[
                           { id: 'src-upload', name: 'File Upload', icon: 'upload' as const, color: '#706E6B', desc: 'Upload CSV, JSON, or Parquet files' },
                           { id: 'src-kits', name: 'Installed Data Kits & Packages', icon: 'pkg' as const, color: '#00A1E0', desc: 'Installed data kits and managed packages' },
@@ -1167,8 +1181,8 @@ export default function DataStreamsContent({ demoSession }: DataStreamsContentPr
                             <button
                               key={src.id}
                               onClick={() => setSelectedSource(src.id)}
-                              className={`relative flex items-center gap-3 rounded-lg border-2 p-4 transition-all text-left ${
-                                isSelected ? 'border-[var(--sf-blue)] bg-[#EEF4FF] shadow-sm' : 'border-[var(--sf-border)] bg-white hover:border-[#B0B0B0] hover:bg-[#FAFAF9]'
+                              className={`relative flex flex-col items-center text-center rounded-lg border-2 p-6 transition-all ${
+                                isSelected ? 'border-[var(--sf-blue)] bg-[#EEF4FF] shadow-sm' : 'border-[#D8DDE6] bg-white hover:border-[#B0B0B0]'
                               }`}
                             >
                               {isSelected && (
@@ -1176,15 +1190,13 @@ export default function DataStreamsContent({ demoSession }: DataStreamsContentPr
                                   <Check className="w-2 h-2 text-white absolute top-0.5 right-0.5" />
                                 </div>
                               )}
-                              <div className="w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0" style={{ backgroundColor: src.color + '18' }}>
-                                {src.icon === 'upload' ? <Upload className="w-5 h-5" style={{ color: src.color }} /> :
-                                 src.icon === 'pkg' ? <Database className="w-5 h-5" style={{ color: src.color }} /> :
-                                 <svg viewBox="0 0 24 24" className="w-5 h-5"><circle cx="12" cy="12" r="10" fill={src.color} /><text x="12" y="16" textAnchor="middle" fill="white" fontSize="8" fontWeight="bold">SF</text></svg>}
+                              <div className="w-14 h-14 rounded-lg flex items-center justify-center mb-3" style={{ backgroundColor: src.color + '18' }}>
+                                {src.icon === 'upload' ? <Upload className="w-8 h-8" style={{ color: src.color }} /> :
+                                 src.icon === 'pkg' ? <Database className="w-8 h-8" style={{ color: src.color }} /> :
+                                 <svg viewBox="0 0 24 24" className="w-8 h-8"><circle cx="12" cy="12" r="10" fill={src.color} /><text x="12" y="16" textAnchor="middle" fill="white" fontSize="8" fontWeight="bold">SF</text></svg>}
                               </div>
-                              <div className="flex-1 min-w-0">
-                                <div className="text-xs font-semibold text-[var(--sf-text-primary)]">{src.name}</div>
-                                <div className="text-[10px] text-[var(--sf-text-tertiary)] mt-0.5">{src.desc}</div>
-                              </div>
+                              <div className="text-sm font-semibold text-[var(--sf-text-primary)]">{src.name}</div>
+                              <div className="text-xs text-[var(--sf-text-tertiary)] mt-1">{src.desc}</div>
                             </button>
                           );
                         })}
