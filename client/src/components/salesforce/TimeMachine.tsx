@@ -1,5 +1,5 @@
 import { useRef } from 'react';
-import { Clock, Calendar, Sparkles, Check, Compass } from 'lucide-react';
+import { Clock, Calendar, Sparkles, Check, Compass, Rocket } from 'lucide-react';
 
 export interface TimelineOption {
   id: string;
@@ -13,9 +13,16 @@ export const timelines: TimelineOption[] = [
   {
     id: 'today',
     label: 'Today',
-    description: 'Current state of your data platform',
+    description: 'Current live product state',
     icon: Clock,
     color: '#0176D3',
+  },
+  {
+    id: '264-release',
+    label: '264 Release',
+    description: 'Next release — Informatica MDM & new capabilities',
+    icon: Rocket,
+    color: '#FF5D2D',
   },
   {
     id: '2-years',
