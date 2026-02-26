@@ -581,28 +581,62 @@ export default function DataStreamsContent({ demoSession, currentTimeline }: Dat
 
   const handleCreateStreamsInner = () => {
     if (selectedSource === 'informatica') {
+      // Create one data stream per entity from each selected bundle
       const newStreams: DataStream[] = [];
+      const ts = Date.now();
       selectedBundles.forEach((bundleId) => {
         const bundle = informaticaBundles.find((b) => b.id === bundleId);
         if (bundle) {
-          newStreams.push({
-            id: `ds-infa-${Date.now()}-${bundleId}`,
-            name: `${bundle.name} - Informatica MDM`,
-            source: `Informatica MDM (${selectedTenant})`,
-            sourceType: 'informatica',
-            object: bundle.name,
-            status: 'Pending',
-            recordsProcessed: 0,
-            lastRefreshed: '—',
-            refreshFrequency: 'Every 1 hour',
-            dataSpace: selectedDataSpace,
-            tenant: selectedTenant,
-            fields: generateStreamFields(bundle.name),
+          bundle.entities.forEach((entity, idx) => {
+            newStreams.push({
+              id: `ds-infa-${ts}-${bundleId}-${idx}`,
+              name: `${entity.name}_Home`,
+              source: `Informatica MDM (${selectedTenant})`,
+              sourceType: 'informatica',
+              object: bundle.name,
+              status: 'Pending',
+              recordsProcessed: 0,
+              lastRefreshed: '—',
+              refreshFrequency: 'Every 1 hour',
+              dataSpace: selectedDataSpace,
+              tenant: selectedTenant,
+              fields: Array.from({ length: entity.fieldCount }, (_, fi) => ({
+                name: `${entity.name}_Field_${fi + 1}`,
+                type: ['Text', 'Number', 'Date', 'Lookup', 'Boolean'][fi % 5],
+                description: `Field ${fi + 1} of ${entity.name}`,
+              })),
+            });
           });
         }
       });
       setDataStreams((prev) => [...newStreams, ...prev]);
-    } else if (selectedSource && selectedSource !== 'salesforce') {
+    } else if (selectedSource === 'salesforce') {
+      // Create one data stream per object from each selected Salesforce bundle
+      const newStreams: DataStream[] = [];
+      const ts = Date.now();
+      selectedSfBundles.forEach((bundleId) => {
+        const bundle = salesforceStandardBundles.find((b) => b.id === bundleId);
+        if (bundle) {
+          bundle.objects.forEach((obj, idx) => {
+            newStreams.push({
+              id: `ds-sf-${ts}-${bundleId}-${idx}`,
+              name: `${obj}_Home`,
+              source: 'Salesforce CRM',
+              sourceType: 'salesforce',
+              object: bundle.name,
+              status: 'Pending',
+              recordsProcessed: 0,
+              lastRefreshed: '—',
+              refreshFrequency: 'Every 1 hour',
+              dataSpace: selectedDataSpace,
+            });
+          });
+        }
+      });
+      if (newStreams.length > 0) {
+        setDataStreams((prev) => [...newStreams, ...prev]);
+      }
+    } else if (selectedSource) {
       // Generic connector source — create a placeholder stream
       const info = resolveSourceInfo(selectedSource);
       const newStream: DataStream = {
