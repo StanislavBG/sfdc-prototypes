@@ -22,6 +22,7 @@ import { salesforceApps, type Workflow } from '@/lib/mock-data';
 export interface DemoSessionState {
   informaticaConnections: { name: string; alias: string; orgId: string }[];
   selectedBundles: string[];
+  installedDatakits: string[]; // datakit ruleset IDs installed via IR wizard (e.g. 'INFA-C360')
 }
 
 interface LayoutProps {
@@ -43,6 +44,7 @@ export default function Layout({ children }: LayoutProps) {
   const [demoSession, setDemoSession] = useState<DemoSessionState>({
     informaticaConnections: [],
     selectedBundles: [],
+    installedDatakits: [],
   });
   const mainRef = useRef<HTMLElement>(null);
 
@@ -197,7 +199,7 @@ export default function Layout({ children }: LayoutProps) {
               ) : activeTab === 'Context Manager' ? (
                 <HelpDocExplorer />
               ) : activeTab === 'Identity Resolutions' ? (
-                <IdentityResolutionContent demoSession={demoSession} />
+                <IdentityResolutionContent demoSession={demoSession} onDemoSessionChange={setDemoSession} />
               ) : activeTab === 'Data Streams' ? (
                 <DataStreamsContent demoSession={demoSession} />
               ) : (

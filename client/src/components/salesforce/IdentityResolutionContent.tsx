@@ -291,13 +291,15 @@ function localToApi(rs: IdentityRuleset): IdentityRulesetData {
 interface DemoSessionState {
   informaticaConnections: { name: string; alias: string; orgId: string }[];
   selectedBundles: string[];
+  installedDatakits: string[];
 }
 
 interface IdentityResolutionContentProps {
   demoSession?: DemoSessionState;
+  onDemoSessionChange?: (session: DemoSessionState) => void;
 }
 
-export default function IdentityResolutionContent({ demoSession }: IdentityResolutionContentProps) {
+export default function IdentityResolutionContent({ demoSession, onDemoSessionChange }: IdentityResolutionContentProps) {
   // ── API hooks ─────────────────────────────────────────────────────
   const { data: apiRulesets, isLoading, isError } = useIdentityRulesets();
   const createMutation = useCreateIdentityRuleset();
@@ -528,6 +530,13 @@ export default function IdentityResolutionContent({ demoSession }: IdentityResol
       isCX: isCXDatakit,
     };
     createMutation.mutate(localToApi(newRs));
+    // Record installed datakit in session
+    if (isFromDatakit && selectedDatakitRuleset && onDemoSessionChange && demoSession) {
+      onDemoSessionChange({
+        ...demoSession,
+        installedDatakits: [...demoSession.installedDatakits, selectedDatakitRuleset],
+      });
+    }
     setNewRulesetOpen(false);
   };
 
@@ -703,6 +712,15 @@ export default function IdentityResolutionContent({ demoSession }: IdentityResol
   // BYOM DETAIL VIEW — "Bring Your Own MDM" mode (non-CX only)
   // CX datakits (Customer 360 / Real Time) use the standard detail view
   // ──────────────────────────────────────────────────────────────────
+  // Determine if this BYOM ruleset's datakit has been installed → mappings are populated
+  const byomMappingPopulated = selectedRuleset?.isBYOM && demoSession
+    ? demoSession.installedDatakits.includes(selectedRuleset.rulesetId)
+    : false;
+
+  // Data exploration chart modal
+  const [exploreOpen, setExploreOpen] = useState(false);
+  const [exploreDMO, setExploreDMO] = useState<'link' | 'unified'>('link');
+
   if (selectedRuleset && selectedRuleset.isBYOM && !selectedRuleset.isCX) {
     return (
       <div className="h-full flex flex-col">
@@ -772,12 +790,15 @@ export default function IdentityResolutionContent({ demoSession }: IdentityResol
                     <div>
                       <h3 className="text-sm font-bold text-[var(--sf-text-primary)] mb-1">Verify Unified Link DMO</h3>
                       <p className="text-xs text-[var(--sf-text-tertiary)] leading-relaxed">
-                        Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. To Data Explorer
+                        Explore the Unified Link data model object to understand cross-source identity linkage and resolution quality.
                       </p>
                     </div>
-                    <button className="flex-shrink-0 ml-4 px-4 py-1.5 text-xs font-medium border border-[var(--sf-border)] rounded hover:bg-[#F3F3F3] text-[var(--sf-text-secondary)] flex items-center gap-1.5">
-                      <Eye className="w-3.5 h-3.5" />
-                      View
+                    <button
+                      onClick={() => { setExploreDMO('link'); setExploreOpen(true); }}
+                      className="flex-shrink-0 ml-4 px-4 py-1.5 text-xs font-medium text-white bg-[var(--sf-blue)] rounded hover:bg-[var(--sf-blue-hover)] flex items-center gap-1.5"
+                    >
+                      <Search className="w-3.5 h-3.5" />
+                      Explore
                     </button>
                   </div>
 
@@ -786,73 +807,130 @@ export default function IdentityResolutionContent({ demoSession }: IdentityResol
                     <div>
                       <h3 className="text-sm font-bold text-[var(--sf-text-primary)] mb-1">Verify Primary Unified DMO</h3>
                       <p className="text-xs text-[var(--sf-text-tertiary)] leading-relaxed">
-                        Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+                        Explore the Primary Unified data model object to review merged profile quality and field completeness.
                       </p>
                     </div>
-                    <button className="flex-shrink-0 ml-4 px-4 py-1.5 text-xs font-medium border border-[var(--sf-border)] rounded hover:bg-[#F3F3F3] text-[var(--sf-text-secondary)] flex items-center gap-1.5">
-                      <Eye className="w-3.5 h-3.5" />
-                      View
+                    <button
+                      onClick={() => { setExploreDMO('unified'); setExploreOpen(true); }}
+                      className="flex-shrink-0 ml-4 px-4 py-1.5 text-xs font-medium text-white bg-[var(--sf-blue)] rounded hover:bg-[var(--sf-blue-hover)] flex items-center gap-1.5"
+                    >
+                      <Search className="w-3.5 h-3.5" />
+                      Explore
                     </button>
                   </div>
                 </div>
               </div>
 
-              {/* "Bring Your Own Identity" — Mapping status (empty — no mappings done) */}
+              {/* "Bring Your Own Identity" — Mapping status (toggles based on datakit install) */}
               <div className="sf-card">
                 <div className="sf-card-header flex items-center justify-between">
                   <h2 className="text-base font-bold text-[var(--sf-text-primary)]">&ldquo;Bring Your Own Identity&rdquo;</h2>
-                  <span className="text-xs text-[var(--sf-text-tertiary)] font-medium">0 / 87 Fields Mapped</span>
+                  <span className={`text-xs font-medium ${byomMappingPopulated ? 'text-[var(--sf-success)]' : 'text-[var(--sf-text-tertiary)]'}`}>
+                    {byomMappingPopulated ? '87 / 87 Fields Mapped' : '0 / 87 Fields Mapped'}
+                  </span>
                 </div>
                 <div className="sf-card-body">
-                  <div className="flex items-center justify-between mb-4">
-                    <div className="flex items-center gap-2">
-                      <AlertTriangle className="w-5 h-5 text-[var(--sf-warning)]" />
-                      <p className="text-sm text-[var(--sf-text-secondary)]">
-                        <span className="font-medium">No mappings configured.</span> Map source fields to target DMOs to activate identity resolution.
-                      </p>
-                    </div>
-                    <button className="px-4 py-1.5 text-xs font-medium text-white bg-[var(--sf-blue)] rounded hover:bg-[var(--sf-blue-hover)]">
-                      Start Mapping
-                    </button>
-                  </div>
-
-                  {/* Empty mapping canvas — source (left) → center (no lines) → target (right) */}
-                  <div className="border border-[var(--sf-border)] rounded-lg bg-[#FAFAF9] p-4">
-                    <div className="flex items-start gap-0">
-                      {/* Source fields column */}
-                      <div className="w-[200px] flex-shrink-0">
-                        <div className="text-[10px] uppercase tracking-wider text-[var(--sf-text-tertiary)] font-medium mb-2 px-2">Source Fields</div>
-                        {['First Name', 'Last Name', 'Email', 'Phone', 'Address Line 1', 'City', 'State', 'Postal Code'].map((f) => (
-                          <div key={f} className="flex items-center gap-2 px-2 py-1.5 text-xs text-[var(--sf-text-secondary)] border-b border-[var(--sf-border)] last:border-0">
-                            <div className="w-2 h-2 rounded-full bg-[#D8DDE6]" />
-                            {f}
-                          </div>
-                        ))}
+                  {byomMappingPopulated ? (
+                    <>
+                      {/* Populated mapping status */}
+                      <div className="flex items-center justify-between mb-4">
+                        <div className="flex items-center gap-2">
+                          <CheckCircle2 className="w-5 h-5 text-[var(--sf-success)]" />
+                          <p className="text-sm text-[var(--sf-text-secondary)]">
+                            <span className="sf-link font-medium">Your Mapping</span> is complete. 3rd party rules active.
+                          </p>
+                        </div>
+                        <button className="px-4 py-1.5 text-xs font-medium border border-[var(--sf-border)] rounded hover:bg-[#F3F3F3] text-[var(--sf-text-secondary)]">
+                          Convert to Regular IR
+                        </button>
                       </div>
 
-                      {/* Center area — empty, no connection lines */}
-                      <div className="flex-1 flex items-center justify-center min-h-[220px]">
-                        <div className="text-center">
-                          <div className="w-12 h-12 mx-auto mb-2 rounded-full bg-[#E5E5E5] flex items-center justify-center">
-                            <ArrowRight className="w-5 h-5 text-[#B0B0B0]" />
+                      {/* Populated mapping canvas — all connected */}
+                      <div className="border border-[var(--sf-border)] rounded-lg bg-[#FAFAF9] p-4">
+                        <div className="flex items-start gap-0 relative">
+                          {/* Source fields column */}
+                          <div className="w-[200px] flex-shrink-0">
+                            <div className="text-[10px] uppercase tracking-wider text-[var(--sf-text-tertiary)] font-medium mb-2 px-2">Source Fields</div>
+                            {['First Name', 'Last Name', 'Email', 'Phone', 'Address Line 1', 'City', 'State', 'Postal Code'].map((f) => (
+                              <div key={f} className="flex items-center gap-2 px-2 py-1.5 text-xs text-[var(--sf-text-primary)] border-b border-[var(--sf-border)] last:border-0">
+                                <div className="w-2 h-2 rounded-full bg-[var(--sf-success)]" />
+                                {f}
+                              </div>
+                            ))}
                           </div>
-                          <p className="text-xs text-[var(--sf-text-tertiary)]">No connections</p>
-                          <p className="text-[10px] text-[var(--sf-text-tertiary)] mt-0.5">Drag fields to create mappings</p>
+
+                          {/* Center — SVG connection lines */}
+                          <div className="flex-1 min-h-[220px] relative">
+                            <svg className="w-full h-full absolute inset-0" viewBox="0 0 200 260" preserveAspectRatio="none">
+                              {[0,1,2,3,4,5,6,7].map((i) => {
+                                const y = 30 + i * 29;
+                                return <line key={i} x1="0" y1={y} x2="200" y2={y} stroke="#4BC076" strokeWidth="1.5" strokeDasharray="4 2" opacity="0.6" />;
+                              })}
+                            </svg>
+                          </div>
+
+                          {/* Target DMO column */}
+                          <div className="w-[200px] flex-shrink-0">
+                            <div className="text-[10px] uppercase tracking-wider text-[var(--sf-text-tertiary)] font-medium mb-2 px-2">Target DMO</div>
+                            {['ssot__FirstName__c', 'ssot__LastName__c', 'ssot__Email__c', 'ssot__Phone__c', 'ssot__Street__c', 'ssot__City__c', 'ssot__State__c', 'ssot__PostalCode__c'].map((f) => (
+                              <div key={f} className="flex items-center justify-end gap-2 px-2 py-1.5 text-xs text-[var(--sf-text-primary)] border-b border-[var(--sf-border)] last:border-0">
+                                {f}
+                                <div className="w-2 h-2 rounded-full bg-[var(--sf-success)]" />
+                              </div>
+                            ))}
+                          </div>
                         </div>
                       </div>
-
-                      {/* Target DMO column */}
-                      <div className="w-[200px] flex-shrink-0">
-                        <div className="text-[10px] uppercase tracking-wider text-[var(--sf-text-tertiary)] font-medium mb-2 px-2">Target DMO</div>
-                        {['ssot__FirstName__c', 'ssot__LastName__c', 'ssot__Email__c', 'ssot__Phone__c', 'ssot__Street__c', 'ssot__City__c', 'ssot__State__c', 'ssot__PostalCode__c'].map((f) => (
-                          <div key={f} className="flex items-center justify-end gap-2 px-2 py-1.5 text-xs text-[var(--sf-text-secondary)] border-b border-[var(--sf-border)] last:border-0">
-                            {f}
-                            <div className="w-2 h-2 rounded-full bg-[#D8DDE6]" />
-                          </div>
-                        ))}
+                    </>
+                  ) : (
+                    <>
+                      {/* Empty mapping status */}
+                      <div className="flex items-center justify-between mb-4">
+                        <div className="flex items-center gap-2">
+                          <AlertTriangle className="w-5 h-5 text-[var(--sf-warning)]" />
+                          <p className="text-sm text-[var(--sf-text-secondary)]">
+                            <span className="font-medium">No mappings configured.</span> Map source fields to target DMOs to activate identity resolution.
+                          </p>
+                        </div>
+                        <button className="px-4 py-1.5 text-xs font-medium text-white bg-[var(--sf-blue)] rounded hover:bg-[var(--sf-blue-hover)]">
+                          Start Mapping
+                        </button>
                       </div>
-                    </div>
-                  </div>
+
+                      {/* Empty mapping canvas */}
+                      <div className="border border-[var(--sf-border)] rounded-lg bg-[#FAFAF9] p-4">
+                        <div className="flex items-start gap-0">
+                          <div className="w-[200px] flex-shrink-0">
+                            <div className="text-[10px] uppercase tracking-wider text-[var(--sf-text-tertiary)] font-medium mb-2 px-2">Source Fields</div>
+                            {['First Name', 'Last Name', 'Email', 'Phone', 'Address Line 1', 'City', 'State', 'Postal Code'].map((f) => (
+                              <div key={f} className="flex items-center gap-2 px-2 py-1.5 text-xs text-[var(--sf-text-secondary)] border-b border-[var(--sf-border)] last:border-0">
+                                <div className="w-2 h-2 rounded-full bg-[#D8DDE6]" />
+                                {f}
+                              </div>
+                            ))}
+                          </div>
+                          <div className="flex-1 flex items-center justify-center min-h-[220px]">
+                            <div className="text-center">
+                              <div className="w-12 h-12 mx-auto mb-2 rounded-full bg-[#E5E5E5] flex items-center justify-center">
+                                <ArrowRight className="w-5 h-5 text-[#B0B0B0]" />
+                              </div>
+                              <p className="text-xs text-[var(--sf-text-tertiary)]">No connections</p>
+                              <p className="text-[10px] text-[var(--sf-text-tertiary)] mt-0.5">Drag fields to create mappings</p>
+                            </div>
+                          </div>
+                          <div className="w-[200px] flex-shrink-0">
+                            <div className="text-[10px] uppercase tracking-wider text-[var(--sf-text-tertiary)] font-medium mb-2 px-2">Target DMO</div>
+                            {['ssot__FirstName__c', 'ssot__LastName__c', 'ssot__Email__c', 'ssot__Phone__c', 'ssot__Street__c', 'ssot__City__c', 'ssot__State__c', 'ssot__PostalCode__c'].map((f) => (
+                              <div key={f} className="flex items-center justify-end gap-2 px-2 py-1.5 text-xs text-[var(--sf-text-secondary)] border-b border-[var(--sf-border)] last:border-0">
+                                {f}
+                                <div className="w-2 h-2 rounded-full bg-[#D8DDE6]" />
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      </div>
+                    </>
+                  )}
 
                   {/* Collapsible Details */}
                   <div className="border-t border-[var(--sf-border)] pt-3 mt-4">
@@ -980,6 +1058,110 @@ export default function IdentityResolutionContent({ demoSession }: IdentityResol
             </div>
           </div>
         </div>
+
+        {/* ── Data Exploration Modal ─────────────────────────────── */}
+        {exploreOpen && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center">
+            <div className="absolute inset-0 bg-black/40" onClick={() => setExploreOpen(false)} />
+            <div className="relative bg-white rounded-lg shadow-2xl w-[720px] max-h-[80vh] overflow-hidden">
+              {/* Header */}
+              <div className="px-6 py-4 border-b border-[var(--sf-border)] flex items-center justify-between">
+                <div>
+                  <h2 className="text-base font-bold text-[var(--sf-text-primary)]">
+                    Data Explorer — {exploreDMO === 'link' ? 'Unified Link DMO' : 'Primary Unified DMO'}
+                  </h2>
+                  <p className="text-xs text-[var(--sf-text-tertiary)] mt-0.5">
+                    {exploreDMO === 'link' ? 'ssot__UnifiedLink__dlm' : `ssot__${selectedRuleset.primaryDataModelObject}__dlm`}
+                  </p>
+                </div>
+                <button onClick={() => setExploreOpen(false)} className="w-7 h-7 flex items-center justify-center rounded hover:bg-[#F3F3F3] text-[var(--sf-text-tertiary)]">
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
+
+              {/* Chart grid */}
+              <div className="p-6 overflow-y-auto max-h-[65vh] space-y-6">
+                {/* Row 1: Record counts + match rate */}
+                <div className="grid grid-cols-3 gap-4">
+                  <div className="border border-[var(--sf-border)] rounded-lg p-4 text-center">
+                    <p className="text-[10px] uppercase tracking-wider text-[var(--sf-text-tertiary)] mb-1">Total Records</p>
+                    <p className="text-2xl font-bold text-[var(--sf-blue)]">{exploreDMO === 'link' ? '45,892' : '38,241'}</p>
+                  </div>
+                  <div className="border border-[var(--sf-border)] rounded-lg p-4 text-center">
+                    <p className="text-[10px] uppercase tracking-wider text-[var(--sf-text-tertiary)] mb-1">{exploreDMO === 'link' ? 'Linked Pairs' : 'Unified Profiles'}</p>
+                    <p className="text-2xl font-bold text-[var(--sf-success)]">{exploreDMO === 'link' ? '12,547' : '10,594'}</p>
+                  </div>
+                  <div className="border border-[var(--sf-border)] rounded-lg p-4 text-center">
+                    <p className="text-[10px] uppercase tracking-wider text-[var(--sf-text-tertiary)] mb-1">{exploreDMO === 'link' ? 'Link Rate' : 'Consolidation'}</p>
+                    <p className="text-2xl font-bold text-[#FF4A00]">{exploreDMO === 'link' ? '27.3%' : '72.3%'}</p>
+                  </div>
+                </div>
+
+                {/* Chart: Source Distribution (bar chart via SVG) */}
+                <div className="border border-[var(--sf-border)] rounded-lg p-4">
+                  <h3 className="text-sm font-semibold text-[var(--sf-text-primary)] mb-3">
+                    {exploreDMO === 'link' ? 'Links by Source System' : 'Records by Data Source'}
+                  </h3>
+                  <svg viewBox="0 0 600 140" className="w-full">
+                    {[
+                      { label: 'Informatica MDM', value: 0.72, color: '#FF4A00' },
+                      { label: 'Salesforce CRM', value: 0.45, color: '#0070D2' },
+                      { label: 'Marketing Cloud', value: 0.28, color: '#9C27B0' },
+                      { label: 'External API', value: 0.15, color: '#4CAF50' },
+                    ].map((bar, i) => (
+                      <g key={bar.label} transform={`translate(0, ${i * 34})`}>
+                        <text x="0" y="14" fontSize="11" fill="#706E6B" fontFamily="sans-serif">{bar.label}</text>
+                        <rect x="140" y="2" width={bar.value * 350} height="18" rx="3" fill={bar.color} opacity="0.85" />
+                        <text x={145 + bar.value * 350} y="15" fontSize="10" fill="#706E6B" fontFamily="sans-serif">{Math.round(bar.value * 100)}%</text>
+                      </g>
+                    ))}
+                  </svg>
+                </div>
+
+                {/* Chart: Field Completeness (horizontal segments) */}
+                <div className="border border-[var(--sf-border)] rounded-lg p-4">
+                  <h3 className="text-sm font-semibold text-[var(--sf-text-primary)] mb-3">Field Completeness</h3>
+                  <div className="space-y-2">
+                    {(exploreDMO === 'link'
+                      ? [{ f: 'Source Record ID', pct: 100 }, { f: 'Target Record ID', pct: 100 }, { f: 'Link Confidence', pct: 94 }, { f: 'Match Rule', pct: 91 }, { f: 'Created Date', pct: 100 }]
+                      : [{ f: 'First Name', pct: 98 }, { f: 'Last Name', pct: 99 }, { f: 'Email', pct: 87 }, { f: 'Phone', pct: 72 }, { f: 'Address', pct: 64 }, { f: 'Date of Birth', pct: 41 }]
+                    ).map((row) => (
+                      <div key={row.f} className="flex items-center gap-3">
+                        <span className="text-xs text-[var(--sf-text-secondary)] w-32 flex-shrink-0">{row.f}</span>
+                        <div className="flex-1 h-3 bg-[#E5E5E5] rounded-full overflow-hidden">
+                          <div className="h-full rounded-full" style={{ width: `${row.pct}%`, backgroundColor: row.pct > 90 ? '#4BC076' : row.pct > 70 ? '#FF9800' : '#E91E63' }} />
+                        </div>
+                        <span className="text-xs font-medium text-[var(--sf-text-primary)] w-10 text-right">{row.pct}%</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Chart: Match Quality Distribution (donut via SVG) */}
+                <div className="border border-[var(--sf-border)] rounded-lg p-4">
+                  <h3 className="text-sm font-semibold text-[var(--sf-text-primary)] mb-3">
+                    {exploreDMO === 'link' ? 'Link Confidence Distribution' : 'Match Quality Score'}
+                  </h3>
+                  <div className="flex items-center gap-8">
+                    <svg viewBox="0 0 120 120" className="w-28 h-28 flex-shrink-0">
+                      <circle cx="60" cy="60" r="52" fill="none" stroke="#E5E5E5" strokeWidth="12" />
+                      <circle cx="60" cy="60" r="52" fill="none" stroke="#4BC076" strokeWidth="12" strokeDasharray={`${0.68 * 327} ${327}`} strokeDashoffset="0" transform="rotate(-90 60 60)" />
+                      <circle cx="60" cy="60" r="52" fill="none" stroke="#FF9800" strokeWidth="12" strokeDasharray={`${0.22 * 327} ${327}`} strokeDashoffset={`${-0.68 * 327}`} transform="rotate(-90 60 60)" />
+                      <circle cx="60" cy="60" r="52" fill="none" stroke="#E91E63" strokeWidth="12" strokeDasharray={`${0.10 * 327} ${327}`} strokeDashoffset={`${-0.90 * 327}`} transform="rotate(-90 60 60)" />
+                      <text x="60" y="56" textAnchor="middle" fontSize="18" fontWeight="bold" fill="#1B1C1D">68%</text>
+                      <text x="60" y="72" textAnchor="middle" fontSize="9" fill="#706E6B">High</text>
+                    </svg>
+                    <div className="space-y-2">
+                      <div className="flex items-center gap-2"><div className="w-3 h-3 rounded-full bg-[#4BC076]" /><span className="text-xs text-[var(--sf-text-secondary)]">High confidence (68%)</span></div>
+                      <div className="flex items-center gap-2"><div className="w-3 h-3 rounded-full bg-[#FF9800]" /><span className="text-xs text-[var(--sf-text-secondary)]">Medium confidence (22%)</span></div>
+                      <div className="flex items-center gap-2"><div className="w-3 h-3 rounded-full bg-[#E91E63]" /><span className="text-xs text-[var(--sf-text-secondary)]">Low confidence (10%)</span></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     );
   }

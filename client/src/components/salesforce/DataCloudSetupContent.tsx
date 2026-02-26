@@ -37,6 +37,7 @@ interface DataBundle {
   name: string;
   installedVersion: string;
   latestVersion: string;
+  fieldTag?: string; // e.g. "264 fields" — shown as a tag on highlighted bundles
 }
 
 interface SetupPage {
@@ -124,8 +125,8 @@ const sfdcBundles: DataBundle[] = [
 const initialInformaticaConnections: Connection[] = [];
 
 const informaticaBundles: DataBundle[] = [
-  { name: 'Informatica MDM Cloud', installedVersion: '--', latestVersion: '2.1' },
-  { name: 'Informatica Data Quality', installedVersion: '--', latestVersion: '3.4' },
+  { name: 'Informatica MDM Cloud', installedVersion: '--', latestVersion: '2.1', fieldTag: '264 fields' },
+  { name: 'Informatica Data Quality', installedVersion: '--', latestVersion: '3.4', fieldTag: '86 fields' },
 ];
 
 // ── Informatica Logo SVG ─────────────────────────────────────────────
@@ -165,6 +166,7 @@ type WizardStep = 'select-type' | 'alias' | 'login' | 'permissions';
 interface DemoSessionState {
   informaticaConnections: { name: string; alias: string; orgId: string }[];
   selectedBundles: string[];
+  installedDatakits: string[];
 }
 
 interface DataCloudSetupContentProps {
@@ -1410,7 +1412,14 @@ export default function DataCloudSetupContent({ onBack, demoSession, onDemoSessi
                         const isInstalled = demoSession?.selectedBundles.includes(bundle.name);
                         return (
                         <tr key={bundle.name}>
-                          <td className="sf-link font-medium">{bundle.name}</td>
+                          <td className="sf-link font-medium">
+                            <span className="flex items-center gap-2">
+                              {bundle.name}
+                              {bundle.fieldTag && (
+                                <span className={`px-1.5 py-0.5 text-[9px] font-bold text-white rounded ${isInformatica ? 'bg-[#FF4A00]' : 'bg-[var(--sf-blue)]'}`}>{bundle.fieldTag}</span>
+                              )}
+                            </span>
+                          </td>
                           <td>{isInstalled ? bundle.latestVersion : bundle.installedVersion}</td>
                           <td>{bundle.latestVersion}</td>
                           <td>
