@@ -173,10 +173,11 @@ interface DataCloudSetupContentProps {
   onBack?: () => void;
   demoSession?: DemoSessionState;
   onDemoSessionChange?: (session: DemoSessionState) => void;
+  onNavigateToDataStreamsBundles?: () => void;
 }
 
 // ── Component ────────────────────────────────────────────────────────
-export default function DataCloudSetupContent({ onBack, demoSession, onDemoSessionChange }: DataCloudSetupContentProps) {
+export default function DataCloudSetupContent({ onBack, demoSession, onDemoSessionChange, onNavigateToDataStreamsBundles }: DataCloudSetupContentProps) {
   const [activeNavItem, setActiveNavItem] = useState('setup-home');
   const [quickFindQuery, setQuickFindQuery] = useState('');
   const [expandedNavItems, setExpandedNavItems] = useState<Set<string>>(new Set(['feature-manager']));
@@ -1422,7 +1423,8 @@ export default function DataCloudSetupContent({ onBack, demoSession, onDemoSessi
                 )}
               </div>
 
-              {/* Standard Data Bundles */}
+              {/* Standard Data Bundles — only show for Informatica when at least one connection exists */}
+              {(!isInformatica || currentConnections.length > 0) && (
               <div className="sf-card">
                 <div className="sf-card-header">
                   <div className="flex items-center gap-1.5">
@@ -1469,6 +1471,10 @@ export default function DataCloudSetupContent({ onBack, demoSession, onDemoSessi
                                       selectedBundles: [...demoSession.selectedBundles, bundle.name],
                                     });
                                   }
+                                  // For Informatica bundles, navigate to Data Streams Bundles step
+                                  if (isInformatica && onNavigateToDataStreamsBundles) {
+                                    onNavigateToDataStreamsBundles();
+                                  }
                                 }}
                                 className={`px-3 py-1 text-xs font-medium text-white rounded transition-colors ${
                                   isInformatica ? 'bg-[#FF4A00] hover:bg-[#E54300]' : 'bg-[var(--sf-blue)] hover:bg-[var(--sf-blue-hover)]'
@@ -1485,6 +1491,7 @@ export default function DataCloudSetupContent({ onBack, demoSession, onDemoSessi
                   </table>
                 </div>
               </div>
+              )}
             </div>
           ) : (
             /* Generic setup page placeholder */
