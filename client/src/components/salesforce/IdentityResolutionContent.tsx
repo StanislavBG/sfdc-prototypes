@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import {
   ArrowLeft,
+  ArrowRight,
   ChevronRight,
   ChevronDown,
   ChevronUp,
@@ -359,7 +360,16 @@ function localToApi(rs: IdentityRuleset): IdentityRulesetData {
 }
 
 // ── Component ────────────────────────────────────────────────────────
-export default function IdentityResolutionContent() {
+interface DemoSessionState {
+  informaticaConnections: { name: string; alias: string; orgId: string }[];
+  selectedBundles: string[];
+}
+
+interface IdentityResolutionContentProps {
+  demoSession?: DemoSessionState;
+}
+
+export default function IdentityResolutionContent({ demoSession }: IdentityResolutionContentProps) {
   // ── API hooks ─────────────────────────────────────────────────────
   const { data: apiRulesets, isLoading, isError } = useIdentityRulesets();
   const createMutation = useCreateIdentityRuleset();
@@ -437,21 +447,30 @@ export default function IdentityResolutionContent() {
   const [selectedDatakitRuleset, setSelectedDatakitRuleset] = useState<string | null>(null);
 
   const datakitCategories = ['Knowledge Space', 'Billing Analytics', 'Informatica MDM', 'Agentforce Analytics', 'Pricing', 'Content Kit'];
-  const datakitRulesets: Record<string, { name: string; id: string; dataSpace: string; primaryDMO: string; realTime?: boolean; cx?: boolean }[]> = {
+  // Full catalog of Informatica MDM rulesets — Phase-2 item always shown (grayed), others filtered by session bundle selection
+  const allInformaticaRulesets: { name: string; id: string; dataSpace: string; primaryDMO: string; phase2?: boolean; cx?: boolean; bundleName?: string }[] = [
+    { name: 'Customer 360', id: 'INFA-C360', dataSpace: 'default', primaryDMO: 'Individual', cx: true, bundleName: 'Informatica MDM Cloud' },
+    { name: 'Customer 360', id: 'INFA-C360-RT', dataSpace: 'default', primaryDMO: 'Individual', phase2: true, cx: true, bundleName: 'Informatica MDM Cloud' },
+    { name: 'Reference 360', id: 'INFA-R360', dataSpace: 'default', primaryDMO: 'Account', bundleName: 'Informatica MDM Cloud' },
+    { name: 'Supplies 360', id: 'INFA-S360', dataSpace: 'default', primaryDMO: 'Account', bundleName: 'Informatica MDM Cloud' },
+    { name: 'Reporter 360', id: 'INFA-RP360', dataSpace: 'default', primaryDMO: 'Individual', bundleName: 'Informatica Data Quality' },
+    { name: 'Organization 360', id: 'INFA-O360', dataSpace: 'default', primaryDMO: 'Individual', bundleName: 'Informatica Data Quality' },
+  ];
+
+  // Filter Informatica rulesets: Phase-2 items always visible (but disabled), others only if their bundle was selected in Setup
+  const hasSessionBundles = demoSession && demoSession.selectedBundles.length > 0;
+  const filteredInformaticaRulesets = hasSessionBundles
+    ? allInformaticaRulesets.filter((rs) => rs.phase2 || demoSession.selectedBundles.includes(rs.bundleName || ''))
+    : allInformaticaRulesets; // show all if no session (backward compat)
+
+  const datakitRulesets: Record<string, { name: string; id: string; dataSpace: string; primaryDMO: string; phase2?: boolean; cx?: boolean; bundleName?: string }[]> = {
     'Knowledge Space': [
       { name: 'Customer Dedup', id: 'KS-001', dataSpace: 'default', primaryDMO: 'Individual' },
     ],
     'Billing Analytics': [
       { name: 'Billing Account Match', id: 'BA-001', dataSpace: 'default', primaryDMO: 'Account' },
     ],
-    'Informatica MDM': [
-      { name: 'Customer 360', id: 'INFA-C360', dataSpace: 'default', primaryDMO: 'Individual', cx: true },
-      { name: 'Customer 360', id: 'INFA-C360-RT', dataSpace: 'default', primaryDMO: 'Individual', realTime: true, cx: true },
-      { name: 'Reference 360', id: 'INFA-R360', dataSpace: 'default', primaryDMO: 'Account' },
-      { name: 'Supplies 360', id: 'INFA-S360', dataSpace: 'default', primaryDMO: 'Account' },
-      { name: 'Reporter 360', id: 'INFA-RP360', dataSpace: 'default', primaryDMO: 'Individual' },
-      { name: 'Organization 360', id: 'INFA-O360', dataSpace: 'default', primaryDMO: 'Individual' },
-    ],
+    'Informatica MDM': filteredInformaticaRulesets,
     'Agentforce Analytics': [
       { name: 'Agent Contact Resolution', id: 'AF-001', dataSpace: 'default', primaryDMO: 'Individual' },
     ],
@@ -850,26 +869,65 @@ export default function IdentityResolutionContent() {
                 </div>
               </div>
 
-              {/* "Bring Your Own Identity" — Mapping status */}
+              {/* "Bring Your Own Identity" — Mapping status (empty — no mappings done) */}
               <div className="sf-card">
-                <div className="sf-card-header">
+                <div className="sf-card-header flex items-center justify-between">
                   <h2 className="text-base font-bold text-[var(--sf-text-primary)]">&ldquo;Bring Your Own Identity&rdquo;</h2>
+                  <span className="text-xs text-[var(--sf-text-tertiary)] font-medium">0 / 87 Fields Mapped</span>
                 </div>
                 <div className="sf-card-body">
                   <div className="flex items-center justify-between mb-4">
                     <div className="flex items-center gap-2">
-                      <CheckCircle2 className="w-5 h-5 text-[var(--sf-success)]" />
+                      <AlertTriangle className="w-5 h-5 text-[var(--sf-warning)]" />
                       <p className="text-sm text-[var(--sf-text-secondary)]">
-                        <span className="sf-link font-medium">Your Mapping</span> is complete. 3rd party rules active.
+                        <span className="font-medium">No mappings configured.</span> Map source fields to target DMOs to activate identity resolution.
                       </p>
                     </div>
-                    <button className="px-4 py-1.5 text-xs font-medium border border-[var(--sf-border)] rounded hover:bg-[#F3F3F3] text-[var(--sf-text-secondary)]">
-                      Convert to Regular IR
+                    <button className="px-4 py-1.5 text-xs font-medium text-white bg-[var(--sf-blue)] rounded hover:bg-[var(--sf-blue-hover)]">
+                      Start Mapping
                     </button>
                   </div>
 
+                  {/* Empty mapping canvas — source (left) → center (no lines) → target (right) */}
+                  <div className="border border-[var(--sf-border)] rounded-lg bg-[#FAFAF9] p-4">
+                    <div className="flex items-start gap-0">
+                      {/* Source fields column */}
+                      <div className="w-[200px] flex-shrink-0">
+                        <div className="text-[10px] uppercase tracking-wider text-[var(--sf-text-tertiary)] font-medium mb-2 px-2">Source Fields</div>
+                        {['First Name', 'Last Name', 'Email', 'Phone', 'Address Line 1', 'City', 'State', 'Postal Code'].map((f) => (
+                          <div key={f} className="flex items-center gap-2 px-2 py-1.5 text-xs text-[var(--sf-text-secondary)] border-b border-[var(--sf-border)] last:border-0">
+                            <div className="w-2 h-2 rounded-full bg-[#D8DDE6]" />
+                            {f}
+                          </div>
+                        ))}
+                      </div>
+
+                      {/* Center area — empty, no connection lines */}
+                      <div className="flex-1 flex items-center justify-center min-h-[220px]">
+                        <div className="text-center">
+                          <div className="w-12 h-12 mx-auto mb-2 rounded-full bg-[#E5E5E5] flex items-center justify-center">
+                            <ArrowRight className="w-5 h-5 text-[#B0B0B0]" />
+                          </div>
+                          <p className="text-xs text-[var(--sf-text-tertiary)]">No connections</p>
+                          <p className="text-[10px] text-[var(--sf-text-tertiary)] mt-0.5">Drag fields to create mappings</p>
+                        </div>
+                      </div>
+
+                      {/* Target DMO column */}
+                      <div className="w-[200px] flex-shrink-0">
+                        <div className="text-[10px] uppercase tracking-wider text-[var(--sf-text-tertiary)] font-medium mb-2 px-2">Target DMO</div>
+                        {['ssot__FirstName__c', 'ssot__LastName__c', 'ssot__Email__c', 'ssot__Phone__c', 'ssot__Street__c', 'ssot__City__c', 'ssot__State__c', 'ssot__PostalCode__c'].map((f) => (
+                          <div key={f} className="flex items-center justify-end gap-2 px-2 py-1.5 text-xs text-[var(--sf-text-secondary)] border-b border-[var(--sf-border)] last:border-0">
+                            {f}
+                            <div className="w-2 h-2 rounded-full bg-[#D8DDE6]" />
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+
                   {/* Collapsible Details */}
-                  <div className="border-t border-[var(--sf-border)] pt-3">
+                  <div className="border-t border-[var(--sf-border)] pt-3 mt-4">
                     <button
                       onClick={() => setByomDetailsOpen(!byomDetailsOpen)}
                       className="flex items-center gap-1.5 text-sm font-medium text-[var(--sf-text-primary)] mb-3"
@@ -1952,6 +2010,19 @@ export default function IdentityResolutionContent() {
                     <div className="px-4 py-3 border-b border-[var(--sf-border)]">
                       <h3 className="text-sm font-semibold text-[var(--sf-text-primary)]">Datakit Selection</h3>
                       <p className="text-xs text-[var(--sf-text-tertiary)] mt-0.5">{selectedDatakit} — select a ruleset to install</p>
+                      {/* Session context: show remembered connections + bundles */}
+                      {demoSession && demoSession.informaticaConnections.length > 0 && selectedDatakit === 'Informatica MDM' && (
+                        <div className="mt-2 px-3 py-2 bg-[#FFF3ED] rounded-md border border-[#FFD6C0]">
+                          <p className="text-[11px] font-medium text-[#B33500]">
+                            Connected: {demoSession.informaticaConnections.map((c) => c.alias).join(', ')}
+                          </p>
+                          {demoSession.selectedBundles.length > 0 && (
+                            <p className="text-[11px] text-[#B33500] mt-0.5">
+                              Installed Bundles: {demoSession.selectedBundles.join(', ')}
+                            </p>
+                          )}
+                        </div>
+                      )}
                     </div>
                     {(datakitRulesets[selectedDatakit] || []).length === 0 ? (
                       <div className="flex items-center justify-center h-48 text-sm text-[var(--sf-text-tertiary)]">
@@ -1967,26 +2038,29 @@ export default function IdentityResolutionContent() {
                           </tr>
                         </thead>
                         <tbody>
-                          {(datakitRulesets[selectedDatakit] || []).map((rs) => (
+                          {(datakitRulesets[selectedDatakit] || []).map((rs) => {
+                            const isPhase2 = !!rs.phase2;
+                            return (
                             <tr
                               key={rs.id}
-                              className={`cursor-pointer ${selectedDatakitRuleset === rs.id ? 'bg-[#EEF4FF]' : 'hover:bg-[#FAFAF9]'}`}
-                              onClick={() => setSelectedDatakitRuleset(rs.id)}
+                              className={`${isPhase2 ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'} ${selectedDatakitRuleset === rs.id && !isPhase2 ? 'bg-[#EEF4FF]' : 'hover:bg-[#FAFAF9]'}`}
+                              onClick={() => { if (!isPhase2) setSelectedDatakitRuleset(rs.id); }}
                             >
                               <td>
                                 <input
                                   type="radio"
                                   name="datakit-ruleset"
                                   checked={selectedDatakitRuleset === rs.id}
-                                  onChange={() => setSelectedDatakitRuleset(rs.id)}
+                                  onChange={() => { if (!isPhase2) setSelectedDatakitRuleset(rs.id); }}
+                                  disabled={isPhase2}
                                   className="w-4 h-4 accent-[var(--sf-blue)]"
                                 />
                               </td>
                               <td>
                                 <div className="flex items-center gap-2">
-                                  <span className="text-sm font-medium text-[var(--sf-text-primary)]">{rs.name}</span>
-                                  {rs.realTime && (
-                                    <span className="sf-badge sf-badge-info">Real Time</span>
+                                  <span className={`text-sm font-medium ${isPhase2 ? 'text-[var(--sf-text-tertiary)]' : 'text-[var(--sf-text-primary)]'}`}>{rs.name}</span>
+                                  {isPhase2 && (
+                                    <span className="sf-badge sf-badge-neutral" style={{ opacity: 0.6 }}>Phase-2</span>
                                   )}
                                 </div>
                               </td>
@@ -1994,7 +2068,8 @@ export default function IdentityResolutionContent() {
                                 {rs.primaryDMO} resolution — {rs.dataSpace} data space
                               </td>
                             </tr>
-                          ))}
+                            );
+                          })}
                         </tbody>
                       </table>
                     )}
@@ -2025,6 +2100,21 @@ export default function IdentityResolutionContent() {
                           <div className="sf-detail-field"><div className="sf-detail-label">Mode</div><div className="sf-detail-value">Bring Your Own MDM</div></div>
                           <div className="sf-detail-field"><div className="sf-detail-label">Ruleset ID</div><div className="sf-detail-value">{selectedDatakitRuleset}</div></div>
                           <div className="sf-detail-field"><div className="sf-detail-label">Created By</div><div className="sf-detail-value">Data Cloud</div></div>
+                          {/* Session-remembered data */}
+                          {demoSession && demoSession.informaticaConnections.length > 0 && selectedDatakit === 'Informatica MDM' && (
+                            <>
+                              <div className="sf-detail-field">
+                                <div className="sf-detail-label">Connection</div>
+                                <div className="sf-detail-value">{demoSession.informaticaConnections.map((c) => c.alias).join(', ')}</div>
+                              </div>
+                              {demoSession.selectedBundles.length > 0 && (
+                                <div className="sf-detail-field">
+                                  <div className="sf-detail-label">Data Bundles</div>
+                                  <div className="sf-detail-value">{demoSession.selectedBundles.join(', ')}</div>
+                                </div>
+                              )}
+                            </>
+                          )}
                         </>
                       )}
                     </div>
