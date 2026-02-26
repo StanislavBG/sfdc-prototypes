@@ -383,8 +383,40 @@ function generateStreamFields(bundleName: string): StreamField[] {
   }));
 }
 
+// ── Demo Session ────────────────────────────────────────────────────
+interface DemoSessionState {
+  informaticaConnections: { name: string; alias: string; orgId: string }[];
+  selectedBundles: string[];
+}
+
+interface DataStreamsContentProps {
+  demoSession?: DemoSessionState;
+}
+
+// Map installed bundle names to the data streams they generate
+const bundleToStreams: Record<string, DataStream[]> = {
+  'Informatica MDM Cloud': [
+    { id: 'ds-infa-c360', name: 'Customer 360 - Informatica MDM', source: 'Informatica MDM (USA-1)', sourceType: 'informatica', object: 'Customer 360', status: 'Active', recordsProcessed: 12061, lastRefreshed: '02/25/2026, 3:45 PM', refreshFrequency: 'Every 1 hour', dataSpace: 'default', tenant: 'USA-1', fields: generateStreamFields('Customer 360') },
+    { id: 'ds-infa-prod', name: 'Product 360 - Informatica MDM', source: 'Informatica MDM (USA-1)', sourceType: 'informatica', object: 'Product 360', status: 'Active', recordsProcessed: 8432, lastRefreshed: '02/25/2026, 3:45 PM', refreshFrequency: 'Every 1 hour', dataSpace: 'default', tenant: 'USA-1', fields: generateStreamFields('Product 360') },
+    { id: 'ds-infa-supp', name: 'Supplier 360 - Informatica MDM', source: 'Informatica MDM (USA-1)', sourceType: 'informatica', object: 'Supplier 360', status: 'Active', recordsProcessed: 3217, lastRefreshed: '02/25/2026, 2:30 PM', refreshFrequency: 'Every 6 hours', dataSpace: 'default', tenant: 'USA-1', fields: generateStreamFields('Supplier 360') },
+    { id: 'ds-infa-ref', name: 'Reference 360 - Informatica MDM', source: 'Informatica MDM (USA-1)', sourceType: 'informatica', object: 'Reference 360', status: 'Active', recordsProcessed: 1456, lastRefreshed: '02/25/2026, 1:00 PM', refreshFrequency: 'Every 12 hours', dataSpace: 'default', tenant: 'USA-1', fields: generateStreamFields('Reference 360') },
+  ],
+  'Informatica Data Quality': [
+    { id: 'ds-infa-org', name: 'Organization 360 - Informatica MDM', source: 'Informatica MDM (USA-1)', sourceType: 'informatica', object: 'Organization 360', status: 'Pending', recordsProcessed: 0, lastRefreshed: '—', refreshFrequency: 'Every 1 hour', dataSpace: 'default', tenant: 'USA-1', fields: generateStreamFields('Organization 360') },
+    { id: 'ds-infa-fin', name: 'Finance 360 - Informatica MDM', source: 'Informatica MDM (USA-1)', sourceType: 'informatica', object: 'Finance 360', status: 'Pending', recordsProcessed: 0, lastRefreshed: '—', refreshFrequency: 'Every 6 hours', dataSpace: 'default', tenant: 'USA-1', fields: generateStreamFields('Finance 360') },
+  ],
+};
+
 // ── Component ────────────────────────────────────────────────────────
-export default function DataStreamsContent() {
+export default function DataStreamsContent({ demoSession }: DataStreamsContentProps) {
+  // Compute session-aware data streams: base Salesforce streams + streams from installed bundles
+  const sessionStreams: DataStream[] = [];
+  if (demoSession) {
+    demoSession.selectedBundles.forEach((bundleName) => {
+      const streams = bundleToStreams[bundleName];
+      if (streams) sessionStreams.push(...streams);
+    });
+  }
   const [dataStreams, setDataStreams] = useState<DataStream[]>(mockDataStreams);
   const [searchQuery, setSearchQuery] = useState('');
   const [filterSource, setFilterSource] = useState<string>('all');
@@ -438,8 +470,11 @@ export default function DataStreamsContent() {
     return '📄';
   };
 
+  // Combine user-created streams with session-derived Informatica streams
+  const allStreams = [...dataStreams, ...sessionStreams.filter((ss) => !dataStreams.some((ds) => ds.id === ss.id))];
+
   // Filter streams
-  const filteredStreams = dataStreams.filter((ds) => {
+  const filteredStreams = allStreams.filter((ds) => {
     const matchSearch = ds.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       ds.source.toLowerCase().includes(searchQuery.toLowerCase()) ||
       ds.object.toLowerCase().includes(searchQuery.toLowerCase());

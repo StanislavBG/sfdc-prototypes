@@ -199,7 +199,7 @@ export default function Layout({ children }: LayoutProps) {
               ) : activeTab === 'Identity Resolutions' ? (
                 <IdentityResolutionContent demoSession={demoSession} />
               ) : activeTab === 'Data Streams' ? (
-                <DataStreamsContent />
+                <DataStreamsContent demoSession={demoSession} />
               ) : (
                 <div className="p-6">
                   <div className="sf-card">
