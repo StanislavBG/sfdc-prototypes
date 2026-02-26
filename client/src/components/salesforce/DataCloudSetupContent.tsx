@@ -162,12 +162,19 @@ function SalesforceCloudLogo({ size = 80 }: { size?: number }) {
 // ── Connect an Org Wizard Steps ──────────────────────────────────────
 type WizardStep = 'select-type' | 'alias' | 'login' | 'permissions';
 
+interface DemoSessionState {
+  informaticaConnections: { name: string; alias: string; orgId: string }[];
+  selectedBundles: string[];
+}
+
 interface DataCloudSetupContentProps {
   onBack?: () => void;
+  demoSession?: DemoSessionState;
+  onDemoSessionChange?: (session: DemoSessionState) => void;
 }
 
 // ── Component ────────────────────────────────────────────────────────
-export default function DataCloudSetupContent({ onBack }: DataCloudSetupContentProps) {
+export default function DataCloudSetupContent({ onBack, demoSession, onDemoSessionChange }: DataCloudSetupContentProps) {
   const [activeNavItem, setActiveNavItem] = useState('setup-home');
   const [quickFindQuery, setQuickFindQuery] = useState('');
   const [expandedNavItems, setExpandedNavItems] = useState<Set<string>>(new Set(['feature-manager']));
@@ -255,6 +262,16 @@ export default function DataCloudSetupContent({ onBack }: DataCloudSetupContentP
 
     if (isInformatica) {
       setInformaticaConnections((prev) => [...prev, newConnection]);
+      // Update demo session with the new Informatica connection
+      if (onDemoSessionChange && demoSession) {
+        onDemoSessionChange({
+          ...demoSession,
+          informaticaConnections: [
+            ...demoSession.informaticaConnections,
+            { name: newConnection.connectionName, alias: newConnection.alias, orgId: newConnection.orgId },
+          ],
+        });
+      }
     } else {
       setSfdcConnections((prev) => [...prev, newConnection]);
     }
@@ -1385,22 +1402,43 @@ export default function DataCloudSetupContent({ onBack }: DataCloudSetupContentP
                         <th><div className="flex items-center gap-1">Name <ChevronDown className="w-3 h-3 opacity-50" /></div></th>
                         <th><div className="flex items-center gap-1">Installed Version <ChevronDown className="w-3 h-3 opacity-50" /></div></th>
                         <th><div className="flex items-center gap-1">Latest Version <ChevronDown className="w-3 h-3 opacity-50" /></div></th>
-                        <th className="w-10"></th>
+                        <th className="w-24">Action</th>
                       </tr>
                     </thead>
                     <tbody>
-                      {currentBundles.map((bundle) => (
+                      {currentBundles.map((bundle) => {
+                        const isInstalled = demoSession?.selectedBundles.includes(bundle.name);
+                        return (
                         <tr key={bundle.name}>
                           <td className="sf-link font-medium">{bundle.name}</td>
-                          <td>{bundle.installedVersion}</td>
+                          <td>{isInstalled ? bundle.latestVersion : bundle.installedVersion}</td>
                           <td>{bundle.latestVersion}</td>
                           <td>
-                            <button className="w-6 h-6 flex items-center justify-center rounded hover:bg-[#F3F3F3] text-[var(--sf-text-tertiary)]">
-                              <ChevronDown className="w-3.5 h-3.5" />
-                            </button>
+                            {isInstalled ? (
+                              <span className="inline-flex items-center gap-1 text-xs font-medium text-[var(--sf-success)]">
+                                <CheckCircle2 className="w-3.5 h-3.5" /> Installed
+                              </span>
+                            ) : (
+                              <button
+                                onClick={() => {
+                                  if (onDemoSessionChange && demoSession) {
+                                    onDemoSessionChange({
+                                      ...demoSession,
+                                      selectedBundles: [...demoSession.selectedBundles, bundle.name],
+                                    });
+                                  }
+                                }}
+                                className={`px-3 py-1 text-xs font-medium text-white rounded transition-colors ${
+                                  isInformatica ? 'bg-[#FF4A00] hover:bg-[#E54300]' : 'bg-[var(--sf-blue)] hover:bg-[var(--sf-blue-hover)]'
+                                }`}
+                              >
+                                Install
+                              </button>
+                            )}
                           </td>
                         </tr>
-                      ))}
+                        );
+                      })}
                     </tbody>
                   </table>
                 </div>
