@@ -46,6 +46,9 @@ export default function Layout({ children }: LayoutProps) {
     selectedBundles: [],
     installedDatakits: [],
   });
+
+  // Flag to auto-open Data Streams wizard at Bundles step with Informatica pre-selected
+  const [openDataStreamsBundles, setOpenDataStreamsBundles] = useState(false);
   const mainRef = useRef<HTMLElement>(null);
 
   const isAdmin = currentTimeline === 'context-explorer';
@@ -140,7 +143,16 @@ export default function Layout({ children }: LayoutProps) {
         />
         <div className="flex flex-1 overflow-hidden">
           <main ref={mainRef} className="flex-1 overflow-y-auto">
-            <DataCloudSetupContent onBack={() => setShowDataCloudSetup(false)} demoSession={demoSession} onDemoSessionChange={setDemoSession} />
+            <DataCloudSetupContent
+              onBack={() => setShowDataCloudSetup(false)}
+              demoSession={demoSession}
+              onDemoSessionChange={setDemoSession}
+              onNavigateToDataStreamsBundles={() => {
+                setShowDataCloudSetup(false);
+                setActiveTab('Data Streams');
+                setOpenDataStreamsBundles(true);
+              }}
+            />
           </main>
         </div>
         <TimeMachine
@@ -201,7 +213,11 @@ export default function Layout({ children }: LayoutProps) {
               ) : activeTab === 'Identity Resolutions' ? (
                 <IdentityResolutionContent demoSession={demoSession} onDemoSessionChange={setDemoSession} />
               ) : activeTab === 'Data Streams' ? (
-                <DataStreamsContent demoSession={demoSession} />
+                <DataStreamsContent
+                  demoSession={demoSession}
+                  initialOpenBundles={openDataStreamsBundles}
+                  onBundlesOpened={() => setOpenDataStreamsBundles(false)}
+                />
               ) : (
                 <div className="p-6">
                   <div className="sf-card">
