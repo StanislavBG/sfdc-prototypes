@@ -395,19 +395,22 @@ interface DataStreamsContentProps {
   currentTimeline?: string;
 }
 
-// Map installed bundle names to the data streams they generate
-const bundleToStreams: Record<string, DataStream[]> = {
-  'Informatica MDM Cloud': [
-    { id: 'ds-infa-c360', name: 'Customer 360 - Informatica MDM', source: 'Informatica MDM (USA-1)', sourceType: 'informatica', object: 'Customer 360', status: 'Active', recordsProcessed: 12061, lastRefreshed: '02/25/2026, 3:45 PM', refreshFrequency: 'Every 1 hour', dataSpace: 'default', tenant: 'USA-1', fields: generateStreamFields('Customer 360') },
-    { id: 'ds-infa-prod', name: 'Product 360 - Informatica MDM', source: 'Informatica MDM (USA-1)', sourceType: 'informatica', object: 'Product 360', status: 'Active', recordsProcessed: 8432, lastRefreshed: '02/25/2026, 3:45 PM', refreshFrequency: 'Every 1 hour', dataSpace: 'default', tenant: 'USA-1', fields: generateStreamFields('Product 360') },
-    { id: 'ds-infa-supp', name: 'Supplier 360 - Informatica MDM', source: 'Informatica MDM (USA-1)', sourceType: 'informatica', object: 'Supplier 360', status: 'Active', recordsProcessed: 3217, lastRefreshed: '02/25/2026, 2:30 PM', refreshFrequency: 'Every 6 hours', dataSpace: 'default', tenant: 'USA-1', fields: generateStreamFields('Supplier 360') },
-    { id: 'ds-infa-ref', name: 'Reference 360 - Informatica MDM', source: 'Informatica MDM (USA-1)', sourceType: 'informatica', object: 'Reference 360', status: 'Active', recordsProcessed: 1456, lastRefreshed: '02/25/2026, 1:00 PM', refreshFrequency: 'Every 12 hours', dataSpace: 'default', tenant: 'USA-1', fields: generateStreamFields('Reference 360') },
-  ],
-  'Informatica Data Quality': [
-    { id: 'ds-infa-org', name: 'Organization 360 - Informatica MDM', source: 'Informatica MDM (USA-1)', sourceType: 'informatica', object: 'Organization 360', status: 'Pending', recordsProcessed: 0, lastRefreshed: '—', refreshFrequency: 'Every 1 hour', dataSpace: 'default', tenant: 'USA-1', fields: generateStreamFields('Organization 360') },
-    { id: 'ds-infa-fin', name: 'Finance 360 - Informatica MDM', source: 'Informatica MDM (USA-1)', sourceType: 'informatica', object: 'Finance 360', status: 'Pending', recordsProcessed: 0, lastRefreshed: '—', refreshFrequency: 'Every 6 hours', dataSpace: 'default', tenant: 'USA-1', fields: generateStreamFields('Finance 360') },
-  ],
-};
+// Map installed bundle names to the data streams they generate — tenant alias injected at runtime
+function getBundleStreams(tenant: string): Record<string, DataStream[]> {
+  const t = tenant || 'Default';
+  return {
+    'Informatica MDM Cloud': [
+      { id: 'ds-infa-c360', name: 'Customer 360 - Informatica MDM', source: `Informatica MDM (${t})`, sourceType: 'informatica', object: 'Customer 360', status: 'Active', recordsProcessed: 12061, lastRefreshed: '02/25/2026, 3:45 PM', refreshFrequency: 'Every 1 hour', dataSpace: 'default', tenant: t, fields: generateStreamFields('Customer 360') },
+      { id: 'ds-infa-prod', name: 'Product 360 - Informatica MDM', source: `Informatica MDM (${t})`, sourceType: 'informatica', object: 'Product 360', status: 'Active', recordsProcessed: 8432, lastRefreshed: '02/25/2026, 3:45 PM', refreshFrequency: 'Every 1 hour', dataSpace: 'default', tenant: t, fields: generateStreamFields('Product 360') },
+      { id: 'ds-infa-supp', name: 'Supplier 360 - Informatica MDM', source: `Informatica MDM (${t})`, sourceType: 'informatica', object: 'Supplier 360', status: 'Active', recordsProcessed: 3217, lastRefreshed: '02/25/2026, 2:30 PM', refreshFrequency: 'Every 6 hours', dataSpace: 'default', tenant: t, fields: generateStreamFields('Supplier 360') },
+      { id: 'ds-infa-ref', name: 'Reference 360 - Informatica MDM', source: `Informatica MDM (${t})`, sourceType: 'informatica', object: 'Reference 360', status: 'Active', recordsProcessed: 1456, lastRefreshed: '02/25/2026, 1:00 PM', refreshFrequency: 'Every 12 hours', dataSpace: 'default', tenant: t, fields: generateStreamFields('Reference 360') },
+    ],
+    'Informatica Data Quality': [
+      { id: 'ds-infa-org', name: 'Organization 360 - Informatica MDM', source: `Informatica MDM (${t})`, sourceType: 'informatica', object: 'Organization 360', status: 'Pending', recordsProcessed: 0, lastRefreshed: '—', refreshFrequency: 'Every 1 hour', dataSpace: 'default', tenant: t, fields: generateStreamFields('Organization 360') },
+      { id: 'ds-infa-fin', name: 'Finance 360 - Informatica MDM', source: `Informatica MDM (${t})`, sourceType: 'informatica', object: 'Finance 360', status: 'Pending', recordsProcessed: 0, lastRefreshed: '—', refreshFrequency: 'Every 6 hours', dataSpace: 'default', tenant: t, fields: generateStreamFields('Finance 360') },
+    ],
+  };
+}
 
 // ── Component ────────────────────────────────────────────────────────
 export default function DataStreamsContent({ demoSession, currentTimeline }: DataStreamsContentProps) {
@@ -415,11 +418,13 @@ export default function DataStreamsContent({ demoSession, currentTimeline }: Dat
   const is264Release = currentTimeline === '264-release';
 
   // Compute session-aware data streams: base Salesforce streams + streams from installed bundles
-  // Informatica streams only appear in 264 Release timeline
+  // Informatica streams only appear in 264 Release timeline, tenant comes from session connections
   const sessionStreams: DataStream[] = [];
   if (is264Release && demoSession) {
+    const tenantAlias = demoSession.informaticaConnections[0]?.alias || 'Default';
+    const bundleStreams = getBundleStreams(tenantAlias);
     demoSession.selectedBundles.forEach((bundleName) => {
-      const streams = bundleToStreams[bundleName];
+      const streams = bundleStreams[bundleName];
       if (streams) sessionStreams.push(...streams);
     });
   }
@@ -443,8 +448,9 @@ export default function DataStreamsContent({ demoSession, currentTimeline }: Dat
   const [selectedDataSpace, setSelectedDataSpace] = useState('default');
   const [dataSpaceDropdownOpen, setDataSpaceDropdownOpen] = useState(false);
 
-  // Informatica bundle selection
-  const [selectedTenant, setSelectedTenant] = useState('USA-1');
+  // Informatica bundle selection — tenant comes from session connections
+  const sessionTenants = demoSession?.informaticaConnections.map((c) => c.alias) || [];
+  const [selectedTenant, setSelectedTenant] = useState(() => sessionTenants[0] || '');
   const [selectedBundles, setSelectedBundles] = useState<Set<string>>(new Set());
 
   // Connector explorer
@@ -498,7 +504,7 @@ export default function DataStreamsContent({ demoSession, currentTimeline }: Dat
   const handleOpenNew = () => {
     setNewModalStep(1);
     setSelectedSource(null);
-    setSelectedTenant('USA-1');
+    setSelectedTenant(sessionTenants[0] || '');
     setSelectedBundles(new Set());
     setConnectorSearch('');
     setConnectorCategory('all');
@@ -1586,9 +1592,13 @@ export default function DataStreamsContent({ demoSession, currentTimeline }: Dat
                           onChange={(e) => setSelectedTenant(e.target.value)}
                           className="w-full px-3 py-2 text-sm border border-[var(--sf-border)] rounded bg-white focus:outline-none"
                         >
-                          <option value="USA-1">USA-1</option>
-                          <option value="Europe-1">Europe-1</option>
-                          <option value="APAC-1">APAC-1</option>
+                          {sessionTenants.length > 0 ? (
+                            sessionTenants.map((alias) => (
+                              <option key={alias} value={alias}>{alias}</option>
+                            ))
+                          ) : (
+                            <option value="" disabled>No tenants configured — connect in Data Cloud Setup</option>
+                          )}
                         </select>
                       </div>
                       <div className="flex items-center border border-[var(--sf-border)] rounded overflow-hidden">
