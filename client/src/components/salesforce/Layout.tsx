@@ -14,6 +14,17 @@ import TimeMachine from './TimeMachine';
 import AppLauncher from './AppLauncher';
 import { salesforceApps, type Workflow } from '@/lib/mock-data';
 
+// ── Demo Session State ─────────────────────────────────────────────
+// Tracks user selections across the multi-step demo flow:
+// 1) Create Informatica Connections → remembered names
+// 2) Select Data Bundles → remembered bundle names
+// 3) Create IR from Datakit → uses remembered data
+export interface DemoSessionState {
+  informaticaConnections: { name: string; alias: string; orgId: string }[];
+  selectedBundles: string[];
+  installedDatakits: string[]; // datakit ruleset IDs installed via IR wizard (e.g. 'INFA-C360')
+}
+
 interface LayoutProps {
   children?: React.ReactNode;
 }
@@ -28,6 +39,13 @@ export default function Layout({ children }: LayoutProps) {
   const [appLauncherOpen, setAppLauncherOpen] = useState(false);
   const [showDataCloudSetup, setShowDataCloudSetup] = useState(false);
   const [exportToast, setExportToast] = useState<string | null>(null);
+
+  // Demo session state — shared across Setup & IR pages
+  const [demoSession, setDemoSession] = useState<DemoSessionState>({
+    informaticaConnections: [],
+    selectedBundles: [],
+    installedDatakits: [],
+  });
   const mainRef = useRef<HTMLElement>(null);
 
   const isAdmin = currentTimeline === 'context-explorer';
@@ -122,7 +140,7 @@ export default function Layout({ children }: LayoutProps) {
         />
         <div className="flex flex-1 overflow-hidden">
           <main ref={mainRef} className="flex-1 overflow-y-auto">
-            <DataCloudSetupContent onBack={() => setShowDataCloudSetup(false)} />
+            <DataCloudSetupContent onBack={() => setShowDataCloudSetup(false)} demoSession={demoSession} onDemoSessionChange={setDemoSession} />
           </main>
         </div>
         <TimeMachine
@@ -181,9 +199,9 @@ export default function Layout({ children }: LayoutProps) {
               ) : activeTab === 'Context Manager' ? (
                 <HelpDocExplorer />
               ) : activeTab === 'Identity Resolutions' ? (
-                <IdentityResolutionContent />
+                <IdentityResolutionContent demoSession={demoSession} onDemoSessionChange={setDemoSession} />
               ) : activeTab === 'Data Streams' ? (
-                <DataStreamsContent />
+                <DataStreamsContent demoSession={demoSession} />
               ) : (
                 <div className="p-6">
                   <div className="sf-card">
