@@ -387,6 +387,7 @@ function generateStreamFields(bundleName: string): StreamField[] {
 interface DemoSessionState {
   informaticaConnections: { name: string; alias: string; orgId: string }[];
   selectedBundles: string[];
+  installedDatakits: string[];
 }
 
 interface DataStreamsContentProps {
@@ -1299,17 +1300,21 @@ export default function DataStreamsContent({ demoSession }: DataStreamsContentPr
                           {informaticaBundles.map((bundle) => {
                             const isSelected = selectedBundles.has(bundle.id);
                             const isFocused = focusedBundleId === bundle.id;
+                            const isHighlighted = bundle.name === 'Customer 360' || bundle.name === 'Organization 360';
+                            const fieldTag = bundle.name === 'Customer 360' ? '264' : bundle.name === 'Organization 360' ? '86' : null;
                             return (
                               <button
                                 key={bundle.id}
                                 onClick={() => { toggleBundle(bundle.id); setFocusedBundleId(bundle.id); }}
                                 onMouseEnter={() => setFocusedBundleId(bundle.id)}
                                 className={`relative text-left rounded-lg border-2 p-4 transition-all ${
-                                  isSelected
-                                    ? 'border-[#FF4A00] bg-[#FFF8F5] shadow-sm'
-                                    : isFocused
-                                      ? 'border-[#FF4A00]/50 bg-[#FFFAF7]'
-                                      : 'border-[var(--sf-border)] bg-white hover:border-[#FF4A00]/50'
+                                  !isHighlighted && !isSelected
+                                    ? 'border-[var(--sf-border)] bg-[#FAFAF9] opacity-50 cursor-default'
+                                    : isSelected
+                                      ? 'border-[#FF4A00] bg-[#FFF8F5] shadow-sm'
+                                      : isFocused
+                                        ? 'border-[#FF4A00]/50 bg-[#FFFAF7]'
+                                        : 'border-[var(--sf-border)] bg-white hover:border-[#FF4A00]/50'
                                 }`}
                               >
                                 {isSelected && (
@@ -1320,12 +1325,17 @@ export default function DataStreamsContent({ demoSession }: DataStreamsContentPr
                                 <div className="flex items-center gap-3 mb-2">
                                   <div className="w-8 h-8 flex items-center justify-center flex-shrink-0">
                                     <svg viewBox="0 0 24 24" className="w-6 h-6">
-                                      <path d="M12 2 L22 12 L12 22 L2 12 Z" fill={isSelected ? '#FF4A00' : '#FFB088'} />
+                                      <path d="M12 2 L22 12 L12 22 L2 12 Z" fill={isSelected ? '#FF4A00' : isHighlighted ? '#FFB088' : '#D8DDE6'} />
                                       <text x="12" y="15" textAnchor="middle" fill="white" fontSize="8" fontWeight="bold">{bundle.objectCount}</text>
                                     </svg>
                                   </div>
                                   <div>
-                                    <div className={`text-sm font-semibold ${isSelected ? 'text-[#FF4A00]' : 'text-[var(--sf-text-primary)]'}`}>{bundle.name}</div>
+                                    <div className="flex items-center gap-2">
+                                      <span className={`text-sm font-semibold ${isSelected ? 'text-[#FF4A00]' : isHighlighted ? 'text-[var(--sf-text-primary)]' : 'text-[var(--sf-text-tertiary)]'}`}>{bundle.name}</span>
+                                      {fieldTag && (
+                                        <span className="px-1.5 py-0.5 text-[9px] font-bold bg-[#FF4A00] text-white rounded">{fieldTag} fields</span>
+                                      )}
+                                    </div>
                                     <div className="text-[10px] text-[var(--sf-text-tertiary)]">{bundle.entities.length} Entities &middot; Informatica MDM</div>
                                   </div>
                                 </div>
