@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useMdsSimulator } from './MdsSimulatorContext';
 import {
   Search,
   ChevronRight,
@@ -273,10 +274,12 @@ export default function DataCloudSetupContent({ onBack, demoSession, onDemoSessi
   const [loginPassword, setLoginPassword] = useState('');
   const [rememberMe, setRememberMe] = useState(true);
 
+  // MDS Simulator — global context
+  const { enabled: mdsSimulatorVisible, setEnabled: setMdsSimulatorVisible, triggerDelay } = useMdsSimulator();
+
   // Setup Home state
   const [setupHomeLearnOpen, setSetupHomeLearnOpen] = useState(true);
   const [setupHomeTab, setSetupHomeTab] = useState<'get-started' | 'plan-data' | 'monitor'>('get-started');
-  const [mdsSimulatorVisible, setMdsSimulatorVisible] = useState(false);
 
   // Solution Manager state
   const [smActiveSolution, setSmActiveSolution] = useState<string | null>(null);
@@ -313,11 +316,11 @@ export default function DataCloudSetupContent({ onBack, demoSession, onDemoSessi
 
   const handleWizardNext = () => {
     if (wizardStep === 'select-type' && selectedOrgType) {
-      setWizardStep('alias');
+      triggerDelay(() => setWizardStep('alias'));
     } else if (wizardStep === 'alias' && connectionAlias.trim()) {
-      setWizardStep('login');
+      triggerDelay(() => setWizardStep('login'));
     } else if (wizardStep === 'login') {
-      setWizardStep('permissions');
+      triggerDelay(() => setWizardStep('permissions'));
     }
   };
 
@@ -328,6 +331,10 @@ export default function DataCloudSetupContent({ onBack, demoSession, onDemoSessi
   };
 
   const handleAllowAccess = () => {
+    triggerDelay(() => handleAllowAccessInner());
+  };
+
+  const handleAllowAccessInner = () => {
     // Create a new connection from wizard data
     const newConnection: Connection = {
       id: `conn-${Date.now()}`,
@@ -612,8 +619,9 @@ export default function DataCloudSetupContent({ onBack, demoSession, onDemoSessi
   // ── Install Bundle handler ──
   const handleInstallBundle = () => {
     if (!installModalBundle) return;
-    setInstallModalLoading(true);
-    setTimeout(() => {
+    triggerDelay(() => {
+      setInstallModalLoading(true);
+      setTimeout(() => {
       // Add bundle to session
       if (onDemoSessionChange && demoSession) {
         onDemoSessionChange({
@@ -653,6 +661,7 @@ export default function DataCloudSetupContent({ onBack, demoSession, onDemoSessi
       setActiveNavItem('installed-packages');
       setPackageDetailName(null);
     }, 2500);
+    });
   };
 
   // Informatica metadata components for View Components
@@ -731,7 +740,7 @@ export default function DataCloudSetupContent({ onBack, demoSession, onDemoSessi
                     <button
                       onClick={() => {
                         if (item.hasChildren) toggleNavExpand(item.id);
-                        else setActiveNavItem(item.id);
+                        else triggerDelay(() => setActiveNavItem(item.id));
                       }}
                       className={`w-full flex items-center gap-1.5 px-4 py-1.5 text-xs text-left transition-colors ${
                         activeNavItem === item.id
