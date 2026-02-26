@@ -418,6 +418,9 @@ export default function DataStreamsContent({ demoSession }: DataStreamsContentPr
       if (streams) sessionStreams.push(...streams);
     });
   }
+  // Check if Informatica is connected in the current session
+  const hasInformaticaConn = (demoSession?.informaticaConnections.length ?? 0) > 0;
+
   const [dataStreams, setDataStreams] = useState<DataStream[]>(mockDataStreams);
   const [searchQuery, setSearchQuery] = useState('');
   const [filterSource, setFilterSource] = useState<string>('all');
@@ -1057,29 +1060,24 @@ export default function DataStreamsContent({ demoSession }: DataStreamsContentPr
 
                     {/* ─── Connected Sources ─── */}
                     <div>
-                      <h3 className="text-xs font-semibold uppercase tracking-wider text-[var(--sf-text-tertiary)] mb-3">Connected Sources</h3>
-                      <div className="grid grid-cols-3 gap-3">
+                      <h3 className="text-sm font-semibold text-[var(--sf-text-primary)] mb-3">Connected Sources</h3>
+                      <div className={`grid gap-3 ${hasInformaticaConn ? 'grid-cols-4' : 'grid-cols-3'}`}>
                         {/* Ingestion API */}
                         {(() => {
                           const isSelected = selectedSource === 'src-api';
                           return (
                             <button
                               onClick={() => setSelectedSource('src-api')}
-                              className={`relative flex items-center gap-3 rounded-lg border-2 p-4 transition-all text-left ${
-                                isSelected ? 'border-[var(--sf-blue)] bg-[#EEF4FF] shadow-sm' : 'border-[#D8DDE6] bg-white hover:border-[#B0B0B0] hover:bg-[#FAFAF9]'
+                              className={`relative flex items-start gap-3 rounded-lg border p-5 transition-all text-left min-h-[100px] ${
+                                isSelected ? 'border-[var(--sf-blue)] bg-[#EEF4FF] shadow-sm' : 'border-[#D8DDE6] bg-white hover:border-[#B0B0B0]'
                               }`}
                             >
-                              {isSelected && (
-                                <div className="absolute top-0 right-0 w-6 h-6 bg-[var(--sf-blue)] flex items-center justify-center" style={{ clipPath: 'polygon(0 0, 100% 0, 100% 100%)' }}>
-                                  <Check className="w-2.5 h-2.5 text-white absolute top-0.5 right-0.5" />
-                                </div>
-                              )}
-                              <div className="w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0 bg-[#032D60]">
-                                <Server className="w-5 h-5 text-white" />
+                              <div className="w-10 h-10 flex items-center justify-center flex-shrink-0 text-[#706E6B]">
+                                <Server className="w-7 h-7" />
                               </div>
                               <div className="flex-1 min-w-0">
                                 <div className="text-sm font-semibold text-[var(--sf-text-primary)]">Ingestion API</div>
-                                <div className="text-[10px] text-[var(--sf-text-tertiary)] mt-0.5">Real-time event data via REST API</div>
+                                <div className="text-xs text-[var(--sf-text-tertiary)] mt-1 leading-relaxed">Stream and/or bulk upload data from external sources</div>
                               </div>
                             </button>
                           );
@@ -1091,25 +1089,17 @@ export default function DataStreamsContent({ demoSession }: DataStreamsContentPr
                           return (
                             <button
                               onClick={() => setSelectedSource('salesforce')}
-                              className={`relative flex items-center gap-3 rounded-lg border-2 p-4 transition-all text-left ${
-                                isSelected ? 'border-[var(--sf-blue)] bg-[#EEF4FF] shadow-sm' : 'border-[#D8DDE6] bg-white hover:border-[#B0B0B0] hover:bg-[#FAFAF9]'
+                              className={`relative flex items-start gap-3 rounded-lg border p-5 transition-all text-left min-h-[100px] ${
+                                isSelected ? 'border-[var(--sf-blue)] bg-[#EEF4FF] shadow-sm' : 'border-[#D8DDE6] bg-white hover:border-[#B0B0B0]'
                               }`}
                             >
-                              {isSelected && (
-                                <div className="absolute top-0 right-0 w-6 h-6 bg-[var(--sf-blue)] flex items-center justify-center" style={{ clipPath: 'polygon(0 0, 100% 0, 100% 100%)' }}>
-                                  <Check className="w-2.5 h-2.5 text-white absolute top-0.5 right-0.5" />
-                                </div>
-                              )}
-                              <div className="w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0 bg-[#0070D2]">
-                                <svg viewBox="0 0 32 32" className="w-6 h-6">
-                                  <text x="16" y="22" textAnchor="middle" fill="white" fontSize="14" fontWeight="bold" fontStyle="italic">sf</text>
-                                </svg>
+                              <div className="w-10 h-10 flex items-center justify-center flex-shrink-0 text-[#00A1E0]">
+                                <svg viewBox="0 0 48 48" className="w-8 h-8"><path fill="currentColor" d="M20.5 8.5c2.3-2.4 5.5-3.9 9-3.9 4.8 0 9 2.8 11 6.8 1.5-.6 3.1-1 4.8-1 7 0 12.7 5.7 12.7 12.7S52.3 35.8 45.3 35.8c-1.3 0-2.5-.2-3.7-.6-1.8 3.5-5.4 5.9-9.6 5.9-1.8 0-3.5-.4-5-1.2-1.8 2.8-4.9 4.6-8.5 4.6-4.5 0-8.3-3-9.6-7.1-.8.1-1.6.2-2.4.2C2.9 37.6 0 34.7 0 29.1s4.5-8.5 8.5-8.5c.6 0 1.2.1 1.8.2C11.2 14.7 15.4 10.3 20.5 8.5z" transform="scale(0.7) translate(2,5)"/></svg>
                               </div>
                               <div className="flex-1 min-w-0">
                                 <div className="text-sm font-semibold text-[var(--sf-text-primary)]">Salesforce CRM</div>
-                                <div className="text-[10px] text-[var(--sf-text-tertiary)] mt-0.5">Standard and custom Salesforce objects</div>
+                                <div className="text-xs text-[var(--sf-text-tertiary)] mt-1 leading-relaxed">Import objects from Salesforce CRM</div>
                               </div>
-                              <span className="sf-badge sf-badge-success text-[9px]">Connected</span>
                             </button>
                           );
                         })()}
@@ -1120,56 +1110,45 @@ export default function DataStreamsContent({ demoSession }: DataStreamsContentPr
                           return (
                             <button
                               onClick={() => setSelectedSource('src-s2s')}
-                              className={`relative flex items-center gap-3 rounded-lg border-2 p-4 transition-all text-left ${
-                                isSelected ? 'border-[var(--sf-blue)] bg-[#EEF4FF] shadow-sm' : 'border-[#D8DDE6] bg-white hover:border-[#B0B0B0] hover:bg-[#FAFAF9]'
+                              className={`relative flex items-start gap-3 rounded-lg border p-5 transition-all text-left min-h-[100px] ${
+                                isSelected ? 'border-[var(--sf-blue)] bg-[#EEF4FF] shadow-sm' : 'border-[#D8DDE6] bg-white hover:border-[#B0B0B0]'
                               }`}
                             >
-                              {isSelected && (
-                                <div className="absolute top-0 right-0 w-6 h-6 bg-[var(--sf-blue)] flex items-center justify-center" style={{ clipPath: 'polygon(0 0, 100% 0, 100% 100%)' }}>
-                                  <Check className="w-2.5 h-2.5 text-white absolute top-0.5 right-0.5" />
-                                </div>
-                              )}
-                              <div className="w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0 bg-[#5C6BC0]">
-                                <Globe className="w-5 h-5 text-white" />
+                              <div className="w-10 h-10 flex items-center justify-center flex-shrink-0 text-[#706E6B]">
+                                <svg viewBox="0 0 24 24" className="w-7 h-7" fill="none" stroke="currentColor" strokeWidth="1.5"><line x1="2" y1="4" x2="22" y2="4" /><line x1="2" y1="8" x2="22" y2="8" /><line x1="2" y1="12" x2="22" y2="12" /><rect x="4" y="2" width="16" height="12" rx="1" /><line x1="12" y1="14" x2="12" y2="18" /><circle cx="12" cy="20" r="2" /></svg>
                               </div>
                               <div className="flex-1 min-w-0">
                                 <div className="text-sm font-semibold text-[var(--sf-text-primary)]">Server To Server</div>
-                                <div className="text-[10px] text-[var(--sf-text-tertiary)] mt-0.5">Authenticated server-to-server</div>
+                                <div className="text-xs text-[var(--sf-text-tertiary)] mt-1 leading-relaxed">Manually configure an authenticated connection between your server and Data Cloud.</div>
                               </div>
                             </button>
                           );
                         })()}
-                      </div>
 
-                      {/* Informatica MDM — highlighted connected source */}
-                      <div className="mt-3">
-                        <button
-                          onClick={() => setSelectedSource('informatica')}
-                          className={`relative flex items-center gap-3 rounded-lg border-2 p-4 transition-all text-left w-full ${
-                            selectedSource === 'informatica'
-                              ? 'border-[#FF4A00] bg-[#FFF8F5] shadow-sm'
-                              : 'border-[#FF4A00]/40 bg-[#FFF8F5] hover:border-[#FF4A00]'
-                          }`}
-                        >
-                          {selectedSource === 'informatica' && (
-                            <div className="absolute top-0 right-0 w-6 h-6 bg-[#FF4A00] flex items-center justify-center" style={{ clipPath: 'polygon(0 0, 100% 0, 100% 100%)' }}>
-                              <Check className="w-2.5 h-2.5 text-white absolute top-0.5 right-0.5" />
-                            </div>
-                          )}
-                          <div className="w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0 bg-[#FF4A00]">
-                            <svg viewBox="0 0 32 32" className="w-6 h-6">
-                              <text x="16" y="22" textAnchor="middle" fill="white" fontSize="12" fontWeight="bold">INFA</text>
-                            </svg>
-                          </div>
-                          <div className="flex-1 min-w-0">
-                            <div className="text-sm font-bold text-[#FF4A00]">Informatica MDM</div>
-                            <div className="text-[10px] text-[#D95800] mt-0.5">MDM business entities &amp; bundles</div>
-                          </div>
-                          <div className="flex items-center gap-2">
-                            <span className="sf-badge sf-badge-success text-[9px]">Connected</span>
-                            <span className="px-1.5 py-0.5 text-[8px] font-bold uppercase tracking-wider bg-[#FF4A00] text-white rounded">New</span>
-                          </div>
-                        </button>
+                        {/* Informatica MDM — only shown when connected */}
+                        {hasInformaticaConn && (() => {
+                          const isSelected = selectedSource === 'informatica';
+                          return (
+                            <button
+                              onClick={() => setSelectedSource('informatica')}
+                              className={`relative flex items-start gap-3 rounded-lg border p-5 transition-all text-left min-h-[100px] ${
+                                isSelected ? 'border-[var(--sf-blue)] bg-[#EEF4FF] shadow-sm' : 'border-[#D8DDE6] bg-white hover:border-[#B0B0B0]'
+                              }`}
+                            >
+                              <div className="w-10 h-10 flex items-center justify-center flex-shrink-0">
+                                <svg viewBox="0 0 40 40" className="w-8 h-8">
+                                  <rect width="40" height="40" rx="4" fill="#FF4A00" />
+                                  <text x="20" y="26" textAnchor="middle" fill="white" fontSize="11" fontWeight="bold">INFA</text>
+                                </svg>
+                              </div>
+                              <div className="flex-1 min-w-0">
+                                <div className="text-sm font-semibold text-[var(--sf-text-primary)]">Informatica MDM</div>
+                                <div className="text-xs text-[var(--sf-text-tertiary)] mt-1 leading-relaxed">Ingest or federate master data from Informatica MDM</div>
+                              </div>
+                              <span className="sf-badge sf-badge-success text-[9px] mt-1">Connected</span>
+                            </button>
+                          );
+                        })()}
                       </div>
                     </div>
 
@@ -1443,118 +1422,119 @@ export default function DataStreamsContent({ demoSession }: DataStreamsContentPr
                 );
               })()}
 
-              {/* Step 2: Configuration — Informatica bundles grid + entity detail */}
+              {/* Step 2: Configuration — Informatica bundles (matches Salesforce layout exactly) */}
               {newModalStep === 2 && selectedSource === 'informatica' && (() => {
                 const focusedBundle = informaticaBundles.find((b) => b.id === focusedBundleId);
                 return (
                   <div className="space-y-4">
-                    {/* Tenant selector */}
-                    <div className="flex items-center gap-4">
-                      <div>
-                        <label className="block text-xs font-medium text-[var(--sf-text-tertiary)] uppercase tracking-wide mb-1">Informatica Tenant</label>
+                    {/* Info banner */}
+                    <div className="flex items-start gap-3 p-4 bg-[#E1F5FE] rounded-lg">
+                      <Info className="w-5 h-5 text-[var(--sf-blue)] flex-shrink-0 mt-0.5" />
+                      <div className="text-sm text-[var(--sf-text-secondary)]">
+                        To ensure data is ingested from fields and objects created in the future, we recommend granting <strong>View All Fields (Global)</strong> system permission on the Data Cloud Informatica MDM Connector permission set. <span className="sf-link">Learn More</span>
+                      </div>
+                    </div>
+
+                    <p className="text-xs text-[var(--sf-text-tertiary)]">
+                      Select a tenant to ingest data from, then select an object or data bundle.
+                    </p>
+
+                    {/* Tenant selector + view toggle */}
+                    <div className="flex items-end gap-3">
+                      <div className="flex-1">
+                        <label className="block text-xs font-medium text-[var(--sf-text-tertiary)] mb-1">* Informatica Tenant</label>
                         <select
                           value={selectedTenant}
                           onChange={(e) => setSelectedTenant(e.target.value)}
-                          className="px-3 py-2 text-sm border border-[#FF4A00]/40 rounded bg-[#FFF8F5] text-[#FF4A00] font-medium focus:outline-none focus:border-[#FF4A00] focus:ring-1 focus:ring-[#FF4A00]/20"
+                          className="w-full px-3 py-2 text-sm border border-[var(--sf-border)] rounded bg-white focus:outline-none"
                         >
                           <option value="USA-1">USA-1</option>
                           <option value="Europe-1">Europe-1</option>
                           <option value="APAC-1">APAC-1</option>
                         </select>
                       </div>
-                      <div className="ml-auto text-xs text-[var(--sf-text-tertiary)]">
-                        {selectedBundles.size} bundle{selectedBundles.size !== 1 ? 's' : ''} selected
+                      <div className="flex items-center border border-[var(--sf-border)] rounded overflow-hidden">
+                        <button className="px-3 py-2 text-xs font-medium bg-[var(--sf-blue)] text-white">View Bundles</button>
+                        <button className="px-3 py-2 text-xs font-medium bg-white text-[var(--sf-text-secondary)] hover:bg-[#F3F3F3]">View Objects</button>
                       </div>
                     </div>
 
+                    {/* Loading spinner state */}
+                    {step2Loading ? (
+                      <div className="flex flex-col items-center justify-center py-20">
+                        <div className="flex gap-1.5 mb-3">
+                          <div className="w-2.5 h-2.5 rounded-full bg-[var(--sf-blue)] animate-bounce" style={{ animationDelay: '0ms' }} />
+                          <div className="w-2.5 h-2.5 rounded-full bg-[var(--sf-blue)] animate-bounce" style={{ animationDelay: '150ms' }} />
+                          <div className="w-2.5 h-2.5 rounded-full bg-[var(--sf-blue)] animate-bounce" style={{ animationDelay: '300ms' }} />
+                        </div>
+                        <p className="text-sm text-[var(--sf-text-tertiary)]">Loading bundles...</p>
+                      </div>
+                    ) : (
+                    <>
+                    {/* Bundle grid + detail sidebar */}
                     <div className="flex gap-4">
-                      {/* Bundles grid */}
                       <div className="flex-1 min-w-0">
-                        <div className="grid grid-cols-2 gap-3">
-                          {informaticaBundles.map((bundle) => {
-                            const isSelected = selectedBundles.has(bundle.id);
-                            const isFocused = focusedBundleId === bundle.id;
-                            const isHighlighted = bundle.name === 'Customer 360' || bundle.name === 'Organization 360';
-                            const fieldTag = bundle.name === 'Customer 360' ? '264' : bundle.name === 'Organization 360' ? '86' : null;
-                            return (
-                              <button
-                                key={bundle.id}
-                                onClick={() => { toggleBundle(bundle.id); setFocusedBundleId(bundle.id); }}
-                                onMouseEnter={() => setFocusedBundleId(bundle.id)}
-                                className={`relative text-left rounded-lg border-2 p-4 transition-all ${
-                                  !isHighlighted && !isSelected
-                                    ? 'border-[var(--sf-border)] bg-[#FAFAF9] opacity-50 cursor-default'
-                                    : isSelected
-                                      ? 'border-[#FF4A00] bg-[#FFF8F5] shadow-sm'
-                                      : isFocused
-                                        ? 'border-[#FF4A00]/50 bg-[#FFFAF7]'
-                                        : 'border-[var(--sf-border)] bg-white hover:border-[#FF4A00]/50'
-                                }`}
-                              >
-                                {isSelected && (
-                                  <div className="absolute top-0 right-0 w-6 h-6 bg-[#FF4A00] flex items-center justify-center" style={{ clipPath: 'polygon(0 0, 100% 0, 100% 100%)' }}>
-                                    <Check className="w-2.5 h-2.5 text-white absolute top-0.5 right-0.5" />
-                                  </div>
-                                )}
-                                <div className="flex items-center gap-3 mb-2">
-                                  <div className="w-8 h-8 flex items-center justify-center flex-shrink-0">
-                                    <svg viewBox="0 0 24 24" className="w-6 h-6">
-                                      <path d="M12 2 L22 12 L12 22 L2 12 Z" fill={isSelected ? '#FF4A00' : isHighlighted ? '#FFB088' : '#D8DDE6'} />
-                                      <text x="12" y="15" textAnchor="middle" fill="white" fontSize="8" fontWeight="bold">{bundle.objectCount}</text>
+                        <div className="flex items-center justify-between mb-2">
+                          <h4 className="text-sm font-semibold text-[var(--sf-text-primary)]">Standard Bundles ({informaticaBundles.length})</h4>
+                        </div>
+                        <div className="max-h-[320px] overflow-y-auto border border-[var(--sf-border)] rounded-lg">
+                          <div className="grid grid-cols-2 gap-0">
+                            {informaticaBundles.map((bundle) => {
+                              const isSelected = selectedBundles.has(bundle.id);
+                              const isFocused = focusedBundleId === bundle.id;
+                              return (
+                                <button
+                                  key={bundle.id}
+                                  onClick={() => { toggleBundle(bundle.id); setFocusedBundleId(bundle.id); }}
+                                  onMouseEnter={() => setFocusedBundleId(bundle.id)}
+                                  className={`flex items-center gap-3 p-3 text-left border border-[var(--sf-border)] transition-all ${
+                                    isSelected ? 'bg-[#EEF4FF] border-[var(--sf-blue)]' : isFocused ? 'bg-[#FAFAF9]' : 'bg-white hover:bg-[#FAFAF9]'
+                                  }`}
+                                >
+                                  <div className="w-8 h-8 rounded flex items-center justify-center flex-shrink-0 bg-[#FF4A00]">
+                                    <svg viewBox="0 0 32 32" className="w-5 h-5">
+                                      <text x="16" y="22" textAnchor="middle" fill="white" fontSize="10" fontWeight="bold">INFA</text>
                                     </svg>
                                   </div>
-                                  <div>
-                                    <div className="flex items-center gap-2">
-                                      <span className={`text-sm font-semibold ${isSelected ? 'text-[#FF4A00]' : isHighlighted ? 'text-[var(--sf-text-primary)]' : 'text-[var(--sf-text-tertiary)]'}`}>{bundle.name}</span>
-                                      {fieldTag && (
-                                        <span className="px-1.5 py-0.5 text-[9px] font-bold bg-[#FF4A00] text-white rounded">{fieldTag} fields</span>
-                                      )}
-                                    </div>
+                                  <div className="flex-1 min-w-0">
+                                    <div className="text-xs font-medium text-[var(--sf-text-primary)] truncate">{bundle.name}</div>
                                     <div className="text-[10px] text-[var(--sf-text-tertiary)]">{bundle.entities.length} Entities &middot; Informatica MDM</div>
                                   </div>
-                                </div>
-                                <p className="text-xs text-[var(--sf-text-tertiary)] leading-relaxed">{bundle.description}</p>
-                              </button>
-                            );
-                          })}
+                                  {isSelected && <Check className="w-4 h-4 text-[var(--sf-blue)] flex-shrink-0" />}
+                                </button>
+                              );
+                            })}
+                          </div>
                         </div>
                       </div>
 
-                      {/* Bundle Details sidebar */}
+                      {/* Bundle detail sidebar */}
                       {focusedBundle && (
-                        <div className="w-[240px] flex-shrink-0">
-                          <div className="border border-[#FF4A00]/30 rounded-lg bg-[#FFFAF7] overflow-hidden sticky top-0">
-                            <div className="px-4 py-3 border-b border-[#FF4A00]/20 bg-[#FFF3ED]">
-                              <h4 className="text-sm font-semibold text-[#FF4A00]">Bundle Details</h4>
-                            </div>
-                            <div className="p-4 space-y-3">
-                              <div className="flex items-center gap-2">
-                                <svg viewBox="0 0 24 24" className="w-5 h-5 flex-shrink-0">
-                                  <path d="M12 2 L22 12 L12 22 L2 12 Z" fill="#FF4A00" />
-                                  <text x="12" y="15" textAnchor="middle" fill="white" fontSize="8" fontWeight="bold">{focusedBundle.entities.length}</text>
+                        <div className="w-[220px] flex-shrink-0">
+                          <div className="border border-[var(--sf-border)] rounded-lg bg-white p-4">
+                            <h4 className="text-sm font-semibold text-[var(--sf-text-primary)] mb-1">Bundle Details</h4>
+                            <div className="flex items-center gap-2 mb-3">
+                              <div className="w-6 h-6 rounded flex items-center justify-center bg-[#FF4A00]">
+                                <svg viewBox="0 0 32 32" className="w-4 h-4">
+                                  <text x="16" y="22" textAnchor="middle" fill="white" fontSize="12" fontWeight="bold">IN</text>
                                 </svg>
-                                <span className="text-sm font-semibold text-[var(--sf-text-primary)]">{focusedBundle.name}</span>
                               </div>
-                              <div className="space-y-1">
-                                <div className="text-[10px] text-[var(--sf-text-tertiary)]">Type: <span className="text-[var(--sf-text-secondary)]">{focusedBundle.type}</span></div>
-                                <div className="text-[10px] text-[var(--sf-text-tertiary)]">Description: <span className="text-[var(--sf-text-secondary)]">{focusedBundle.description}</span></div>
-                              </div>
-
-                              <div>
-                                <div className="text-[10px] font-semibold text-[var(--sf-text-primary)] mb-2">Entities included ({focusedBundle.entities.length})</div>
-                                <div className="flex flex-wrap gap-1">
-                                  {focusedBundle.entities.map((entity) => (
-                                    <span key={entity.name} className="px-1.5 py-0.5 text-[9px] bg-[#FFF3ED] text-[#FF4A00] rounded font-mono border border-[#FF4A00]/20">
-                                      {entity.name}
-                                    </span>
-                                  ))}
-                                </div>
-                              </div>
+                              <span className="text-xs font-medium text-[var(--sf-text-primary)]">{focusedBundle.name}</span>
+                            </div>
+                            <div className="text-[10px] text-[var(--sf-text-tertiary)] mb-1">Type: <span className="text-[var(--sf-text-secondary)]">MDM Business Entity Bundle</span></div>
+                            <div className="text-[10px] text-[var(--sf-text-tertiary)] mb-3">Description: <span className="text-[var(--sf-text-secondary)]">{focusedBundle.description}</span></div>
+                            <div className="text-[10px] font-medium text-[var(--sf-text-primary)] mb-2">Entities included ({focusedBundle.entities.length})</div>
+                            <div className="flex flex-wrap gap-1">
+                              {focusedBundle.entities.map((entity) => (
+                                <span key={entity.name} className="px-1.5 py-0.5 text-[9px] bg-[#F3F3F3] text-[var(--sf-text-secondary)] rounded font-mono">{entity.name}</span>
+                              ))}
                             </div>
                           </div>
                         </div>
                       )}
                     </div>
+                    </>
+                    )}
                   </div>
                 );
               })()}
