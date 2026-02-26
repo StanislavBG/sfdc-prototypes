@@ -391,6 +391,7 @@ interface DemoSessionState {
 
 interface DataStreamsContentProps {
   demoSession?: DemoSessionState;
+  currentTimeline?: string;
 }
 
 // Map installed bundle names to the data streams they generate
@@ -408,17 +409,20 @@ const bundleToStreams: Record<string, DataStream[]> = {
 };
 
 // ── Component ────────────────────────────────────────────────────────
-export default function DataStreamsContent({ demoSession }: DataStreamsContentProps) {
+export default function DataStreamsContent({ demoSession, currentTimeline }: DataStreamsContentProps) {
+  const is264Release = currentTimeline === '264-release';
+
   // Compute session-aware data streams: base Salesforce streams + streams from installed bundles
+  // Informatica streams only appear in 264 Release timeline
   const sessionStreams: DataStream[] = [];
-  if (demoSession) {
+  if (is264Release && demoSession) {
     demoSession.selectedBundles.forEach((bundleName) => {
       const streams = bundleToStreams[bundleName];
       if (streams) sessionStreams.push(...streams);
     });
   }
-  // Check if Informatica is connected in the current session
-  const hasInformaticaConn = (demoSession?.informaticaConnections.length ?? 0) > 0;
+  // Check if Informatica is connected in the current session (only relevant in 264 Release)
+  const hasInformaticaConn = is264Release && (demoSession?.informaticaConnections.length ?? 0) > 0;
 
   const [dataStreams, setDataStreams] = useState<DataStream[]>(mockDataStreams);
   const [searchQuery, setSearchQuery] = useState('');
@@ -1066,7 +1070,7 @@ export default function DataStreamsContent({ demoSession }: DataStreamsContentPr
           >
             <option value="all">All Sources</option>
             <option value="salesforce">Salesforce CRM</option>
-            <option value="informatica">Informatica MDM</option>
+            {is264Release && <option value="informatica">Informatica MDM</option>}
             <option value="api">Ingestion API</option>
           </select>
         </div>

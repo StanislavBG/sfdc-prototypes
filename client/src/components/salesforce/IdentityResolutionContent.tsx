@@ -297,9 +297,10 @@ interface DemoSessionState {
 interface IdentityResolutionContentProps {
   demoSession?: DemoSessionState;
   onDemoSessionChange?: (session: DemoSessionState) => void;
+  currentTimeline?: string;
 }
 
-export default function IdentityResolutionContent({ demoSession, onDemoSessionChange }: IdentityResolutionContentProps) {
+export default function IdentityResolutionContent({ demoSession, onDemoSessionChange, currentTimeline }: IdentityResolutionContentProps) {
   // ── API hooks ─────────────────────────────────────────────────────
   const { data: apiRulesets, isLoading, isError } = useIdentityRulesets();
   const createMutation = useCreateIdentityRuleset();
@@ -1914,6 +1915,44 @@ export default function IdentityResolutionContent({ demoSession, onDemoSessionCh
   // ──────────────────────────────────────────────────────────────────
   // LIST VIEW
   // ──────────────────────────────────────────────────────────────────
+
+  // Today timeline → empty state (live product has no rulesets configured yet)
+  if (currentTimeline === 'today') {
+    return (
+      <div className="p-6">
+        <div className="flex items-center justify-between mb-4">
+          <div>
+            <h1 className="text-lg font-bold text-[var(--sf-text-primary)]">Identity Resolutions</h1>
+            <p className="text-xs text-[var(--sf-text-tertiary)] mt-0.5">Manage rulesets that match and unify source profiles into unified profiles.</p>
+          </div>
+        </div>
+        <div className="sf-card">
+          <div className="flex flex-col items-center justify-center py-20 px-6 text-center">
+            {/* Salesforce Trailblazer-style icon */}
+            <svg viewBox="0 0 140 100" className="w-32 h-24 mb-6 opacity-30">
+              <defs>
+                <linearGradient id="irEmptyGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stopColor="#69B4F0" />
+                  <stop offset="100%" stopColor="#4A9DE0" />
+                </linearGradient>
+              </defs>
+              <path d="M58 12c5.5-5.7 13-9.2 21.5-9.2 11.3 0 21.2 6.4 26.1 15.7 4.1-1.7 8.6-2.6 13.3-2.6 18 0 32.5 14.5 32.5 32.5S137 80.9 119 80.9c-2.3 0-4.6-.2-6.9-.6-4.4 6.7-11.8 11-20.3 11-4.4 0-8.4-1.2-11.9-3.2-4.4 7.8-12.6 13.1-22.2 13.1-9 0-16.9-4.7-21.3-11.6-2.6.6-5.2 1.1-7.9 1.1C11.6 91.7.3 78 .3 61c0-11.1 5.9-20.8 14.7-26.2C13.5 31.3 12.7 27.6 12.7 23.5 12.7 10.8 23.5 0 36.2 0 45.3 0 53.4 5.2 58 12z"
+                fill="url(#irEmptyGrad)" />
+              <text x="70" y="58" textAnchor="middle" fill="white" fontFamily="Arial, sans-serif" fontSize="18" fontStyle="italic" fontWeight="bold">
+                salesforce
+              </text>
+            </svg>
+            <h2 className="text-base font-semibold text-[var(--sf-text-primary)] mb-2">No Identity Resolution Rulesets</h2>
+            <p className="text-sm text-[var(--sf-text-tertiary)] max-w-md">
+              Identity Resolution rulesets help you match and unify source profiles into unified profiles.
+              Switch to the <span className="font-semibold text-[#FF5D2D]">264 Release</span> timeline to explore the new Informatica MDM integration and create rulesets.
+            </p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   if (isLoading) {
     return (
       <div className="flex items-center justify-center h-64">
