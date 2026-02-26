@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
+import { useMdsSimulator } from './MdsSimulatorContext';
 import {
   ArrowLeft,
   ArrowRight,
@@ -301,6 +302,8 @@ interface IdentityResolutionContentProps {
 }
 
 export default function IdentityResolutionContent({ demoSession, onDemoSessionChange, currentTimeline }: IdentityResolutionContentProps) {
+  const { triggerDelay } = useMdsSimulator();
+
   // ── API hooks ─────────────────────────────────────────────────────
   const { data: apiRulesets, isLoading, isError } = useIdentityRulesets();
   const createMutation = useCreateIdentityRuleset();
@@ -426,10 +429,10 @@ export default function IdentityResolutionContent({ demoSession, onDemoSessionCh
 
   const handleNewRulesetNext = () => {
     if (newRulesetStep === 1 && newRulesetOption) {
-      setNewRulesetStep(2);
+      triggerDelay(() => setNewRulesetStep(2));
     } else if (newRulesetStep === 2) {
       if (newRulesetOption === 'create' && newRulesetName.trim()) {
-        setNewRulesetStep(3);
+        triggerDelay(() => setNewRulesetStep(3));
       } else if (newRulesetOption === 'datakit' && selectedDatakitRuleset) {
         // Populate name/DMO from selected datakit ruleset
         const currentRulesets = datakitRulesets[selectedDatakit] || [];
@@ -439,7 +442,7 @@ export default function IdentityResolutionContent({ demoSession, onDemoSessionCh
           setNewRulesetPrimaryDMO(picked.primaryDMO);
           setNewRulesetDataSpace(picked.dataSpace);
         }
-        setNewRulesetStep(3);
+        triggerDelay(() => setNewRulesetStep(3));
       }
     }
   };
@@ -451,6 +454,10 @@ export default function IdentityResolutionContent({ demoSession, onDemoSessionCh
 
   const handleNewRulesetSave = () => {
     if (!newRulesetName.trim()) return;
+    triggerDelay(() => handleNewRulesetSaveInner());
+  };
+
+  const handleNewRulesetSaveInner = () => {
     const isFromDatakit = newRulesetOption === 'datakit';
     // Check if the selected datakit ruleset is a CX (Customer 360) type
     const currentDkRulesets = datakitRulesets[selectedDatakit] || [];
@@ -2180,7 +2187,7 @@ export default function IdentityResolutionContent({ demoSession, onDemoSessionCh
                           return (
                             <button
                               key={cat}
-                              onClick={() => { setSelectedDatakit(cat); setSelectedDatakitRuleset(null); }}
+                              onClick={() => triggerDelay(() => { setSelectedDatakit(cat); setSelectedDatakitRuleset(null); })}
                               className={`w-full text-left px-3 py-2 text-sm rounded-md mb-0.5 transition-colors ${
                                 isActive && isInformatica
                                   ? 'bg-[#FFF3ED] text-[#FF4A00] font-semibold'
