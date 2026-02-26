@@ -13,7 +13,6 @@ import {
   ArrowLeft,
   Filter,
   CheckCircle2,
-  Eye,
   Edit3,
   ExternalLink,
   Upload,
@@ -392,6 +391,7 @@ interface DemoSessionState {
 
 interface DataStreamsContentProps {
   demoSession?: DemoSessionState;
+  currentTimeline?: string;
 }
 
 // Map installed bundle names to the data streams they generate
@@ -409,17 +409,20 @@ const bundleToStreams: Record<string, DataStream[]> = {
 };
 
 // ── Component ────────────────────────────────────────────────────────
-export default function DataStreamsContent({ demoSession }: DataStreamsContentProps) {
+export default function DataStreamsContent({ demoSession, currentTimeline }: DataStreamsContentProps) {
+  const is264Release = currentTimeline === '264-release';
+
   // Compute session-aware data streams: base Salesforce streams + streams from installed bundles
+  // Informatica streams only appear in 264 Release timeline
   const sessionStreams: DataStream[] = [];
-  if (demoSession) {
+  if (is264Release && demoSession) {
     demoSession.selectedBundles.forEach((bundleName) => {
       const streams = bundleToStreams[bundleName];
       if (streams) sessionStreams.push(...streams);
     });
   }
-  // Check if Informatica is connected in the current session
-  const hasInformaticaConn = (demoSession?.informaticaConnections.length ?? 0) > 0;
+  // Check if Informatica is connected in the current session (only relevant in 264 Release)
+  const hasInformaticaConn = is264Release && (demoSession?.informaticaConnections.length ?? 0) > 0;
 
   const [dataStreams, setDataStreams] = useState<DataStream[]>(mockDataStreams);
   const [searchQuery, setSearchQuery] = useState('');
@@ -606,153 +609,169 @@ export default function DataStreamsContent({ demoSession }: DataStreamsContentPr
   };
 
   // ── Helper: get the reviewing field ──
-  const reviewingField = selectedStream?.fields?.find((f) => f.id === reviewFieldId) || null;
+  // ── Data Mapping state helpers ──
+  // Determine if a datakit is installed for the current stream
+  const streamDatakitPrefix: Record<string, string> = {
+    'Customer 360': 'INFA-C360',
+    'Organization 360': 'INFA-O360',
+    'Reference 360': 'INFA-R360',
+    'Supplier 360': 'INFA-S360',
+    'Product 360': 'INFA-P360',
+    'Finance 360': 'INFA-F360',
+  };
+  const hasDatakitForStream = (stream: DataStream) => {
+    const prefix = streamDatakitPrefix[stream.object];
+    if (!prefix || !demoSession?.installedDatakits) return false;
+    return demoSession.installedDatakits.some((dk) => dk.startsWith(prefix));
+  };
+
+  // Detail tab state
+  const [detailTab, setDetailTab] = useState<'fields' | 'details' | 'refresh-history'>('fields');
 
   // ──────────────────────────────────────────────────────────────────
-  // VISUAL MAPPING REVIEW SCREEN
+  // VISUAL MAPPING REVIEW SCREEN (Image 4)
   // ──────────────────────────────────────────────────────────────────
-  if (selectedStream && reviewingField) {
+  if (selectedStream && reviewFieldId !== null) {
     const allFields = selectedStream.fields || [];
-    const sourceName = selectedStream.source;
     const objectName = selectedStream.object;
     // Group target fields by DMO for the right side
     const dmoGroups: Record<string, StreamField[]> = {};
     allFields.forEach((f) => { (dmoGroups[f.targetDMO] = dmoGroups[f.targetDMO] || []).push(f); });
+    const autoMappedCount = allFields.filter((f) => f.mappingStatus === 'Auto-Mapped').length;
 
     return (
-      <div className="h-full flex flex-col">
-        {/* Breadcrumb */}
-        <div className="bg-white border-b border-[var(--sf-border)] px-6 py-2 flex items-center gap-2">
-          <button onClick={() => setReviewFieldId(null)} className="flex items-center gap-1 text-xs text-[var(--sf-link)] hover:underline">
-            <ArrowLeft className="w-3.5 h-3.5" />
+      <div className="h-full flex flex-col bg-[#F3F3F3]">
+        {/* Breadcrumb header */}
+        <div className="bg-white border-b border-[var(--sf-border)] px-6 py-3 flex items-center gap-2">
+          <button onClick={() => setReviewFieldId(null)} className="flex items-center gap-1 text-sm text-[var(--sf-link)] hover:underline">
+            <ArrowLeft className="w-4 h-4" />
             {selectedStream.name}
           </button>
           <ChevronRight className="w-3 h-3 text-[var(--sf-text-tertiary)]" />
-          <span className="text-xs font-medium text-[var(--sf-text-primary)]">Data Mapping Review</span>
+          <span className="text-sm font-medium text-[var(--sf-text-primary)]">Field Mapping</span>
         </div>
 
-        {/* Mapping header */}
-        <div className="bg-white border-b border-[var(--sf-border)] px-6 py-4">
-          <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-lg font-bold text-[var(--sf-text-primary)]">Data Mapping — {objectName}</h1>
-              <p className="text-xs text-[var(--sf-text-tertiary)] mt-0.5">
-                Source: <span className="font-medium text-[#FF4A00]">{sourceName}</span>
-                {' '}&rarr;{' '}
-                Target: <span className="font-medium text-[var(--sf-blue)]">Data Cloud DMOs</span>
-              </p>
+        {/* 3-panel layout */}
+        <div className="flex-1 overflow-hidden flex">
+          {/* LEFT: Source Fields */}
+          <div className="w-[360px] flex-shrink-0 border-r border-[var(--sf-border)] bg-white flex flex-col">
+            <div className="px-4 py-3 border-b border-[var(--sf-border)] flex items-center gap-2">
+              <div className="w-6 h-6 rounded bg-[#FF4A00] flex items-center justify-center flex-shrink-0">
+                <svg viewBox="0 0 24 24" className="w-4 h-4"><text x="12" y="16" textAnchor="middle" fill="white" fontSize="8" fontWeight="bold">IN</text></svg>
+              </div>
+              <h3 className="text-sm font-semibold text-[var(--sf-text-primary)]">Source Fields</h3>
+              <span className="text-xs text-[var(--sf-text-tertiary)] ml-auto">{allFields.length} fields</span>
             </div>
-            <div className="flex items-center gap-2">
-              <span className="flex items-center gap-1 text-xs text-[var(--sf-success)] font-medium">
-                <CheckCircle2 className="w-3.5 h-3.5" />
-                {allFields.filter((f) => f.mappingStatus === 'Auto-Mapped').length}/{allFields.length} fields auto-mapped
-              </span>
+            <div className="flex-1 overflow-y-auto">
+              {allFields.map((field) => {
+                const isActive = field.id === reviewFieldId;
+                return (
+                  <button
+                    key={field.id}
+                    onClick={() => setReviewFieldId(field.id)}
+                    className={`w-full text-left px-4 py-2.5 flex items-center gap-3 border-b border-[var(--sf-border)] transition-colors ${isActive ? 'bg-[#FFF3ED]' : 'hover:bg-[#FAFAF9]'}`}
+                  >
+                    <div className={`w-2 h-2 rounded-full flex-shrink-0 ${field.mappingStatus === 'Auto-Mapped' ? 'bg-[#2E844A]' : field.mappingStatus === 'Unmapped' ? 'bg-[#BA0517]' : 'bg-[#FFB75D]'}`} />
+                    <div className="flex-1 min-w-0">
+                      <div className="text-xs font-mono font-medium text-[var(--sf-text-primary)] truncate">{field.fieldName}</div>
+                      <div className="text-[10px] text-[var(--sf-text-tertiary)]">{field.dataType}</div>
+                    </div>
+                    {field.mappingStatus === 'Auto-Mapped' && <Check className="w-3.5 h-3.5 text-[#2E844A] flex-shrink-0" />}
+                  </button>
+                );
+              })}
             </div>
           </div>
-        </div>
 
-        {/* Visual mapper */}
-        <div className="flex-1 overflow-y-auto bg-[var(--sf-content-bg)]">
-          <div className="p-6">
-            <div className="flex gap-6">
-              {/* LEFT: Source fields */}
-              <div className="w-[340px] flex-shrink-0">
-                <div className="sf-card">
-                  <div className="px-4 py-3 border-b-2 border-[#FF4A00]">
-                    <div className="flex items-center gap-2">
-                      <svg viewBox="0 0 24 24" className="w-4 h-4 flex-shrink-0">
-                        <rect x="2" y="2" width="20" height="20" rx="3" fill="#FF4A00" />
-                        <text x="12" y="16" textAnchor="middle" fill="white" fontSize="9" fontWeight="bold">INFA</text>
-                      </svg>
-                      <h3 className="text-sm font-semibold text-[var(--sf-text-primary)]">{objectName}</h3>
-                      <span className="text-[10px] text-[var(--sf-text-tertiary)] ml-auto">{selectedStream.tenant}</span>
-                    </div>
-                  </div>
-                  <div className="divide-y divide-[var(--sf-border)]">
-                    {allFields.map((field) => (
-                      <div key={field.id} className={`px-4 py-2.5 flex items-center gap-2 text-xs transition-colors ${field.id === reviewFieldId ? 'bg-[#FFF3ED]' : 'hover:bg-[#FAFAF9]'}`}>
-                        <div className={`w-2 h-2 rounded-full flex-shrink-0 ${field.mappingStatus === 'Auto-Mapped' ? 'bg-[var(--sf-success)]' : field.mappingStatus === 'Unmapped' ? 'bg-[var(--sf-error)]' : 'bg-[#FFB75D]'}`} />
-                        <span className="font-mono text-[var(--sf-text-primary)]">{field.fieldName}</span>
-                        <span className="text-[var(--sf-text-tertiary)] ml-auto">{field.dataType}</span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </div>
-
-              {/* CENTER: Connector lines */}
-              <div className="flex-shrink-0 flex items-center justify-center" style={{ width: 100 }}>
-                <svg className="w-full" viewBox="0 0 100 600" style={{ height: Math.max(allFields.length * 36, 400) }}>
-                  {allFields.map((field, i) => {
-                    // Find the target field's position in the right side
-                    const dmoKeys = Object.keys(dmoGroups);
-                    let rightY = 0;
-                    let found = false;
-                    let offset = 0;
-                    for (const dmo of dmoKeys) {
-                      offset += 36; // header
-                      for (const f of dmoGroups[dmo]) {
-                        if (f.id === field.id) {
-                          rightY = offset + 14;
-                          found = true;
-                          break;
-                        }
-                        offset += 30;
-                      }
-                      if (found) break;
-                      offset += 8; // gap
+          {/* CENTER: Connection lines */}
+          <div className="w-[120px] flex-shrink-0 flex items-stretch bg-[#F9F9F9] relative">
+            <svg className="w-full h-full" preserveAspectRatio="none" viewBox={`0 0 120 ${Math.max(allFields.length * 40, 400)}`}>
+              {allFields.map((field, i) => {
+                const dmoKeys = Object.keys(dmoGroups);
+                let rightY = 0;
+                let found = false;
+                let offset = 0;
+                for (const dmo of dmoKeys) {
+                  offset += 44; // header
+                  for (const f of dmoGroups[dmo]) {
+                    if (f.id === field.id) {
+                      rightY = offset + 18;
+                      found = true;
+                      break;
                     }
-                    const leftY = i * 36 + 50;
-                    const color = field.mappingStatus === 'Auto-Mapped' ? '#2E844A' : '#FFB75D';
+                    offset += 40;
+                  }
+                  if (found) break;
+                  offset += 8;
+                }
+                if (!found) rightY = i * 40 + 60;
+                const leftY = i * 40 + 60;
+                const isActive = field.id === reviewFieldId;
+                const color = field.mappingStatus === 'Auto-Mapped' ? '#2E844A' : '#FFB75D';
+                return (
+                  <path
+                    key={field.id}
+                    d={`M 0 ${leftY} C 60 ${leftY}, 60 ${rightY}, 120 ${rightY}`}
+                    stroke={color}
+                    strokeWidth={isActive ? 2.5 : 1.5}
+                    fill="none"
+                    opacity={isActive ? 1 : 0.3}
+                  />
+                );
+              })}
+            </svg>
+          </div>
+
+          {/* RIGHT: Target DMO */}
+          <div className="flex-1 bg-white flex flex-col border-l border-[var(--sf-border)]">
+            <div className="px-4 py-3 border-b border-[var(--sf-border)] flex items-center gap-2">
+              <div className="w-6 h-6 rounded bg-[var(--sf-blue)] flex items-center justify-center flex-shrink-0">
+                <Database className="w-3.5 h-3.5 text-white" />
+              </div>
+              <h3 className="text-sm font-semibold text-[var(--sf-text-primary)]">Target DMO</h3>
+              <span className="text-xs text-[var(--sf-text-tertiary)] ml-auto">{objectName}</span>
+            </div>
+            <div className="flex-1 overflow-y-auto">
+              {Object.entries(dmoGroups).map(([dmoName, fields]) => (
+                <div key={dmoName}>
+                  <div className="px-4 py-2.5 bg-[#F9F9F9] border-b border-[var(--sf-border)]">
+                    <span className="text-xs font-semibold text-[var(--sf-blue)]">{dmoName}</span>
+                  </div>
+                  {fields.map((field) => {
+                    const isActive = field.id === reviewFieldId;
                     return (
-                      <path
+                      <button
                         key={field.id}
-                        d={`M 0 ${leftY} C 50 ${leftY}, 50 ${rightY}, 100 ${rightY}`}
-                        stroke={color}
-                        strokeWidth={field.id === reviewFieldId ? 2.5 : 1.5}
-                        fill="none"
-                        opacity={field.id === reviewFieldId ? 1 : 0.4}
-                      />
+                        onClick={() => setReviewFieldId(field.id)}
+                        className={`w-full text-left px-4 py-2.5 flex items-center gap-3 border-b border-[var(--sf-border)] transition-colors ${isActive ? 'bg-[#EEF4FF]' : 'hover:bg-[#FAFAF9]'}`}
+                      >
+                        <div className={`w-2 h-2 rounded-full flex-shrink-0 ${field.mappingStatus === 'Auto-Mapped' ? 'bg-[#2E844A]' : 'bg-[#FFB75D]'}`} />
+                        <div className="flex-1 min-w-0">
+                          <div className="text-xs font-mono font-medium text-[var(--sf-text-primary)] truncate">{field.targetField}</div>
+                          <div className="text-[10px] text-[var(--sf-text-tertiary)]">{field.dataType}</div>
+                        </div>
+                      </button>
                     );
                   })}
-                </svg>
-              </div>
-
-              {/* RIGHT: Target DMOs */}
-              <div className="w-[340px] flex-shrink-0 space-y-3">
-                {Object.entries(dmoGroups).map(([dmoName, fields]) => (
-                  <div key={dmoName} className="sf-card">
-                    <div className="px-4 py-2.5 border-b-2 border-[var(--sf-blue)]">
-                      <h4 className="text-xs font-semibold text-[var(--sf-blue)]">{dmoName}</h4>
-                    </div>
-                    <div className="divide-y divide-[var(--sf-border)]">
-                      {fields.map((field) => (
-                        <div key={field.id} className={`px-4 py-2 flex items-center gap-2 text-xs transition-colors ${field.id === reviewFieldId ? 'bg-[#EEF4FF]' : 'hover:bg-[#FAFAF9]'}`}>
-                          <div className={`w-2 h-2 rounded-full flex-shrink-0 ${field.mappingStatus === 'Auto-Mapped' ? 'bg-[var(--sf-success)]' : 'bg-[#FFB75D]'}`} />
-                          <span className="font-mono text-[var(--sf-text-primary)]">{field.targetField}</span>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {/* Legend */}
-            <div className="mt-6 flex items-center gap-6 text-xs text-[var(--sf-text-tertiary)]">
-              <div className="flex items-center gap-1.5"><div className="w-3 h-0.5 bg-[#2E844A]" /> Auto-Mapped</div>
-              <div className="flex items-center gap-1.5"><div className="w-3 h-0.5 bg-[#FFB75D]" /> Manual / Review Needed</div>
-              <div className="flex items-center gap-1.5"><div className="w-2 h-2 rounded-full bg-[var(--sf-error)]" /> Unmapped</div>
+                </div>
+              ))}
             </div>
           </div>
         </div>
 
         {/* Footer */}
         <div className="bg-white border-t border-[var(--sf-border)] px-6 py-3 flex items-center justify-between">
-          <button onClick={() => setReviewFieldId(null)} className="px-4 py-1.5 text-sm font-medium text-[var(--sf-text-secondary)] border border-[var(--sf-border)] rounded hover:bg-[#F3F3F3]">
-            &larr; Back to Fields
-          </button>
-          <button className="px-4 py-1.5 text-sm font-medium text-white bg-[var(--sf-blue)] rounded hover:bg-[var(--sf-blue-hover)]">
+          <div className="flex items-center gap-4">
+            <button onClick={() => setReviewFieldId(null)} className="px-4 py-2 text-sm font-medium text-[var(--sf-text-secondary)] border border-[var(--sf-border)] rounded hover:bg-[#F3F3F3]">
+              Back
+            </button>
+            <div className="flex items-center gap-4 text-xs text-[var(--sf-text-tertiary)]">
+              <div className="flex items-center gap-1.5"><div className="w-2 h-2 rounded-full bg-[#2E844A]" /> Auto-Mapped ({autoMappedCount})</div>
+              <div className="flex items-center gap-1.5"><div className="w-2 h-2 rounded-full bg-[#FFB75D]" /> Review Needed</div>
+              <div className="flex items-center gap-1.5"><div className="w-2 h-2 rounded-full bg-[#BA0517]" /> Unmapped</div>
+            </div>
+          </div>
+          <button className="px-5 py-2 text-sm font-medium text-white bg-[var(--sf-blue)] rounded hover:bg-[var(--sf-blue-hover)]">
             Approve Mapping
           </button>
         </div>
@@ -761,17 +780,19 @@ export default function DataStreamsContent({ demoSession }: DataStreamsContentPr
   }
 
   // ──────────────────────────────────────────────────────────────────
-  // DATA STREAM DETAIL VIEW — Fields panel
+  // DATA STREAM DETAIL VIEW (Image 2/3)
   // ──────────────────────────────────────────────────────────────────
   if (selectedStream) {
     const fields = selectedStream.fields || [];
     const autoMapped = fields.filter((f) => f.mappingStatus === 'Auto-Mapped').length;
+    const hasMappingDatakit = hasDatakitForStream(selectedStream);
+    const isInfaStream = selectedStream.sourceType === 'informatica';
 
     return (
       <div className="h-full flex flex-col">
         {/* Breadcrumb */}
         <div className="bg-white border-b border-[var(--sf-border)] px-6 py-2 flex items-center gap-2">
-          <button onClick={() => setSelectedStream(null)} className="flex items-center gap-1 text-xs text-[var(--sf-link)] hover:underline">
+          <button onClick={() => { setSelectedStream(null); setDetailTab('fields'); }} className="flex items-center gap-1 text-xs text-[var(--sf-link)] hover:underline">
             <ArrowLeft className="w-3.5 h-3.5" />
             Data Streams
           </button>
@@ -782,121 +803,218 @@ export default function DataStreamsContent({ demoSession }: DataStreamsContentPr
         {/* Header */}
         <div className="bg-white border-b border-[var(--sf-border)] px-6 py-4">
           <div className="flex items-start gap-4">
-            <div className={`w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0 ${selectedStream.sourceType === 'informatica' ? 'bg-[#FF4A00]' : 'bg-[#032D60]'}`}>
-              <Database className="w-5 h-5 text-white" />
+            <div className={`w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0 ${isInfaStream ? 'bg-[#FF4A00]' : 'bg-[#032D60]'}`}>
+              {isInfaStream ? (
+                <svg viewBox="0 0 32 32" className="w-6 h-6"><text x="16" y="22" textAnchor="middle" fill="white" fontSize="10" fontWeight="bold">INFA</text></svg>
+              ) : (
+                <Database className="w-5 h-5 text-white" />
+              )}
             </div>
             <div className="flex-1">
               <h1 className="text-lg font-bold text-[var(--sf-text-primary)]">{selectedStream.name}</h1>
-              <p className="text-xs text-[var(--sf-text-tertiary)] mt-0.5">Data Stream from {selectedStream.source}</p>
+              <p className="text-xs text-[var(--sf-text-tertiary)] mt-0.5">Data Stream &middot; {selectedStream.source}</p>
             </div>
             <div className="flex items-center gap-2">
-              <button className="px-3 py-1.5 text-xs font-medium border border-[var(--sf-border)] rounded hover:bg-[#F3F3F3] text-[var(--sf-text-secondary)]">Refresh Now</button>
+              <button className="px-3 py-1.5 text-xs font-medium border border-[var(--sf-border)] rounded hover:bg-[#F3F3F3] text-[var(--sf-text-secondary)]">
+                <RefreshCw className="w-3.5 h-3.5 inline mr-1" />Refresh Now
+              </button>
               <button className="px-3 py-1.5 text-xs font-medium border border-[var(--sf-border)] rounded hover:bg-[#F3F3F3] text-[var(--sf-text-secondary)]">Edit</button>
             </div>
           </div>
 
-          {/* Metadata bar */}
-          <div className="flex flex-wrap items-center gap-x-8 gap-y-2 mt-4">
-            <div>
-              <p className="text-[10px] uppercase tracking-wider text-[var(--sf-text-tertiary)]">Source</p>
-              <p className="text-sm font-medium text-[var(--sf-text-primary)]">{selectedStream.source}</p>
-            </div>
-            <div>
-              <p className="text-[10px] uppercase tracking-wider text-[var(--sf-text-tertiary)]">Object</p>
-              <p className="text-sm font-medium text-[var(--sf-text-primary)]">{selectedStream.object}</p>
-            </div>
-            <div>
-              <p className="text-[10px] uppercase tracking-wider text-[var(--sf-text-tertiary)]">Status</p>
-              <p className="text-sm">{statusBadge(selectedStream.status)}</p>
-            </div>
-            <div>
-              <p className="text-[10px] uppercase tracking-wider text-[var(--sf-text-tertiary)]">Records Processed</p>
-              <p className="text-sm font-medium text-[var(--sf-text-primary)]">{fmt(selectedStream.recordsProcessed)}</p>
-            </div>
-            <div>
-              <p className="text-[10px] uppercase tracking-wider text-[var(--sf-text-tertiary)]">Last Refreshed</p>
-              <p className="text-sm font-medium text-[var(--sf-text-primary)]">{selectedStream.lastRefreshed}</p>
-            </div>
-            <div>
-              <p className="text-[10px] uppercase tracking-wider text-[var(--sf-text-tertiary)]">Data Space</p>
-              <p className="text-sm font-medium text-[var(--sf-text-primary)] capitalize">{selectedStream.dataSpace}</p>
-            </div>
+          {/* Metadata strip */}
+          <div className="flex flex-wrap items-center gap-x-8 gap-y-2 mt-4 pb-1">
+            {[
+              ['Source', selectedStream.source],
+              ['Object', selectedStream.object],
+              ['Status', '__badge__'],
+              ['Records Processed', fmt(selectedStream.recordsProcessed)],
+              ['Last Refreshed', selectedStream.lastRefreshed],
+              ['Refresh Frequency', selectedStream.refreshFrequency],
+              ['Data Space', selectedStream.dataSpace],
+            ].map(([label, value]) => (
+              <div key={label}>
+                <p className="text-[10px] uppercase tracking-wider text-[var(--sf-text-tertiary)]">{label}</p>
+                {value === '__badge__' ? <div className="mt-0.5">{statusBadge(selectedStream.status)}</div> : (
+                  <p className="text-sm font-medium text-[var(--sf-text-primary)] capitalize">{value}</p>
+                )}
+              </div>
+            ))}
+          </div>
+
+          {/* Tabs */}
+          <div className="flex items-center gap-0 mt-2 -mb-4 border-b-0">
+            {(['fields', 'details', 'refresh-history'] as const).map((tab) => {
+              const labels: Record<string, string> = { 'fields': 'Fields', 'details': 'Details', 'refresh-history': 'Refresh History' };
+              const active = detailTab === tab;
+              return (
+                <button
+                  key={tab}
+                  onClick={() => setDetailTab(tab)}
+                  className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${
+                    active ? 'border-[var(--sf-blue)] text-[var(--sf-blue)]' : 'border-transparent text-[var(--sf-text-tertiary)] hover:text-[var(--sf-text-secondary)]'
+                  }`}
+                >
+                  {labels[tab]}
+                </button>
+              );
+            })}
           </div>
         </div>
 
-        {/* Fields table */}
+        {/* Tab content + Data Mapping sidebar */}
         <div className="flex-1 overflow-y-auto bg-[var(--sf-content-bg)]">
-          <div className="p-6">
-            {fields.length > 0 ? (
-              <div className="sf-card">
-                <div className="sf-card-header">
-                  <div className="flex items-center gap-3">
+          <div className="flex gap-6 p-6">
+            {/* Main content area */}
+            <div className="flex-1 min-w-0">
+              {detailTab === 'fields' && (
+                <div className="sf-card">
+                  <div className="sf-card-header">
                     <h2 className="text-sm font-semibold text-[var(--sf-text-primary)]">
                       Fields <span className="text-xs font-normal text-[var(--sf-text-tertiary)]">({fields.length})</span>
                     </h2>
-                    <span className="flex items-center gap-1 text-xs text-[var(--sf-success)] font-medium">
-                      <CheckCircle2 className="w-3.5 h-3.5" />
-                      {autoMapped} auto-mapped
-                    </span>
                   </div>
-                  <div className="flex items-center gap-2">
-                    <button
-                      onClick={() => setReviewFieldId(fields[0]?.id || null)}
-                      className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-white bg-[var(--sf-blue)] rounded hover:bg-[var(--sf-blue-hover)] transition-colors"
-                    >
-                      <Eye className="w-3.5 h-3.5" />
-                      Review All Mappings
-                    </button>
-                  </div>
+                  {fields.length > 0 ? (
+                    <div className="overflow-x-auto">
+                      <table className="sf-table">
+                        <thead>
+                          <tr>
+                            <th><div className="flex items-center gap-1">Field Name <ChevronDown className="w-3 h-3 opacity-50" /></div></th>
+                            <th>Data Type</th>
+                            <th>Is Required</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {fields.map((field) => (
+                            <tr key={field.id}>
+                              <td><span className="font-mono text-sm">{field.fieldName}</span></td>
+                              <td><span className="text-xs px-1.5 py-0.5 bg-[#F3F3F3] rounded font-mono">{field.dataType}</span></td>
+                              <td><span className="text-xs text-[var(--sf-text-tertiary)]">{field.fieldName.includes('id') || field.fieldName.includes('name') ? 'Yes' : 'No'}</span></td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  ) : (
+                    <div className="sf-card-body text-center py-12">
+                      <Database className="w-10 h-10 text-[var(--sf-text-tertiary)] mx-auto mb-3 opacity-40" />
+                      <p className="text-sm text-[var(--sf-text-tertiary)]">No fields available for this data stream.</p>
+                    </div>
+                  )}
                 </div>
-                <div className="overflow-x-auto">
-                  <table className="sf-table">
-                    <thead>
-                      <tr>
-                        <th>Field Name</th>
-                        <th>Data Type</th>
-                        <th>Target DMO</th>
-                        <th>Target Field</th>
-                        <th>Mapping Status</th>
-                        <th className="w-24 text-center">Actions</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {fields.map((field) => (
-                        <tr key={field.id}>
-                          <td>
-                            <span className="font-mono text-sm">{field.fieldName}</span>
-                          </td>
-                          <td>
-                            <span className="text-xs px-1.5 py-0.5 bg-[#F3F3F3] rounded font-mono">{field.dataType}</span>
-                          </td>
-                          <td className="sf-link text-xs">{field.targetDMO}</td>
-                          <td><span className="font-mono text-xs">{field.targetField}</span></td>
-                          <td>
-                            <span className={`sf-badge ${field.mappingStatus === 'Auto-Mapped' ? 'sf-badge-success' : field.mappingStatus === 'Unmapped' ? 'sf-badge-error' : 'sf-badge-warning'}`}>
-                              {field.mappingStatus}
-                            </span>
-                          </td>
-                          <td className="text-center">
-                            <button
-                              onClick={(e) => { e.stopPropagation(); setReviewFieldId(field.id); }}
-                              className="px-2.5 py-1 text-[11px] font-medium text-[var(--sf-link)] border border-[var(--sf-border)] rounded hover:bg-[#EEF4FF] transition-colors"
-                            >
-                              Review
-                            </button>
-                          </td>
-                        </tr>
+              )}
+
+              {detailTab === 'details' && (
+                <div className="sf-card">
+                  <div className="sf-card-header">
+                    <h2 className="text-sm font-semibold text-[var(--sf-text-primary)]">Stream Details</h2>
+                  </div>
+                  <div className="sf-card-body">
+                    <div className="grid grid-cols-2 gap-y-4 gap-x-8 text-sm">
+                      {[
+                        ['Data Stream Name', selectedStream.name],
+                        ['Source', selectedStream.source],
+                        ['Object', selectedStream.object],
+                        ['Status', selectedStream.status],
+                        ['Data Space', selectedStream.dataSpace],
+                        ['Refresh Frequency', selectedStream.refreshFrequency],
+                        ['Records Processed', fmt(selectedStream.recordsProcessed)],
+                        ['Last Refreshed', selectedStream.lastRefreshed],
+                        ...(selectedStream.tenant ? [['Tenant', selectedStream.tenant]] : []),
+                      ].map(([label, value]) => (
+                        <div key={label}>
+                          <p className="text-xs text-[var(--sf-text-tertiary)] mb-0.5">{label}</p>
+                          <p className="text-[var(--sf-text-primary)] font-medium">{value}</p>
+                        </div>
                       ))}
-                    </tbody>
-                  </table>
+                    </div>
+                  </div>
                 </div>
-              </div>
-            ) : (
-              <div className="sf-card">
-                <div className="sf-card-body text-center py-12">
-                  <Database className="w-10 h-10 text-[var(--sf-text-tertiary)] mx-auto mb-3 opacity-40" />
-                  <p className="text-sm text-[var(--sf-text-tertiary)]">No field mappings available for this data stream.</p>
-                  <p className="text-xs text-[var(--sf-text-tertiary)] mt-1">Field mappings are auto-created for Informatica MDM data streams.</p>
+              )}
+
+              {detailTab === 'refresh-history' && (
+                <div className="sf-card">
+                  <div className="sf-card-header">
+                    <h2 className="text-sm font-semibold text-[var(--sf-text-primary)]">Refresh History</h2>
+                  </div>
+                  <div className="overflow-x-auto">
+                    <table className="sf-table">
+                      <thead>
+                        <tr>
+                          <th>Refresh Date</th>
+                          <th>Status</th>
+                          <th>Records</th>
+                          <th>Duration</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {selectedStream.status !== 'Pending' ? (
+                          <>
+                            <tr><td>{selectedStream.lastRefreshed}</td><td><span className="sf-badge sf-badge-success">Success</span></td><td>{fmt(selectedStream.recordsProcessed)}</td><td>2m 34s</td></tr>
+                            <tr><td>02/24/2026, 3:45 PM</td><td><span className="sf-badge sf-badge-success">Success</span></td><td>{fmt(Math.floor(selectedStream.recordsProcessed * 0.98))}</td><td>2m 12s</td></tr>
+                            <tr><td>02/23/2026, 3:45 PM</td><td><span className="sf-badge sf-badge-success">Success</span></td><td>{fmt(Math.floor(selectedStream.recordsProcessed * 0.95))}</td><td>2m 45s</td></tr>
+                          </>
+                        ) : (
+                          <tr><td colSpan={4} className="text-center py-8 text-sm text-[var(--sf-text-tertiary)]">No refresh history yet — stream is pending first refresh.</td></tr>
+                        )}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Data Mapping sidebar */}
+            {isInfaStream && (
+              <div className="w-[280px] flex-shrink-0">
+                <div className="sf-card">
+                  <div className="sf-card-header">
+                    <h3 className="text-sm font-semibold text-[var(--sf-text-primary)]">Data Mapping</h3>
+                  </div>
+                  <div className="sf-card-body">
+                    {hasMappingDatakit ? (
+                      /* Initialized state (Image 1) — datakit installed */
+                      <div className="space-y-4">
+                        <div>
+                          <p className="text-[10px] uppercase tracking-wider text-[var(--sf-text-tertiary)] mb-0.5">Data Space</p>
+                          <p className="text-sm font-medium text-[var(--sf-text-primary)] capitalize">{selectedStream.dataSpace}</p>
+                        </div>
+                        <div>
+                          <p className="text-[10px] uppercase tracking-wider text-[var(--sf-text-tertiary)] mb-1">Mapping Status</p>
+                          <div className="flex items-center gap-2">
+                            <div className="flex-1 h-2 bg-[#E0E0E0] rounded-full overflow-hidden">
+                              <div className="h-full bg-[#2E844A] rounded-full" style={{ width: fields.length ? `${(autoMapped / fields.length) * 100}%` : '0%' }} />
+                            </div>
+                            <span className="text-xs font-medium text-[var(--sf-text-primary)]">{autoMapped}/{fields.length}</span>
+                          </div>
+                          <p className="text-xs text-[var(--sf-text-tertiary)] mt-1">
+                            {autoMapped} of {fields.length} fields auto-mapped
+                          </p>
+                        </div>
+                        <button
+                          onClick={() => setReviewFieldId(fields[0]?.id || '__all__')}
+                          className="w-full px-4 py-2 text-sm font-medium text-white bg-[var(--sf-blue)] rounded hover:bg-[var(--sf-blue-hover)] transition-colors"
+                        >
+                          Review Mapping
+                        </button>
+                      </div>
+                    ) : (
+                      /* Empty state (Image 3) — no datakit installed */
+                      <div className="text-center py-6">
+                        <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-[#F3F3F3] flex items-center justify-center">
+                          <svg viewBox="0 0 24 24" className="w-8 h-8 text-[var(--sf-text-tertiary)] opacity-50" fill="none" stroke="currentColor" strokeWidth="1.5">
+                            <path d="M4 6h16M4 12h16M4 18h8" strokeLinecap="round" />
+                            <circle cx="19" cy="17" r="3" />
+                            <path d="M19 15v4M17 17h4" strokeLinecap="round" />
+                          </svg>
+                        </div>
+                        <h4 className="text-sm font-semibold text-[var(--sf-text-primary)] mb-1">No Data Mapping Available</h4>
+                        <p className="text-xs text-[var(--sf-text-tertiary)] leading-relaxed">
+                          Install a Data Kit from Identity Resolution to enable field mapping for this data stream.
+                        </p>
+                      </div>
+                    )}
+                  </div>
                 </div>
               </div>
             )}
@@ -952,7 +1070,7 @@ export default function DataStreamsContent({ demoSession }: DataStreamsContentPr
           >
             <option value="all">All Sources</option>
             <option value="salesforce">Salesforce CRM</option>
-            <option value="informatica">Informatica MDM</option>
+            {is264Release && <option value="informatica">Informatica MDM</option>}
             <option value="api">Ingestion API</option>
           </select>
         </div>
@@ -1061,24 +1179,27 @@ export default function DataStreamsContent({ demoSession }: DataStreamsContentPr
                     {/* ─── Connected Sources ─── */}
                     <div>
                       <h3 className="text-sm font-semibold text-[var(--sf-text-primary)] mb-3">Connected Sources</h3>
-                      <div className={`grid gap-3 ${hasInformaticaConn ? 'grid-cols-4' : 'grid-cols-3'}`}>
+                      <div className="grid grid-cols-3 gap-4">
                         {/* Ingestion API */}
                         {(() => {
                           const isSelected = selectedSource === 'src-api';
                           return (
                             <button
                               onClick={() => setSelectedSource('src-api')}
-                              className={`relative flex items-start gap-3 rounded-lg border p-5 transition-all text-left min-h-[100px] ${
+                              className={`relative flex flex-col items-center text-center rounded-lg border-2 p-6 transition-all ${
                                 isSelected ? 'border-[var(--sf-blue)] bg-[#EEF4FF] shadow-sm' : 'border-[#D8DDE6] bg-white hover:border-[#B0B0B0]'
                               }`}
                             >
-                              <div className="w-10 h-10 flex items-center justify-center flex-shrink-0 text-[#706E6B]">
-                                <Server className="w-7 h-7" />
+                              {isSelected && (
+                                <div className="absolute top-0 right-0 w-6 h-6 bg-[var(--sf-blue)] flex items-center justify-center" style={{ clipPath: 'polygon(0 0, 100% 0, 100% 100%)' }}>
+                                  <Check className="w-2.5 h-2.5 text-white absolute top-0.5 right-0.5" />
+                                </div>
+                              )}
+                              <div className="w-14 h-14 rounded-lg flex items-center justify-center mb-3 bg-[#F3F3F3]">
+                                <Server className="w-8 h-8 text-[#706E6B]" />
                               </div>
-                              <div className="flex-1 min-w-0">
-                                <div className="text-sm font-semibold text-[var(--sf-text-primary)]">Ingestion API</div>
-                                <div className="text-xs text-[var(--sf-text-tertiary)] mt-1 leading-relaxed">Stream and/or bulk upload data from external sources</div>
-                              </div>
+                              <div className="text-sm font-semibold text-[var(--sf-text-primary)]">Ingestion API</div>
+                              <div className="text-xs text-[var(--sf-text-tertiary)] mt-1">Stream and/or bulk upload data from external sources</div>
                             </button>
                           );
                         })()}
@@ -1089,17 +1210,20 @@ export default function DataStreamsContent({ demoSession }: DataStreamsContentPr
                           return (
                             <button
                               onClick={() => setSelectedSource('salesforce')}
-                              className={`relative flex items-start gap-3 rounded-lg border p-5 transition-all text-left min-h-[100px] ${
+                              className={`relative flex flex-col items-center text-center rounded-lg border-2 p-6 transition-all ${
                                 isSelected ? 'border-[var(--sf-blue)] bg-[#EEF4FF] shadow-sm' : 'border-[#D8DDE6] bg-white hover:border-[#B0B0B0]'
                               }`}
                             >
-                              <div className="w-10 h-10 flex items-center justify-center flex-shrink-0 text-[#00A1E0]">
-                                <svg viewBox="0 0 48 48" className="w-8 h-8"><path fill="currentColor" d="M20.5 8.5c2.3-2.4 5.5-3.9 9-3.9 4.8 0 9 2.8 11 6.8 1.5-.6 3.1-1 4.8-1 7 0 12.7 5.7 12.7 12.7S52.3 35.8 45.3 35.8c-1.3 0-2.5-.2-3.7-.6-1.8 3.5-5.4 5.9-9.6 5.9-1.8 0-3.5-.4-5-1.2-1.8 2.8-4.9 4.6-8.5 4.6-4.5 0-8.3-3-9.6-7.1-.8.1-1.6.2-2.4.2C2.9 37.6 0 34.7 0 29.1s4.5-8.5 8.5-8.5c.6 0 1.2.1 1.8.2C11.2 14.7 15.4 10.3 20.5 8.5z" transform="scale(0.7) translate(2,5)"/></svg>
+                              {isSelected && (
+                                <div className="absolute top-0 right-0 w-6 h-6 bg-[var(--sf-blue)] flex items-center justify-center" style={{ clipPath: 'polygon(0 0, 100% 0, 100% 100%)' }}>
+                                  <Check className="w-2.5 h-2.5 text-white absolute top-0.5 right-0.5" />
+                                </div>
+                              )}
+                              <div className="w-14 h-14 rounded-lg flex items-center justify-center mb-3 bg-[#E8F4FD]">
+                                <svg viewBox="0 0 48 48" className="w-9 h-9 text-[#00A1E0]"><path fill="currentColor" d="M20.5 8.5c2.3-2.4 5.5-3.9 9-3.9 4.8 0 9 2.8 11 6.8 1.5-.6 3.1-1 4.8-1 7 0 12.7 5.7 12.7 12.7S52.3 35.8 45.3 35.8c-1.3 0-2.5-.2-3.7-.6-1.8 3.5-5.4 5.9-9.6 5.9-1.8 0-3.5-.4-5-1.2-1.8 2.8-4.9 4.6-8.5 4.6-4.5 0-8.3-3-9.6-7.1-.8.1-1.6.2-2.4.2C2.9 37.6 0 34.7 0 29.1s4.5-8.5 8.5-8.5c.6 0 1.2.1 1.8.2C11.2 14.7 15.4 10.3 20.5 8.5z" transform="scale(0.7) translate(2,5)"/></svg>
                               </div>
-                              <div className="flex-1 min-w-0">
-                                <div className="text-sm font-semibold text-[var(--sf-text-primary)]">Salesforce CRM</div>
-                                <div className="text-xs text-[var(--sf-text-tertiary)] mt-1 leading-relaxed">Import objects from Salesforce CRM</div>
-                              </div>
+                              <div className="text-sm font-semibold text-[var(--sf-text-primary)]">Salesforce CRM</div>
+                              <div className="text-xs text-[var(--sf-text-tertiary)] mt-1">Import objects from Salesforce CRM</div>
                             </button>
                           );
                         })()}
@@ -1110,53 +1234,61 @@ export default function DataStreamsContent({ demoSession }: DataStreamsContentPr
                           return (
                             <button
                               onClick={() => setSelectedSource('src-s2s')}
-                              className={`relative flex items-start gap-3 rounded-lg border p-5 transition-all text-left min-h-[100px] ${
+                              className={`relative flex flex-col items-center text-center rounded-lg border-2 p-6 transition-all ${
                                 isSelected ? 'border-[var(--sf-blue)] bg-[#EEF4FF] shadow-sm' : 'border-[#D8DDE6] bg-white hover:border-[#B0B0B0]'
                               }`}
                             >
-                              <div className="w-10 h-10 flex items-center justify-center flex-shrink-0 text-[#706E6B]">
-                                <svg viewBox="0 0 24 24" className="w-7 h-7" fill="none" stroke="currentColor" strokeWidth="1.5"><line x1="2" y1="4" x2="22" y2="4" /><line x1="2" y1="8" x2="22" y2="8" /><line x1="2" y1="12" x2="22" y2="12" /><rect x="4" y="2" width="16" height="12" rx="1" /><line x1="12" y1="14" x2="12" y2="18" /><circle cx="12" cy="20" r="2" /></svg>
+                              {isSelected && (
+                                <div className="absolute top-0 right-0 w-6 h-6 bg-[var(--sf-blue)] flex items-center justify-center" style={{ clipPath: 'polygon(0 0, 100% 0, 100% 100%)' }}>
+                                  <Check className="w-2.5 h-2.5 text-white absolute top-0.5 right-0.5" />
+                                </div>
+                              )}
+                              <div className="w-14 h-14 rounded-lg flex items-center justify-center mb-3 bg-[#F3F3F3]">
+                                <Globe className="w-8 h-8 text-[#706E6B]" />
                               </div>
-                              <div className="flex-1 min-w-0">
-                                <div className="text-sm font-semibold text-[var(--sf-text-primary)]">Server To Server</div>
-                                <div className="text-xs text-[var(--sf-text-tertiary)] mt-1 leading-relaxed">Manually configure an authenticated connection between your server and Data Cloud.</div>
-                              </div>
-                            </button>
-                          );
-                        })()}
-
-                        {/* Informatica MDM — only shown when connected */}
-                        {hasInformaticaConn && (() => {
-                          const isSelected = selectedSource === 'informatica';
-                          return (
-                            <button
-                              onClick={() => setSelectedSource('informatica')}
-                              className={`relative flex items-start gap-3 rounded-lg border p-5 transition-all text-left min-h-[100px] ${
-                                isSelected ? 'border-[var(--sf-blue)] bg-[#EEF4FF] shadow-sm' : 'border-[#D8DDE6] bg-white hover:border-[#B0B0B0]'
-                              }`}
-                            >
-                              <div className="w-10 h-10 flex items-center justify-center flex-shrink-0">
-                                <svg viewBox="0 0 40 40" className="w-8 h-8">
-                                  <rect width="40" height="40" rx="4" fill="#FF4A00" />
-                                  <text x="20" y="26" textAnchor="middle" fill="white" fontSize="11" fontWeight="bold">INFA</text>
-                                </svg>
-                              </div>
-                              <div className="flex-1 min-w-0">
-                                <div className="text-sm font-semibold text-[var(--sf-text-primary)]">Informatica MDM</div>
-                                <div className="text-xs text-[var(--sf-text-tertiary)] mt-1 leading-relaxed">Ingest or federate master data from Informatica MDM</div>
-                              </div>
-                              <span className="sf-badge sf-badge-success text-[9px] mt-1">Connected</span>
+                              <div className="text-sm font-semibold text-[var(--sf-text-primary)]">Server To Server</div>
+                              <div className="text-xs text-[var(--sf-text-tertiary)] mt-1">Manually configure an authenticated connection</div>
                             </button>
                           );
                         })()}
                       </div>
+
+                      {/* Informatica MDM — extra row, only when connected */}
+                      {hasInformaticaConn && (
+                        <div className="grid grid-cols-3 gap-4 mt-4">
+                          {(() => {
+                            const isSelected = selectedSource === 'informatica';
+                            return (
+                              <button
+                                onClick={() => setSelectedSource('informatica')}
+                                className={`relative flex flex-col items-center text-center rounded-lg border-2 p-6 transition-all ${
+                                  isSelected ? 'border-[var(--sf-blue)] bg-[#EEF4FF] shadow-sm' : 'border-[#D8DDE6] bg-white hover:border-[#B0B0B0]'
+                                }`}
+                              >
+                                {isSelected && (
+                                  <div className="absolute top-0 right-0 w-6 h-6 bg-[var(--sf-blue)] flex items-center justify-center" style={{ clipPath: 'polygon(0 0, 100% 0, 100% 100%)' }}>
+                                    <Check className="w-2.5 h-2.5 text-white absolute top-0.5 right-0.5" />
+                                  </div>
+                                )}
+                                <div className="w-14 h-14 rounded flex items-center justify-center mb-3 bg-[#FF4A00]">
+                                  <svg viewBox="0 0 40 40" className="w-9 h-9">
+                                    <text x="20" y="26" textAnchor="middle" fill="white" fontSize="12" fontWeight="bold">INFA</text>
+                                  </svg>
+                                </div>
+                                <div className="text-sm font-semibold text-[var(--sf-text-primary)]">Informatica MDM</div>
+                                <div className="text-xs text-[var(--sf-text-tertiary)] mt-1">Ingest master data entities from Informatica MDM</div>
+                              </button>
+                            );
+                          })()}
+                        </div>
+                      )}
                     </div>
 
                     {/* ─── Other Sources ─── */}
                     <div>
-                      <h3 className="text-xs font-semibold uppercase tracking-wider text-[var(--sf-text-tertiary)] mb-1">Other Sources</h3>
-                      <p className="text-[10px] text-[var(--sf-text-tertiary)] mb-3">Load a sample file in order to teach the system about your file&apos;s structure, or connect additional data sources.</p>
-                      <div className="grid grid-cols-3 gap-3">
+                      <h3 className="text-sm font-semibold text-[var(--sf-text-primary)] mb-1">Other Sources</h3>
+                      <p className="text-xs text-[var(--sf-text-tertiary)] mb-3">Load a sample file in order to teach the system about your file&apos;s structure, or connect additional data sources.</p>
+                      <div className="grid grid-cols-3 gap-4">
                         {[
                           { id: 'src-upload', name: 'File Upload', icon: 'upload' as const, color: '#706E6B', desc: 'Upload CSV, JSON, or Parquet files' },
                           { id: 'src-kits', name: 'Installed Data Kits & Packages', icon: 'pkg' as const, color: '#00A1E0', desc: 'Installed data kits and managed packages' },
@@ -1167,8 +1299,8 @@ export default function DataStreamsContent({ demoSession }: DataStreamsContentPr
                             <button
                               key={src.id}
                               onClick={() => setSelectedSource(src.id)}
-                              className={`relative flex items-center gap-3 rounded-lg border-2 p-4 transition-all text-left ${
-                                isSelected ? 'border-[var(--sf-blue)] bg-[#EEF4FF] shadow-sm' : 'border-[var(--sf-border)] bg-white hover:border-[#B0B0B0] hover:bg-[#FAFAF9]'
+                              className={`relative flex flex-col items-center text-center rounded-lg border-2 p-6 transition-all ${
+                                isSelected ? 'border-[var(--sf-blue)] bg-[#EEF4FF] shadow-sm' : 'border-[#D8DDE6] bg-white hover:border-[#B0B0B0]'
                               }`}
                             >
                               {isSelected && (
@@ -1176,15 +1308,13 @@ export default function DataStreamsContent({ demoSession }: DataStreamsContentPr
                                   <Check className="w-2 h-2 text-white absolute top-0.5 right-0.5" />
                                 </div>
                               )}
-                              <div className="w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0" style={{ backgroundColor: src.color + '18' }}>
-                                {src.icon === 'upload' ? <Upload className="w-5 h-5" style={{ color: src.color }} /> :
-                                 src.icon === 'pkg' ? <Database className="w-5 h-5" style={{ color: src.color }} /> :
-                                 <svg viewBox="0 0 24 24" className="w-5 h-5"><circle cx="12" cy="12" r="10" fill={src.color} /><text x="12" y="16" textAnchor="middle" fill="white" fontSize="8" fontWeight="bold">SF</text></svg>}
+                              <div className="w-14 h-14 rounded-lg flex items-center justify-center mb-3" style={{ backgroundColor: src.color + '18' }}>
+                                {src.icon === 'upload' ? <Upload className="w-8 h-8" style={{ color: src.color }} /> :
+                                 src.icon === 'pkg' ? <Database className="w-8 h-8" style={{ color: src.color }} /> :
+                                 <svg viewBox="0 0 24 24" className="w-8 h-8"><circle cx="12" cy="12" r="10" fill={src.color} /><text x="12" y="16" textAnchor="middle" fill="white" fontSize="8" fontWeight="bold">SF</text></svg>}
                               </div>
-                              <div className="flex-1 min-w-0">
-                                <div className="text-xs font-semibold text-[var(--sf-text-primary)]">{src.name}</div>
-                                <div className="text-[10px] text-[var(--sf-text-tertiary)] mt-0.5">{src.desc}</div>
-                              </div>
+                              <div className="text-sm font-semibold text-[var(--sf-text-primary)]">{src.name}</div>
+                              <div className="text-xs text-[var(--sf-text-tertiary)] mt-1">{src.desc}</div>
                             </button>
                           );
                         })}

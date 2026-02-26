@@ -201,10 +201,11 @@ interface DataCloudSetupContentProps {
   onBack?: () => void;
   demoSession?: DemoSessionState;
   onDemoSessionChange?: (session: DemoSessionState) => void;
+  currentTimeline?: string;
 }
 
 // ── Component ────────────────────────────────────────────────────────
-export default function DataCloudSetupContent({ onBack, demoSession, onDemoSessionChange }: DataCloudSetupContentProps) {
+export default function DataCloudSetupContent({ onBack, demoSession, onDemoSessionChange, currentTimeline }: DataCloudSetupContentProps) {
   const [activeNavItem, setActiveNavItem] = useState('setup-home');
   const [quickFindQuery, setQuickFindQuery] = useState('');
   const [expandedNavItems, setExpandedNavItems] = useState<Set<string>>(new Set(['feature-manager']));
@@ -289,6 +290,7 @@ export default function DataCloudSetupContent({ onBack, demoSession, onDemoSessi
   const [smRadioState, setSmRadioState] = useState<Record<string, number>>({});
   const [smToggleState, setSmToggleState] = useState<Record<string, boolean>>({});
 
+  const is264Release = currentTimeline === '264-release';
   const isInformatica = activeNavItem === 'informatica-mdm' || activeNavItem === 'informatica-mdm-sf';
 
   const toggleNavExpand = (id: string) => {
@@ -358,16 +360,25 @@ export default function DataCloudSetupContent({ onBack, demoSession, onDemoSessi
     setConnectOrgOpen(false);
   };
 
-  // Filter nav items
+  // Gate Informatica-related nav items behind 264 Release timeline
+  const informaticaNavIds = new Set(['informatica-mdm', 'informatica-mdm-sf', 'solution-manager']);
+  const timelineFilteredNav = is264Release
+    ? setupNavSections
+    : setupNavSections.map((section) => ({
+        ...section,
+        items: section.items.filter((item) => !informaticaNavIds.has(item.id)),
+      })).filter((s) => s.items.length > 0 || s.title);
+
+  // Filter nav items by search query
   const filteredSections = quickFindQuery.trim()
-    ? setupNavSections.map((section) => ({
+    ? timelineFilteredNav.map((section) => ({
         ...section,
         items: section.items.filter((item) =>
           item.label.toLowerCase().includes(quickFindQuery.toLowerCase()) ||
           item.children?.some((c) => c.label.toLowerCase().includes(quickFindQuery.toLowerCase()))
         ),
       })).filter((s) => s.items.length > 0)
-    : setupNavSections;
+    : timelineFilteredNav;
 
   // ── Solution Manager data ────────────────────────────────────────────
   const smTiles = [
