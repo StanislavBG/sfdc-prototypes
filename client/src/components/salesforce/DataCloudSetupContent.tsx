@@ -209,9 +209,21 @@ export default function DataCloudSetupContent({ onBack, demoSession, onDemoSessi
   const [quickFindQuery, setQuickFindQuery] = useState('');
   const [expandedNavItems, setExpandedNavItems] = useState<Set<string>>(new Set(['feature-manager']));
 
-  // Persisted connections state
+  // Persisted connections state — initialize from demoSession for session persistence
   const [sfdcConnections, setSfdcConnections] = useState<Connection[]>(initialSfdcConnections);
-  const [informaticaConnections, setInformaticaConnections] = useState<Connection[]>(initialInformaticaConnections);
+  const [informaticaConnections, setInformaticaConnections] = useState<Connection[]>(() => {
+    if (demoSession?.informaticaConnections.length) {
+      return demoSession.informaticaConnections.map((c, i) => ({
+        id: `conn-infa-session-${i}`,
+        connectionName: c.name,
+        alias: c.alias,
+        connectionStatus: 'Active',
+        lastUpdated: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric', hour: 'numeric', minute: '2-digit' }),
+        orgId: c.orgId,
+      }));
+    }
+    return initialInformaticaConnections;
+  });
 
   // Install Bundle wizard modal
   const [installModalOpen, setInstallModalOpen] = useState(false);
@@ -219,8 +231,36 @@ export default function DataCloudSetupContent({ onBack, demoSession, onDemoSessi
   const [installModalChoice, setInstallModalChoice] = useState<'admins' | 'all' | 'profiles'>('admins');
   const [installModalLoading, setInstallModalLoading] = useState(false);
 
-  // Installed Packages state
-  const [installedPackages, setInstalledPackages] = useState<InstalledPackage[]>(baseInstalledPackages);
+  // Installed Packages state — initialize from demoSession for session persistence
+  const [installedPackages, setInstalledPackages] = useState<InstalledPackage[]>(() => {
+    const pkgs = [...baseInstalledPackages];
+    if (demoSession?.selectedBundles.length) {
+      demoSession.selectedBundles.forEach((bundleName) => {
+        const isInfaBundle = informaticaBundles.some((b) => b.name === bundleName);
+        const displayName = bundleName === 'Informatica MDM Cloud' ? 'Customer 360' : bundleName === 'Informatica Data Quality' ? 'Organization 360' : bundleName;
+        const bundle = [...informaticaBundles, ...sfdcBundles].find((b) => b.name === bundleName);
+        pkgs.push({
+          name: displayName,
+          publisher: isInfaBundle ? 'Informatica' : 'CDP CRM 1',
+          versionNumber: bundle?.latestVersion || '1.0',
+          namespacePrefix: isInfaBundle ? 'infa_mdm_dk' : 'cdp_crm_dk2',
+          installDate: new Date().toLocaleDateString('en-US', { month: 'numeric', day: 'numeric', year: 'numeric', hour: 'numeric', minute: '2-digit' }),
+          limits: false,
+          apps: 0,
+          tabs: 0,
+          objects: 0,
+          appExchangeReady: 'Passed',
+          description: isInfaBundle ? `Informatica MDM business entity bundle for ${displayName}. Contains master data objects, match rules, and data quality configurations.` : '',
+          versionName: isInfaBundle ? 'Winter 2026' : 'Spring 2025',
+          packageType: 'Managed',
+          packageId: `033B${Math.random().toString(36).substring(2, 12).toUpperCase()}`,
+          language: 'English',
+          isInformatica: isInfaBundle,
+        });
+      });
+    }
+    return pkgs;
+  });
   const [packageDetailName, setPackageDetailName] = useState<string | null>(null);
 
   // Connect Org wizard
