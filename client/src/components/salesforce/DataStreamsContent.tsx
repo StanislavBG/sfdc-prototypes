@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import {
   Plus,
   Search,
@@ -392,6 +392,8 @@ interface DemoSessionState {
 
 interface DataStreamsContentProps {
   demoSession?: DemoSessionState;
+  initialOpenBundles?: boolean;
+  onBundlesOpened?: () => void;
 }
 
 // Map installed bundle names to the data streams they generate
@@ -409,7 +411,7 @@ const bundleToStreams: Record<string, DataStream[]> = {
 };
 
 // ── Component ────────────────────────────────────────────────────────
-export default function DataStreamsContent({ demoSession }: DataStreamsContentProps) {
+export default function DataStreamsContent({ demoSession, initialOpenBundles, onBundlesOpened }: DataStreamsContentProps) {
   // Compute session-aware data streams: base Salesforce streams + streams from installed bundles
   const sessionStreams: DataStream[] = [];
   if (demoSession) {
@@ -454,6 +456,18 @@ export default function DataStreamsContent({ demoSession }: DataStreamsContentPr
 
   // Step 2 loading spinner — brief loading animation when entering Step 2
   const [step2Loading, setStep2Loading] = useState(false);
+
+  // Auto-open wizard at Bundles step (step 2) with Informatica pre-selected
+  useEffect(() => {
+    if (initialOpenBundles) {
+      setNewModalOpen(true);
+      setSelectedSource('informatica');
+      setNewModalStep(2);
+      setStep2Loading(true);
+      setTimeout(() => setStep2Loading(false), 1500);
+      onBundlesOpened?.();
+    }
+  }, [initialOpenBundles]);
 
   // Helpers
   const fmt = (n: number) => n.toLocaleString();
