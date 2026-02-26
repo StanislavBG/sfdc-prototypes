@@ -452,6 +452,9 @@ export default function DataStreamsContent({ demoSession }: DataStreamsContentPr
   const [sfBundleSearch, setSfBundleSearch] = useState('');
   const [focusedSfBundleId, setFocusedSfBundleId] = useState<string | null>(null);
 
+  // Step 2 loading spinner — brief loading animation when entering Step 2
+  const [step2Loading, setStep2Loading] = useState(false);
+
   // Helpers
   const fmt = (n: number) => n.toLocaleString();
 
@@ -517,7 +520,9 @@ export default function DataStreamsContent({ demoSession }: DataStreamsContentPr
     if (newModalStep === 1 && selectedSource) {
       // Core sources go to Step 2 (bundle selection); others skip to Step 3
       if (selectedSource === 'salesforce' || selectedSource === 'informatica') {
+        setStep2Loading(true);
         setNewModalStep(2);
+        setTimeout(() => setStep2Loading(false), 1500);
       } else {
         setNewModalStep(3);
       }
@@ -1033,7 +1038,7 @@ export default function DataStreamsContent({ demoSession }: DataStreamsContentPr
 
             {/* Body */}
             <div className="flex-1 overflow-y-auto px-6 py-6">
-              {/* Step 1: Source selection — rich connector marketplace */}
+              {/* Step 1: Source selection — matches Salesforce reference layout */}
               {newModalStep === 1 && (() => {
                 const filteredConnectors = explorerConnectors.filter((c) => {
                   const matchSearch = connectorSearch === '' || c.name.toLowerCase().includes(connectorSearch.toLowerCase()) || c.category.toLowerCase().includes(connectorSearch.toLowerCase());
@@ -1042,40 +1047,105 @@ export default function DataStreamsContent({ demoSession }: DataStreamsContentPr
                 });
                 return (
                   <div className="space-y-6">
-                    {/* ─── Connected Sources (pinned top) ─── */}
+                    {/* Info banner */}
+                    <div className="flex items-start gap-3 p-4 bg-[#E1F5FE] rounded-lg">
+                      <Info className="w-5 h-5 text-[var(--sf-blue)] flex-shrink-0 mt-0.5" />
+                      <div className="text-sm text-[var(--sf-text-secondary)]">
+                        Select the data source from which you can ingest or federate data. Only sources that are already connected to Data Cloud appear on this list. <span className="sf-link">Learn More</span>
+                      </div>
+                    </div>
+
+                    {/* ─── Connected Sources ─── */}
                     <div>
                       <h3 className="text-xs font-semibold uppercase tracking-wider text-[var(--sf-text-tertiary)] mb-3">Connected Sources</h3>
-                      <div className="grid grid-cols-2 gap-3">
-                        {/* Salesforce CRM */}
-                        <button
-                          onClick={() => setSelectedSource('salesforce')}
-                          className={`relative flex items-center gap-3 rounded-lg border-2 p-4 transition-all text-left ${
-                            selectedSource === 'salesforce'
-                              ? 'border-[var(--sf-blue)] bg-[#EEF4FF] shadow-sm'
-                              : 'border-[#D8DDE6] bg-white hover:border-[#B0B0B0] hover:bg-[#FAFAF9]'
-                          }`}
-                        >
-                          {selectedSource === 'salesforce' && (
-                            <div className="absolute top-0 right-0 w-6 h-6 bg-[var(--sf-blue)] flex items-center justify-center" style={{ clipPath: 'polygon(0 0, 100% 0, 100% 100%)' }}>
-                              <Check className="w-2.5 h-2.5 text-white absolute top-0.5 right-0.5" />
-                            </div>
-                          )}
-                          <div className="w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0 bg-[#0070D2]">
-                            <svg viewBox="0 0 32 32" className="w-6 h-6">
-                              <text x="16" y="22" textAnchor="middle" fill="white" fontSize="14" fontWeight="bold" fontStyle="italic">sf</text>
-                            </svg>
-                          </div>
-                          <div className="flex-1 min-w-0">
-                            <div className="text-sm font-semibold text-[var(--sf-text-primary)]">Salesforce CRM</div>
-                            <div className="text-xs text-[var(--sf-text-tertiary)] mt-0.5">Standard and custom Salesforce objects</div>
-                          </div>
-                          <span className="sf-badge sf-badge-success text-[9px]">Connected</span>
-                        </button>
+                      <div className="grid grid-cols-3 gap-3">
+                        {/* Ingestion API */}
+                        {(() => {
+                          const isSelected = selectedSource === 'src-api';
+                          return (
+                            <button
+                              onClick={() => setSelectedSource('src-api')}
+                              className={`relative flex items-center gap-3 rounded-lg border-2 p-4 transition-all text-left ${
+                                isSelected ? 'border-[var(--sf-blue)] bg-[#EEF4FF] shadow-sm' : 'border-[#D8DDE6] bg-white hover:border-[#B0B0B0] hover:bg-[#FAFAF9]'
+                              }`}
+                            >
+                              {isSelected && (
+                                <div className="absolute top-0 right-0 w-6 h-6 bg-[var(--sf-blue)] flex items-center justify-center" style={{ clipPath: 'polygon(0 0, 100% 0, 100% 100%)' }}>
+                                  <Check className="w-2.5 h-2.5 text-white absolute top-0.5 right-0.5" />
+                                </div>
+                              )}
+                              <div className="w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0 bg-[#032D60]">
+                                <Server className="w-5 h-5 text-white" />
+                              </div>
+                              <div className="flex-1 min-w-0">
+                                <div className="text-sm font-semibold text-[var(--sf-text-primary)]">Ingestion API</div>
+                                <div className="text-[10px] text-[var(--sf-text-tertiary)] mt-0.5">Real-time event data via REST API</div>
+                              </div>
+                            </button>
+                          );
+                        })()}
 
-                        {/* Informatica MDM */}
+                        {/* Salesforce CRM */}
+                        {(() => {
+                          const isSelected = selectedSource === 'salesforce';
+                          return (
+                            <button
+                              onClick={() => setSelectedSource('salesforce')}
+                              className={`relative flex items-center gap-3 rounded-lg border-2 p-4 transition-all text-left ${
+                                isSelected ? 'border-[var(--sf-blue)] bg-[#EEF4FF] shadow-sm' : 'border-[#D8DDE6] bg-white hover:border-[#B0B0B0] hover:bg-[#FAFAF9]'
+                              }`}
+                            >
+                              {isSelected && (
+                                <div className="absolute top-0 right-0 w-6 h-6 bg-[var(--sf-blue)] flex items-center justify-center" style={{ clipPath: 'polygon(0 0, 100% 0, 100% 100%)' }}>
+                                  <Check className="w-2.5 h-2.5 text-white absolute top-0.5 right-0.5" />
+                                </div>
+                              )}
+                              <div className="w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0 bg-[#0070D2]">
+                                <svg viewBox="0 0 32 32" className="w-6 h-6">
+                                  <text x="16" y="22" textAnchor="middle" fill="white" fontSize="14" fontWeight="bold" fontStyle="italic">sf</text>
+                                </svg>
+                              </div>
+                              <div className="flex-1 min-w-0">
+                                <div className="text-sm font-semibold text-[var(--sf-text-primary)]">Salesforce CRM</div>
+                                <div className="text-[10px] text-[var(--sf-text-tertiary)] mt-0.5">Standard and custom Salesforce objects</div>
+                              </div>
+                              <span className="sf-badge sf-badge-success text-[9px]">Connected</span>
+                            </button>
+                          );
+                        })()}
+
+                        {/* Server To Server */}
+                        {(() => {
+                          const isSelected = selectedSource === 'src-s2s';
+                          return (
+                            <button
+                              onClick={() => setSelectedSource('src-s2s')}
+                              className={`relative flex items-center gap-3 rounded-lg border-2 p-4 transition-all text-left ${
+                                isSelected ? 'border-[var(--sf-blue)] bg-[#EEF4FF] shadow-sm' : 'border-[#D8DDE6] bg-white hover:border-[#B0B0B0] hover:bg-[#FAFAF9]'
+                              }`}
+                            >
+                              {isSelected && (
+                                <div className="absolute top-0 right-0 w-6 h-6 bg-[var(--sf-blue)] flex items-center justify-center" style={{ clipPath: 'polygon(0 0, 100% 0, 100% 100%)' }}>
+                                  <Check className="w-2.5 h-2.5 text-white absolute top-0.5 right-0.5" />
+                                </div>
+                              )}
+                              <div className="w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0 bg-[#5C6BC0]">
+                                <Globe className="w-5 h-5 text-white" />
+                              </div>
+                              <div className="flex-1 min-w-0">
+                                <div className="text-sm font-semibold text-[var(--sf-text-primary)]">Server To Server</div>
+                                <div className="text-[10px] text-[var(--sf-text-tertiary)] mt-0.5">Authenticated server-to-server</div>
+                              </div>
+                            </button>
+                          );
+                        })()}
+                      </div>
+
+                      {/* Informatica MDM — highlighted connected source */}
+                      <div className="mt-3">
                         <button
                           onClick={() => setSelectedSource('informatica')}
-                          className={`relative flex items-center gap-3 rounded-lg border-2 p-4 transition-all text-left ${
+                          className={`relative flex items-center gap-3 rounded-lg border-2 p-4 transition-all text-left w-full ${
                             selectedSource === 'informatica'
                               ? 'border-[#FF4A00] bg-[#FFF8F5] shadow-sm'
                               : 'border-[#FF4A00]/40 bg-[#FFF8F5] hover:border-[#FF4A00]'
@@ -1093,9 +1163,9 @@ export default function DataStreamsContent({ demoSession }: DataStreamsContentPr
                           </div>
                           <div className="flex-1 min-w-0">
                             <div className="text-sm font-bold text-[#FF4A00]">Informatica MDM</div>
-                            <div className="text-xs text-[#D95800] mt-0.5">MDM business entities &amp; bundles</div>
+                            <div className="text-[10px] text-[#D95800] mt-0.5">MDM business entities &amp; bundles</div>
                           </div>
-                          <div className="flex flex-col items-end gap-1">
+                          <div className="flex items-center gap-2">
                             <span className="sf-badge sf-badge-success text-[9px]">Connected</span>
                             <span className="px-1.5 py-0.5 text-[8px] font-bold uppercase tracking-wider bg-[#FF4A00] text-white rounded">New</span>
                           </div>
@@ -1105,18 +1175,21 @@ export default function DataStreamsContent({ demoSession }: DataStreamsContentPr
 
                     {/* ─── Other Sources ─── */}
                     <div>
-                      <h3 className="text-xs font-semibold uppercase tracking-wider text-[var(--sf-text-tertiary)] mb-3">Other Sources</h3>
-                      <div className="grid grid-cols-4 gap-2">
-                        {otherSources.map((src) => {
+                      <h3 className="text-xs font-semibold uppercase tracking-wider text-[var(--sf-text-tertiary)] mb-1">Other Sources</h3>
+                      <p className="text-[10px] text-[var(--sf-text-tertiary)] mb-3">Load a sample file in order to teach the system about your file&apos;s structure, or connect additional data sources.</p>
+                      <div className="grid grid-cols-3 gap-3">
+                        {[
+                          { id: 'src-upload', name: 'File Upload', icon: 'upload' as const, color: '#706E6B', desc: 'Upload CSV, JSON, or Parquet files' },
+                          { id: 'src-kits', name: 'Installed Data Kits & Packages', icon: 'pkg' as const, color: '#00A1E0', desc: 'Installed data kits and managed packages' },
+                          { id: 'c-snowflake', name: 'Snowflake', icon: 'sf-conn' as const, color: '#29B5E8', desc: 'Snowflake data warehouse connector' },
+                        ].map((src) => {
                           const isSelected = selectedSource === src.id;
                           return (
                             <button
                               key={src.id}
                               onClick={() => setSelectedSource(src.id)}
-                              className={`relative flex flex-col items-center gap-2 p-3 rounded-lg border-2 transition-all text-center ${
-                                isSelected
-                                  ? 'border-[var(--sf-blue)] bg-[#EEF4FF] shadow-sm'
-                                  : 'border-[var(--sf-border)] bg-white hover:border-[#B0B0B0] hover:bg-[#FAFAF9]'
+                              className={`relative flex items-center gap-3 rounded-lg border-2 p-4 transition-all text-left ${
+                                isSelected ? 'border-[var(--sf-blue)] bg-[#EEF4FF] shadow-sm' : 'border-[var(--sf-border)] bg-white hover:border-[#B0B0B0] hover:bg-[#FAFAF9]'
                               }`}
                             >
                               {isSelected && (
@@ -1124,13 +1197,15 @@ export default function DataStreamsContent({ demoSession }: DataStreamsContentPr
                                   <Check className="w-2 h-2 text-white absolute top-0.5 right-0.5" />
                                 </div>
                               )}
-                              <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ backgroundColor: src.color + '18' }}>
-                                {src.icon === '↑' ? <Upload className="w-4 h-4" style={{ color: src.color }} /> :
-                                 src.icon === 'API' ? <Server className="w-4 h-4" style={{ color: src.color }} /> :
-                                 src.icon === 'S2S' ? <Globe className="w-4 h-4" style={{ color: src.color }} /> :
-                                 <Database className="w-4 h-4" style={{ color: src.color }} />}
+                              <div className="w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0" style={{ backgroundColor: src.color + '18' }}>
+                                {src.icon === 'upload' ? <Upload className="w-5 h-5" style={{ color: src.color }} /> :
+                                 src.icon === 'pkg' ? <Database className="w-5 h-5" style={{ color: src.color }} /> :
+                                 <svg viewBox="0 0 24 24" className="w-5 h-5"><circle cx="12" cy="12" r="10" fill={src.color} /><text x="12" y="16" textAnchor="middle" fill="white" fontSize="8" fontWeight="bold">SF</text></svg>}
                               </div>
-                              <span className="text-[11px] font-medium text-[var(--sf-text-primary)] leading-tight">{src.name}</span>
+                              <div className="flex-1 min-w-0">
+                                <div className="text-xs font-semibold text-[var(--sf-text-primary)]">{src.name}</div>
+                                <div className="text-[10px] text-[var(--sf-text-tertiary)] mt-0.5">{src.desc}</div>
+                              </div>
                             </button>
                           );
                         })}
@@ -1144,18 +1219,26 @@ export default function DataStreamsContent({ demoSession }: DataStreamsContentPr
                           Explore Other Connectors <span className="text-[10px] font-normal normal-case">({filteredConnectors.length})</span>
                         </h3>
                       </div>
-                      {/* Search + Category filter */}
-                      <div className="flex items-center gap-2 mb-3">
+                      {/* Search + filter checkboxes */}
+                      <div className="flex items-center gap-3 mb-3">
                         <div className="relative flex-1">
                           <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-[var(--sf-text-tertiary)]" />
                           <input
                             type="text"
-                            placeholder="Search connectors..."
+                            placeholder="Filter Connectors"
                             value={connectorSearch}
                             onChange={(e) => setConnectorSearch(e.target.value)}
                             className="w-full pl-8 pr-3 py-1.5 text-xs border border-[var(--sf-border)] rounded focus:outline-none focus:border-[var(--sf-blue-light)] focus:ring-1 focus:ring-[rgba(27,150,255,0.2)]"
                           />
                         </div>
+                        <label className="flex items-center gap-1.5 text-xs text-[var(--sf-text-secondary)] cursor-pointer">
+                          <input type="checkbox" defaultChecked className="w-3.5 h-3.5 rounded border-[var(--sf-border)] accent-[var(--sf-blue)]" />
+                          Generally Available
+                        </label>
+                        <label className="flex items-center gap-1.5 text-xs text-[var(--sf-text-secondary)] cursor-pointer">
+                          <input type="checkbox" defaultChecked className="w-3.5 h-3.5 rounded border-[var(--sf-border)] accent-[var(--sf-blue)]" />
+                          Beta
+                        </label>
                         <select
                           value={connectorCategory}
                           onChange={(e) => setConnectorCategory(e.target.value)}
@@ -1191,7 +1274,10 @@ export default function DataStreamsContent({ demoSession }: DataStreamsContentPr
                                   <span className="text-[9px] font-bold text-white leading-none">{conn.icon}</span>
                                 </div>
                                 <div className="flex-1 min-w-0">
-                                  <div className="text-[11px] font-medium text-[var(--sf-text-primary)] truncate leading-tight">{conn.name}</div>
+                                  <div className="flex items-center gap-1.5">
+                                    <span className="text-[11px] font-medium text-[var(--sf-text-primary)] truncate leading-tight">{conn.name}</span>
+                                    <span className="px-1 py-0 text-[7px] font-semibold uppercase tracking-wider border border-[var(--sf-border)] text-[var(--sf-text-tertiary)] rounded flex-shrink-0">Beta</span>
+                                  </div>
                                   <div className="text-[9px] text-[var(--sf-text-tertiary)] truncate">{conn.category}</div>
                                 </div>
                               </button>
@@ -1217,6 +1303,18 @@ export default function DataStreamsContent({ demoSession }: DataStreamsContentPr
                 const focusedSfBundle = salesforceStandardBundles.find((b) => b.id === focusedSfBundleId);
                 return (
                   <div className="space-y-4">
+                    {/* Info banner */}
+                    <div className="flex items-start gap-3 p-4 bg-[#E1F5FE] rounded-lg">
+                      <Info className="w-5 h-5 text-[var(--sf-blue)] flex-shrink-0 mt-0.5" />
+                      <div className="text-sm text-[var(--sf-text-secondary)]">
+                        To ensure data is ingested from fields and objects created in the future, we recommend granting <strong>View All Fields (Global)</strong> and <strong>View All Data</strong> permission to the integration user profile. <span className="sf-link">Learn More</span>
+                      </div>
+                    </div>
+
+                    <p className="text-xs text-[var(--sf-text-tertiary)]">
+                      Select an org to ingest data from, then select an object or data bundle.
+                    </p>
+
                     {/* Org selector + view toggle */}
                     <div className="flex items-end gap-3">
                       <div className="flex-1">
@@ -1225,7 +1323,7 @@ export default function DataStreamsContent({ demoSession }: DataStreamsContentPr
                           <option>Data Cloud SG</option>
                         </select>
                       </div>
-                      <div className="flex items-center gap-1 border border-[var(--sf-border)] rounded overflow-hidden">
+                      <div className="flex items-center border border-[var(--sf-border)] rounded overflow-hidden">
                         <button
                           onClick={() => setSfViewMode('bundles')}
                           className={`px-3 py-2 text-xs font-medium ${sfViewMode === 'bundles' ? 'bg-[var(--sf-blue)] text-white' : 'bg-white text-[var(--sf-text-secondary)] hover:bg-[#F3F3F3]'}`}
@@ -1237,10 +1335,18 @@ export default function DataStreamsContent({ demoSession }: DataStreamsContentPr
                       </div>
                     </div>
 
-                    <p className="text-xs text-[var(--sf-text-tertiary)]">
-                      Select an org to ingest data from, then select an object or data bundle.
-                    </p>
-
+                    {/* Loading spinner state */}
+                    {step2Loading ? (
+                      <div className="flex flex-col items-center justify-center py-20">
+                        <div className="flex gap-1.5 mb-3">
+                          <div className="w-2.5 h-2.5 rounded-full bg-[var(--sf-blue)] animate-bounce" style={{ animationDelay: '0ms' }} />
+                          <div className="w-2.5 h-2.5 rounded-full bg-[var(--sf-blue)] animate-bounce" style={{ animationDelay: '150ms' }} />
+                          <div className="w-2.5 h-2.5 rounded-full bg-[var(--sf-blue)] animate-bounce" style={{ animationDelay: '300ms' }} />
+                        </div>
+                        <p className="text-sm text-[var(--sf-text-tertiary)]">Loading bundles...</p>
+                      </div>
+                    ) : (
+                    <>
                     {/* Bundle view */}
                     {sfViewMode === 'bundles' && (
                       <div className="flex gap-4">
@@ -1255,7 +1361,7 @@ export default function DataStreamsContent({ demoSession }: DataStreamsContentPr
                             </div>
                           </div>
                           <div className="max-h-[320px] overflow-y-auto border border-[var(--sf-border)] rounded-lg">
-                            <div className="grid grid-cols-2 gap-0">
+                            <div className="grid grid-cols-3 gap-0">
                               {filteredSfBundles.map((bundle) => {
                                 const isSelected = selectedSfBundles.has(bundle.id);
                                 const isFocused = focusedSfBundleId === bundle.id;
@@ -1330,6 +1436,8 @@ export default function DataStreamsContent({ demoSession }: DataStreamsContentPr
                           </select>
                         </div>
                       </div>
+                    )}
+                    </>
                     )}
                   </div>
                 );
