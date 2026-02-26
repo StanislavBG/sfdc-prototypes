@@ -12,6 +12,7 @@ import WorkflowSidebar from './WorkflowSidebar';
 import WorkflowArea from './WorkflowArea';
 import TimeMachine from './TimeMachine';
 import AppLauncher from './AppLauncher';
+import { MdsSimulatorProvider } from './MdsSimulatorContext';
 import { salesforceApps, type Workflow } from '@/lib/mock-data';
 
 // ── Demo Session State ─────────────────────────────────────────────
@@ -123,6 +124,7 @@ export default function Layout({ children }: LayoutProps) {
   // Data Cloud Setup takes over the whole content area
   if (showDataCloudSetup) {
     return (
+      <MdsSimulatorProvider>
       <div className="min-h-screen flex flex-col bg-[var(--sf-content-bg)]">
         <Header
           appName="Data Cloud Setup"
@@ -163,10 +165,12 @@ export default function Layout({ children }: LayoutProps) {
           </div>
         )}
       </div>
+      </MdsSimulatorProvider>
     );
   }
 
   return (
+    <MdsSimulatorProvider>
     <div className="min-h-screen flex flex-col bg-[var(--sf-content-bg)]">
       {/* Single-row header */}
       <Header
@@ -265,5 +269,6 @@ export default function Layout({ children }: LayoutProps) {
         </div>
       )}
     </div>
+    </MdsSimulatorProvider>
   );
 }
