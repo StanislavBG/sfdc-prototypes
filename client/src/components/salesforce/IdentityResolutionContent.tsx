@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import {
   ArrowLeft,
+  ArrowRight,
   ChevronRight,
   ChevronDown,
   ChevronUp,
@@ -147,15 +148,15 @@ function generateProcessingHistory(): ProcessingHistoryEntry[] {
 const mockRulesets: IdentityRuleset[] = [
   {
     id: 'rs-001',
-    rulesetName: 'Individual (Main)',
-    rulesetId: 'IDR-2024-001',
+    rulesetName: 'Individual (Customer-360)',
+    rulesetId: 'INFA-C360',
     dataSpace: 'default',
     primaryDataModelObject: 'Individual',
     secondaryDataModelObject: 'Individual',
     rulesetStatus: 'Published',
     lastJobStatus: 'Completed',
     lastJobCompleted: '02/24/2026, 3:45 PM',
-    description: '',
+    description: 'Installed from Informatica MDM datakit (CX)',
     createdBy: 'Data Cloud',
     createdDate: '5/1/2025, 9:10 PM',
     lastModifiedBy: 'Automated Process',
@@ -193,19 +194,10 @@ const mockRulesets: IdentityRuleset[] = [
         defaultRule: 'Most Recent',
         fields: [
           { id: 'rf-1', fieldName: 'Address Line 1', reconciliationRule: 'Most Recent', usingDefault: true },
-          { id: 'rf-2', fieldName: 'Address Line 2', reconciliationRule: 'Most Recent', usingDefault: true },
-          { id: 'rf-3', fieldName: 'City', reconciliationRule: 'Most Recent', usingDefault: true },
-          { id: 'rf-4', fieldName: 'State', reconciliationRule: 'Most Recent', usingDefault: true },
-          { id: 'rf-5', fieldName: 'Postal Code', reconciliationRule: 'Most Recent', usingDefault: true },
-          { id: 'rf-6', fieldName: 'Country', reconciliationRule: 'Most Recent', usingDefault: true },
-        ],
-      },
-      {
-        dmoName: 'Contact Point App',
-        defaultRule: 'Most Recent',
-        fields: [
-          { id: 'rf-7', fieldName: 'App Id', reconciliationRule: 'Most Recent', usingDefault: true },
-          { id: 'rf-8', fieldName: 'App Type', reconciliationRule: 'Most Recent', usingDefault: true },
+          { id: 'rf-2', fieldName: 'City', reconciliationRule: 'Most Recent', usingDefault: true },
+          { id: 'rf-3', fieldName: 'State', reconciliationRule: 'Most Recent', usingDefault: true },
+          { id: 'rf-4', fieldName: 'Postal Code', reconciliationRule: 'Most Recent', usingDefault: true },
+          { id: 'rf-5', fieldName: 'Country', reconciliationRule: 'Most Recent', usingDefault: true },
         ],
       },
       {
@@ -236,69 +228,6 @@ const mockRulesets: IdentityRuleset[] = [
       },
     ],
     processingHistory: generateProcessingHistory(),
-  },
-  {
-    id: 'rs-002',
-    rulesetName: 'Account (B2B)',
-    rulesetId: 'IDR-2024-002',
-    dataSpace: 'default',
-    primaryDataModelObject: 'Account',
-    secondaryDataModelObject: 'Account',
-    rulesetStatus: 'Published',
-    lastJobStatus: 'Completed',
-    lastJobCompleted: '02/24/2026, 4:12 PM',
-    description: 'B2B account deduplication ruleset',
-    createdBy: 'Data Cloud',
-    createdDate: '6/15/2025, 10:30 AM',
-    lastModifiedBy: 'Automated Process',
-    isScheduled: true,
-    sourceProfiles: 324891,
-    matchedSourceProfiles: 198234,
-    totalUnifiedProfiles: 145672,
-    consolidationRate: 55,
-    matchRules: [
-      {
-        id: 'mr-5', ruleName: 'Exact Company Name', priority: 1,
-        criteria: [
-          { id: 'mc-10', dataModelObject: 'Account', field: 'Account Name', matchMethod: 'Exact', crossFieldDMO: '', crossFieldMatchField: '', matchOnBlank: false, caseSensitive: false },
-        ],
-      },
-    ],
-    reconciliationGroups: [
-      {
-        dmoName: 'Account',
-        defaultRule: 'Source Priority',
-        fields: [
-          { id: 'rf-20', fieldName: 'Account Name', reconciliationRule: 'Source Priority', usingDefault: true },
-          { id: 'rf-21', fieldName: 'Website Domain', reconciliationRule: 'Most Recent', usingDefault: false },
-          { id: 'rf-22', fieldName: 'Phone', reconciliationRule: 'Source Priority', usingDefault: true },
-        ],
-      },
-    ],
-    processingHistory: [],
-  },
-  {
-    id: 'rs-003',
-    rulesetName: 'Household',
-    rulesetId: 'IDR-2024-003',
-    dataSpace: 'default',
-    primaryDataModelObject: 'Individual',
-    secondaryDataModelObject: 'Individual',
-    rulesetStatus: 'Draft',
-    lastJobStatus: 'Not Run',
-    lastJobCompleted: '—',
-    description: '',
-    createdBy: 'Data Cloud',
-    createdDate: '7/1/2025, 2:00 PM',
-    lastModifiedBy: 'Data Cloud',
-    isScheduled: false,
-    sourceProfiles: 0,
-    matchedSourceProfiles: 0,
-    totalUnifiedProfiles: 0,
-    consolidationRate: 0,
-    matchRules: [],
-    reconciliationGroups: [],
-    processingHistory: [],
   },
 ];
 
@@ -359,7 +288,18 @@ function localToApi(rs: IdentityRuleset): IdentityRulesetData {
 }
 
 // ── Component ────────────────────────────────────────────────────────
-export default function IdentityResolutionContent() {
+interface DemoSessionState {
+  informaticaConnections: { name: string; alias: string; orgId: string }[];
+  selectedBundles: string[];
+  installedDatakits: string[];
+}
+
+interface IdentityResolutionContentProps {
+  demoSession?: DemoSessionState;
+  onDemoSessionChange?: (session: DemoSessionState) => void;
+}
+
+export default function IdentityResolutionContent({ demoSession, onDemoSessionChange }: IdentityResolutionContentProps) {
   // ── API hooks ─────────────────────────────────────────────────────
   const { data: apiRulesets, isLoading, isError } = useIdentityRulesets();
   const createMutation = useCreateIdentityRuleset();
@@ -437,21 +377,30 @@ export default function IdentityResolutionContent() {
   const [selectedDatakitRuleset, setSelectedDatakitRuleset] = useState<string | null>(null);
 
   const datakitCategories = ['Knowledge Space', 'Billing Analytics', 'Informatica MDM', 'Agentforce Analytics', 'Pricing', 'Content Kit'];
-  const datakitRulesets: Record<string, { name: string; id: string; dataSpace: string; primaryDMO: string; realTime?: boolean; cx?: boolean }[]> = {
+  // Full catalog of Informatica MDM rulesets — Phase-2 item always shown (grayed), others filtered by session bundle selection
+  const allInformaticaRulesets: { name: string; id: string; dataSpace: string; primaryDMO: string; phase2?: boolean; cx?: boolean; bundleName?: string }[] = [
+    { name: 'Customer 360', id: 'INFA-C360', dataSpace: 'default', primaryDMO: 'Individual', cx: true, bundleName: 'Informatica MDM Cloud' },
+    { name: 'Customer 360', id: 'INFA-C360-RT', dataSpace: 'default', primaryDMO: 'Individual', phase2: true, cx: true, bundleName: 'Informatica MDM Cloud' },
+    { name: 'Organization 360', id: 'INFA-O360', dataSpace: 'default', primaryDMO: 'Account', bundleName: 'Informatica MDM Cloud' },
+    { name: 'Reference 360', id: 'INFA-R360', dataSpace: 'default', primaryDMO: 'Account', bundleName: 'Informatica MDM Cloud' },
+    { name: 'Supplier 360', id: 'INFA-S360', dataSpace: 'default', primaryDMO: 'Account', bundleName: 'Informatica Data Quality' },
+    { name: 'Finance 360', id: 'INFA-F360', dataSpace: 'default', primaryDMO: 'Account', bundleName: 'Informatica Data Quality' },
+  ];
+
+  // Filter Informatica rulesets: Phase-2 items always visible (but disabled), others only if their bundle was selected in Setup
+  const hasSessionBundles = demoSession && demoSession.selectedBundles.length > 0;
+  const filteredInformaticaRulesets = hasSessionBundles
+    ? allInformaticaRulesets.filter((rs) => rs.phase2 || demoSession.selectedBundles.includes(rs.bundleName || ''))
+    : allInformaticaRulesets; // show all if no session (backward compat)
+
+  const datakitRulesets: Record<string, { name: string; id: string; dataSpace: string; primaryDMO: string; phase2?: boolean; cx?: boolean; bundleName?: string }[]> = {
     'Knowledge Space': [
       { name: 'Customer Dedup', id: 'KS-001', dataSpace: 'default', primaryDMO: 'Individual' },
     ],
     'Billing Analytics': [
       { name: 'Billing Account Match', id: 'BA-001', dataSpace: 'default', primaryDMO: 'Account' },
     ],
-    'Informatica MDM': [
-      { name: 'Customer 360', id: 'INFA-C360', dataSpace: 'default', primaryDMO: 'Individual', cx: true },
-      { name: 'Customer 360', id: 'INFA-C360-RT', dataSpace: 'default', primaryDMO: 'Individual', realTime: true, cx: true },
-      { name: 'Reference 360', id: 'INFA-R360', dataSpace: 'default', primaryDMO: 'Account' },
-      { name: 'Supplies 360', id: 'INFA-S360', dataSpace: 'default', primaryDMO: 'Account' },
-      { name: 'Reporter 360', id: 'INFA-RP360', dataSpace: 'default', primaryDMO: 'Individual' },
-      { name: 'Organization 360', id: 'INFA-O360', dataSpace: 'default', primaryDMO: 'Individual' },
-    ],
+    'Informatica MDM': filteredInformaticaRulesets,
     'Agentforce Analytics': [
       { name: 'Agent Contact Resolution', id: 'AF-001', dataSpace: 'default', primaryDMO: 'Individual' },
     ],
@@ -581,6 +530,13 @@ export default function IdentityResolutionContent() {
       isCX: isCXDatakit,
     };
     createMutation.mutate(localToApi(newRs));
+    // Record installed datakit in session
+    if (isFromDatakit && selectedDatakitRuleset && onDemoSessionChange && demoSession) {
+      onDemoSessionChange({
+        ...demoSession,
+        installedDatakits: [...demoSession.installedDatakits, selectedDatakitRuleset],
+      });
+    }
     setNewRulesetOpen(false);
   };
 
@@ -756,6 +712,15 @@ export default function IdentityResolutionContent() {
   // BYOM DETAIL VIEW — "Bring Your Own MDM" mode (non-CX only)
   // CX datakits (Customer 360 / Real Time) use the standard detail view
   // ──────────────────────────────────────────────────────────────────
+  // Determine if this BYOM ruleset's datakit has been installed → mappings are populated
+  const byomMappingPopulated = selectedRuleset?.isBYOM && demoSession
+    ? demoSession.installedDatakits.includes(selectedRuleset.rulesetId)
+    : false;
+
+  // Data exploration chart modal
+  const [exploreOpen, setExploreOpen] = useState(false);
+  const [exploreDMO, setExploreDMO] = useState<'link' | 'unified'>('link');
+
   if (selectedRuleset && selectedRuleset.isBYOM && !selectedRuleset.isCX) {
     return (
       <div className="h-full flex flex-col">
@@ -825,12 +790,15 @@ export default function IdentityResolutionContent() {
                     <div>
                       <h3 className="text-sm font-bold text-[var(--sf-text-primary)] mb-1">Verify Unified Link DMO</h3>
                       <p className="text-xs text-[var(--sf-text-tertiary)] leading-relaxed">
-                        Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. To Data Explorer
+                        Explore the Unified Link data model object to understand cross-source identity linkage and resolution quality.
                       </p>
                     </div>
-                    <button className="flex-shrink-0 ml-4 px-4 py-1.5 text-xs font-medium border border-[var(--sf-border)] rounded hover:bg-[#F3F3F3] text-[var(--sf-text-secondary)] flex items-center gap-1.5">
-                      <Eye className="w-3.5 h-3.5" />
-                      View
+                    <button
+                      onClick={() => { setExploreDMO('link'); setExploreOpen(true); }}
+                      className="flex-shrink-0 ml-4 px-4 py-1.5 text-xs font-medium text-white bg-[var(--sf-blue)] rounded hover:bg-[var(--sf-blue-hover)] flex items-center gap-1.5"
+                    >
+                      <Search className="w-3.5 h-3.5" />
+                      Explore
                     </button>
                   </div>
 
@@ -839,37 +807,133 @@ export default function IdentityResolutionContent() {
                     <div>
                       <h3 className="text-sm font-bold text-[var(--sf-text-primary)] mb-1">Verify Primary Unified DMO</h3>
                       <p className="text-xs text-[var(--sf-text-tertiary)] leading-relaxed">
-                        Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+                        Explore the Primary Unified data model object to review merged profile quality and field completeness.
                       </p>
                     </div>
-                    <button className="flex-shrink-0 ml-4 px-4 py-1.5 text-xs font-medium border border-[var(--sf-border)] rounded hover:bg-[#F3F3F3] text-[var(--sf-text-secondary)] flex items-center gap-1.5">
-                      <Eye className="w-3.5 h-3.5" />
-                      View
+                    <button
+                      onClick={() => { setExploreDMO('unified'); setExploreOpen(true); }}
+                      className="flex-shrink-0 ml-4 px-4 py-1.5 text-xs font-medium text-white bg-[var(--sf-blue)] rounded hover:bg-[var(--sf-blue-hover)] flex items-center gap-1.5"
+                    >
+                      <Search className="w-3.5 h-3.5" />
+                      Explore
                     </button>
                   </div>
                 </div>
               </div>
 
-              {/* "Bring Your Own Identity" — Mapping status */}
+              {/* "Bring Your Own Identity" — Mapping status (toggles based on datakit install) */}
               <div className="sf-card">
-                <div className="sf-card-header">
+                <div className="sf-card-header flex items-center justify-between">
                   <h2 className="text-base font-bold text-[var(--sf-text-primary)]">&ldquo;Bring Your Own Identity&rdquo;</h2>
+                  <span className={`text-xs font-medium ${byomMappingPopulated ? 'text-[var(--sf-success)]' : 'text-[var(--sf-text-tertiary)]'}`}>
+                    {byomMappingPopulated ? '87 / 87 Fields Mapped' : '0 / 87 Fields Mapped'}
+                  </span>
                 </div>
                 <div className="sf-card-body">
-                  <div className="flex items-center justify-between mb-4">
-                    <div className="flex items-center gap-2">
-                      <CheckCircle2 className="w-5 h-5 text-[var(--sf-success)]" />
-                      <p className="text-sm text-[var(--sf-text-secondary)]">
-                        <span className="sf-link font-medium">Your Mapping</span> is complete. 3rd party rules active.
-                      </p>
-                    </div>
-                    <button className="px-4 py-1.5 text-xs font-medium border border-[var(--sf-border)] rounded hover:bg-[#F3F3F3] text-[var(--sf-text-secondary)]">
-                      Convert to Regular IR
-                    </button>
-                  </div>
+                  {byomMappingPopulated ? (
+                    <>
+                      {/* Populated mapping status */}
+                      <div className="flex items-center justify-between mb-4">
+                        <div className="flex items-center gap-2">
+                          <CheckCircle2 className="w-5 h-5 text-[var(--sf-success)]" />
+                          <p className="text-sm text-[var(--sf-text-secondary)]">
+                            <span className="sf-link font-medium">Your Mapping</span> is complete. 3rd party rules active.
+                          </p>
+                        </div>
+                        <button className="px-4 py-1.5 text-xs font-medium border border-[var(--sf-border)] rounded hover:bg-[#F3F3F3] text-[var(--sf-text-secondary)]">
+                          Convert to Regular IR
+                        </button>
+                      </div>
+
+                      {/* Populated mapping canvas — all connected */}
+                      <div className="border border-[var(--sf-border)] rounded-lg bg-[#FAFAF9] p-4">
+                        <div className="flex items-start gap-0 relative">
+                          {/* Source fields column */}
+                          <div className="w-[200px] flex-shrink-0">
+                            <div className="text-[10px] uppercase tracking-wider text-[var(--sf-text-tertiary)] font-medium mb-2 px-2">Source Fields</div>
+                            {['First Name', 'Last Name', 'Email', 'Phone', 'Address Line 1', 'City', 'State', 'Postal Code'].map((f) => (
+                              <div key={f} className="flex items-center gap-2 px-2 py-1.5 text-xs text-[var(--sf-text-primary)] border-b border-[var(--sf-border)] last:border-0">
+                                <div className="w-2 h-2 rounded-full bg-[var(--sf-success)]" />
+                                {f}
+                              </div>
+                            ))}
+                          </div>
+
+                          {/* Center — SVG connection lines */}
+                          <div className="flex-1 min-h-[220px] relative">
+                            <svg className="w-full h-full absolute inset-0" viewBox="0 0 200 260" preserveAspectRatio="none">
+                              {[0,1,2,3,4,5,6,7].map((i) => {
+                                const y = 30 + i * 29;
+                                return <line key={i} x1="0" y1={y} x2="200" y2={y} stroke="#4BC076" strokeWidth="1.5" strokeDasharray="4 2" opacity="0.6" />;
+                              })}
+                            </svg>
+                          </div>
+
+                          {/* Target DMO column */}
+                          <div className="w-[200px] flex-shrink-0">
+                            <div className="text-[10px] uppercase tracking-wider text-[var(--sf-text-tertiary)] font-medium mb-2 px-2">Target DMO</div>
+                            {['ssot__FirstName__c', 'ssot__LastName__c', 'ssot__Email__c', 'ssot__Phone__c', 'ssot__Street__c', 'ssot__City__c', 'ssot__State__c', 'ssot__PostalCode__c'].map((f) => (
+                              <div key={f} className="flex items-center justify-end gap-2 px-2 py-1.5 text-xs text-[var(--sf-text-primary)] border-b border-[var(--sf-border)] last:border-0">
+                                {f}
+                                <div className="w-2 h-2 rounded-full bg-[var(--sf-success)]" />
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      </div>
+                    </>
+                  ) : (
+                    <>
+                      {/* Empty mapping status */}
+                      <div className="flex items-center justify-between mb-4">
+                        <div className="flex items-center gap-2">
+                          <AlertTriangle className="w-5 h-5 text-[var(--sf-warning)]" />
+                          <p className="text-sm text-[var(--sf-text-secondary)]">
+                            <span className="font-medium">No mappings configured.</span> Map source fields to target DMOs to activate identity resolution.
+                          </p>
+                        </div>
+                        <button className="px-4 py-1.5 text-xs font-medium text-white bg-[var(--sf-blue)] rounded hover:bg-[var(--sf-blue-hover)]">
+                          Start Mapping
+                        </button>
+                      </div>
+
+                      {/* Empty mapping canvas */}
+                      <div className="border border-[var(--sf-border)] rounded-lg bg-[#FAFAF9] p-4">
+                        <div className="flex items-start gap-0">
+                          <div className="w-[200px] flex-shrink-0">
+                            <div className="text-[10px] uppercase tracking-wider text-[var(--sf-text-tertiary)] font-medium mb-2 px-2">Source Fields</div>
+                            {['First Name', 'Last Name', 'Email', 'Phone', 'Address Line 1', 'City', 'State', 'Postal Code'].map((f) => (
+                              <div key={f} className="flex items-center gap-2 px-2 py-1.5 text-xs text-[var(--sf-text-secondary)] border-b border-[var(--sf-border)] last:border-0">
+                                <div className="w-2 h-2 rounded-full bg-[#D8DDE6]" />
+                                {f}
+                              </div>
+                            ))}
+                          </div>
+                          <div className="flex-1 flex items-center justify-center min-h-[220px]">
+                            <div className="text-center">
+                              <div className="w-12 h-12 mx-auto mb-2 rounded-full bg-[#E5E5E5] flex items-center justify-center">
+                                <ArrowRight className="w-5 h-5 text-[#B0B0B0]" />
+                              </div>
+                              <p className="text-xs text-[var(--sf-text-tertiary)]">No connections</p>
+                              <p className="text-[10px] text-[var(--sf-text-tertiary)] mt-0.5">Drag fields to create mappings</p>
+                            </div>
+                          </div>
+                          <div className="w-[200px] flex-shrink-0">
+                            <div className="text-[10px] uppercase tracking-wider text-[var(--sf-text-tertiary)] font-medium mb-2 px-2">Target DMO</div>
+                            {['ssot__FirstName__c', 'ssot__LastName__c', 'ssot__Email__c', 'ssot__Phone__c', 'ssot__Street__c', 'ssot__City__c', 'ssot__State__c', 'ssot__PostalCode__c'].map((f) => (
+                              <div key={f} className="flex items-center justify-end gap-2 px-2 py-1.5 text-xs text-[var(--sf-text-secondary)] border-b border-[var(--sf-border)] last:border-0">
+                                {f}
+                                <div className="w-2 h-2 rounded-full bg-[#D8DDE6]" />
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      </div>
+                    </>
+                  )}
 
                   {/* Collapsible Details */}
-                  <div className="border-t border-[var(--sf-border)] pt-3">
+                  <div className="border-t border-[var(--sf-border)] pt-3 mt-4">
                     <button
                       onClick={() => setByomDetailsOpen(!byomDetailsOpen)}
                       className="flex items-center gap-1.5 text-sm font-medium text-[var(--sf-text-primary)] mb-3"
@@ -994,6 +1058,110 @@ export default function IdentityResolutionContent() {
             </div>
           </div>
         </div>
+
+        {/* ── Data Exploration Modal ─────────────────────────────── */}
+        {exploreOpen && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center">
+            <div className="absolute inset-0 bg-black/40" onClick={() => setExploreOpen(false)} />
+            <div className="relative bg-white rounded-lg shadow-2xl w-[720px] max-h-[80vh] overflow-hidden">
+              {/* Header */}
+              <div className="px-6 py-4 border-b border-[var(--sf-border)] flex items-center justify-between">
+                <div>
+                  <h2 className="text-base font-bold text-[var(--sf-text-primary)]">
+                    Data Explorer — {exploreDMO === 'link' ? 'Unified Link DMO' : 'Primary Unified DMO'}
+                  </h2>
+                  <p className="text-xs text-[var(--sf-text-tertiary)] mt-0.5">
+                    {exploreDMO === 'link' ? 'ssot__UnifiedLink__dlm' : `ssot__${selectedRuleset.primaryDataModelObject}__dlm`}
+                  </p>
+                </div>
+                <button onClick={() => setExploreOpen(false)} className="w-7 h-7 flex items-center justify-center rounded hover:bg-[#F3F3F3] text-[var(--sf-text-tertiary)]">
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
+
+              {/* Chart grid */}
+              <div className="p-6 overflow-y-auto max-h-[65vh] space-y-6">
+                {/* Row 1: Record counts + match rate */}
+                <div className="grid grid-cols-3 gap-4">
+                  <div className="border border-[var(--sf-border)] rounded-lg p-4 text-center">
+                    <p className="text-[10px] uppercase tracking-wider text-[var(--sf-text-tertiary)] mb-1">Total Records</p>
+                    <p className="text-2xl font-bold text-[var(--sf-blue)]">{exploreDMO === 'link' ? '45,892' : '38,241'}</p>
+                  </div>
+                  <div className="border border-[var(--sf-border)] rounded-lg p-4 text-center">
+                    <p className="text-[10px] uppercase tracking-wider text-[var(--sf-text-tertiary)] mb-1">{exploreDMO === 'link' ? 'Linked Pairs' : 'Unified Profiles'}</p>
+                    <p className="text-2xl font-bold text-[var(--sf-success)]">{exploreDMO === 'link' ? '12,547' : '10,594'}</p>
+                  </div>
+                  <div className="border border-[var(--sf-border)] rounded-lg p-4 text-center">
+                    <p className="text-[10px] uppercase tracking-wider text-[var(--sf-text-tertiary)] mb-1">{exploreDMO === 'link' ? 'Link Rate' : 'Consolidation'}</p>
+                    <p className="text-2xl font-bold text-[#FF4A00]">{exploreDMO === 'link' ? '27.3%' : '72.3%'}</p>
+                  </div>
+                </div>
+
+                {/* Chart: Source Distribution (bar chart via SVG) */}
+                <div className="border border-[var(--sf-border)] rounded-lg p-4">
+                  <h3 className="text-sm font-semibold text-[var(--sf-text-primary)] mb-3">
+                    {exploreDMO === 'link' ? 'Links by Source System' : 'Records by Data Source'}
+                  </h3>
+                  <svg viewBox="0 0 600 140" className="w-full">
+                    {[
+                      { label: 'Informatica MDM', value: 0.72, color: '#FF4A00' },
+                      { label: 'Salesforce CRM', value: 0.45, color: '#0070D2' },
+                      { label: 'Marketing Cloud', value: 0.28, color: '#9C27B0' },
+                      { label: 'External API', value: 0.15, color: '#4CAF50' },
+                    ].map((bar, i) => (
+                      <g key={bar.label} transform={`translate(0, ${i * 34})`}>
+                        <text x="0" y="14" fontSize="11" fill="#706E6B" fontFamily="sans-serif">{bar.label}</text>
+                        <rect x="140" y="2" width={bar.value * 350} height="18" rx="3" fill={bar.color} opacity="0.85" />
+                        <text x={145 + bar.value * 350} y="15" fontSize="10" fill="#706E6B" fontFamily="sans-serif">{Math.round(bar.value * 100)}%</text>
+                      </g>
+                    ))}
+                  </svg>
+                </div>
+
+                {/* Chart: Field Completeness (horizontal segments) */}
+                <div className="border border-[var(--sf-border)] rounded-lg p-4">
+                  <h3 className="text-sm font-semibold text-[var(--sf-text-primary)] mb-3">Field Completeness</h3>
+                  <div className="space-y-2">
+                    {(exploreDMO === 'link'
+                      ? [{ f: 'Source Record ID', pct: 100 }, { f: 'Target Record ID', pct: 100 }, { f: 'Link Confidence', pct: 94 }, { f: 'Match Rule', pct: 91 }, { f: 'Created Date', pct: 100 }]
+                      : [{ f: 'First Name', pct: 98 }, { f: 'Last Name', pct: 99 }, { f: 'Email', pct: 87 }, { f: 'Phone', pct: 72 }, { f: 'Address', pct: 64 }, { f: 'Date of Birth', pct: 41 }]
+                    ).map((row) => (
+                      <div key={row.f} className="flex items-center gap-3">
+                        <span className="text-xs text-[var(--sf-text-secondary)] w-32 flex-shrink-0">{row.f}</span>
+                        <div className="flex-1 h-3 bg-[#E5E5E5] rounded-full overflow-hidden">
+                          <div className="h-full rounded-full" style={{ width: `${row.pct}%`, backgroundColor: row.pct > 90 ? '#4BC076' : row.pct > 70 ? '#FF9800' : '#E91E63' }} />
+                        </div>
+                        <span className="text-xs font-medium text-[var(--sf-text-primary)] w-10 text-right">{row.pct}%</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Chart: Match Quality Distribution (donut via SVG) */}
+                <div className="border border-[var(--sf-border)] rounded-lg p-4">
+                  <h3 className="text-sm font-semibold text-[var(--sf-text-primary)] mb-3">
+                    {exploreDMO === 'link' ? 'Link Confidence Distribution' : 'Match Quality Score'}
+                  </h3>
+                  <div className="flex items-center gap-8">
+                    <svg viewBox="0 0 120 120" className="w-28 h-28 flex-shrink-0">
+                      <circle cx="60" cy="60" r="52" fill="none" stroke="#E5E5E5" strokeWidth="12" />
+                      <circle cx="60" cy="60" r="52" fill="none" stroke="#4BC076" strokeWidth="12" strokeDasharray={`${0.68 * 327} ${327}`} strokeDashoffset="0" transform="rotate(-90 60 60)" />
+                      <circle cx="60" cy="60" r="52" fill="none" stroke="#FF9800" strokeWidth="12" strokeDasharray={`${0.22 * 327} ${327}`} strokeDashoffset={`${-0.68 * 327}`} transform="rotate(-90 60 60)" />
+                      <circle cx="60" cy="60" r="52" fill="none" stroke="#E91E63" strokeWidth="12" strokeDasharray={`${0.10 * 327} ${327}`} strokeDashoffset={`${-0.90 * 327}`} transform="rotate(-90 60 60)" />
+                      <text x="60" y="56" textAnchor="middle" fontSize="18" fontWeight="bold" fill="#1B1C1D">68%</text>
+                      <text x="60" y="72" textAnchor="middle" fontSize="9" fill="#706E6B">High</text>
+                    </svg>
+                    <div className="space-y-2">
+                      <div className="flex items-center gap-2"><div className="w-3 h-3 rounded-full bg-[#4BC076]" /><span className="text-xs text-[var(--sf-text-secondary)]">High confidence (68%)</span></div>
+                      <div className="flex items-center gap-2"><div className="w-3 h-3 rounded-full bg-[#FF9800]" /><span className="text-xs text-[var(--sf-text-secondary)]">Medium confidence (22%)</span></div>
+                      <div className="flex items-center gap-2"><div className="w-3 h-3 rounded-full bg-[#E91E63]" /><span className="text-xs text-[var(--sf-text-secondary)]">Low confidence (10%)</span></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     );
   }
@@ -1952,6 +2120,19 @@ export default function IdentityResolutionContent() {
                     <div className="px-4 py-3 border-b border-[var(--sf-border)]">
                       <h3 className="text-sm font-semibold text-[var(--sf-text-primary)]">Datakit Selection</h3>
                       <p className="text-xs text-[var(--sf-text-tertiary)] mt-0.5">{selectedDatakit} — select a ruleset to install</p>
+                      {/* Session context: show remembered connections + bundles */}
+                      {demoSession && demoSession.informaticaConnections.length > 0 && selectedDatakit === 'Informatica MDM' && (
+                        <div className="mt-2 px-3 py-2 bg-[#FFF3ED] rounded-md border border-[#FFD6C0]">
+                          <p className="text-[11px] font-medium text-[#B33500]">
+                            Connected: {demoSession.informaticaConnections.map((c) => c.alias).join(', ')}
+                          </p>
+                          {demoSession.selectedBundles.length > 0 && (
+                            <p className="text-[11px] text-[#B33500] mt-0.5">
+                              Installed Bundles: {demoSession.selectedBundles.join(', ')}
+                            </p>
+                          )}
+                        </div>
+                      )}
                     </div>
                     {(datakitRulesets[selectedDatakit] || []).length === 0 ? (
                       <div className="flex items-center justify-center h-48 text-sm text-[var(--sf-text-tertiary)]">
@@ -1967,26 +2148,29 @@ export default function IdentityResolutionContent() {
                           </tr>
                         </thead>
                         <tbody>
-                          {(datakitRulesets[selectedDatakit] || []).map((rs) => (
+                          {(datakitRulesets[selectedDatakit] || []).map((rs) => {
+                            const isPhase2 = !!rs.phase2;
+                            return (
                             <tr
                               key={rs.id}
-                              className={`cursor-pointer ${selectedDatakitRuleset === rs.id ? 'bg-[#EEF4FF]' : 'hover:bg-[#FAFAF9]'}`}
-                              onClick={() => setSelectedDatakitRuleset(rs.id)}
+                              className={`${isPhase2 ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'} ${selectedDatakitRuleset === rs.id && !isPhase2 ? 'bg-[#EEF4FF]' : 'hover:bg-[#FAFAF9]'}`}
+                              onClick={() => { if (!isPhase2) setSelectedDatakitRuleset(rs.id); }}
                             >
                               <td>
                                 <input
                                   type="radio"
                                   name="datakit-ruleset"
                                   checked={selectedDatakitRuleset === rs.id}
-                                  onChange={() => setSelectedDatakitRuleset(rs.id)}
+                                  onChange={() => { if (!isPhase2) setSelectedDatakitRuleset(rs.id); }}
+                                  disabled={isPhase2}
                                   className="w-4 h-4 accent-[var(--sf-blue)]"
                                 />
                               </td>
                               <td>
                                 <div className="flex items-center gap-2">
-                                  <span className="text-sm font-medium text-[var(--sf-text-primary)]">{rs.name}</span>
-                                  {rs.realTime && (
-                                    <span className="sf-badge sf-badge-info">Real Time</span>
+                                  <span className={`text-sm font-medium ${isPhase2 ? 'text-[var(--sf-text-tertiary)]' : 'text-[var(--sf-text-primary)]'}`}>{rs.name}</span>
+                                  {isPhase2 && (
+                                    <span className="sf-badge sf-badge-neutral" style={{ opacity: 0.6 }}>Phase-2</span>
                                   )}
                                 </div>
                               </td>
@@ -1994,7 +2178,8 @@ export default function IdentityResolutionContent() {
                                 {rs.primaryDMO} resolution — {rs.dataSpace} data space
                               </td>
                             </tr>
-                          ))}
+                            );
+                          })}
                         </tbody>
                       </table>
                     )}
@@ -2025,6 +2210,21 @@ export default function IdentityResolutionContent() {
                           <div className="sf-detail-field"><div className="sf-detail-label">Mode</div><div className="sf-detail-value">Bring Your Own MDM</div></div>
                           <div className="sf-detail-field"><div className="sf-detail-label">Ruleset ID</div><div className="sf-detail-value">{selectedDatakitRuleset}</div></div>
                           <div className="sf-detail-field"><div className="sf-detail-label">Created By</div><div className="sf-detail-value">Data Cloud</div></div>
+                          {/* Session-remembered data */}
+                          {demoSession && demoSession.informaticaConnections.length > 0 && selectedDatakit === 'Informatica MDM' && (
+                            <>
+                              <div className="sf-detail-field">
+                                <div className="sf-detail-label">Connection</div>
+                                <div className="sf-detail-value">{demoSession.informaticaConnections.map((c) => c.alias).join(', ')}</div>
+                              </div>
+                              {demoSession.selectedBundles.length > 0 && (
+                                <div className="sf-detail-field">
+                                  <div className="sf-detail-label">Data Bundles</div>
+                                  <div className="sf-detail-value">{demoSession.selectedBundles.join(', ')}</div>
+                                </div>
+                              )}
+                            </>
+                          )}
                         </>
                       )}
                     </div>

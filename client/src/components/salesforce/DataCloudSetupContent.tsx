@@ -37,6 +37,7 @@ interface DataBundle {
   name: string;
   installedVersion: string;
   latestVersion: string;
+  fieldTag?: string; // e.g. "264 fields" — shown as a tag on highlighted bundles
 }
 
 interface SetupPage {
@@ -124,8 +125,8 @@ const sfdcBundles: DataBundle[] = [
 const initialInformaticaConnections: Connection[] = [];
 
 const informaticaBundles: DataBundle[] = [
-  { name: 'Informatica MDM Cloud', installedVersion: '--', latestVersion: '2.1' },
-  { name: 'Informatica Data Quality', installedVersion: '--', latestVersion: '3.4' },
+  { name: 'Informatica MDM Cloud', installedVersion: '--', latestVersion: '2.1', fieldTag: '264 fields' },
+  { name: 'Informatica Data Quality', installedVersion: '--', latestVersion: '3.4', fieldTag: '86 fields' },
 ];
 
 // ── Informatica Logo SVG ─────────────────────────────────────────────
@@ -162,12 +163,20 @@ function SalesforceCloudLogo({ size = 80 }: { size?: number }) {
 // ── Connect an Org Wizard Steps ──────────────────────────────────────
 type WizardStep = 'select-type' | 'alias' | 'login' | 'permissions';
 
+interface DemoSessionState {
+  informaticaConnections: { name: string; alias: string; orgId: string }[];
+  selectedBundles: string[];
+  installedDatakits: string[];
+}
+
 interface DataCloudSetupContentProps {
   onBack?: () => void;
+  demoSession?: DemoSessionState;
+  onDemoSessionChange?: (session: DemoSessionState) => void;
 }
 
 // ── Component ────────────────────────────────────────────────────────
-export default function DataCloudSetupContent({ onBack }: DataCloudSetupContentProps) {
+export default function DataCloudSetupContent({ onBack, demoSession, onDemoSessionChange }: DataCloudSetupContentProps) {
   const [activeNavItem, setActiveNavItem] = useState('setup-home');
   const [quickFindQuery, setQuickFindQuery] = useState('');
   const [expandedNavItems, setExpandedNavItems] = useState<Set<string>>(new Set(['feature-manager']));
@@ -188,6 +197,7 @@ export default function DataCloudSetupContent({ onBack }: DataCloudSetupContentP
   // Setup Home state
   const [setupHomeLearnOpen, setSetupHomeLearnOpen] = useState(true);
   const [setupHomeTab, setSetupHomeTab] = useState<'get-started' | 'plan-data' | 'monitor'>('get-started');
+  const [mdsSimulatorVisible, setMdsSimulatorVisible] = useState(false);
 
   // Solution Manager state
   const [smActiveSolution, setSmActiveSolution] = useState<string | null>(null);
@@ -254,6 +264,16 @@ export default function DataCloudSetupContent({ onBack }: DataCloudSetupContentP
 
     if (isInformatica) {
       setInformaticaConnections((prev) => [...prev, newConnection]);
+      // Update demo session with the new Informatica connection
+      if (onDemoSessionChange && demoSession) {
+        onDemoSessionChange({
+          ...demoSession,
+          informaticaConnections: [
+            ...demoSession.informaticaConnections,
+            { name: newConnection.connectionName, alias: newConnection.alias, orgId: newConnection.orgId },
+          ],
+        });
+      }
     } else {
       setSfdcConnections((prev) => [...prev, newConnection]);
     }
@@ -656,6 +676,68 @@ export default function DataCloudSetupContent({ onBack }: DataCloudSetupContentP
                   </svg>
                 </div>
               </div>
+
+              {/* ── Admin Toggle Panel ── */}
+              <div className="px-6 pt-6 pb-2">
+                <div className="border border-[var(--sf-border)] rounded-lg bg-white overflow-hidden">
+                  <div className="flex items-center justify-between px-5 py-3">
+                    <div className="flex items-center gap-3">
+                      <span className="text-2xl">😊</span>
+                      <div>
+                        <h4 className="text-sm font-semibold text-[var(--sf-text-primary)]">Prototype Controls</h4>
+                        <p className="text-[10px] text-[var(--sf-text-tertiary)]">Toggle visibility of simulator branding elements</p>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-4">
+                      <div className="flex items-center gap-2">
+                        <span className="text-lg">😄</span>
+                        <label className="text-xs font-medium text-[var(--sf-text-secondary)]">MDS Simulator</label>
+                        <button
+                          onClick={() => setMdsSimulatorVisible(!mdsSimulatorVisible)}
+                          className={`relative w-10 h-5 rounded-full transition-colors ${mdsSimulatorVisible ? 'bg-[var(--sf-blue)]' : 'bg-[#D8DDE6]'}`}
+                        >
+                          <div className={`absolute top-0.5 w-4 h-4 rounded-full bg-white shadow transition-transform ${mdsSimulatorVisible ? 'translate-x-5' : 'translate-x-0.5'}`} />
+                        </button>
+                      </div>
+                      <span className="text-2xl">😎</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* MDS Simulator thinking indicator — hidden by default */}
+              {mdsSimulatorVisible && (
+                <div className="px-6 pb-2">
+                  <div className="border-2 border-dashed border-[var(--sf-blue)]/30 rounded-lg bg-[#EEF4FF] p-4 flex items-center gap-4">
+                    {/* Thinking animation */}
+                    <div className="relative w-12 h-12 flex items-center justify-center flex-shrink-0">
+                      <div className="absolute inset-0 rounded-full border-2 border-[var(--sf-blue)]/20 border-t-[var(--sf-blue)] animate-spin" />
+                      <div className="absolute inset-1.5 rounded-full border-2 border-[#FF4A00]/20 border-b-[#FF4A00] animate-spin" style={{ animationDirection: 'reverse', animationDuration: '1.5s' }} />
+                      <span className="text-lg">🧠</span>
+                    </div>
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2 mb-1">
+                        <div className="flex gap-0.5">
+                          <div className="w-1.5 h-1.5 rounded-full bg-[var(--sf-blue)] animate-bounce" style={{ animationDelay: '0ms' }} />
+                          <div className="w-1.5 h-1.5 rounded-full bg-[var(--sf-blue)] animate-bounce" style={{ animationDelay: '150ms' }} />
+                          <div className="w-1.5 h-1.5 rounded-full bg-[var(--sf-blue)] animate-bounce" style={{ animationDelay: '300ms' }} />
+                        </div>
+                        <span className="text-xs font-medium text-[var(--sf-blue)]">Thinking...</span>
+                      </div>
+                      <div className="text-base font-bold text-[var(--sf-text-primary)] tracking-wide">
+                        MDS Simulator
+                      </div>
+                      <p className="text-[10px] text-[var(--sf-text-tertiary)] mt-0.5">
+                        Multi-Domain Simulator — Informatica MDM + Salesforce Data Cloud prototype environment
+                      </p>
+                    </div>
+                    <div className="flex flex-col items-center gap-1 flex-shrink-0">
+                      <span className="text-3xl">😃</span>
+                      <span className="text-[9px] text-[var(--sf-text-tertiary)] font-medium">Active</span>
+                    </div>
+                  </div>
+                </div>
+              )}
 
               {/* Learn About Data Cloud — collapsible */}
               <div className="px-6 py-6">
@@ -1322,22 +1404,50 @@ export default function DataCloudSetupContent({ onBack }: DataCloudSetupContentP
                         <th><div className="flex items-center gap-1">Name <ChevronDown className="w-3 h-3 opacity-50" /></div></th>
                         <th><div className="flex items-center gap-1">Installed Version <ChevronDown className="w-3 h-3 opacity-50" /></div></th>
                         <th><div className="flex items-center gap-1">Latest Version <ChevronDown className="w-3 h-3 opacity-50" /></div></th>
-                        <th className="w-10"></th>
+                        <th className="w-24">Action</th>
                       </tr>
                     </thead>
                     <tbody>
-                      {currentBundles.map((bundle) => (
+                      {currentBundles.map((bundle) => {
+                        const isInstalled = demoSession?.selectedBundles.includes(bundle.name);
+                        return (
                         <tr key={bundle.name}>
-                          <td className="sf-link font-medium">{bundle.name}</td>
-                          <td>{bundle.installedVersion}</td>
+                          <td className="sf-link font-medium">
+                            <span className="flex items-center gap-2">
+                              {bundle.name}
+                              {bundle.fieldTag && (
+                                <span className={`px-1.5 py-0.5 text-[9px] font-bold text-white rounded ${isInformatica ? 'bg-[#FF4A00]' : 'bg-[var(--sf-blue)]'}`}>{bundle.fieldTag}</span>
+                              )}
+                            </span>
+                          </td>
+                          <td>{isInstalled ? bundle.latestVersion : bundle.installedVersion}</td>
                           <td>{bundle.latestVersion}</td>
                           <td>
-                            <button className="w-6 h-6 flex items-center justify-center rounded hover:bg-[#F3F3F3] text-[var(--sf-text-tertiary)]">
-                              <ChevronDown className="w-3.5 h-3.5" />
-                            </button>
+                            {isInstalled ? (
+                              <span className="inline-flex items-center gap-1 text-xs font-medium text-[var(--sf-success)]">
+                                <CheckCircle2 className="w-3.5 h-3.5" /> Installed
+                              </span>
+                            ) : (
+                              <button
+                                onClick={() => {
+                                  if (onDemoSessionChange && demoSession) {
+                                    onDemoSessionChange({
+                                      ...demoSession,
+                                      selectedBundles: [...demoSession.selectedBundles, bundle.name],
+                                    });
+                                  }
+                                }}
+                                className={`px-3 py-1 text-xs font-medium text-white rounded transition-colors ${
+                                  isInformatica ? 'bg-[#FF4A00] hover:bg-[#E54300]' : 'bg-[var(--sf-blue)] hover:bg-[var(--sf-blue-hover)]'
+                                }`}
+                              >
+                                Install
+                              </button>
+                            )}
                           </td>
                         </tr>
-                      ))}
+                        );
+                      })}
                     </tbody>
                   </table>
                 </div>
