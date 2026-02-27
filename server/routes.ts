@@ -416,5 +416,116 @@ export async function registerRoutes(
     }
   });
 
+  // =========================================================================
+  // BS Charts
+  // =========================================================================
+
+  /** Ensure table exists */
+  try {
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS bs_charts (
+        id SERIAL PRIMARY KEY,
+        name TEXT NOT NULL,
+        data TEXT NOT NULL,
+        created_at TIMESTAMP DEFAULT NOW(),
+        updated_at TIMESTAMP DEFAULT NOW()
+      )
+    `);
+  } catch (err) {
+    console.error("Failed to create bs_charts table:", err);
+  }
+
+  /** List all charts */
+  app.get(api.bsCharts.list.path, async (_req, res) => {
+    try {
+      const result = await pool.query("SELECT id, name, created_at, updated_at FROM bs_charts ORDER BY updated_at DESC");
+      res.json(result.rows.map((row: any) => ({
+        id: row.id,
+        name: row.name,
+        createdAt: row.created_at,
+        updatedAt: row.updated_at,
+      })));
+    } catch (err) {
+      console.error("List bs_charts error:", err);
+      res.json([]);
+    }
+  });
+
+  /** Get single chart */
+  app.get(api.bsCharts.get.path, async (req, res) => {
+    try {
+      const result = await pool.query("SELECT * FROM bs_charts WHERE id = $1", [Number(req.params.id)]);
+      if (result.rows.length === 0) return res.status(404).json({ message: "Not found" });
+      const row = result.rows[0];
+      res.json({
+        id: row.id,
+        name: row.name,
+        data: JSON.parse(row.data),
+        createdAt: row.created_at,
+        updatedAt: row.updated_at,
+      });
+    } catch (err: any) {
+      console.error("Get bs_chart error:", err);
+      res.status(500).json({ message: err.message });
+    }
+  });
+
+  /** Create chart */
+  app.post(api.bsCharts.create.path, async (req, res) => {
+    try {
+      const { name, data } = req.body;
+      const result = await pool.query(
+        "INSERT INTO bs_charts (name, data) VALUES ($1, $2) RETURNING *",
+        [name || 'Untitled Chart', JSON.stringify(data || { nodes: [], edges: [] })]
+      );
+      const row = result.rows[0];
+      res.status(201).json({
+        id: row.id,
+        name: row.name,
+        data: JSON.parse(row.data),
+        createdAt: row.created_at,
+        updatedAt: row.updated_at,
+      });
+    } catch (err: any) {
+      console.error("Create bs_chart error:", err);
+      res.status(500).json({ message: err.message });
+    }
+  });
+
+  /** Update chart */
+  app.put(api.bsCharts.update.path, async (req, res) => {
+    try {
+      const id = Number(req.params.id);
+      const { name, data } = req.body;
+      const result = await pool.query(
+        "UPDATE bs_charts SET name = COALESCE($1, name), data = COALESCE($2, data), updated_at = NOW() WHERE id = $3 RETURNING *",
+        [name || null, data ? JSON.stringify(data) : null, id]
+      );
+      if (result.rows.length === 0) return res.status(404).json({ message: "Not found" });
+      const row = result.rows[0];
+      res.json({
+        id: row.id,
+        name: row.name,
+        data: JSON.parse(row.data),
+        createdAt: row.created_at,
+        updatedAt: row.updated_at,
+      });
+    } catch (err: any) {
+      console.error("Update bs_chart error:", err);
+      res.status(500).json({ message: err.message });
+    }
+  });
+
+  /** Delete chart */
+  app.delete(api.bsCharts.delete.path, async (req, res) => {
+    try {
+      await pool.query("DELETE FROM bs_charts WHERE id = $1", [Number(req.params.id)]);
+      res.json({ deleted: true });
+    } catch (err: any) {
+      console.error("Delete bs_chart error:", err);
+      res.status(500).json({ message: err.message });
+    }
+  });
+
   return httpServer;
 }
