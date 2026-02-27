@@ -193,7 +193,7 @@ const salesforceStandardBundles: SfBundle[] = [
     objects: ['Product2', 'PricebookEntry', 'Pricebook2', 'ProductCategory'] },
   { id: 'sf-b23', name: 'Quoting Bundle', objectCount: 3, icon: 'QB', iconColor: '#607D8B',
     objects: ['Quote', 'QuoteLineItem', 'QuoteDocument'] },
-  { id: 'sf-b24', name: 'Sales Cloud Bundle', objectCount: 6, icon: 'SC', iconColor: '#0070D2',
+  { id: 'sf-b24', name: 'Sales Cloud Bundle', objectCount: 6, icon: 'SC', iconColor: 'var(--slds-g-color-brand)',
     objects: ['Account', 'Contact', 'Opportunity', 'Lead', 'Case', 'Campaign'] },
   { id: 'sf-b25', name: 'Service Cloud Bundle', objectCount: 5, icon: 'SV', iconColor: '#009688',
     objects: ['Case', 'CaseComment', 'CaseHistory', 'Entitlement', 'ServiceContract'] },
@@ -277,7 +277,7 @@ interface Connector {
 
 const otherSources: Connector[] = [
   { id: 'src-upload', name: 'File Upload', category: 'Other Sources', icon: '↑', color: '#706E6B', description: 'Upload CSV, JSON, or Parquet files' },
-  { id: 'src-api', name: 'Ingestion API', category: 'Other Sources', icon: 'API', color: '#032D60', description: 'Real-time event data via REST API' },
+  { id: 'src-api', name: 'Ingestion API', category: 'Other Sources', icon: 'API', color: 'var(--slds-g-color-brand-1)', description: 'Real-time event data via REST API' },
   { id: 'src-s2s', name: 'Server to Server', category: 'Other Sources', icon: 'S2S', color: '#5C6BC0', description: 'Authenticated server-to-server connection' },
   { id: 'src-kits', name: 'Data Kits & Packages', category: 'Other Sources', icon: 'PKG', color: '#00A1E0', description: 'Installed data kits and managed packages' },
 ];
@@ -334,7 +334,7 @@ const explorerConnectors: Connector[] = [
   { id: 'c-netsuite', name: 'NetSuite', category: 'ERP', icon: 'NS', color: '#003B5C' },
   { id: 'c-oracle-db', name: 'Oracle Database', category: 'Database', icon: 'ORA', color: '#C74634' },
   { id: 'c-outreach', name: 'Outreach', category: 'Sales', icon: 'OR', color: '#5951FF' },
-  { id: 'c-pardot', name: 'Pardot', category: 'Marketing', icon: 'PD', color: '#032D60' },
+  { id: 'c-pardot', name: 'Pardot', category: 'Marketing', icon: 'PD', color: 'var(--slds-g-color-brand-1)' },
   { id: 'c-paypal', name: 'PayPal', category: 'Payments', icon: 'PP', color: '#003087' },
   { id: 'c-pendo', name: 'Pendo', category: 'Analytics', icon: 'PE', color: '#FF4876' },
   { id: 'c-pinterest', name: 'Pinterest Ads', category: 'Advertising', icon: 'PI', color: '#E60023' },
@@ -522,7 +522,7 @@ export default function DataStreamsContent({ demoSession, currentTimeline }: Dat
   const allConnectorSources = [...otherSources, ...explorerConnectors];
   const resolveSourceInfo = (src: string | null): { name: string; color: string; icon: string; category: string } => {
     if (!src) return { name: '', color: '#706E6B', icon: '', category: '' };
-    if (src === 'salesforce') return { name: 'Salesforce CRM', color: '#0070D2', icon: 'sf', category: 'CRM' };
+    if (src === 'salesforce') return { name: 'Salesforce CRM', color: 'var(--slds-g-color-brand)', icon: 'sf', category: 'CRM' };
     if (src === 'informatica') return { name: 'Informatica MDM', color: '#FF4A00', icon: 'INFA', category: 'MDM' };
     const found = allConnectorSources.find((c) => c.id === src);
     if (found) return { name: found.name, color: found.color, icon: found.icon, category: found.category };
@@ -688,27 +688,27 @@ export default function DataStreamsContent({ demoSession, currentTimeline }: Dat
     const autoMappedCount = allFields.filter((f) => f.mappingStatus === 'Auto-Mapped').length;
 
     return (
-      <div className="h-full flex flex-col bg-[#F3F3F3]">
+      <div className="h-full flex flex-col bg-slds-neutral-2">
         {/* Breadcrumb header */}
-        <div className="bg-white border-b border-[var(--sf-border)] px-6 py-3 flex items-center gap-2">
-          <button onClick={() => setReviewFieldId(null)} className="flex items-center gap-1 text-sm text-[var(--sf-link)] hover:underline">
+        <div className="bg-white border-b border-slds-border-1 px-6 py-3 flex items-center gap-2">
+          <button onClick={() => setReviewFieldId(null)} className="flex items-center gap-1 text-sm text-slds-brand hover:underline">
             <ArrowLeft className="w-4 h-4" />
             {selectedStream.name}
           </button>
-          <ChevronRight className="w-3 h-3 text-[var(--sf-text-tertiary)]" />
-          <span className="text-sm font-medium text-[var(--sf-text-primary)]">Field Mapping</span>
+          <ChevronRight className="w-3 h-3 text-slds-neutral-7" />
+          <span className="text-sm font-medium text-slds-neutral-base">Field Mapping</span>
         </div>
 
         {/* 3-panel layout */}
         <div className="flex-1 overflow-hidden flex">
           {/* LEFT: Source Fields */}
-          <div className="w-[360px] flex-shrink-0 border-r border-[var(--sf-border)] bg-white flex flex-col">
-            <div className="px-4 py-3 border-b border-[var(--sf-border)] flex items-center gap-2">
+          <div className="w-[360px] flex-shrink-0 border-r border-slds-border-1 bg-white flex flex-col">
+            <div className="px-4 py-3 border-b border-slds-border-1 flex items-center gap-2">
               <div className="w-6 h-6 rounded bg-[#FF4A00] flex items-center justify-center flex-shrink-0">
                 <svg viewBox="0 0 24 24" className="w-4 h-4"><text x="12" y="16" textAnchor="middle" fill="white" fontSize="8" fontWeight="bold">IN</text></svg>
               </div>
-              <h3 className="text-sm font-semibold text-[var(--sf-text-primary)]">Source Fields</h3>
-              <span className="text-xs text-[var(--sf-text-tertiary)] ml-auto">{allFields.length} fields</span>
+              <h3 className="text-sm font-semibold text-slds-neutral-base">Source Fields</h3>
+              <span className="text-xs text-slds-neutral-7 ml-auto">{allFields.length} fields</span>
             </div>
             <div className="flex-1 overflow-y-auto">
               {allFields.map((field) => {
@@ -717,14 +717,14 @@ export default function DataStreamsContent({ demoSession, currentTimeline }: Dat
                   <button
                     key={field.id}
                     onClick={() => setReviewFieldId(field.id)}
-                    className={`w-full text-left px-4 py-2.5 flex items-center gap-3 border-b border-[var(--sf-border)] transition-colors ${isActive ? 'bg-[#FFF3ED]' : 'hover:bg-[#FAFAF9]'}`}
+                    className={`w-full text-left px-4 py-2.5 flex items-center gap-3 border-b border-slds-border-1 transition-colors ${isActive ? 'bg-[#FFF3ED]' : 'hover:bg-[#FAFAF9]'}`}
                   >
-                    <div className={`w-2 h-2 rounded-full flex-shrink-0 ${field.mappingStatus === 'Auto-Mapped' ? 'bg-[#2E844A]' : field.mappingStatus === 'Unmapped' ? 'bg-[#BA0517]' : 'bg-[#FFB75D]'}`} />
+                    <div className={`w-2 h-2 rounded-full flex-shrink-0 ${field.mappingStatus === 'Auto-Mapped' ? 'bg-slds-success-1' : field.mappingStatus === 'Unmapped' ? 'bg-[#BA0517]' : 'bg-[#FFB75D]'}`} />
                     <div className="flex-1 min-w-0">
-                      <div className="text-xs font-mono font-medium text-[var(--sf-text-primary)] truncate">{field.fieldName}</div>
-                      <div className="text-[10px] text-[var(--sf-text-tertiary)]">{field.dataType}</div>
+                      <div className="text-xs font-mono font-medium text-slds-neutral-base truncate">{field.fieldName}</div>
+                      <div className="text-[10px] text-slds-neutral-7">{field.dataType}</div>
                     </div>
-                    {field.mappingStatus === 'Auto-Mapped' && <Check className="w-3.5 h-3.5 text-[#2E844A] flex-shrink-0" />}
+                    {field.mappingStatus === 'Auto-Mapped' && <Check className="w-3.5 h-3.5 text-slds-success-1 flex-shrink-0" />}
                   </button>
                 );
               })}
@@ -771,19 +771,19 @@ export default function DataStreamsContent({ demoSession, currentTimeline }: Dat
           </div>
 
           {/* RIGHT: Target DMO */}
-          <div className="flex-1 bg-white flex flex-col border-l border-[var(--sf-border)]">
-            <div className="px-4 py-3 border-b border-[var(--sf-border)] flex items-center gap-2">
-              <div className="w-6 h-6 rounded bg-[var(--sf-blue)] flex items-center justify-center flex-shrink-0">
+          <div className="flex-1 bg-white flex flex-col border-l border-slds-border-1">
+            <div className="px-4 py-3 border-b border-slds-border-1 flex items-center gap-2">
+              <div className="w-6 h-6 rounded bg-slds-brand flex items-center justify-center flex-shrink-0">
                 <Database className="w-3.5 h-3.5 text-white" />
               </div>
-              <h3 className="text-sm font-semibold text-[var(--sf-text-primary)]">Target DMO</h3>
-              <span className="text-xs text-[var(--sf-text-tertiary)] ml-auto">{objectName}</span>
+              <h3 className="text-sm font-semibold text-slds-neutral-base">Target DMO</h3>
+              <span className="text-xs text-slds-neutral-7 ml-auto">{objectName}</span>
             </div>
             <div className="flex-1 overflow-y-auto">
               {Object.entries(dmoGroups).map(([dmoName, fields]) => (
                 <div key={dmoName}>
-                  <div className="px-4 py-2.5 bg-[#F9F9F9] border-b border-[var(--sf-border)]">
-                    <span className="text-xs font-semibold text-[var(--sf-blue)]">{dmoName}</span>
+                  <div className="px-4 py-2.5 bg-[#F9F9F9] border-b border-slds-border-1">
+                    <span className="text-xs font-semibold text-slds-brand">{dmoName}</span>
                   </div>
                   {fields.map((field) => {
                     const isActive = field.id === reviewFieldId;
@@ -791,12 +791,12 @@ export default function DataStreamsContent({ demoSession, currentTimeline }: Dat
                       <button
                         key={field.id}
                         onClick={() => setReviewFieldId(field.id)}
-                        className={`w-full text-left px-4 py-2.5 flex items-center gap-3 border-b border-[var(--sf-border)] transition-colors ${isActive ? 'bg-[#EEF4FF]' : 'hover:bg-[#FAFAF9]'}`}
+                        className={`w-full text-left px-4 py-2.5 flex items-center gap-3 border-b border-slds-border-1 transition-colors ${isActive ? 'bg-[#EEF4FF]' : 'hover:bg-[#FAFAF9]'}`}
                       >
-                        <div className={`w-2 h-2 rounded-full flex-shrink-0 ${field.mappingStatus === 'Auto-Mapped' ? 'bg-[#2E844A]' : 'bg-[#FFB75D]'}`} />
+                        <div className={`w-2 h-2 rounded-full flex-shrink-0 ${field.mappingStatus === 'Auto-Mapped' ? 'bg-slds-success-1' : 'bg-[#FFB75D]'}`} />
                         <div className="flex-1 min-w-0">
-                          <div className="text-xs font-mono font-medium text-[var(--sf-text-primary)] truncate">{field.targetField}</div>
-                          <div className="text-[10px] text-[var(--sf-text-tertiary)]">{field.dataType}</div>
+                          <div className="text-xs font-mono font-medium text-slds-neutral-base truncate">{field.targetField}</div>
+                          <div className="text-[10px] text-slds-neutral-7">{field.dataType}</div>
                         </div>
                       </button>
                     );
@@ -808,18 +808,18 @@ export default function DataStreamsContent({ demoSession, currentTimeline }: Dat
         </div>
 
         {/* Footer */}
-        <div className="bg-white border-t border-[var(--sf-border)] px-6 py-3 flex items-center justify-between">
+        <div className="bg-white border-t border-slds-border-1 px-6 py-3 flex items-center justify-between">
           <div className="flex items-center gap-4">
-            <button onClick={() => setReviewFieldId(null)} className="px-4 py-2 text-sm font-medium text-[var(--sf-text-secondary)] border border-[var(--sf-border)] rounded hover:bg-[#F3F3F3]">
+            <button onClick={() => setReviewFieldId(null)} className="px-4 py-2 text-sm font-medium text-slds-neutral-9 border border-slds-border-1 rounded hover:bg-slds-neutral-2">
               Back
             </button>
-            <div className="flex items-center gap-4 text-xs text-[var(--sf-text-tertiary)]">
-              <div className="flex items-center gap-1.5"><div className="w-2 h-2 rounded-full bg-[#2E844A]" /> Auto-Mapped ({autoMappedCount})</div>
+            <div className="flex items-center gap-4 text-xs text-slds-neutral-7">
+              <div className="flex items-center gap-1.5"><div className="w-2 h-2 rounded-full bg-slds-success-1" /> Auto-Mapped ({autoMappedCount})</div>
               <div className="flex items-center gap-1.5"><div className="w-2 h-2 rounded-full bg-[#FFB75D]" /> Review Needed</div>
               <div className="flex items-center gap-1.5"><div className="w-2 h-2 rounded-full bg-[#BA0517]" /> Unmapped</div>
             </div>
           </div>
-          <button className="px-5 py-2 text-sm font-medium text-white bg-[var(--sf-blue)] rounded hover:bg-[var(--sf-blue-hover)]">
+          <button className="px-5 py-2 text-sm font-medium text-white bg-slds-brand rounded hover:bg-slds-brand-contrast-1">
             Approve Mapping
           </button>
         </div>
@@ -839,19 +839,19 @@ export default function DataStreamsContent({ demoSession, currentTimeline }: Dat
     return (
       <div className="h-full flex flex-col">
         {/* Breadcrumb */}
-        <div className="bg-white border-b border-[var(--sf-border)] px-6 py-2 flex items-center gap-2">
-          <button onClick={() => { setSelectedStream(null); setDetailTab('fields'); }} className="flex items-center gap-1 text-xs text-[var(--sf-link)] hover:underline">
+        <div className="bg-white border-b border-slds-border-1 px-6 py-2 flex items-center gap-2">
+          <button onClick={() => { setSelectedStream(null); setDetailTab('fields'); }} className="flex items-center gap-1 text-xs text-slds-brand hover:underline">
             <ArrowLeft className="w-3.5 h-3.5" />
             Data Streams
           </button>
-          <ChevronRight className="w-3 h-3 text-[var(--sf-text-tertiary)]" />
-          <span className="text-xs font-medium text-[var(--sf-text-primary)]">{selectedStream.name}</span>
+          <ChevronRight className="w-3 h-3 text-slds-neutral-7" />
+          <span className="text-xs font-medium text-slds-neutral-base">{selectedStream.name}</span>
         </div>
 
         {/* Header */}
-        <div className="bg-white border-b border-[var(--sf-border)] px-6 py-4">
+        <div className="bg-white border-b border-slds-border-1 px-6 py-4">
           <div className="flex items-start gap-4">
-            <div className={`w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0 ${isInfaStream ? 'bg-[#FF4A00]' : 'bg-[#032D60]'}`}>
+            <div className={`w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0 ${isInfaStream ? 'bg-[#FF4A00]' : 'bg-slds-brand-1'}`}>
               {isInfaStream ? (
                 <svg viewBox="0 0 32 32" className="w-6 h-6"><text x="16" y="22" textAnchor="middle" fill="white" fontSize="10" fontWeight="bold">INFA</text></svg>
               ) : (
@@ -859,14 +859,14 @@ export default function DataStreamsContent({ demoSession, currentTimeline }: Dat
               )}
             </div>
             <div className="flex-1">
-              <h1 className="text-lg font-bold text-[var(--sf-text-primary)]">{selectedStream.name}</h1>
-              <p className="text-xs text-[var(--sf-text-tertiary)] mt-0.5">Data Stream &middot; {selectedStream.source}</p>
+              <h1 className="text-lg font-bold text-slds-neutral-base">{selectedStream.name}</h1>
+              <p className="text-xs text-slds-neutral-7 mt-0.5">Data Stream &middot; {selectedStream.source}</p>
             </div>
             <div className="flex items-center gap-2">
-              <button className="px-3 py-1.5 text-xs font-medium border border-[var(--sf-border)] rounded hover:bg-[#F3F3F3] text-[var(--sf-text-secondary)]">
+              <button className="px-3 py-1.5 text-xs font-medium border border-slds-border-1 rounded hover:bg-slds-neutral-2 text-slds-neutral-9">
                 <RefreshCw className="w-3.5 h-3.5 inline mr-1" />Refresh Now
               </button>
-              <button className="px-3 py-1.5 text-xs font-medium border border-[var(--sf-border)] rounded hover:bg-[#F3F3F3] text-[var(--sf-text-secondary)]">Edit</button>
+              <button className="px-3 py-1.5 text-xs font-medium border border-slds-border-1 rounded hover:bg-slds-neutral-2 text-slds-neutral-9">Edit</button>
             </div>
           </div>
 
@@ -882,9 +882,9 @@ export default function DataStreamsContent({ demoSession, currentTimeline }: Dat
               ['Data Space', selectedStream.dataSpace],
             ].map(([label, value]) => (
               <div key={label}>
-                <p className="text-[10px] uppercase tracking-wider text-[var(--sf-text-tertiary)]">{label}</p>
+                <p className="text-[10px] uppercase tracking-wider text-slds-neutral-7">{label}</p>
                 {value === '__badge__' ? <div className="mt-0.5">{statusBadge(selectedStream.status)}</div> : (
-                  <p className="text-sm font-medium text-[var(--sf-text-primary)] capitalize">{value}</p>
+                  <p className="text-sm font-medium text-slds-neutral-base capitalize">{value}</p>
                 )}
               </div>
             ))}
@@ -900,7 +900,7 @@ export default function DataStreamsContent({ demoSession, currentTimeline }: Dat
                   key={tab}
                   onClick={() => setDetailTab(tab)}
                   className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${
-                    active ? 'border-[var(--sf-blue)] text-[var(--sf-blue)]' : 'border-transparent text-[var(--sf-text-tertiary)] hover:text-[var(--sf-text-secondary)]'
+                    active ? 'border-slds-brand text-slds-brand' : 'border-transparent text-slds-neutral-7 hover:text-slds-neutral-9'
                   }`}
                 >
                   {labels[tab]}
@@ -911,15 +911,15 @@ export default function DataStreamsContent({ demoSession, currentTimeline }: Dat
         </div>
 
         {/* Tab content + Data Mapping sidebar */}
-        <div className="flex-1 overflow-y-auto bg-[var(--sf-content-bg)]">
+        <div className="flex-1 overflow-y-auto bg-slds-neutral-2">
           <div className="flex gap-6 p-6">
             {/* Main content area */}
             <div className="flex-1 min-w-0">
               {detailTab === 'fields' && (
                 <div className="sf-card">
                   <div className="sf-card-header">
-                    <h2 className="text-sm font-semibold text-[var(--sf-text-primary)]">
-                      Fields <span className="text-xs font-normal text-[var(--sf-text-tertiary)]">({fields.length})</span>
+                    <h2 className="text-sm font-semibold text-slds-neutral-base">
+                      Fields <span className="text-xs font-normal text-slds-neutral-7">({fields.length})</span>
                     </h2>
                   </div>
                   {fields.length > 0 ? (
@@ -936,8 +936,8 @@ export default function DataStreamsContent({ demoSession, currentTimeline }: Dat
                           {fields.map((field) => (
                             <tr key={field.id}>
                               <td><span className="font-mono text-sm">{field.fieldName}</span></td>
-                              <td><span className="text-xs px-1.5 py-0.5 bg-[#F3F3F3] rounded font-mono">{field.dataType}</span></td>
-                              <td><span className="text-xs text-[var(--sf-text-tertiary)]">{field.fieldName.includes('id') || field.fieldName.includes('name') ? 'Yes' : 'No'}</span></td>
+                              <td><span className="text-xs px-1.5 py-0.5 bg-slds-neutral-2 rounded font-mono">{field.dataType}</span></td>
+                              <td><span className="text-xs text-slds-neutral-7">{field.fieldName.includes('id') || field.fieldName.includes('name') ? 'Yes' : 'No'}</span></td>
                             </tr>
                           ))}
                         </tbody>
@@ -945,8 +945,8 @@ export default function DataStreamsContent({ demoSession, currentTimeline }: Dat
                     </div>
                   ) : (
                     <div className="sf-card-body text-center py-12">
-                      <Database className="w-10 h-10 text-[var(--sf-text-tertiary)] mx-auto mb-3 opacity-40" />
-                      <p className="text-sm text-[var(--sf-text-tertiary)]">No fields available for this data stream.</p>
+                      <Database className="w-10 h-10 text-slds-neutral-7 mx-auto mb-3 opacity-40" />
+                      <p className="text-sm text-slds-neutral-7">No fields available for this data stream.</p>
                     </div>
                   )}
                 </div>
@@ -955,7 +955,7 @@ export default function DataStreamsContent({ demoSession, currentTimeline }: Dat
               {detailTab === 'details' && (
                 <div className="sf-card">
                   <div className="sf-card-header">
-                    <h2 className="text-sm font-semibold text-[var(--sf-text-primary)]">Stream Details</h2>
+                    <h2 className="text-sm font-semibold text-slds-neutral-base">Stream Details</h2>
                   </div>
                   <div className="sf-card-body">
                     <div className="grid grid-cols-2 gap-y-4 gap-x-8 text-sm">
@@ -971,8 +971,8 @@ export default function DataStreamsContent({ demoSession, currentTimeline }: Dat
                         ...(selectedStream.tenant ? [['Tenant', selectedStream.tenant]] : []),
                       ].map(([label, value]) => (
                         <div key={label}>
-                          <p className="text-xs text-[var(--sf-text-tertiary)] mb-0.5">{label}</p>
-                          <p className="text-[var(--sf-text-primary)] font-medium">{value}</p>
+                          <p className="text-xs text-slds-neutral-7 mb-0.5">{label}</p>
+                          <p className="text-slds-neutral-base font-medium">{value}</p>
                         </div>
                       ))}
                     </div>
@@ -983,7 +983,7 @@ export default function DataStreamsContent({ demoSession, currentTimeline }: Dat
               {detailTab === 'refresh-history' && (
                 <div className="sf-card">
                   <div className="sf-card-header">
-                    <h2 className="text-sm font-semibold text-[var(--sf-text-primary)]">Refresh History</h2>
+                    <h2 className="text-sm font-semibold text-slds-neutral-base">Refresh History</h2>
                   </div>
                   <div className="overflow-x-auto">
                     <table className="sf-table">
@@ -1003,7 +1003,7 @@ export default function DataStreamsContent({ demoSession, currentTimeline }: Dat
                             <tr><td>02/23/2026, 3:45 PM</td><td><span className="sf-badge sf-badge-success">Success</span></td><td>{fmt(Math.floor(selectedStream.recordsProcessed * 0.95))}</td><td>2m 45s</td></tr>
                           </>
                         ) : (
-                          <tr><td colSpan={4} className="text-center py-8 text-sm text-[var(--sf-text-tertiary)]">No refresh history yet — stream is pending first refresh.</td></tr>
+                          <tr><td colSpan={4} className="text-center py-8 text-sm text-slds-neutral-7">No refresh history yet — stream is pending first refresh.</td></tr>
                         )}
                       </tbody>
                     </table>
@@ -1017,31 +1017,31 @@ export default function DataStreamsContent({ demoSession, currentTimeline }: Dat
               <div className="w-[280px] flex-shrink-0">
                 <div className="sf-card">
                   <div className="sf-card-header">
-                    <h3 className="text-sm font-semibold text-[var(--sf-text-primary)]">Data Mapping</h3>
+                    <h3 className="text-sm font-semibold text-slds-neutral-base">Data Mapping</h3>
                   </div>
                   <div className="sf-card-body">
                     {hasMappingDatakit ? (
                       /* Initialized state (Image 1) — datakit installed */
                       <div className="space-y-4">
                         <div>
-                          <p className="text-[10px] uppercase tracking-wider text-[var(--sf-text-tertiary)] mb-0.5">Data Space</p>
-                          <p className="text-sm font-medium text-[var(--sf-text-primary)] capitalize">{selectedStream.dataSpace}</p>
+                          <p className="text-[10px] uppercase tracking-wider text-slds-neutral-7 mb-0.5">Data Space</p>
+                          <p className="text-sm font-medium text-slds-neutral-base capitalize">{selectedStream.dataSpace}</p>
                         </div>
                         <div>
-                          <p className="text-[10px] uppercase tracking-wider text-[var(--sf-text-tertiary)] mb-1">Mapping Status</p>
+                          <p className="text-[10px] uppercase tracking-wider text-slds-neutral-7 mb-1">Mapping Status</p>
                           <div className="flex items-center gap-2">
                             <div className="flex-1 h-2 bg-[#E0E0E0] rounded-full overflow-hidden">
-                              <div className="h-full bg-[#2E844A] rounded-full" style={{ width: fields.length ? `${(autoMapped / fields.length) * 100}%` : '0%' }} />
+                              <div className="h-full bg-slds-success-1 rounded-full" style={{ width: fields.length ? `${(autoMapped / fields.length) * 100}%` : '0%' }} />
                             </div>
-                            <span className="text-xs font-medium text-[var(--sf-text-primary)]">{autoMapped}/{fields.length}</span>
+                            <span className="text-xs font-medium text-slds-neutral-base">{autoMapped}/{fields.length}</span>
                           </div>
-                          <p className="text-xs text-[var(--sf-text-tertiary)] mt-1">
+                          <p className="text-xs text-slds-neutral-7 mt-1">
                             {autoMapped} of {fields.length} fields auto-mapped
                           </p>
                         </div>
                         <button
                           onClick={() => setReviewFieldId(fields[0]?.id || '__all__')}
-                          className="w-full px-4 py-2 text-sm font-medium text-white bg-[var(--sf-blue)] rounded hover:bg-[var(--sf-blue-hover)] transition-colors"
+                          className="w-full px-4 py-2 text-sm font-medium text-white bg-slds-brand rounded hover:bg-slds-brand-contrast-1 transition-colors"
                         >
                           Review Mapping
                         </button>
@@ -1049,15 +1049,15 @@ export default function DataStreamsContent({ demoSession, currentTimeline }: Dat
                     ) : (
                       /* Empty state (Image 3) — no datakit installed */
                       <div className="text-center py-6">
-                        <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-[#F3F3F3] flex items-center justify-center">
-                          <svg viewBox="0 0 24 24" className="w-8 h-8 text-[var(--sf-text-tertiary)] opacity-50" fill="none" stroke="currentColor" strokeWidth="1.5">
+                        <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-slds-neutral-2 flex items-center justify-center">
+                          <svg viewBox="0 0 24 24" className="w-8 h-8 text-slds-neutral-7 opacity-50" fill="none" stroke="currentColor" strokeWidth="1.5">
                             <path d="M4 6h16M4 12h16M4 18h8" strokeLinecap="round" />
                             <circle cx="19" cy="17" r="3" />
                             <path d="M19 15v4M17 17h4" strokeLinecap="round" />
                           </svg>
                         </div>
-                        <h4 className="text-sm font-semibold text-[var(--sf-text-primary)] mb-1">No Data Mapping Available</h4>
-                        <p className="text-xs text-[var(--sf-text-tertiary)] leading-relaxed">
+                        <h4 className="text-sm font-semibold text-slds-neutral-base mb-1">No Data Mapping Available</h4>
+                        <p className="text-xs text-slds-neutral-7 leading-relaxed">
                           Install a Data Kit from Identity Resolution to enable field mapping for this data stream.
                         </p>
                       </div>
@@ -1078,18 +1078,18 @@ export default function DataStreamsContent({ demoSession, currentTimeline }: Dat
   return (
     <div className="h-full flex flex-col">
       {/* Page header */}
-      <div className="bg-white border-b border-[var(--sf-border)] px-6 py-4">
+      <div className="bg-white border-b border-slds-border-1 px-6 py-4">
         <div className="flex items-start gap-4">
-          <div className="w-10 h-10 rounded-lg bg-[#032D60] flex items-center justify-center flex-shrink-0">
+          <div className="w-10 h-10 rounded-lg bg-slds-brand-1 flex items-center justify-center flex-shrink-0">
             <Database className="w-5 h-5 text-white" />
           </div>
           <div className="flex-1">
-            <h1 className="text-lg font-bold text-[var(--sf-text-primary)]">Data Streams</h1>
-            <p className="text-xs text-[var(--sf-text-tertiary)] mt-0.5">Manage data ingestion streams from connected sources</p>
+            <h1 className="text-lg font-bold text-slds-neutral-base">Data Streams</h1>
+            <p className="text-xs text-slds-neutral-7 mt-0.5">Manage data ingestion streams from connected sources</p>
           </div>
           <button
             onClick={handleOpenNew}
-            className="flex items-center gap-1.5 px-4 py-2 text-sm font-medium text-white bg-[var(--sf-blue)] rounded hover:bg-[var(--sf-blue-hover)] transition-colors"
+            className="flex items-center gap-1.5 px-4 py-2 text-sm font-medium text-white bg-slds-brand rounded hover:bg-slds-brand-contrast-1 transition-colors"
           >
             <Plus className="w-4 h-4" />
             New Data Stream
@@ -1098,23 +1098,23 @@ export default function DataStreamsContent({ demoSession, currentTimeline }: Dat
       </div>
 
       {/* Toolbar */}
-      <div className="bg-white border-b border-[var(--sf-border)] px-6 py-2.5 flex items-center gap-3">
+      <div className="bg-white border-b border-slds-border-1 px-6 py-2.5 flex items-center gap-3">
         <div className="relative flex-1 max-w-sm">
-          <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-[var(--sf-text-tertiary)]" />
+          <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slds-neutral-7" />
           <input
             type="text"
             placeholder="Search data streams..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-8 pr-3 py-1.5 text-xs border border-[var(--sf-border)] rounded focus:outline-none focus:border-[var(--sf-blue-light)] focus:ring-1 focus:ring-[rgba(27,150,255,0.2)]"
+            className="w-full pl-8 pr-3 py-1.5 text-xs border border-slds-border-1 rounded focus:outline-none focus:border-slds-brand-2 focus:ring-1 focus:ring-[rgba(27,150,255,0.2)]"
           />
         </div>
         <div className="flex items-center gap-1.5">
-          <Filter className="w-3.5 h-3.5 text-[var(--sf-text-tertiary)]" />
+          <Filter className="w-3.5 h-3.5 text-slds-neutral-7" />
           <select
             value={filterSource}
             onChange={(e) => setFilterSource(e.target.value)}
-            className="px-2 py-1.5 text-xs border border-[var(--sf-border)] rounded bg-white focus:outline-none"
+            className="px-2 py-1.5 text-xs border border-slds-border-1 rounded bg-white focus:outline-none"
           >
             <option value="all">All Sources</option>
             <option value="salesforce">Salesforce CRM</option>
@@ -1123,20 +1123,20 @@ export default function DataStreamsContent({ demoSession, currentTimeline }: Dat
           </select>
         </div>
         <div className="ml-auto flex items-center gap-2">
-          <span className="text-xs text-[var(--sf-text-tertiary)]">{filteredStreams.length} streams</span>
-          <button className="w-7 h-7 flex items-center justify-center rounded hover:bg-[#F3F3F3] text-[var(--sf-text-tertiary)]">
+          <span className="text-xs text-slds-neutral-7">{filteredStreams.length} streams</span>
+          <button className="w-7 h-7 flex items-center justify-center rounded hover:bg-slds-neutral-2 text-slds-neutral-7">
             <RefreshCw className="w-3.5 h-3.5" />
           </button>
         </div>
       </div>
 
       {/* Data Streams Table */}
-      <div className="flex-1 overflow-y-auto bg-[var(--sf-content-bg)]">
+      <div className="flex-1 overflow-y-auto bg-slds-neutral-2">
         <div className="p-6">
           <div className="sf-card">
             <div className="sf-card-header">
-              <h2 className="text-sm font-semibold text-[var(--sf-text-primary)]">
-                All Data Streams <span className="text-xs font-normal text-[var(--sf-text-tertiary)]">({filteredStreams.length})</span>
+              <h2 className="text-sm font-semibold text-slds-neutral-base">
+                All Data Streams <span className="text-xs font-normal text-slds-neutral-7">({filteredStreams.length})</span>
               </h2>
             </div>
             <div className="overflow-x-auto">
@@ -1155,7 +1155,7 @@ export default function DataStreamsContent({ demoSession, currentTimeline }: Dat
                 </thead>
                 <tbody>
                   {filteredStreams.map((ds) => (
-                    <tr key={ds.id} className="cursor-pointer hover:bg-[#F3F3F3]" onClick={() => setSelectedStream(ds)}>
+                    <tr key={ds.id} className="cursor-pointer hover:bg-slds-neutral-2" onClick={() => setSelectedStream(ds)}>
                       <td>
                         <div className="flex items-center gap-2">
                           <span>{sourceIcon(ds.sourceType)}</span>
@@ -1173,7 +1173,7 @@ export default function DataStreamsContent({ demoSession, currentTimeline }: Dat
                   ))}
                   {filteredStreams.length === 0 && (
                     <tr>
-                      <td colSpan={8} className="text-center py-8 text-sm text-[var(--sf-text-tertiary)]">
+                      <td colSpan={8} className="text-center py-8 text-sm text-slds-neutral-7">
                         No data streams found.
                       </td>
                     </tr>
@@ -1193,14 +1193,14 @@ export default function DataStreamsContent({ demoSession, currentTimeline }: Dat
           <div className="absolute inset-0 bg-black/40" onClick={() => setNewModalOpen(false)} />
           <div className={`relative bg-white rounded-lg shadow-2xl max-h-[90vh] flex flex-col transition-all ${newModalStep === 1 || newModalStep === 2 ? 'w-[900px]' : newModalStep === 4 ? 'w-[960px]' : 'w-[640px]'}`}>
             {/* Header */}
-            <div className="flex items-center justify-between px-6 py-4 border-b border-[var(--sf-border)]">
+            <div className="flex items-center justify-between px-6 py-4 border-b border-slds-border-1">
               <div>
-                <h2 className="text-base font-semibold text-[var(--sf-text-primary)]">New Data Stream</h2>
-                <p className="text-xs text-[var(--sf-text-tertiary)] mt-0.5">
+                <h2 className="text-base font-semibold text-slds-neutral-base">New Data Stream</h2>
+                <p className="text-xs text-slds-neutral-7 mt-0.5">
                   {newModalStep === 1 ? 'Select a data source to connect.' : newModalStep === 2 ? 'Configure your data stream.' : newModalStep === 3 ? 'Review and confirm.' : 'Put the finishing touches on your data stream(s).'}
                 </p>
               </div>
-              <button onClick={() => setNewModalOpen(false)} className="w-7 h-7 flex items-center justify-center rounded hover:bg-[#F3F3F3] text-[var(--sf-text-tertiary)]">
+              <button onClick={() => setNewModalOpen(false)} className="w-7 h-7 flex items-center justify-center rounded hover:bg-slds-neutral-2 text-slds-neutral-7">
                 <X className="w-4 h-4" />
               </button>
             </div>
@@ -1218,15 +1218,15 @@ export default function DataStreamsContent({ demoSession, currentTimeline }: Dat
                   <div className="space-y-6">
                     {/* Info banner */}
                     <div className="flex items-start gap-3 p-4 bg-[#E1F5FE] rounded-lg">
-                      <Info className="w-5 h-5 text-[var(--sf-blue)] flex-shrink-0 mt-0.5" />
-                      <div className="text-sm text-[var(--sf-text-secondary)]">
+                      <Info className="w-5 h-5 text-slds-brand flex-shrink-0 mt-0.5" />
+                      <div className="text-sm text-slds-neutral-9">
                         Select the data source from which you can ingest or federate data. Only sources that are already connected to Data Cloud appear on this list. <span className="sf-link">Learn More</span>
                       </div>
                     </div>
 
                     {/* ─── Connected Sources ─── */}
                     <div>
-                      <h3 className="text-sm font-semibold text-[var(--sf-text-primary)] mb-3">Connected Sources</h3>
+                      <h3 className="text-sm font-semibold text-slds-neutral-base mb-3">Connected Sources</h3>
                       <div className="grid grid-cols-3 gap-4">
                         {/* Ingestion API */}
                         {(() => {
@@ -1235,19 +1235,19 @@ export default function DataStreamsContent({ demoSession, currentTimeline }: Dat
                             <button
                               onClick={() => setSelectedSource('src-api')}
                               className={`relative flex flex-col items-center text-center rounded-lg border-2 p-6 transition-all ${
-                                isSelected ? 'border-[var(--sf-blue)] bg-[#EEF4FF] shadow-sm' : 'border-[#D8DDE6] bg-white hover:border-[#B0B0B0]'
+                                isSelected ? 'border-slds-brand bg-[#EEF4FF] shadow-sm' : 'border-[#D8DDE6] bg-white hover:border-[#B0B0B0]'
                               }`}
                             >
                               {isSelected && (
-                                <div className="absolute top-0 right-0 w-6 h-6 bg-[var(--sf-blue)] flex items-center justify-center" style={{ clipPath: 'polygon(0 0, 100% 0, 100% 100%)' }}>
+                                <div className="absolute top-0 right-0 w-6 h-6 bg-slds-brand flex items-center justify-center" style={{ clipPath: 'polygon(0 0, 100% 0, 100% 100%)' }}>
                                   <Check className="w-2.5 h-2.5 text-white absolute top-0.5 right-0.5" />
                                 </div>
                               )}
-                              <div className="w-14 h-14 rounded-lg flex items-center justify-center mb-3 bg-[#F3F3F3]">
-                                <Server className="w-8 h-8 text-[#706E6B]" />
+                              <div className="w-14 h-14 rounded-lg flex items-center justify-center mb-3 bg-slds-neutral-2">
+                                <Server className="w-8 h-8 text-slds-neutral-7" />
                               </div>
-                              <div className="text-sm font-semibold text-[var(--sf-text-primary)]">Ingestion API</div>
-                              <div className="text-xs text-[var(--sf-text-tertiary)] mt-1">Stream and/or bulk upload data from external sources</div>
+                              <div className="text-sm font-semibold text-slds-neutral-base">Ingestion API</div>
+                              <div className="text-xs text-slds-neutral-7 mt-1">Stream and/or bulk upload data from external sources</div>
                             </button>
                           );
                         })()}
@@ -1259,19 +1259,19 @@ export default function DataStreamsContent({ demoSession, currentTimeline }: Dat
                             <button
                               onClick={() => setSelectedSource('salesforce')}
                               className={`relative flex flex-col items-center text-center rounded-lg border-2 p-6 transition-all ${
-                                isSelected ? 'border-[var(--sf-blue)] bg-[#EEF4FF] shadow-sm' : 'border-[#D8DDE6] bg-white hover:border-[#B0B0B0]'
+                                isSelected ? 'border-slds-brand bg-[#EEF4FF] shadow-sm' : 'border-[#D8DDE6] bg-white hover:border-[#B0B0B0]'
                               }`}
                             >
                               {isSelected && (
-                                <div className="absolute top-0 right-0 w-6 h-6 bg-[var(--sf-blue)] flex items-center justify-center" style={{ clipPath: 'polygon(0 0, 100% 0, 100% 100%)' }}>
+                                <div className="absolute top-0 right-0 w-6 h-6 bg-slds-brand flex items-center justify-center" style={{ clipPath: 'polygon(0 0, 100% 0, 100% 100%)' }}>
                                   <Check className="w-2.5 h-2.5 text-white absolute top-0.5 right-0.5" />
                                 </div>
                               )}
                               <div className="w-14 h-14 rounded-lg flex items-center justify-center mb-3 bg-[#E8F4FD]">
                                 <svg viewBox="0 0 48 48" className="w-9 h-9 text-[#00A1E0]"><path fill="currentColor" d="M20.5 8.5c2.3-2.4 5.5-3.9 9-3.9 4.8 0 9 2.8 11 6.8 1.5-.6 3.1-1 4.8-1 7 0 12.7 5.7 12.7 12.7S52.3 35.8 45.3 35.8c-1.3 0-2.5-.2-3.7-.6-1.8 3.5-5.4 5.9-9.6 5.9-1.8 0-3.5-.4-5-1.2-1.8 2.8-4.9 4.6-8.5 4.6-4.5 0-8.3-3-9.6-7.1-.8.1-1.6.2-2.4.2C2.9 37.6 0 34.7 0 29.1s4.5-8.5 8.5-8.5c.6 0 1.2.1 1.8.2C11.2 14.7 15.4 10.3 20.5 8.5z" transform="scale(0.7) translate(2,5)"/></svg>
                               </div>
-                              <div className="text-sm font-semibold text-[var(--sf-text-primary)]">Salesforce CRM</div>
-                              <div className="text-xs text-[var(--sf-text-tertiary)] mt-1">Import objects from Salesforce CRM</div>
+                              <div className="text-sm font-semibold text-slds-neutral-base">Salesforce CRM</div>
+                              <div className="text-xs text-slds-neutral-7 mt-1">Import objects from Salesforce CRM</div>
                             </button>
                           );
                         })()}
@@ -1283,19 +1283,19 @@ export default function DataStreamsContent({ demoSession, currentTimeline }: Dat
                             <button
                               onClick={() => setSelectedSource('src-s2s')}
                               className={`relative flex flex-col items-center text-center rounded-lg border-2 p-6 transition-all ${
-                                isSelected ? 'border-[var(--sf-blue)] bg-[#EEF4FF] shadow-sm' : 'border-[#D8DDE6] bg-white hover:border-[#B0B0B0]'
+                                isSelected ? 'border-slds-brand bg-[#EEF4FF] shadow-sm' : 'border-[#D8DDE6] bg-white hover:border-[#B0B0B0]'
                               }`}
                             >
                               {isSelected && (
-                                <div className="absolute top-0 right-0 w-6 h-6 bg-[var(--sf-blue)] flex items-center justify-center" style={{ clipPath: 'polygon(0 0, 100% 0, 100% 100%)' }}>
+                                <div className="absolute top-0 right-0 w-6 h-6 bg-slds-brand flex items-center justify-center" style={{ clipPath: 'polygon(0 0, 100% 0, 100% 100%)' }}>
                                   <Check className="w-2.5 h-2.5 text-white absolute top-0.5 right-0.5" />
                                 </div>
                               )}
-                              <div className="w-14 h-14 rounded-lg flex items-center justify-center mb-3 bg-[#F3F3F3]">
-                                <Globe className="w-8 h-8 text-[#706E6B]" />
+                              <div className="w-14 h-14 rounded-lg flex items-center justify-center mb-3 bg-slds-neutral-2">
+                                <Globe className="w-8 h-8 text-slds-neutral-7" />
                               </div>
-                              <div className="text-sm font-semibold text-[var(--sf-text-primary)]">Server To Server</div>
-                              <div className="text-xs text-[var(--sf-text-tertiary)] mt-1">Manually configure an authenticated connection</div>
+                              <div className="text-sm font-semibold text-slds-neutral-base">Server To Server</div>
+                              <div className="text-xs text-slds-neutral-7 mt-1">Manually configure an authenticated connection</div>
                             </button>
                           );
                         })()}
@@ -1310,11 +1310,11 @@ export default function DataStreamsContent({ demoSession, currentTimeline }: Dat
                               <button
                                 onClick={() => setSelectedSource('informatica')}
                                 className={`relative flex flex-col items-center text-center rounded-lg border-2 p-6 transition-all ${
-                                  isSelected ? 'border-[var(--sf-blue)] bg-[#EEF4FF] shadow-sm' : 'border-[#D8DDE6] bg-white hover:border-[#B0B0B0]'
+                                  isSelected ? 'border-slds-brand bg-[#EEF4FF] shadow-sm' : 'border-[#D8DDE6] bg-white hover:border-[#B0B0B0]'
                                 }`}
                               >
                                 {isSelected && (
-                                  <div className="absolute top-0 right-0 w-6 h-6 bg-[var(--sf-blue)] flex items-center justify-center" style={{ clipPath: 'polygon(0 0, 100% 0, 100% 100%)' }}>
+                                  <div className="absolute top-0 right-0 w-6 h-6 bg-slds-brand flex items-center justify-center" style={{ clipPath: 'polygon(0 0, 100% 0, 100% 100%)' }}>
                                     <Check className="w-2.5 h-2.5 text-white absolute top-0.5 right-0.5" />
                                   </div>
                                 )}
@@ -1323,8 +1323,8 @@ export default function DataStreamsContent({ demoSession, currentTimeline }: Dat
                                     <text x="20" y="26" textAnchor="middle" fill="white" fontSize="12" fontWeight="bold">INFA</text>
                                   </svg>
                                 </div>
-                                <div className="text-sm font-semibold text-[var(--sf-text-primary)]">Informatica MDM</div>
-                                <div className="text-xs text-[var(--sf-text-tertiary)] mt-1">Ingest master data entities from Informatica MDM</div>
+                                <div className="text-sm font-semibold text-slds-neutral-base">Informatica MDM</div>
+                                <div className="text-xs text-slds-neutral-7 mt-1">Ingest master data entities from Informatica MDM</div>
                               </button>
                             );
                           })()}
@@ -1334,8 +1334,8 @@ export default function DataStreamsContent({ demoSession, currentTimeline }: Dat
 
                     {/* ─── Other Sources ─── */}
                     <div>
-                      <h3 className="text-sm font-semibold text-[var(--sf-text-primary)] mb-1">Other Sources</h3>
-                      <p className="text-xs text-[var(--sf-text-tertiary)] mb-3">Load a sample file in order to teach the system about your file&apos;s structure, or connect additional data sources.</p>
+                      <h3 className="text-sm font-semibold text-slds-neutral-base mb-1">Other Sources</h3>
+                      <p className="text-xs text-slds-neutral-7 mb-3">Load a sample file in order to teach the system about your file&apos;s structure, or connect additional data sources.</p>
                       <div className="grid grid-cols-3 gap-4">
                         {[
                           { id: 'src-upload', name: 'File Upload', icon: 'upload' as const, color: '#706E6B', desc: 'Upload CSV, JSON, or Parquet files' },
@@ -1348,11 +1348,11 @@ export default function DataStreamsContent({ demoSession, currentTimeline }: Dat
                               key={src.id}
                               onClick={() => setSelectedSource(src.id)}
                               className={`relative flex flex-col items-center text-center rounded-lg border-2 p-6 transition-all ${
-                                isSelected ? 'border-[var(--sf-blue)] bg-[#EEF4FF] shadow-sm' : 'border-[#D8DDE6] bg-white hover:border-[#B0B0B0]'
+                                isSelected ? 'border-slds-brand bg-[#EEF4FF] shadow-sm' : 'border-[#D8DDE6] bg-white hover:border-[#B0B0B0]'
                               }`}
                             >
                               {isSelected && (
-                                <div className="absolute top-0 right-0 w-5 h-5 bg-[var(--sf-blue)] flex items-center justify-center" style={{ clipPath: 'polygon(0 0, 100% 0, 100% 100%)' }}>
+                                <div className="absolute top-0 right-0 w-5 h-5 bg-slds-brand flex items-center justify-center" style={{ clipPath: 'polygon(0 0, 100% 0, 100% 100%)' }}>
                                   <Check className="w-2 h-2 text-white absolute top-0.5 right-0.5" />
                                 </div>
                               )}
@@ -1361,8 +1361,8 @@ export default function DataStreamsContent({ demoSession, currentTimeline }: Dat
                                  src.icon === 'pkg' ? <Database className="w-8 h-8" style={{ color: src.color }} /> :
                                  <svg viewBox="0 0 24 24" className="w-8 h-8"><circle cx="12" cy="12" r="10" fill={src.color} /><text x="12" y="16" textAnchor="middle" fill="white" fontSize="8" fontWeight="bold">SF</text></svg>}
                               </div>
-                              <div className="text-sm font-semibold text-[var(--sf-text-primary)]">{src.name}</div>
-                              <div className="text-xs text-[var(--sf-text-tertiary)] mt-1">{src.desc}</div>
+                              <div className="text-sm font-semibold text-slds-neutral-base">{src.name}</div>
+                              <div className="text-xs text-slds-neutral-7 mt-1">{src.desc}</div>
                             </button>
                           );
                         })}
@@ -1372,34 +1372,34 @@ export default function DataStreamsContent({ demoSession, currentTimeline }: Dat
                     {/* ─── Explore Other Connectors ─── */}
                     <div>
                       <div className="flex items-center justify-between mb-3">
-                        <h3 className="text-xs font-semibold uppercase tracking-wider text-[var(--sf-text-tertiary)]">
+                        <h3 className="text-xs font-semibold uppercase tracking-wider text-slds-neutral-7">
                           Explore Other Connectors <span className="text-[10px] font-normal normal-case">({filteredConnectors.length})</span>
                         </h3>
                       </div>
                       {/* Search + filter checkboxes */}
                       <div className="flex items-center gap-3 mb-3">
                         <div className="relative flex-1">
-                          <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-[var(--sf-text-tertiary)]" />
+                          <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slds-neutral-7" />
                           <input
                             type="text"
                             placeholder="Filter Connectors"
                             value={connectorSearch}
                             onChange={(e) => setConnectorSearch(e.target.value)}
-                            className="w-full pl-8 pr-3 py-1.5 text-xs border border-[var(--sf-border)] rounded focus:outline-none focus:border-[var(--sf-blue-light)] focus:ring-1 focus:ring-[rgba(27,150,255,0.2)]"
+                            className="w-full pl-8 pr-3 py-1.5 text-xs border border-slds-border-1 rounded focus:outline-none focus:border-slds-brand-2 focus:ring-1 focus:ring-[rgba(27,150,255,0.2)]"
                           />
                         </div>
-                        <label className="flex items-center gap-1.5 text-xs text-[var(--sf-text-secondary)] cursor-pointer">
-                          <input type="checkbox" defaultChecked className="w-3.5 h-3.5 rounded border-[var(--sf-border)] accent-[var(--sf-blue)]" />
+                        <label className="flex items-center gap-1.5 text-xs text-slds-neutral-9 cursor-pointer">
+                          <input type="checkbox" defaultChecked className="w-3.5 h-3.5 rounded border-slds-border-1 accent-slds-brand" />
                           Generally Available
                         </label>
-                        <label className="flex items-center gap-1.5 text-xs text-[var(--sf-text-secondary)] cursor-pointer">
-                          <input type="checkbox" defaultChecked className="w-3.5 h-3.5 rounded border-[var(--sf-border)] accent-[var(--sf-blue)]" />
+                        <label className="flex items-center gap-1.5 text-xs text-slds-neutral-9 cursor-pointer">
+                          <input type="checkbox" defaultChecked className="w-3.5 h-3.5 rounded border-slds-border-1 accent-slds-brand" />
                           Beta
                         </label>
                         <select
                           value={connectorCategory}
                           onChange={(e) => setConnectorCategory(e.target.value)}
-                          className="px-2 py-1.5 text-xs border border-[var(--sf-border)] rounded bg-white focus:outline-none"
+                          className="px-2 py-1.5 text-xs border border-slds-border-1 rounded bg-white focus:outline-none"
                         >
                           <option value="all">All Categories</option>
                           {connectorCategories.map((cat) => (
@@ -1408,7 +1408,7 @@ export default function DataStreamsContent({ demoSession, currentTimeline }: Dat
                         </select>
                       </div>
                       {/* Scrollable connector grid */}
-                      <div className="max-h-[260px] overflow-y-auto border border-[var(--sf-border)] rounded-lg bg-[#FAFAF9] p-3">
+                      <div className="max-h-[260px] overflow-y-auto border border-slds-border-1 rounded-lg bg-[#FAFAF9] p-3">
                         <div className="grid grid-cols-4 gap-2">
                           {filteredConnectors.map((conn) => {
                             const isSelected = selectedSource === conn.id;
@@ -1418,12 +1418,12 @@ export default function DataStreamsContent({ demoSession, currentTimeline }: Dat
                                 onClick={() => setSelectedSource(conn.id)}
                                 className={`relative flex items-center gap-2.5 p-2.5 rounded-lg border-2 transition-all text-left group ${
                                   isSelected
-                                    ? 'border-[var(--sf-blue)] bg-[#EEF4FF] shadow-sm'
-                                    : 'border-[var(--sf-border)] bg-white hover:border-[#B0B0B0] hover:shadow-sm'
+                                    ? 'border-slds-brand bg-[#EEF4FF] shadow-sm'
+                                    : 'border-slds-border-1 bg-white hover:border-[#B0B0B0] hover:shadow-sm'
                                 }`}
                               >
                                 {isSelected && (
-                                  <div className="absolute top-0 right-0 w-5 h-5 bg-[var(--sf-blue)] flex items-center justify-center" style={{ clipPath: 'polygon(0 0, 100% 0, 100% 100%)' }}>
+                                  <div className="absolute top-0 right-0 w-5 h-5 bg-slds-brand flex items-center justify-center" style={{ clipPath: 'polygon(0 0, 100% 0, 100% 100%)' }}>
                                     <Check className="w-2 h-2 text-white absolute top-0.5 right-0.5" />
                                   </div>
                                 )}
@@ -1432,16 +1432,16 @@ export default function DataStreamsContent({ demoSession, currentTimeline }: Dat
                                 </div>
                                 <div className="flex-1 min-w-0">
                                   <div className="flex items-center gap-1.5">
-                                    <span className="text-[11px] font-medium text-[var(--sf-text-primary)] truncate leading-tight">{conn.name}</span>
-                                    <span className="px-1 py-0 text-[7px] font-semibold uppercase tracking-wider border border-[var(--sf-border)] text-[var(--sf-text-tertiary)] rounded flex-shrink-0">Beta</span>
+                                    <span className="text-[11px] font-medium text-slds-neutral-base truncate leading-tight">{conn.name}</span>
+                                    <span className="px-1 py-0 text-[7px] font-semibold uppercase tracking-wider border border-slds-border-1 text-slds-neutral-7 rounded flex-shrink-0">Beta</span>
                                   </div>
-                                  <div className="text-[9px] text-[var(--sf-text-tertiary)] truncate">{conn.category}</div>
+                                  <div className="text-[9px] text-slds-neutral-7 truncate">{conn.category}</div>
                                 </div>
                               </button>
                             );
                           })}
                           {filteredConnectors.length === 0 && (
-                            <div className="col-span-4 py-8 text-center text-xs text-[var(--sf-text-tertiary)]">
+                            <div className="col-span-4 py-8 text-center text-xs text-slds-neutral-7">
                               No connectors match your search.
                             </div>
                           )}
@@ -1462,32 +1462,32 @@ export default function DataStreamsContent({ demoSession, currentTimeline }: Dat
                   <div className="space-y-4">
                     {/* Info banner */}
                     <div className="flex items-start gap-3 p-4 bg-[#E1F5FE] rounded-lg">
-                      <Info className="w-5 h-5 text-[var(--sf-blue)] flex-shrink-0 mt-0.5" />
-                      <div className="text-sm text-[var(--sf-text-secondary)]">
+                      <Info className="w-5 h-5 text-slds-brand flex-shrink-0 mt-0.5" />
+                      <div className="text-sm text-slds-neutral-9">
                         To ensure data is ingested from fields and objects created in the future, we recommend granting <strong>View All Fields (Global)</strong> and <strong>View All Data</strong> permission to the integration user profile. <span className="sf-link">Learn More</span>
                       </div>
                     </div>
 
-                    <p className="text-xs text-[var(--sf-text-tertiary)]">
+                    <p className="text-xs text-slds-neutral-7">
                       Select an org to ingest data from, then select an object or data bundle.
                     </p>
 
                     {/* Org selector + view toggle */}
                     <div className="flex items-end gap-3">
                       <div className="flex-1">
-                        <label className="block text-xs font-medium text-[var(--sf-text-tertiary)] mb-1">* Salesforce Org</label>
-                        <select className="w-full px-3 py-2 text-sm border border-[var(--sf-border)] rounded bg-white focus:outline-none">
+                        <label className="block text-xs font-medium text-slds-neutral-7 mb-1">* Salesforce Org</label>
+                        <select className="w-full px-3 py-2 text-sm border border-slds-border-1 rounded bg-white focus:outline-none">
                           <option>Data Cloud SG</option>
                         </select>
                       </div>
-                      <div className="flex items-center border border-[var(--sf-border)] rounded overflow-hidden">
+                      <div className="flex items-center border border-slds-border-1 rounded overflow-hidden">
                         <button
                           onClick={() => setSfViewMode('bundles')}
-                          className={`px-3 py-2 text-xs font-medium ${sfViewMode === 'bundles' ? 'bg-[var(--sf-blue)] text-white' : 'bg-white text-[var(--sf-text-secondary)] hover:bg-[#F3F3F3]'}`}
+                          className={`px-3 py-2 text-xs font-medium ${sfViewMode === 'bundles' ? 'bg-slds-brand text-white' : 'bg-white text-slds-neutral-9 hover:bg-slds-neutral-2'}`}
                         >View Bundles</button>
                         <button
                           onClick={() => setSfViewMode('objects')}
-                          className={`px-3 py-2 text-xs font-medium ${sfViewMode === 'objects' ? 'bg-[var(--sf-blue)] text-white' : 'bg-white text-[var(--sf-text-secondary)] hover:bg-[#F3F3F3]'}`}
+                          className={`px-3 py-2 text-xs font-medium ${sfViewMode === 'objects' ? 'bg-slds-brand text-white' : 'bg-white text-slds-neutral-9 hover:bg-slds-neutral-2'}`}
                         >View Objects</button>
                       </div>
                     </div>
@@ -1496,11 +1496,11 @@ export default function DataStreamsContent({ demoSession, currentTimeline }: Dat
                     {step2Loading ? (
                       <div className="flex flex-col items-center justify-center py-20">
                         <div className="flex gap-1.5 mb-3">
-                          <div className="w-2.5 h-2.5 rounded-full bg-[var(--sf-blue)] animate-bounce" style={{ animationDelay: '0ms' }} />
-                          <div className="w-2.5 h-2.5 rounded-full bg-[var(--sf-blue)] animate-bounce" style={{ animationDelay: '150ms' }} />
-                          <div className="w-2.5 h-2.5 rounded-full bg-[var(--sf-blue)] animate-bounce" style={{ animationDelay: '300ms' }} />
+                          <div className="w-2.5 h-2.5 rounded-full bg-slds-brand animate-bounce" style={{ animationDelay: '0ms' }} />
+                          <div className="w-2.5 h-2.5 rounded-full bg-slds-brand animate-bounce" style={{ animationDelay: '150ms' }} />
+                          <div className="w-2.5 h-2.5 rounded-full bg-slds-brand animate-bounce" style={{ animationDelay: '300ms' }} />
                         </div>
-                        <p className="text-sm text-[var(--sf-text-tertiary)]">Loading bundles...</p>
+                        <p className="text-sm text-slds-neutral-7">Loading bundles...</p>
                       </div>
                     ) : (
                     <>
@@ -1510,14 +1510,14 @@ export default function DataStreamsContent({ demoSession, currentTimeline }: Dat
                         {/* Bundle grid */}
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center justify-between mb-2">
-                            <h4 className="text-sm font-semibold text-[var(--sf-text-primary)]">Standard Bundles ({salesforceStandardBundles.length})</h4>
+                            <h4 className="text-sm font-semibold text-slds-neutral-base">Standard Bundles ({salesforceStandardBundles.length})</h4>
                             <div className="relative w-48">
-                              <Search className="absolute left-2 top-1/2 -translate-y-1/2 w-3 h-3 text-[var(--sf-text-tertiary)]" />
+                              <Search className="absolute left-2 top-1/2 -translate-y-1/2 w-3 h-3 text-slds-neutral-7" />
                               <input type="text" placeholder="Search..." value={sfBundleSearch} onChange={(e) => setSfBundleSearch(e.target.value)}
-                                className="w-full pl-7 pr-2 py-1 text-xs border border-[var(--sf-border)] rounded focus:outline-none focus:border-[var(--sf-blue-light)]" />
+                                className="w-full pl-7 pr-2 py-1 text-xs border border-slds-border-1 rounded focus:outline-none focus:border-slds-brand-2" />
                             </div>
                           </div>
-                          <div className="max-h-[320px] overflow-y-auto border border-[var(--sf-border)] rounded-lg">
+                          <div className="max-h-[320px] overflow-y-auto border border-slds-border-1 rounded-lg">
                             <div className="grid grid-cols-3 gap-0">
                               {filteredSfBundles.map((bundle) => {
                                 const isSelected = selectedSfBundles.has(bundle.id);
@@ -1530,18 +1530,18 @@ export default function DataStreamsContent({ demoSession, currentTimeline }: Dat
                                       setSelectedSfBundles((prev) => { const n = new Set(prev); if (n.has(bundle.id)) n.delete(bundle.id); else n.add(bundle.id); return n; });
                                     }}
                                     onMouseEnter={() => setFocusedSfBundleId(bundle.id)}
-                                    className={`flex items-center gap-3 p-3 text-left border border-[var(--sf-border)] transition-all ${
-                                      isSelected ? 'bg-[#EEF4FF] border-[var(--sf-blue)]' : isFocused ? 'bg-[#FAFAF9]' : 'bg-white hover:bg-[#FAFAF9]'
+                                    className={`flex items-center gap-3 p-3 text-left border border-slds-border-1 transition-all ${
+                                      isSelected ? 'bg-[#EEF4FF] border-slds-brand' : isFocused ? 'bg-[#FAFAF9]' : 'bg-white hover:bg-[#FAFAF9]'
                                     }`}
                                   >
                                     <div className="w-8 h-8 rounded flex items-center justify-center flex-shrink-0" style={{ backgroundColor: bundle.iconColor }}>
                                       <span className="text-[9px] font-bold text-white">{bundle.icon}</span>
                                     </div>
                                     <div className="flex-1 min-w-0">
-                                      <div className="text-xs font-medium text-[var(--sf-text-primary)] truncate">{bundle.name}</div>
-                                      <div className="text-[10px] text-[var(--sf-text-tertiary)]">{bundle.objectCount} Objects &middot; Created by Salesforce</div>
+                                      <div className="text-xs font-medium text-slds-neutral-base truncate">{bundle.name}</div>
+                                      <div className="text-[10px] text-slds-neutral-7">{bundle.objectCount} Objects &middot; Created by Salesforce</div>
                                     </div>
-                                    {isSelected && <Check className="w-4 h-4 text-[var(--sf-blue)] flex-shrink-0" />}
+                                    {isSelected && <Check className="w-4 h-4 text-slds-brand flex-shrink-0" />}
                                   </button>
                                 );
                               })}
@@ -1552,20 +1552,20 @@ export default function DataStreamsContent({ demoSession, currentTimeline }: Dat
                         {/* Bundle detail sidebar */}
                         {focusedSfBundle && (
                           <div className="w-[220px] flex-shrink-0">
-                            <div className="border border-[var(--sf-border)] rounded-lg bg-white p-4">
-                              <h4 className="text-sm font-semibold text-[var(--sf-text-primary)] mb-1">Bundle Details</h4>
+                            <div className="border border-slds-border-1 rounded-lg bg-white p-4">
+                              <h4 className="text-sm font-semibold text-slds-neutral-base mb-1">Bundle Details</h4>
                               <div className="flex items-center gap-2 mb-3">
                                 <div className="w-6 h-6 rounded flex items-center justify-center" style={{ backgroundColor: focusedSfBundle.iconColor }}>
                                   <span className="text-[7px] font-bold text-white">{focusedSfBundle.icon}</span>
                                 </div>
-                                <span className="text-xs font-medium text-[var(--sf-text-primary)]">{focusedSfBundle.name}</span>
+                                <span className="text-xs font-medium text-slds-neutral-base">{focusedSfBundle.name}</span>
                               </div>
-                              <div className="text-[10px] text-[var(--sf-text-tertiary)] mb-1">Type: <span className="text-[var(--sf-text-secondary)]">Standard Data Bundle</span></div>
-                              <div className="text-[10px] text-[var(--sf-text-tertiary)] mb-3">Description:</div>
-                              <div className="text-[10px] font-medium text-[var(--sf-text-primary)] mb-2">Objects included ({focusedSfBundle.objectCount})</div>
+                              <div className="text-[10px] text-slds-neutral-7 mb-1">Type: <span className="text-slds-neutral-9">Standard Data Bundle</span></div>
+                              <div className="text-[10px] text-slds-neutral-7 mb-3">Description:</div>
+                              <div className="text-[10px] font-medium text-slds-neutral-base mb-2">Objects included ({focusedSfBundle.objectCount})</div>
                               <div className="flex flex-wrap gap-1">
                                 {focusedSfBundle.objects.map((obj) => (
-                                  <span key={obj} className="px-1.5 py-0.5 text-[9px] bg-[#F3F3F3] text-[var(--sf-text-secondary)] rounded font-mono">{obj}</span>
+                                  <span key={obj} className="px-1.5 py-0.5 text-[9px] bg-slds-neutral-2 text-slds-neutral-9 rounded font-mono">{obj}</span>
                                 ))}
                               </div>
                             </div>
@@ -1578,16 +1578,16 @@ export default function DataStreamsContent({ demoSession, currentTimeline }: Dat
                     {sfViewMode === 'objects' && (
                       <div className="space-y-3">
                         <div>
-                          <label className="block text-xs font-medium text-[var(--sf-text-tertiary)] uppercase tracking-wide mb-1">Salesforce Object</label>
-                          <select className="w-full px-3 py-2 text-sm border border-[var(--sf-border)] rounded bg-white focus:outline-none">
+                          <label className="block text-xs font-medium text-slds-neutral-7 uppercase tracking-wide mb-1">Salesforce Object</label>
+                          <select className="w-full px-3 py-2 text-sm border border-slds-border-1 rounded bg-white focus:outline-none">
                             <option>Account</option><option>Contact</option><option>Lead</option><option>Opportunity</option>
                             <option>Case</option><option>Campaign</option><option>EmailMessage</option><option>Event</option>
                             <option>Task</option><option>Order</option><option>Product2</option><option>PricebookEntry</option>
                           </select>
                         </div>
                         <div>
-                          <label className="block text-xs font-medium text-[var(--sf-text-tertiary)] uppercase tracking-wide mb-1">Refresh Frequency</label>
-                          <select className="w-full px-3 py-2 text-sm border border-[var(--sf-border)] rounded bg-white focus:outline-none">
+                          <label className="block text-xs font-medium text-slds-neutral-7 uppercase tracking-wide mb-1">Refresh Frequency</label>
+                          <select className="w-full px-3 py-2 text-sm border border-slds-border-1 rounded bg-white focus:outline-none">
                             <option>Every 1 hour</option><option>Every 6 hours</option><option>Every 12 hours</option>
                             <option>Daily</option><option>Manual</option>
                           </select>
@@ -1607,24 +1607,24 @@ export default function DataStreamsContent({ demoSession, currentTimeline }: Dat
                   <div className="space-y-4">
                     {/* Info banner */}
                     <div className="flex items-start gap-3 p-4 bg-[#E1F5FE] rounded-lg">
-                      <Info className="w-5 h-5 text-[var(--sf-blue)] flex-shrink-0 mt-0.5" />
-                      <div className="text-sm text-[var(--sf-text-secondary)]">
+                      <Info className="w-5 h-5 text-slds-brand flex-shrink-0 mt-0.5" />
+                      <div className="text-sm text-slds-neutral-9">
                         To ensure data is ingested from fields and objects created in the future, we recommend granting <strong>View All Fields (Global)</strong> system permission on the Data Cloud Informatica MDM Connector permission set. <span className="sf-link">Learn More</span>
                       </div>
                     </div>
 
-                    <p className="text-xs text-[var(--sf-text-tertiary)]">
+                    <p className="text-xs text-slds-neutral-7">
                       Select a tenant to ingest data from, then select an object or data bundle.
                     </p>
 
                     {/* Tenant selector + view toggle */}
                     <div className="flex items-end gap-3">
                       <div className="flex-1">
-                        <label className="block text-xs font-medium text-[var(--sf-text-tertiary)] mb-1">* Informatica Tenant</label>
+                        <label className="block text-xs font-medium text-slds-neutral-7 mb-1">* Informatica Tenant</label>
                         <select
                           value={selectedTenant}
                           onChange={(e) => setSelectedTenant(e.target.value)}
-                          className="w-full px-3 py-2 text-sm border border-[var(--sf-border)] rounded bg-white focus:outline-none"
+                          className="w-full px-3 py-2 text-sm border border-slds-border-1 rounded bg-white focus:outline-none"
                         >
                           {sessionTenants.length > 0 ? (
                             sessionTenants.map((alias) => (
@@ -1635,9 +1635,9 @@ export default function DataStreamsContent({ demoSession, currentTimeline }: Dat
                           )}
                         </select>
                       </div>
-                      <div className="flex items-center border border-[var(--sf-border)] rounded overflow-hidden">
-                        <button className="px-3 py-2 text-xs font-medium bg-[var(--sf-blue)] text-white">View Bundles</button>
-                        <button className="px-3 py-2 text-xs font-medium bg-white text-[var(--sf-text-secondary)] hover:bg-[#F3F3F3]">View Objects</button>
+                      <div className="flex items-center border border-slds-border-1 rounded overflow-hidden">
+                        <button className="px-3 py-2 text-xs font-medium bg-slds-brand text-white">View Bundles</button>
+                        <button className="px-3 py-2 text-xs font-medium bg-white text-slds-neutral-9 hover:bg-slds-neutral-2">View Objects</button>
                       </div>
                     </div>
 
@@ -1645,11 +1645,11 @@ export default function DataStreamsContent({ demoSession, currentTimeline }: Dat
                     {step2Loading ? (
                       <div className="flex flex-col items-center justify-center py-20">
                         <div className="flex gap-1.5 mb-3">
-                          <div className="w-2.5 h-2.5 rounded-full bg-[var(--sf-blue)] animate-bounce" style={{ animationDelay: '0ms' }} />
-                          <div className="w-2.5 h-2.5 rounded-full bg-[var(--sf-blue)] animate-bounce" style={{ animationDelay: '150ms' }} />
-                          <div className="w-2.5 h-2.5 rounded-full bg-[var(--sf-blue)] animate-bounce" style={{ animationDelay: '300ms' }} />
+                          <div className="w-2.5 h-2.5 rounded-full bg-slds-brand animate-bounce" style={{ animationDelay: '0ms' }} />
+                          <div className="w-2.5 h-2.5 rounded-full bg-slds-brand animate-bounce" style={{ animationDelay: '150ms' }} />
+                          <div className="w-2.5 h-2.5 rounded-full bg-slds-brand animate-bounce" style={{ animationDelay: '300ms' }} />
                         </div>
-                        <p className="text-sm text-[var(--sf-text-tertiary)]">Loading bundles...</p>
+                        <p className="text-sm text-slds-neutral-7">Loading bundles...</p>
                       </div>
                     ) : (
                     <>
@@ -1657,9 +1657,9 @@ export default function DataStreamsContent({ demoSession, currentTimeline }: Dat
                     <div className="flex gap-4">
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center justify-between mb-2">
-                          <h4 className="text-sm font-semibold text-[var(--sf-text-primary)]">Standard Bundles ({informaticaBundles.length})</h4>
+                          <h4 className="text-sm font-semibold text-slds-neutral-base">Standard Bundles ({informaticaBundles.length})</h4>
                         </div>
-                        <div className="max-h-[320px] overflow-y-auto border border-[var(--sf-border)] rounded-lg">
+                        <div className="max-h-[320px] overflow-y-auto border border-slds-border-1 rounded-lg">
                           <div className="grid grid-cols-2 gap-0">
                             {informaticaBundles.map((bundle) => {
                               const isSelected = selectedBundles.has(bundle.id);
@@ -1669,8 +1669,8 @@ export default function DataStreamsContent({ demoSession, currentTimeline }: Dat
                                   key={bundle.id}
                                   onClick={() => { toggleBundle(bundle.id); setFocusedBundleId(bundle.id); }}
                                   onMouseEnter={() => setFocusedBundleId(bundle.id)}
-                                  className={`flex items-center gap-3 p-3 text-left border border-[var(--sf-border)] transition-all ${
-                                    isSelected ? 'bg-[#EEF4FF] border-[var(--sf-blue)]' : isFocused ? 'bg-[#FAFAF9]' : 'bg-white hover:bg-[#FAFAF9]'
+                                  className={`flex items-center gap-3 p-3 text-left border border-slds-border-1 transition-all ${
+                                    isSelected ? 'bg-[#EEF4FF] border-slds-brand' : isFocused ? 'bg-[#FAFAF9]' : 'bg-white hover:bg-[#FAFAF9]'
                                   }`}
                                 >
                                   <div className="w-8 h-8 rounded flex items-center justify-center flex-shrink-0 bg-[#FF4A00]">
@@ -1679,10 +1679,10 @@ export default function DataStreamsContent({ demoSession, currentTimeline }: Dat
                                     </svg>
                                   </div>
                                   <div className="flex-1 min-w-0">
-                                    <div className="text-xs font-medium text-[var(--sf-text-primary)] truncate">{bundle.name}</div>
-                                    <div className="text-[10px] text-[var(--sf-text-tertiary)]">{bundle.entities.length} Entities &middot; Informatica MDM</div>
+                                    <div className="text-xs font-medium text-slds-neutral-base truncate">{bundle.name}</div>
+                                    <div className="text-[10px] text-slds-neutral-7">{bundle.entities.length} Entities &middot; Informatica MDM</div>
                                   </div>
-                                  {isSelected && <Check className="w-4 h-4 text-[var(--sf-blue)] flex-shrink-0" />}
+                                  {isSelected && <Check className="w-4 h-4 text-slds-brand flex-shrink-0" />}
                                 </button>
                               );
                             })}
@@ -1693,22 +1693,22 @@ export default function DataStreamsContent({ demoSession, currentTimeline }: Dat
                       {/* Bundle detail sidebar */}
                       {focusedBundle && (
                         <div className="w-[220px] flex-shrink-0">
-                          <div className="border border-[var(--sf-border)] rounded-lg bg-white p-4">
-                            <h4 className="text-sm font-semibold text-[var(--sf-text-primary)] mb-1">Bundle Details</h4>
+                          <div className="border border-slds-border-1 rounded-lg bg-white p-4">
+                            <h4 className="text-sm font-semibold text-slds-neutral-base mb-1">Bundle Details</h4>
                             <div className="flex items-center gap-2 mb-3">
                               <div className="w-6 h-6 rounded flex items-center justify-center bg-[#FF4A00]">
                                 <svg viewBox="0 0 32 32" className="w-4 h-4">
                                   <text x="16" y="22" textAnchor="middle" fill="white" fontSize="12" fontWeight="bold">IN</text>
                                 </svg>
                               </div>
-                              <span className="text-xs font-medium text-[var(--sf-text-primary)]">{focusedBundle.name}</span>
+                              <span className="text-xs font-medium text-slds-neutral-base">{focusedBundle.name}</span>
                             </div>
-                            <div className="text-[10px] text-[var(--sf-text-tertiary)] mb-1">Type: <span className="text-[var(--sf-text-secondary)]">MDM Business Entity Bundle</span></div>
-                            <div className="text-[10px] text-[var(--sf-text-tertiary)] mb-3">Description: <span className="text-[var(--sf-text-secondary)]">{focusedBundle.description}</span></div>
-                            <div className="text-[10px] font-medium text-[var(--sf-text-primary)] mb-2">Entities included ({focusedBundle.entities.length})</div>
+                            <div className="text-[10px] text-slds-neutral-7 mb-1">Type: <span className="text-slds-neutral-9">MDM Business Entity Bundle</span></div>
+                            <div className="text-[10px] text-slds-neutral-7 mb-3">Description: <span className="text-slds-neutral-9">{focusedBundle.description}</span></div>
+                            <div className="text-[10px] font-medium text-slds-neutral-base mb-2">Entities included ({focusedBundle.entities.length})</div>
                             <div className="flex flex-wrap gap-1">
                               {focusedBundle.entities.map((entity) => (
-                                <span key={entity.name} className="px-1.5 py-0.5 text-[9px] bg-[#F3F3F3] text-[var(--sf-text-secondary)] rounded font-mono">{entity.name}</span>
+                                <span key={entity.name} className="px-1.5 py-0.5 text-[9px] bg-slds-neutral-2 text-slds-neutral-9 rounded font-mono">{entity.name}</span>
                               ))}
                             </div>
                           </div>
@@ -1725,8 +1725,8 @@ export default function DataStreamsContent({ demoSession, currentTimeline }: Dat
               {newModalStep === 3 && (
                 <div className="space-y-4">
                   <div className="flex items-start gap-3 p-4 bg-[#E1F5FE] rounded-lg">
-                    <Info className="w-5 h-5 text-[var(--sf-blue)] flex-shrink-0 mt-0.5" />
-                    <div className="text-sm text-[var(--sf-text-secondary)]">
+                    <Info className="w-5 h-5 text-slds-brand flex-shrink-0 mt-0.5" />
+                    <div className="text-sm text-slds-neutral-9">
                       Review the details below and click <strong>Next</strong> to configure the data space.
                     </div>
                   </div>
@@ -1824,32 +1824,32 @@ export default function DataStreamsContent({ demoSession, currentTimeline }: Dat
                     <div className="flex-1 min-w-0 space-y-4">
                       {/* Data Space selector */}
                       <div>
-                        <label className="flex items-center gap-1 text-xs font-medium text-[var(--sf-text-primary)] mb-1">
+                        <label className="flex items-center gap-1 text-xs font-medium text-slds-neutral-base mb-1">
                           <span className="text-[#C23934]">*</span> Data Space
-                          <Info className="w-3 h-3 text-[var(--sf-text-tertiary)]" />
+                          <Info className="w-3 h-3 text-slds-neutral-7" />
                         </label>
                         <div className="relative">
                           <button
                             onClick={() => setDataSpaceDropdownOpen(!dataSpaceDropdownOpen)}
-                            className="w-full max-w-sm flex items-center justify-between px-3 py-2 text-sm border-2 border-[var(--sf-blue)] rounded bg-white focus:outline-none"
+                            className="w-full max-w-sm flex items-center justify-between px-3 py-2 text-sm border-2 border-slds-brand rounded bg-white focus:outline-none"
                           >
-                            <span className={selectedDataSpace ? 'text-[var(--sf-text-primary)]' : 'text-[var(--sf-text-tertiary)]'}>
+                            <span className={selectedDataSpace ? 'text-slds-neutral-base' : 'text-slds-neutral-7'}>
                               {selectedDataSpace ? dataSpaces.find((d) => d.id === selectedDataSpace)?.label || selectedDataSpace : 'Select Data Space'}
                             </span>
-                            <ChevronDown className="w-4 h-4 text-[var(--sf-text-tertiary)]" />
+                            <ChevronDown className="w-4 h-4 text-slds-neutral-7" />
                           </button>
                           {dataSpaceDropdownOpen && (
-                            <div className="absolute z-10 top-full left-0 mt-1 w-full max-w-sm bg-white border border-[var(--sf-border)] rounded-lg shadow-lg overflow-hidden">
+                            <div className="absolute z-10 top-full left-0 mt-1 w-full max-w-sm bg-white border border-slds-border-1 rounded-lg shadow-lg overflow-hidden">
                               {dataSpaces.map((ds) => (
                                 <button
                                   key={ds.id}
                                   onClick={() => { setSelectedDataSpace(ds.id); setDataSpaceDropdownOpen(false); }}
-                                  className={`w-full text-left px-4 py-2.5 hover:bg-[#EEF4FF] transition-colors border-b border-[var(--sf-border)] last:border-b-0 ${
+                                  className={`w-full text-left px-4 py-2.5 hover:bg-[#EEF4FF] transition-colors border-b border-slds-border-1 last:border-b-0 ${
                                     selectedDataSpace === ds.id ? 'bg-[#EEF4FF]' : ''
                                   }`}
                                 >
-                                  <div className="text-sm font-medium text-[var(--sf-text-primary)]">{ds.label}</div>
-                                  {ds.description && <div className="text-xs text-[var(--sf-text-tertiary)] mt-0.5">{ds.description}</div>}
+                                  <div className="text-sm font-medium text-slds-neutral-base">{ds.label}</div>
+                                  {ds.description && <div className="text-xs text-slds-neutral-7 mt-0.5">{ds.description}</div>}
                                 </button>
                               ))}
                             </div>
@@ -1859,42 +1859,42 @@ export default function DataStreamsContent({ demoSession, currentTimeline }: Dat
 
                       {/* Objects table */}
                       {objectRows.length > 0 && (
-                        <div className="border border-[var(--sf-border)] rounded-lg overflow-hidden">
+                        <div className="border border-slds-border-1 rounded-lg overflow-hidden">
                           <table className="w-full text-xs">
                             <thead>
-                              <tr className="bg-[#FAFAF9] border-b border-[var(--sf-border)]">
-                                <th className="px-3 py-2 text-left font-medium text-[var(--sf-text-tertiary)] w-8">
-                                  <input type="checkbox" className="rounded border-[var(--sf-border)]" defaultChecked />
+                              <tr className="bg-[#FAFAF9] border-b border-slds-border-1">
+                                <th className="px-3 py-2 text-left font-medium text-slds-neutral-7 w-8">
+                                  <input type="checkbox" className="rounded border-slds-border-1" defaultChecked />
                                 </th>
-                                <th className="px-3 py-2 text-left font-medium text-[var(--sf-text-tertiary)]">
+                                <th className="px-3 py-2 text-left font-medium text-slds-neutral-7">
                                   <div className="flex items-center gap-1">Object <ChevronDown className="w-3 h-3 opacity-50" /></div>
                                 </th>
-                                <th className="px-3 py-2 text-left font-medium text-[var(--sf-text-tertiary)]">
+                                <th className="px-3 py-2 text-left font-medium text-slds-neutral-7">
                                   <div className="flex items-center gap-1">Category <ChevronDown className="w-3 h-3 opacity-50" /></div>
                                 </th>
-                                <th className="px-3 py-2 text-left font-medium text-[var(--sf-text-tertiary)]">
+                                <th className="px-3 py-2 text-left font-medium text-slds-neutral-7">
                                   <div className="flex items-center gap-1">Refresh Mode <ChevronDown className="w-3 h-3 opacity-50" /></div>
                                 </th>
-                                <th className="px-3 py-2 text-left font-medium text-[var(--sf-text-tertiary)]">
+                                <th className="px-3 py-2 text-left font-medium text-slds-neutral-7">
                                   <div className="flex items-center gap-1">Full Refresh Interval <ChevronDown className="w-3 h-3 opacity-50" /></div>
                                 </th>
-                                <th className="px-3 py-2 text-left font-medium text-[var(--sf-text-tertiary)]">
+                                <th className="px-3 py-2 text-left font-medium text-slds-neutral-7">
                                   <div className="flex items-center gap-1">Data Space Filtering <ChevronDown className="w-3 h-3 opacity-50" /></div>
                                 </th>
                               </tr>
                             </thead>
                             <tbody className="max-h-[220px] overflow-y-auto">
                               {objectRows.map((obj, i) => (
-                                <tr key={i} className="border-b border-[var(--sf-border)] last:border-b-0 hover:bg-[#FAFAF9]">
-                                  <td className="px-3 py-2 text-center text-[var(--sf-text-tertiary)]">{i + 1}</td>
+                                <tr key={i} className="border-b border-slds-border-1 last:border-b-0 hover:bg-[#FAFAF9]">
+                                  <td className="px-3 py-2 text-center text-slds-neutral-7">{i + 1}</td>
                                   <td className="px-3 py-2">
-                                    <span className="text-[var(--sf-link)] hover:underline cursor-pointer font-medium">{obj.name}</span>
+                                    <span className="text-slds-brand hover:underline cursor-pointer font-medium">{obj.name}</span>
                                   </td>
-                                  <td className="px-3 py-2 text-[var(--sf-text-secondary)]">{obj.category}</td>
-                                  <td className="px-3 py-2 text-[var(--sf-text-secondary)]">Upsert</td>
-                                  <td className="px-3 py-2 text-[var(--sf-text-secondary)]">None</td>
+                                  <td className="px-3 py-2 text-slds-neutral-9">{obj.category}</td>
+                                  <td className="px-3 py-2 text-slds-neutral-9">Upsert</td>
+                                  <td className="px-3 py-2 text-slds-neutral-9">None</td>
                                   <td className="px-3 py-2">
-                                    <span className="text-[var(--sf-link)] hover:underline cursor-pointer">Set Filters</span>
+                                    <span className="text-slds-brand hover:underline cursor-pointer">Set Filters</span>
                                   </td>
                                 </tr>
                               ))}
@@ -1906,28 +1906,28 @@ export default function DataStreamsContent({ demoSession, currentTimeline }: Dat
 
                     {/* Right sidebar — FAQs */}
                     <div className="w-[260px] flex-shrink-0">
-                      <div className="border border-[var(--sf-border)] rounded-lg bg-white overflow-hidden">
-                        <div className="px-4 py-3 border-b border-[var(--sf-border)] bg-[#FAFAF9]">
-                          <h4 className="text-sm font-semibold text-[var(--sf-text-primary)]">Frequently Asked Questions</h4>
+                      <div className="border border-slds-border-1 rounded-lg bg-white overflow-hidden">
+                        <div className="px-4 py-3 border-b border-slds-border-1 bg-[#FAFAF9]">
+                          <h4 className="text-sm font-semibold text-slds-neutral-base">Frequently Asked Questions</h4>
                         </div>
                         <div className="p-4 space-y-4">
                           <div>
-                            <h5 className="text-xs font-bold text-[var(--sf-text-primary)] mb-1">What are data space filters?</h5>
-                            <p className="text-[11px] text-[var(--sf-text-tertiary)] leading-relaxed">
+                            <h5 className="text-xs font-bold text-slds-neutral-base mb-1">What are data space filters?</h5>
+                            <p className="text-[11px] text-slds-neutral-7 leading-relaxed">
                               Data space filters let you determine which records from the data lake object are available in the context of a data space.
                             </p>
                           </div>
                           <div>
-                            <h5 className="text-xs font-bold text-[var(--sf-text-primary)] mb-1">What is a refresh mode?</h5>
-                            <p className="text-[11px] text-[var(--sf-text-tertiary)] leading-relaxed">
+                            <h5 className="text-xs font-bold text-slds-neutral-base mb-1">What is a refresh mode?</h5>
+                            <p className="text-[11px] text-slds-neutral-7 leading-relaxed">
                               After the initial data ingestion, you can opt to replace only the fields for which new data was received (partial refresh) or to replace the entire record with the data received (incremental refresh). When refresh mode is incremental, existing values can be replaced by blank values.
                             </p>
                           </div>
                           <div>
-                            <h5 className="text-xs font-bold text-[var(--sf-text-primary)] mb-1">What is the full refresh interval?</h5>
-                            <p className="text-[11px] text-[var(--sf-text-tertiary)] leading-relaxed">
+                            <h5 className="text-xs font-bold text-slds-neutral-base mb-1">What is the full refresh interval?</h5>
+                            <p className="text-[11px] text-slds-neutral-7 leading-relaxed">
                               The full refresh interval helps determine when a periodic full refresh is triggered. By default it's disabled, but you can enable and configure it to a desired interval.
-                              <span className="text-[var(--sf-link)] hover:underline cursor-pointer ml-1">Learn more</span>
+                              <span className="text-slds-brand hover:underline cursor-pointer ml-1">Learn more</span>
                             </p>
                           </div>
                         </div>
@@ -1939,10 +1939,10 @@ export default function DataStreamsContent({ demoSession, currentTimeline }: Dat
             </div>
 
             {/* Footer with step indicator */}
-            <div className="flex items-center justify-between px-6 py-4 border-t border-[var(--sf-border)] bg-[#FAFAF9]">
+            <div className="flex items-center justify-between px-6 py-4 border-t border-slds-border-1 bg-[#FAFAF9]">
               <div className="flex items-center gap-2">
                 {newModalStep > 1 && (
-                  <button onClick={handleNewBack} className="px-4 py-2 text-sm font-medium text-[var(--sf-text-secondary)] border border-[var(--sf-border)] rounded hover:bg-[#F3F3F3]">
+                  <button onClick={handleNewBack} className="px-4 py-2 text-sm font-medium text-slds-neutral-9 border border-slds-border-1 rounded hover:bg-slds-neutral-2">
                     Previous
                   </button>
                 )}
@@ -1950,13 +1950,13 @@ export default function DataStreamsContent({ demoSession, currentTimeline }: Dat
                   {[1, 2, 3, 4].map((s) => (
                     <div key={s} className="flex items-center gap-1">
                       <div className={`w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-medium ${
-                        s < newModalStep ? 'bg-[var(--sf-success)] text-white' :
-                        s === newModalStep ? 'bg-[var(--sf-blue)] text-white' :
-                        'bg-[#E5E5E5] text-[var(--sf-text-tertiary)]'
+                        s < newModalStep ? 'bg-slds-success-1 text-white' :
+                        s === newModalStep ? 'bg-slds-brand text-white' :
+                        'bg-slds-border-2 text-slds-neutral-7'
                       }`}>
                         {s < newModalStep ? <Check className="w-2.5 h-2.5" /> : s}
                       </div>
-                      {s < 4 && <div className={`w-16 h-0.5 ${s < newModalStep ? 'bg-[var(--sf-success)]' : 'bg-[#E5E5E5]'}`} />}
+                      {s < 4 && <div className={`w-16 h-0.5 ${s < newModalStep ? 'bg-slds-success-1' : 'bg-slds-border-2'}`} />}
                     </div>
                   ))}
                 </div>
@@ -1964,11 +1964,11 @@ export default function DataStreamsContent({ demoSession, currentTimeline }: Dat
               <div className="flex items-center gap-3">
                 {newModalStep === 1 && (
                   <>
-                    <button onClick={() => setNewModalOpen(false)} className="px-4 py-2 text-sm font-medium text-[var(--sf-text-secondary)] border border-[var(--sf-border)] rounded hover:bg-[#F3F3F3]">Cancel</button>
+                    <button onClick={() => setNewModalOpen(false)} className="px-4 py-2 text-sm font-medium text-slds-neutral-9 border border-slds-border-1 rounded hover:bg-slds-neutral-2">Cancel</button>
                     <button
                       onClick={handleNewNext}
                       disabled={!selectedSource}
-                      className="px-5 py-2 text-sm font-medium text-white bg-[var(--sf-blue)] rounded hover:bg-[var(--sf-blue-hover)] disabled:opacity-50 disabled:cursor-not-allowed"
+                      className="px-5 py-2 text-sm font-medium text-white bg-slds-brand rounded hover:bg-slds-brand-contrast-1 disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                       Next
                     </button>
@@ -1978,7 +1978,7 @@ export default function DataStreamsContent({ demoSession, currentTimeline }: Dat
                   <button
                     onClick={handleNewNext}
                     disabled={selectedSource === 'informatica' && selectedBundles.size === 0}
-                    className="px-5 py-2 text-sm font-medium text-white bg-[var(--sf-blue)] rounded hover:bg-[var(--sf-blue-hover)] disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="px-5 py-2 text-sm font-medium text-white bg-slds-brand rounded hover:bg-slds-brand-contrast-1 disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     Next
                   </button>
@@ -1986,7 +1986,7 @@ export default function DataStreamsContent({ demoSession, currentTimeline }: Dat
                 {newModalStep === 3 && (
                   <button
                     onClick={handleNewNext}
-                    className="px-5 py-2 text-sm font-medium text-white bg-[var(--sf-blue)] rounded hover:bg-[var(--sf-blue-hover)]"
+                    className="px-5 py-2 text-sm font-medium text-white bg-slds-brand rounded hover:bg-slds-brand-contrast-1"
                   >
                     Next
                   </button>
@@ -1994,7 +1994,7 @@ export default function DataStreamsContent({ demoSession, currentTimeline }: Dat
                 {newModalStep === 4 && (
                   <button
                     onClick={handleCreateStreams}
-                    className="px-5 py-2 text-sm font-medium text-white bg-[var(--sf-blue)] rounded hover:bg-[var(--sf-blue-hover)]"
+                    className="px-5 py-2 text-sm font-medium text-white bg-slds-brand rounded hover:bg-slds-brand-contrast-1"
                   >
                     Deploy
                   </button>

@@ -15,7 +15,7 @@ export const timelines: TimelineOption[] = [
     label: 'Today',
     description: 'Current live product state',
     icon: Clock,
-    color: '#0176D3',
+    color: 'var(--slds-g-color-brand)',
   },
   {
     id: '264-release',
@@ -60,16 +60,16 @@ export default function TimeMachine({ isOpen, onClose, onSelectTimeline, current
         if (e.target === overlayRef.current) onClose();
       }}
     >
-      <div className="absolute left-0 top-[44px] w-[320px] bg-white rounded-b-lg shadow-xl border border-[var(--sf-border)]">
+      <div className="absolute left-0 top-[44px] w-[320px] bg-white rounded-b-lg shadow-xl border border-slds-border-1">
         {/* Header */}
-        <div className="px-4 pt-4 pb-3 border-b border-[var(--sf-border)]">
+        <div className="px-4 pt-4 pb-3 border-b border-slds-border-1">
           <div className="flex items-center gap-2 mb-1">
             <Sparkles className="w-4 h-4 text-[#9B8BF4]" />
-            <span className="text-sm font-semibold text-[var(--sf-text-primary)]">
+            <span className="text-sm font-semibold text-slds-neutral-base">
               Time Machine
             </span>
           </div>
-          <p className="text-xs text-[var(--sf-text-tertiary)]">
+          <p className="text-xs text-slds-neutral-7">
             Switch your Data 360 view between timelines
           </p>
         </div>
@@ -84,8 +84,8 @@ export default function TimeMachine({ isOpen, onClose, onSelectTimeline, current
                 key={t.id}
                 className={`w-full flex items-center gap-3 p-3 rounded-lg border transition-all ${
                   isActive
-                    ? 'border-[var(--sf-blue)] bg-[#EEF4FF]'
-                    : 'border-[var(--sf-border)] hover:border-[var(--sf-blue-light)] hover:bg-[#F9FAFF]'
+                    ? 'border-slds-brand bg-[#EEF4FF]'
+                    : 'border-slds-border-1 hover:border-slds-brand-2 hover:bg-[#F9FAFF]'
                 }`}
                 onClick={() => {
                   onSelectTimeline(t.id);
@@ -99,15 +99,15 @@ export default function TimeMachine({ isOpen, onClose, onSelectTimeline, current
                   <Icon className="w-5 h-5 text-white" />
                 </div>
                 <div className="flex-1 text-left">
-                  <div className="text-sm font-medium text-[var(--sf-text-primary)]">
+                  <div className="text-sm font-medium text-slds-neutral-base">
                     {t.label}
                   </div>
-                  <div className="text-xs text-[var(--sf-text-tertiary)]">
+                  <div className="text-xs text-slds-neutral-7">
                     {t.description}
                   </div>
                 </div>
                 {isActive && (
-                  <Check className="w-4 h-4 text-[var(--sf-blue)] flex-shrink-0" />
+                  <Check className="w-4 h-4 text-slds-brand flex-shrink-0" />
                 )}
               </button>
             );

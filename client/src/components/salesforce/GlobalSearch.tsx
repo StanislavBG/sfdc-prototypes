@@ -83,7 +83,7 @@ export default function GlobalSearch({ onSelectResult }: GlobalSearchProps) {
         <button
           className={`sf-search-scope flex items-center gap-1 px-3 h-[32px] text-xs font-medium border rounded-l whitespace-nowrap ${
             isFocused
-              ? 'bg-white text-[var(--sf-text-secondary)] border-[var(--sf-blue-light)] border-r-[var(--sf-border)]'
+              ? 'bg-white text-slds-neutral-9 border-slds-brand-2 border-r-slds-border-1'
               : 'bg-white/10 text-white/90 border-white/25 border-r-white/15'
           }`}
         >
@@ -92,7 +92,7 @@ export default function GlobalSearch({ onSelectResult }: GlobalSearchProps) {
         </button>
         {/* Search input */}
         <div className="relative flex-1">
-          <Search className={`absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 ${isFocused ? 'text-[var(--sf-text-tertiary)]' : 'text-white/70'}`} />
+          <Search className={`absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 ${isFocused ? 'text-slds-neutral-7' : 'text-white/70'}`} />
           <input
             ref={inputRef}
             type="text"
@@ -113,7 +113,7 @@ export default function GlobalSearch({ onSelectResult }: GlobalSearchProps) {
                 setIsOpen(false);
                 inputRef.current?.focus();
               }}
-              className={`absolute right-2 top-1/2 -translate-y-1/2 ${isFocused ? 'text-[var(--sf-text-tertiary)]' : 'text-white/70'} hover:text-[var(--sf-text-primary)]`}
+              className={`absolute right-2 top-1/2 -translate-y-1/2 ${isFocused ? 'text-slds-neutral-7' : 'text-white/70'} hover:text-slds-neutral-base`}
             >
               <X className="w-4 h-4" />
             </button>
@@ -125,7 +125,7 @@ export default function GlobalSearch({ onSelectResult }: GlobalSearchProps) {
         <div className="sf-search-results">
           {Object.entries(grouped).map(([type, items]) => (
             <div key={type}>
-              <div className="px-4 py-2 text-xs font-semibold text-[var(--sf-text-tertiary)] uppercase tracking-wide bg-[#FAFAF9] border-b border-[var(--sf-border-light)]">
+              <div className="px-4 py-2 text-xs font-semibold text-slds-neutral-7 uppercase tracking-wide bg-[#FAFAF9] border-b border-slds-border-2">
                 {type}s
               </div>
               {items.map((item) => {
@@ -143,10 +143,10 @@ export default function GlobalSearch({ onSelectResult }: GlobalSearchProps) {
                       <IconComponent className="w-4 h-4 text-white" />
                     </div>
                     <div className="min-w-0">
-                      <div className="text-sm font-medium text-[var(--sf-text-primary)] truncate">
+                      <div className="text-sm font-medium text-slds-neutral-base truncate">
                         {item.name}
                       </div>
-                      <div className="text-xs text-[var(--sf-text-tertiary)] truncate">
+                      <div className="text-xs text-slds-neutral-7 truncate">
                         {item.subtitle}
                       </div>
                     </div>

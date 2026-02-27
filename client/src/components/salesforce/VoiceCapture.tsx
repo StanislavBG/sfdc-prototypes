@@ -64,7 +64,7 @@ export default function VoiceCapture({
       <div className="sf-voice-modal" onClick={(e) => e.stopPropagation()}>
         {/* Header */}
         <div className="sf-voice-header">
-          <span className="text-sm font-semibold text-[var(--sf-text-primary)]">
+          <span className="text-sm font-semibold text-slds-neutral-base">
             Voice Input
           </span>
           <button
@@ -103,7 +103,7 @@ export default function VoiceCapture({
                 ))}
               </div>
             )}
-            <p className="text-xs text-[var(--sf-text-tertiary)] mt-3">
+            <p className="text-xs text-slds-neutral-7 mt-3">
               {isRecording
                 ? 'Listening… tap to stop'
                 : capturedText
@@ -116,7 +116,7 @@ export default function VoiceCapture({
           {capturedText && (
             <div className="sf-voice-result">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-xs font-medium text-[var(--sf-text-tertiary)] uppercase tracking-wide">
+                <span className="text-xs font-medium text-slds-neutral-7 uppercase tracking-wide">
                   Captured Text
                 </span>
                 <button
@@ -136,7 +136,7 @@ export default function VoiceCapture({
                   rows={3}
                 />
               ) : (
-                <p className="text-sm text-[var(--sf-text-primary)] leading-relaxed">
+                <p className="text-sm text-slds-neutral-base leading-relaxed">
                   {capturedText}
                 </p>
               )}

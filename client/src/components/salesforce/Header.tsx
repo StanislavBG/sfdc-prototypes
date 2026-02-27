@@ -141,12 +141,12 @@ export default function Header({
           </button>
 
           {figmaMenuOpen && (
-            <div className="absolute right-0 top-full mt-1 w-[260px] bg-white rounded-lg shadow-xl border border-[var(--sf-border)] z-50">
-              <div className="flex items-center justify-between px-4 py-3 border-b border-[var(--sf-border)]">
-                <span className="text-sm font-semibold text-[var(--sf-text-primary)]">Export to Figma</span>
+            <div className="absolute right-0 top-full mt-1 w-[260px] bg-white rounded-lg shadow-xl border border-slds-border-1 z-50">
+              <div className="flex items-center justify-between px-4 py-3 border-b border-slds-border-1">
+                <span className="text-sm font-semibold text-slds-neutral-base">Export to Figma</span>
                 <button
                   onClick={() => setFigmaMenuOpen(false)}
-                  className="w-6 h-6 flex items-center justify-center rounded hover:bg-[#F3F3F3] text-[var(--sf-text-tertiary)]"
+                  className="w-6 h-6 flex items-center justify-center rounded hover:bg-slds-neutral-2 text-slds-neutral-7"
                 >
                   <X className="w-3.5 h-3.5" />
                 </button>
@@ -154,22 +154,22 @@ export default function Header({
               <div className="py-1">
                 <button
                   onClick={() => { setFigmaMenuOpen(false); onExportSvg?.(); }}
-                  className="w-full flex items-center gap-3 px-4 py-3 hover:bg-[#F3F3F3] transition-colors"
+                  className="w-full flex items-center gap-3 px-4 py-3 hover:bg-slds-neutral-2 transition-colors"
                 >
-                  <Download className="w-4 h-4 text-[var(--sf-text-tertiary)]" />
+                  <Download className="w-4 h-4 text-slds-neutral-7" />
                   <div className="flex-1 text-left">
-                    <span className="text-sm font-medium text-[var(--sf-text-primary)] block">Download as SVG</span>
-                    <span className="text-[10px] text-[var(--sf-text-tertiary)]">Editable vectors in Figma</span>
+                    <span className="text-sm font-medium text-slds-neutral-base block">Download as SVG</span>
+                    <span className="text-[10px] text-slds-neutral-7">Editable vectors in Figma</span>
                   </div>
                 </button>
                 <button
                   onClick={() => { setFigmaMenuOpen(false); onExportHtml?.(); }}
-                  className="w-full flex items-center gap-3 px-4 py-3 hover:bg-[#F3F3F3] transition-colors"
+                  className="w-full flex items-center gap-3 px-4 py-3 hover:bg-slds-neutral-2 transition-colors"
                 >
-                  <Clipboard className="w-4 h-4 text-[var(--sf-text-tertiary)]" />
+                  <Clipboard className="w-4 h-4 text-slds-neutral-7" />
                   <div className="flex-1 text-left">
-                    <span className="text-sm font-medium text-[var(--sf-text-primary)] block">Copy HTML for Figma Plugin</span>
-                    <span className="text-[10px] text-[var(--sf-text-tertiary)]">Paste into html.to.design</span>
+                    <span className="text-sm font-medium text-slds-neutral-base block">Copy HTML for Figma Plugin</span>
+                    <span className="text-[10px] text-slds-neutral-7">Paste into html.to.design</span>
                   </div>
                 </button>
               </div>
@@ -188,13 +188,13 @@ export default function Header({
           </button>
 
           {setupMenuOpen && (
-            <div className="absolute right-0 top-full mt-1 w-[280px] bg-white rounded-lg shadow-xl border border-[var(--sf-border)] z-50">
+            <div className="absolute right-0 top-full mt-1 w-[280px] bg-white rounded-lg shadow-xl border border-slds-border-1 z-50">
               {/* Dropdown header */}
-              <div className="flex items-center justify-between px-4 py-3 border-b border-[var(--sf-border)]">
-                <span className="text-sm font-semibold text-[var(--sf-text-primary)]">Setup Menu</span>
+              <div className="flex items-center justify-between px-4 py-3 border-b border-slds-border-1">
+                <span className="text-sm font-semibold text-slds-neutral-base">Setup Menu</span>
                 <button
                   onClick={() => setSetupMenuOpen(false)}
-                  className="w-6 h-6 flex items-center justify-center rounded hover:bg-[#F3F3F3] text-[var(--sf-text-tertiary)]"
+                  className="w-6 h-6 flex items-center justify-center rounded hover:bg-slds-neutral-2 text-slds-neutral-7"
                 >
                   <X className="w-3.5 h-3.5" />
                 </button>
@@ -206,13 +206,13 @@ export default function Header({
                     setSetupMenuOpen(false);
                     onOpenDataCloudSetup?.();
                   }}
-                  className="w-full flex items-center gap-3 px-4 py-3 hover:bg-[#F3F3F3] transition-colors border-2 border-transparent hover:border-[var(--sf-blue)] rounded-lg mx-0"
+                  className="w-full flex items-center gap-3 px-4 py-3 hover:bg-slds-neutral-2 transition-colors border-2 border-transparent hover:border-slds-brand rounded-lg mx-0"
                 >
                   <div className="w-8 h-8 rounded bg-[#5A3E9E] flex items-center justify-center flex-shrink-0">
                     <Zap className="w-4 h-4 text-white" />
                   </div>
-                  <span className="text-sm font-medium text-[var(--sf-text-primary)] flex-1 text-left">Data Cloud Setup</span>
-                  <ExternalLink className="w-3.5 h-3.5 text-[var(--sf-text-tertiary)]" />
+                  <span className="text-sm font-medium text-slds-neutral-base flex-1 text-left">Data Cloud Setup</span>
+                  <ExternalLink className="w-3.5 h-3.5 text-slds-neutral-7" />
                 </button>
               </div>
             </div>

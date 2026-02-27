@@ -54,7 +54,7 @@ export default function WorkflowSidebar({
         <div className="sf-workflow-input-group">
           <div className="flex items-center gap-2 mb-2">
             <Sparkles className="w-4 h-4 text-[#9B8BF4]" />
-            <span className="text-xs font-semibold text-[var(--sf-text-primary)]">
+            <span className="text-xs font-semibold text-slds-neutral-base">
               What are you working on today?
             </span>
           </div>
@@ -108,7 +108,7 @@ export default function WorkflowSidebar({
                   <span className="sf-workflow-item-label">{wf.title}</span>
                   <span className="sf-workflow-item-desc">{wf.description}</span>
                 </div>
-                <ChevronRight className="w-3.5 h-3.5 text-[var(--sf-text-tertiary)] flex-shrink-0 opacity-0 group-hover:opacity-100" />
+                <ChevronRight className="w-3.5 h-3.5 text-slds-neutral-7 flex-shrink-0 opacity-0 group-hover:opacity-100" />
               </button>
             );
           })}
@@ -135,7 +135,7 @@ export default function WorkflowSidebar({
                   <span className="sf-workflow-item-label">{wf.title}</span>
                   <span className="sf-workflow-item-desc">{wf.description}</span>
                 </div>
-                <ChevronRight className="w-3.5 h-3.5 text-[var(--sf-text-tertiary)] flex-shrink-0 opacity-0 group-hover:opacity-100" />
+                <ChevronRight className="w-3.5 h-3.5 text-slds-neutral-7 flex-shrink-0 opacity-0 group-hover:opacity-100" />
               </button>
             );
           })}

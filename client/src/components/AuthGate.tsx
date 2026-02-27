@@ -72,7 +72,7 @@ export default function AuthGate({ children }: { children: React.ReactNode }) {
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        background: '#032D60',
+        background: 'var(--slds-g-color-brand-1)',
         fontFamily:
           "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
       }}
@@ -93,7 +93,7 @@ export default function AuthGate({ children }: { children: React.ReactNode }) {
             width: 56,
             height: 56,
             borderRadius: '50%',
-            background: '#032D60',
+            background: 'var(--slds-g-color-brand-1)',
             margin: '0 auto 20px',
             display: 'flex',
             alignItems: 'center',
@@ -109,7 +109,7 @@ export default function AuthGate({ children }: { children: React.ReactNode }) {
           style={{
             fontSize: 20,
             fontWeight: 700,
-            color: '#032D60',
+            color: 'var(--slds-g-color-brand-1)',
             margin: '0 0 4px',
           }}
         >

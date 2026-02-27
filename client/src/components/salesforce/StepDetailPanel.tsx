@@ -39,10 +39,10 @@ export default function StepDetailPanel({ step }: StepDetailPanelProps) {
             <Icon className="w-4 h-4" />
           </div>
           <div>
-            <h3 className="text-sm font-semibold text-[var(--sf-text-primary)]">
+            <h3 className="text-sm font-semibold text-slds-neutral-base">
               {detailContent.heading}
             </h3>
-            <span className="text-xs text-[var(--sf-text-tertiary)]">
+            <span className="text-xs text-slds-neutral-7">
               {typeLabels[step.detailType]}
             </span>
           </div>
@@ -54,7 +54,7 @@ export default function StepDetailPanel({ step }: StepDetailPanelProps) {
       </div>
 
       {/* Description */}
-      <p className="text-xs text-[var(--sf-text-tertiary)] px-4 pb-3 leading-relaxed">
+      <p className="text-xs text-slds-neutral-7 px-4 pb-3 leading-relaxed">
         {detailContent.description}
       </p>
 
@@ -66,14 +66,14 @@ export default function StepDetailPanel({ step }: StepDetailPanelProps) {
             {detailContent.options.map((opt) => (
               <button key={opt.label} className="sf-step-option-card">
                 <div className="flex items-start justify-between">
-                  <span className="text-sm font-medium text-[var(--sf-text-primary)]">
+                  <span className="text-sm font-medium text-slds-neutral-base">
                     {opt.label}
                   </span>
                   {opt.recommended && (
                     <span className="sf-badge sf-badge-info">Recommended</span>
                   )}
                 </div>
-                <span className="text-xs text-[var(--sf-text-tertiary)] mt-1">
+                <span className="text-xs text-slds-neutral-7 mt-1">
                   {opt.description}
                 </span>
               </button>
@@ -107,8 +107,8 @@ export default function StepDetailPanel({ step }: StepDetailPanelProps) {
           <div className="sf-step-tips">
             {detailContent.tips.map((tip, i) => (
               <div key={i} className="sf-step-tip">
-                <Lightbulb className="w-3.5 h-3.5 text-[var(--sf-warning)] flex-shrink-0 mt-0.5" />
-                <span className="text-xs text-[var(--sf-text-secondary)] leading-relaxed">
+                <Lightbulb className="w-3.5 h-3.5 text-slds-warning-1 flex-shrink-0 mt-0.5" />
+                <span className="text-xs text-slds-neutral-9 leading-relaxed">
                   {tip}
                 </span>
               </div>

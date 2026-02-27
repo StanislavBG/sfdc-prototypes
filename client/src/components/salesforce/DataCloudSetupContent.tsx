@@ -697,31 +697,31 @@ export default function DataCloudSetupContent({ onBack, demoSession, onDemoSessi
   return (
     <div className="h-full flex flex-col">
       {/* Setup Header Bar */}
-      <div className="bg-white border-b border-[var(--sf-border)] px-4 py-2 flex items-center gap-3">
-        <button onClick={onBack} className="flex items-center gap-1 text-xs text-[var(--sf-link)] hover:underline">
+      <div className="bg-white border-b border-slds-border-1 px-4 py-2 flex items-center gap-3">
+        <button onClick={onBack} className="flex items-center gap-1 text-xs text-slds-brand hover:underline">
           <ArrowLeft className="w-3.5 h-3.5" />
           Back to Data 360
         </button>
-        <div className="w-px h-4 bg-[var(--sf-border)]" />
-        <span className="text-sm font-semibold text-[var(--sf-text-primary)]">Data Cloud Setup</span>
+        <div className="w-px h-4 bg-slds-border-1" />
+        <span className="text-sm font-semibold text-slds-neutral-base">Data Cloud Setup</span>
         <div className="flex-1" />
-        <span className="text-xs text-[var(--sf-text-tertiary)]">Home</span>
-        <span className="text-xs text-[var(--sf-text-tertiary)]">Object Manager</span>
+        <span className="text-xs text-slds-neutral-7">Home</span>
+        <span className="text-xs text-slds-neutral-7">Object Manager</span>
       </div>
 
       <div className="flex flex-1 overflow-hidden">
         {/* ── Left Nav ── */}
-        <nav className="w-[220px] min-w-[220px] bg-white border-r border-[var(--sf-border)] flex flex-col h-full overflow-y-auto">
+        <nav className="w-[220px] min-w-[220px] bg-white border-r border-slds-border-1 flex flex-col h-full overflow-y-auto">
           {/* Quick Find */}
           <div className="p-3">
             <div className="relative">
-              <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-[var(--sf-text-tertiary)]" />
+              <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slds-neutral-7" />
               <input
                 type="text"
                 placeholder="Quick Find"
                 value={quickFindQuery}
                 onChange={(e) => setQuickFindQuery(e.target.value)}
-                className="w-full pl-8 pr-3 py-1.5 text-xs border border-[var(--sf-border)] rounded focus:outline-none focus:border-[var(--sf-blue-light)] focus:ring-1 focus:ring-[rgba(27,150,255,0.2)]"
+                className="w-full pl-8 pr-3 py-1.5 text-xs border border-slds-border-1 rounded focus:outline-none focus:border-slds-brand-2 focus:ring-1 focus:ring-[rgba(27,150,255,0.2)]"
               />
             </div>
           </div>
@@ -731,7 +731,7 @@ export default function DataCloudSetupContent({ onBack, demoSession, onDemoSessi
             {filteredSections.map((section, si) => (
               <div key={si}>
                 {section.title && (
-                  <div className="px-4 pt-4 pb-1 text-[10px] font-bold uppercase tracking-wider text-[var(--sf-text-tertiary)]">
+                  <div className="px-4 pt-4 pb-1 text-[10px] font-bold uppercase tracking-wider text-slds-neutral-7">
                     {section.title}
                   </div>
                 )}
@@ -747,13 +747,13 @@ export default function DataCloudSetupContent({ onBack, demoSession, onDemoSessi
                           ? (item.id === 'informatica-mdm-sf' || item.id === 'informatica-mdm'
                               ? 'bg-[#FFF3ED] text-[#FF4A00] font-semibold'
                               : item.id === 'solution-manager'
-                                ? 'bg-[#EEF4FF] text-[#0070D2] font-bold'
-                                : 'bg-[#EEF4FF] text-[var(--sf-blue)] font-semibold')
+                                ? 'bg-[#EEF4FF] text-slds-brand font-bold'
+                                : 'bg-[#EEF4FF] text-slds-brand font-semibold')
                           : (item.id === 'informatica-mdm-sf'
                               ? 'text-[#FF4A00] font-medium hover:bg-[#FFF3ED]'
                               : item.id === 'solution-manager'
-                                ? 'text-[#0070D2] font-semibold hover:bg-[#EEF4FF]'
-                                : 'text-[var(--sf-text-secondary)] hover:bg-[#F3F3F3]')
+                                ? 'text-slds-brand font-semibold hover:bg-[#EEF4FF]'
+                                : 'text-slds-neutral-9 hover:bg-slds-neutral-2')
                       }`}
                     >
                       {item.hasChildren && (
@@ -761,12 +761,12 @@ export default function DataCloudSetupContent({ onBack, demoSession, onDemoSessi
                           ? <ChevronDown className="w-3 h-3 flex-shrink-0" />
                           : <ChevronRight className="w-3 h-3 flex-shrink-0" />
                       )}
-                      <span className={activeNavItem === item.id ? (item.id === 'informatica-mdm-sf' || item.id === 'informatica-mdm' ? 'text-[#FF4A00]' : item.id === 'solution-manager' ? 'text-[#0070D2]' : 'sf-link') : item.id === 'solution-manager' ? 'text-[#0070D2]' : ''}>{item.label}</span>
+                      <span className={activeNavItem === item.id ? (item.id === 'informatica-mdm-sf' || item.id === 'informatica-mdm' ? 'text-[#FF4A00]' : item.id === 'solution-manager' ? 'text-slds-brand' : 'sf-link') : item.id === 'solution-manager' ? 'text-slds-brand' : ''}>{item.label}</span>
                       {item.id === 'informatica-mdm-sf' && (
                         <span className="ml-auto px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wider bg-[#FF4A00] text-white rounded">New</span>
                       )}
                       {item.id === 'solution-manager' && (
-                        <span className="ml-auto px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wider bg-[#0070D2] text-white rounded">New</span>
+                        <span className="ml-auto px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wider bg-slds-brand text-white rounded">New</span>
                       )}
                     </button>
                     {item.hasChildren && expandedNavItems.has(item.id) && item.children?.map((child) => (
@@ -774,7 +774,7 @@ export default function DataCloudSetupContent({ onBack, demoSession, onDemoSessi
                         key={child.id}
                         onClick={() => setActiveNavItem(child.id)}
                         className={`w-full flex items-center pl-10 pr-4 py-1.5 text-xs text-left transition-colors ${
-                          activeNavItem === child.id ? 'bg-[#EEF4FF] text-[var(--sf-blue)] font-semibold' : 'text-[var(--sf-text-secondary)] hover:bg-[#F3F3F3]'
+                          activeNavItem === child.id ? 'bg-[#EEF4FF] text-slds-brand font-semibold' : 'text-slds-neutral-9 hover:bg-slds-neutral-2'
                         }`}
                       >
                         {child.label}
@@ -788,24 +788,24 @@ export default function DataCloudSetupContent({ onBack, demoSession, onDemoSessi
         </nav>
 
         {/* ── Main Content ── */}
-        <main className="flex-1 overflow-y-auto bg-[var(--sf-content-bg)]">
+        <main className="flex-1 overflow-y-auto bg-slds-neutral-2">
           {activeNavItem === 'setup-home' ? (
             /* ═══════════════════════════════════════════════════════════
                DATA CLOUD SETUP HOME — Matches Salesforce reference layout
                ═══════════════════════════════════════════════════════════ */
             <div>
               {/* Page header — SETUP / Data Cloud Setup */}
-              <div className="bg-white border-b border-[var(--sf-border)] px-6 py-4 flex items-center justify-between">
+              <div className="bg-white border-b border-slds-border-1 px-6 py-4 flex items-center justify-between">
                 <div className="flex items-center gap-4">
                   <div className="w-10 h-10 rounded bg-[#F49756] flex items-center justify-center flex-shrink-0">
                     <svg viewBox="0 0 24 24" className="w-5 h-5 text-white" fill="currentColor"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
                   </div>
                   <div>
-                    <div className="text-xs font-medium text-[var(--sf-blue)] uppercase tracking-wide">SETUP</div>
-                    <h1 className="text-lg font-bold text-[var(--sf-text-primary)]">Data Cloud Setup</h1>
+                    <div className="text-xs font-medium text-slds-brand uppercase tracking-wide">SETUP</div>
+                    <h1 className="text-lg font-bold text-slds-neutral-base">Data Cloud Setup</h1>
                   </div>
                 </div>
-                <button className="px-4 py-1.5 text-sm font-medium text-white bg-[var(--sf-blue)] rounded hover:bg-[var(--sf-blue-hover)] flex items-center gap-1">
+                <button className="px-4 py-1.5 text-sm font-medium text-white bg-slds-brand rounded hover:bg-slds-brand-contrast-1 flex items-center gap-1">
                   Create <ChevronDown className="w-3.5 h-3.5" />
                 </button>
               </div>
@@ -818,14 +818,14 @@ export default function DataCloudSetupContent({ onBack, demoSession, onDemoSessi
                     Data Cloud standard permission sets have changed. Some users must be assigned to new permission sets. Find out what's changed and what you should do next.
                   </p>
                 </div>
-                <button className="text-sm font-medium text-[var(--sf-link)] hover:underline flex-shrink-0 ml-4">Learn More</button>
+                <button className="text-sm font-medium text-slds-brand hover:underline flex-shrink-0 ml-4">Learn More</button>
               </div>
 
               {/* Welcome to Data Cloud hero */}
-              <div className="relative bg-white border-b border-[var(--sf-border)] overflow-hidden">
+              <div className="relative bg-white border-b border-slds-border-1 overflow-hidden">
                 <div className="px-6 py-8 max-w-3xl">
-                  <h2 className="text-3xl font-bold text-[var(--sf-text-primary)] mb-4">Welcome to Data Cloud</h2>
-                  <p className="text-sm text-[var(--sf-text-secondary)] leading-relaxed">
+                  <h2 className="text-3xl font-bold text-slds-neutral-base mb-4">Welcome to Data Cloud</h2>
+                  <p className="text-sm text-slds-neutral-9 leading-relaxed">
                     Harness the power of Data Cloud to unify all your company's data into a holistic view of each customer. Data Cloud consolidates data from all your source systems into Customer 360 profiles to help you understand your customers, empower your teams, and drive business decisions. Use Data Cloud's unified profile data to drive automation and analytics, personalize engagements, and power trusted AI.
                   </p>
                 </div>
@@ -857,8 +857,8 @@ export default function DataCloudSetupContent({ onBack, demoSession, onDemoSessi
                   onClick={() => setSetupHomeLearnOpen(!setupHomeLearnOpen)}
                   className="flex items-center gap-2 mb-4"
                 >
-                  {setupHomeLearnOpen ? <ChevronDown className="w-5 h-5 text-[var(--sf-text-tertiary)]" /> : <ChevronRight className="w-5 h-5 text-[var(--sf-text-tertiary)]" />}
-                  <h3 className="text-base font-semibold text-[var(--sf-text-primary)]">Learn About Data Cloud</h3>
+                  {setupHomeLearnOpen ? <ChevronDown className="w-5 h-5 text-slds-neutral-7" /> : <ChevronRight className="w-5 h-5 text-slds-neutral-7" />}
+                  <h3 className="text-base font-semibold text-slds-neutral-base">Learn About Data Cloud</h3>
                 </button>
 
                 {setupHomeLearnOpen && (
@@ -866,7 +866,7 @@ export default function DataCloudSetupContent({ onBack, demoSession, onDemoSessi
                     {/* Left — tabs + content */}
                     <div className="flex-1 min-w-0">
                       {/* Tab bar */}
-                      <div className="flex border-b border-[var(--sf-border)] mb-5">
+                      <div className="flex border-b border-slds-border-1 mb-5">
                         {(['get-started', 'plan-data', 'monitor'] as const).map((tab) => {
                           const labels = { 'get-started': 'Get Started', 'plan-data': 'Plan Data Strategy', monitor: 'Monitor Data Cloud' };
                           return (
@@ -875,8 +875,8 @@ export default function DataCloudSetupContent({ onBack, demoSession, onDemoSessi
                               onClick={() => setSetupHomeTab(tab)}
                               className={`px-4 py-2.5 text-sm font-medium border-b-2 transition-colors ${
                                 setupHomeTab === tab
-                                  ? 'border-[var(--sf-blue)] text-[var(--sf-blue)]'
-                                  : 'border-transparent text-[var(--sf-text-tertiary)] hover:text-[var(--sf-text-secondary)]'
+                                  ? 'border-slds-brand text-slds-brand'
+                                  : 'border-transparent text-slds-neutral-7 hover:text-slds-neutral-9'
                               }`}
                             >
                               {labels[tab]}
@@ -888,15 +888,15 @@ export default function DataCloudSetupContent({ onBack, demoSession, onDemoSessi
                       {/* Tab content */}
                       {setupHomeTab === 'get-started' && (
                         <div>
-                          <p className="text-sm text-[var(--sf-text-secondary)] leading-relaxed mb-2">
+                          <p className="text-sm text-slds-neutral-9 leading-relaxed mb-2">
                             Ensure that your org has all the necessary licenses to enable access to the features you need to use. Set up data spaces to organize and secure your data. Use permission sets to grant your users access to Data Cloud data and features.
                           </p>
-                          <p className="text-sm text-[var(--sf-text-secondary)] leading-relaxed mb-6">
+                          <p className="text-sm text-slds-neutral-9 leading-relaxed mb-6">
                             Credits are consumed by usage of features and services. Use Digital Wallet to check your recent consumption and consumption trends.
                           </p>
 
-                          <h4 className="text-sm font-bold text-[var(--sf-text-primary)] mb-3">Get Started</h4>
-                          <div className="border border-[var(--sf-border)] rounded-lg divide-y divide-[var(--sf-border)]">
+                          <h4 className="text-sm font-bold text-slds-neutral-base mb-3">Get Started</h4>
+                          <div className="border border-slds-border-1 rounded-lg divide-y divide-slds-border-1">
                             {[
                               { label: 'Review or add licenses', action: 'Check Your Account', navId: '' },
                               { label: 'Partition data with data spaces', action: 'Open Data Spaces Setup', navId: 'data-spaces' },
@@ -904,10 +904,10 @@ export default function DataCloudSetupContent({ onBack, demoSession, onDemoSessi
                               { label: 'Check credit consumption', action: 'Open Digital Wallet', navId: '' },
                             ].map((item, i) => (
                               <div key={i} className="flex items-center justify-between px-4 py-3">
-                                <span className="text-sm text-[var(--sf-text-secondary)]">{item.label}</span>
+                                <span className="text-sm text-slds-neutral-9">{item.label}</span>
                                 <button
                                   onClick={() => item.navId && setActiveNavItem(item.navId)}
-                                  className="text-sm font-medium text-[var(--sf-link)] hover:underline"
+                                  className="text-sm font-medium text-slds-brand hover:underline"
                                 >
                                   {item.action}
                                 </button>
@@ -919,18 +919,18 @@ export default function DataCloudSetupContent({ onBack, demoSession, onDemoSessi
 
                       {setupHomeTab === 'plan-data' && (
                         <div>
-                          <p className="text-sm text-[var(--sf-text-secondary)] leading-relaxed mb-4">
+                          <p className="text-sm text-slds-neutral-9 leading-relaxed mb-4">
                             Plan your data strategy by mapping your source systems, defining data models, and establishing data quality rules before connecting your data to Data Cloud.
                           </p>
-                          <div className="border border-[var(--sf-border)] rounded-lg divide-y divide-[var(--sf-border)]">
+                          <div className="border border-slds-border-1 rounded-lg divide-y divide-slds-border-1">
                             {[
                               { label: 'Map source systems and data objects', action: 'View Data Model' },
                               { label: 'Define identity resolution strategy', action: 'Identity Resolution' },
                               { label: 'Set up calculated insights', action: 'Create Insights' },
                             ].map((item, i) => (
                               <div key={i} className="flex items-center justify-between px-4 py-3">
-                                <span className="text-sm text-[var(--sf-text-secondary)]">{item.label}</span>
-                                <button className="text-sm font-medium text-[var(--sf-link)] hover:underline">{item.action}</button>
+                                <span className="text-sm text-slds-neutral-9">{item.label}</span>
+                                <button className="text-sm font-medium text-slds-brand hover:underline">{item.action}</button>
                               </div>
                             ))}
                           </div>
@@ -939,18 +939,18 @@ export default function DataCloudSetupContent({ onBack, demoSession, onDemoSessi
 
                       {setupHomeTab === 'monitor' && (
                         <div>
-                          <p className="text-sm text-[var(--sf-text-secondary)] leading-relaxed mb-4">
+                          <p className="text-sm text-slds-neutral-9 leading-relaxed mb-4">
                             Monitor your Data Cloud usage, job statuses, and system health to ensure your data pipelines are running smoothly.
                           </p>
-                          <div className="border border-[var(--sf-border)] rounded-lg divide-y divide-[var(--sf-border)]">
+                          <div className="border border-slds-border-1 rounded-lg divide-y divide-slds-border-1">
                             {[
                               { label: 'Check data stream health', action: 'View Data Streams' },
                               { label: 'Monitor identity resolution jobs', action: 'View Jobs' },
                               { label: 'Review error logs', action: 'View Logs' },
                             ].map((item, i) => (
                               <div key={i} className="flex items-center justify-between px-4 py-3">
-                                <span className="text-sm text-[var(--sf-text-secondary)]">{item.label}</span>
-                                <button className="text-sm font-medium text-[var(--sf-link)] hover:underline">{item.action}</button>
+                                <span className="text-sm text-slds-neutral-9">{item.label}</span>
+                                <button className="text-sm font-medium text-slds-brand hover:underline">{item.action}</button>
                               </div>
                             ))}
                           </div>
@@ -960,8 +960,8 @@ export default function DataCloudSetupContent({ onBack, demoSession, onDemoSessi
 
                     {/* Right sidebar — Resources */}
                     <div className="w-[260px] flex-shrink-0">
-                      <div className="border-l-2 border-[var(--sf-border)] pl-5">
-                        <h4 className="text-base font-semibold text-[var(--sf-text-primary)] mb-4">Resources</h4>
+                      <div className="border-l-2 border-slds-border-1 pl-5">
+                        <h4 className="text-base font-semibold text-slds-neutral-base mb-4">Resources</h4>
                         <div className="space-y-3">
                           {[
                             { label: 'About Salesforce Data Cloud', icon: '📘' },
@@ -970,7 +970,7 @@ export default function DataCloudSetupContent({ onBack, demoSession, onDemoSessi
                             { label: 'Data Cloud Features and Learning Path', icon: '📚' },
                             { label: 'Get Started Using Data Cloud', icon: '🚀' },
                           ].map((res, i) => (
-                            <button key={i} className="flex items-center gap-2 text-sm text-[var(--sf-link)] hover:underline w-full text-left">
+                            <button key={i} className="flex items-center gap-2 text-sm text-slds-brand hover:underline w-full text-left">
                               <span className="text-base flex-shrink-0">{res.icon}</span>
                               {res.label}
                             </button>
@@ -988,16 +988,16 @@ export default function DataCloudSetupContent({ onBack, demoSession, onDemoSessi
                ═══════════════════════════════════════════════════════════ */
             <div>
               {/* Page header */}
-              <div className="bg-white border-b border-[var(--sf-border)] px-6 py-4">
-                <div className="text-xs font-medium text-[var(--sf-blue)] uppercase tracking-wide">SETUP</div>
-                <h1 className="text-lg font-bold text-[var(--sf-text-primary)]">Data 360 Org Allowlist</h1>
+              <div className="bg-white border-b border-slds-border-1 px-6 py-4">
+                <div className="text-xs font-medium text-slds-brand uppercase tracking-wide">SETUP</div>
+                <h1 className="text-lg font-bold text-slds-neutral-base">Data 360 Org Allowlist</h1>
               </div>
 
               <div className="px-6 py-6 space-y-4">
                 {/* Allowlist table placeholder */}
                 <div className="sf-card">
                   <div className="sf-card-header">
-                    <h2 className="text-base font-bold text-[var(--sf-text-primary)]">Allowed Organizations</h2>
+                    <h2 className="text-base font-bold text-slds-neutral-base">Allowed Organizations</h2>
                   </div>
                   <div className="sf-card-body">
                     <table className="sf-table w-full text-xs">
@@ -1012,7 +1012,7 @@ export default function DataCloudSetupContent({ onBack, demoSession, onDemoSessi
                         <tr>
                           <td className="sf-link font-medium">00Dfo000001QldR</td>
                           <td>Data Cloud SG</td>
-                          <td><span className="inline-flex items-center gap-1 text-xs font-medium text-[var(--sf-success)]"><CheckCircle2 className="w-3.5 h-3.5" /> Active</span></td>
+                          <td><span className="inline-flex items-center gap-1 text-xs font-medium text-slds-success-1"><CheckCircle2 className="w-3.5 h-3.5" /> Active</span></td>
                         </tr>
                       </tbody>
                     </table>
@@ -1020,22 +1020,22 @@ export default function DataCloudSetupContent({ onBack, demoSession, onDemoSessi
                 </div>
 
                 {/* ── Prototype Controls (moved from Setup Home) ── */}
-                <div className="border border-[var(--sf-border)] rounded-lg bg-white overflow-hidden">
+                <div className="border border-slds-border-1 rounded-lg bg-white overflow-hidden">
                   <div className="flex items-center justify-between px-5 py-3">
                     <div className="flex items-center gap-3">
                       <span className="text-2xl">😊</span>
                       <div>
-                        <h4 className="text-sm font-semibold text-[var(--sf-text-primary)]">Prototype Controls</h4>
-                        <p className="text-[10px] text-[var(--sf-text-tertiary)]">Toggle visibility of simulator branding elements</p>
+                        <h4 className="text-sm font-semibold text-slds-neutral-base">Prototype Controls</h4>
+                        <p className="text-[10px] text-slds-neutral-7">Toggle visibility of simulator branding elements</p>
                       </div>
                     </div>
                     <div className="flex items-center gap-4">
                       <div className="flex items-center gap-2">
                         <span className="text-lg">😄</span>
-                        <label className="text-xs font-medium text-[var(--sf-text-secondary)]">MDS Simulator</label>
+                        <label className="text-xs font-medium text-slds-neutral-9">MDS Simulator</label>
                         <button
                           onClick={() => setMdsSimulatorVisible(!mdsSimulatorVisible)}
-                          className={`relative w-10 h-5 rounded-full transition-colors ${mdsSimulatorVisible ? 'bg-[var(--sf-blue)]' : 'bg-[#D8DDE6]'}`}
+                          className={`relative w-10 h-5 rounded-full transition-colors ${mdsSimulatorVisible ? 'bg-slds-brand' : 'bg-[#D8DDE6]'}`}
                         >
                           <div className={`absolute top-0.5 w-4 h-4 rounded-full bg-white shadow transition-transform ${mdsSimulatorVisible ? 'translate-x-5' : 'translate-x-0.5'}`} />
                         </button>
@@ -1047,31 +1047,31 @@ export default function DataCloudSetupContent({ onBack, demoSession, onDemoSessi
 
                 {/* MDS Simulator thinking indicator */}
                 {mdsSimulatorVisible && (
-                  <div className="border-2 border-dashed border-[var(--sf-blue)]/30 rounded-lg bg-[#EEF4FF] p-4 flex items-center gap-4">
+                  <div className="border-2 border-dashed border-slds-brand/30 rounded-lg bg-[#EEF4FF] p-4 flex items-center gap-4">
                     <div className="relative w-12 h-12 flex items-center justify-center flex-shrink-0">
-                      <div className="absolute inset-0 rounded-full border-2 border-[var(--sf-blue)]/20 border-t-[var(--sf-blue)] animate-spin" />
+                      <div className="absolute inset-0 rounded-full border-2 border-slds-brand/20 border-t-slds-brand animate-spin" />
                       <div className="absolute inset-1.5 rounded-full border-2 border-[#FF4A00]/20 border-b-[#FF4A00] animate-spin" style={{ animationDirection: 'reverse', animationDuration: '1.5s' }} />
                       <span className="text-lg">🧠</span>
                     </div>
                     <div className="flex-1">
                       <div className="flex items-center gap-2 mb-1">
                         <div className="flex gap-0.5">
-                          <div className="w-1.5 h-1.5 rounded-full bg-[var(--sf-blue)] animate-bounce" style={{ animationDelay: '0ms' }} />
-                          <div className="w-1.5 h-1.5 rounded-full bg-[var(--sf-blue)] animate-bounce" style={{ animationDelay: '150ms' }} />
-                          <div className="w-1.5 h-1.5 rounded-full bg-[var(--sf-blue)] animate-bounce" style={{ animationDelay: '300ms' }} />
+                          <div className="w-1.5 h-1.5 rounded-full bg-slds-brand animate-bounce" style={{ animationDelay: '0ms' }} />
+                          <div className="w-1.5 h-1.5 rounded-full bg-slds-brand animate-bounce" style={{ animationDelay: '150ms' }} />
+                          <div className="w-1.5 h-1.5 rounded-full bg-slds-brand animate-bounce" style={{ animationDelay: '300ms' }} />
                         </div>
-                        <span className="text-xs font-medium text-[var(--sf-blue)]">Thinking...</span>
+                        <span className="text-xs font-medium text-slds-brand">Thinking...</span>
                       </div>
-                      <div className="text-base font-bold text-[var(--sf-text-primary)] tracking-wide">
+                      <div className="text-base font-bold text-slds-neutral-base tracking-wide">
                         MDS Simulator
                       </div>
-                      <p className="text-[10px] text-[var(--sf-text-tertiary)] mt-0.5">
+                      <p className="text-[10px] text-slds-neutral-7 mt-0.5">
                         Multi-Domain Simulator — Informatica MDM + Salesforce Data Cloud prototype environment
                       </p>
                     </div>
                     <div className="flex flex-col items-center gap-1 flex-shrink-0">
                       <span className="text-3xl">😃</span>
-                      <span className="text-[9px] text-[var(--sf-text-tertiary)] font-medium">Active</span>
+                      <span className="text-[9px] text-slds-neutral-7 font-medium">Active</span>
                     </div>
                   </div>
                 )}
@@ -1090,19 +1090,19 @@ export default function DataCloudSetupContent({ onBack, demoSession, onDemoSessi
                 return (
                   <div className="h-full flex flex-col">
                     {/* Breadcrumb */}
-                    <div className="bg-white border-b border-[var(--sf-border)] px-6 py-2.5 flex items-center gap-2">
-                      <button onClick={() => setSmActiveSolution(null)} className="text-xs text-[var(--sf-link)] hover:underline">Solution Manager</button>
-                      <ChevronRight className="w-3 h-3 text-[var(--sf-text-tertiary)]" />
-                      <span className="text-xs font-medium text-[var(--sf-text-primary)]">{sol.title}</span>
+                    <div className="bg-white border-b border-slds-border-1 px-6 py-2.5 flex items-center gap-2">
+                      <button onClick={() => setSmActiveSolution(null)} className="text-xs text-slds-brand hover:underline">Solution Manager</button>
+                      <ChevronRight className="w-3 h-3 text-slds-neutral-7" />
+                      <span className="text-xs font-medium text-slds-neutral-base">{sol.title}</span>
                     </div>
 
                     {/* Progress bar */}
-                    <div className="bg-white border-b border-[var(--sf-border)] px-6 py-3">
+                    <div className="bg-white border-b border-slds-border-1 px-6 py-3">
                       <div className="flex items-center justify-between mb-1.5">
-                        <span className="text-xs font-medium text-[var(--sf-text-secondary)]">Overall Progress</span>
-                        <span className="text-xs font-bold text-[#0070D2]">{progress}%</span>
+                        <span className="text-xs font-medium text-slds-neutral-9">Overall Progress</span>
+                        <span className="text-xs font-bold text-slds-brand">{progress}%</span>
                       </div>
-                      <div className="w-full h-2 bg-[#DDDBDA] rounded-full overflow-hidden">
+                      <div className="w-full h-2 bg-slds-border-1 rounded-full overflow-hidden">
                         <div
                           className="h-full rounded-full transition-all duration-500"
                           style={{ width: `${progress}%`, background: 'linear-gradient(90deg, #0070D2, #00A1E0)' }}
@@ -1113,9 +1113,9 @@ export default function DataCloudSetupContent({ onBack, demoSession, onDemoSessi
                     {/* Content: sidebar + steps */}
                     <div className="flex flex-1 overflow-hidden">
                       {/* Step sidebar */}
-                      <div className="w-[200px] min-w-[200px] bg-white border-r border-[var(--sf-border)] overflow-y-auto">
-                        <div className="px-4 py-3 border-b border-[var(--sf-border)]">
-                          <span className="text-[10px] font-bold uppercase tracking-wider text-[var(--sf-text-tertiary)]">Steps</span>
+                      <div className="w-[200px] min-w-[200px] bg-white border-r border-slds-border-1 overflow-y-auto">
+                        <div className="px-4 py-3 border-b border-slds-border-1">
+                          <span className="text-[10px] font-bold uppercase tracking-wider text-slds-neutral-7">Steps</span>
                         </div>
                         <nav className="py-2">
                           {sol.steps.map((step, idx) => {
@@ -1126,20 +1126,20 @@ export default function DataCloudSetupContent({ onBack, demoSession, onDemoSessi
                                 key={idx}
                                 onClick={() => smHandleStepClick(idx)}
                                 className={`w-full flex items-center gap-2.5 px-4 py-2.5 text-left transition-colors ${
-                                  isActive ? 'bg-[#EEF4FF]' : 'hover:bg-[#F3F3F3]'
+                                  isActive ? 'bg-[#EEF4FF]' : 'hover:bg-slds-neutral-2'
                                 }`}
                               >
                                 <div className={`w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0 text-xs font-medium ${
-                                  status === 'completed' ? 'bg-[#2E844A] text-white' :
-                                  status === 'in-progress' ? 'bg-[#0070D2] text-white' :
-                                  'border-2 border-[#DDDBDA] text-[var(--sf-text-tertiary)]'
+                                  status === 'completed' ? 'bg-slds-success-1 text-white' :
+                                  status === 'in-progress' ? 'bg-slds-brand text-white' :
+                                  'border-2 border-slds-border-1 text-slds-neutral-7'
                                 }`}>
                                   {status === 'completed' ? <Check className="w-3 h-3" /> : idx + 1}
                                 </div>
                                 <span className={`text-xs leading-tight ${
-                                  status === 'completed' ? 'text-[#2E844A] font-medium' :
-                                  status === 'in-progress' ? 'text-[#0070D2] font-semibold' :
-                                  'text-[var(--sf-text-secondary)]'
+                                  status === 'completed' ? 'text-slds-success-1 font-medium' :
+                                  status === 'in-progress' ? 'text-slds-brand font-semibold' :
+                                  'text-slds-neutral-9'
                                 }`}>
                                   {step.title}
                                 </span>
@@ -1148,9 +1148,9 @@ export default function DataCloudSetupContent({ onBack, demoSession, onDemoSessi
                           })}
                         </nav>
                         {/* Tutorial video placeholder */}
-                        <div className="mx-4 mb-4 mt-2 rounded-lg border border-[var(--sf-border)] bg-[#F3F3F3] p-4 text-center">
-                          <Play className="w-8 h-8 mx-auto text-[var(--sf-text-tertiary)] mb-2" />
-                          <span className="text-xs text-[var(--sf-text-tertiary)]">Tutorial Video</span>
+                        <div className="mx-4 mb-4 mt-2 rounded-lg border border-slds-border-1 bg-slds-neutral-2 p-4 text-center">
+                          <Play className="w-8 h-8 mx-auto text-slds-neutral-7 mb-2" />
+                          <span className="text-xs text-slds-neutral-7">Tutorial Video</span>
                         </div>
                       </div>
 
@@ -1159,8 +1159,8 @@ export default function DataCloudSetupContent({ onBack, demoSession, onDemoSessi
                         <div className="max-w-3xl">
                           {/* Solution header */}
                           <div className="mb-6">
-                            <h2 className="text-xl font-light text-[var(--sf-text-primary)] mb-1">Integrate Business Entities from Informatica</h2>
-                            <p className="text-sm text-[var(--sf-text-tertiary)]">{sol.headline}</p>
+                            <h2 className="text-xl font-light text-slds-neutral-base mb-1">Integrate Business Entities from Informatica</h2>
+                            <p className="text-sm text-slds-neutral-7">{sol.headline}</p>
                           </div>
 
                           {/* Active step card */}
@@ -1175,9 +1175,9 @@ export default function DataCloudSetupContent({ onBack, demoSession, onDemoSessi
                                 case 'action':
                                   return (
                                     <>
-                                      <p className="text-sm text-[var(--sf-text-secondary)] mb-5 leading-relaxed">{step.description}</p>
+                                      <p className="text-sm text-slds-neutral-9 mb-5 leading-relaxed">{step.description}</p>
                                       {status !== 'completed' && (
-                                        <button onClick={smHandleCompleteStep} className="px-4 py-2 text-sm font-medium text-white bg-[#0070D2] rounded hover:bg-[#005FB2] transition-colors">
+                                        <button onClick={smHandleCompleteStep} className="px-4 py-2 text-sm font-medium text-white bg-slds-brand rounded hover:bg-[#005FB2] transition-colors">
                                           {step.actionLabel}
                                         </button>
                                       )}
@@ -1189,20 +1189,20 @@ export default function DataCloudSetupContent({ onBack, demoSession, onDemoSessi
                                     <div className="space-y-4">
                                       {step.fields.map((field, fi) => (
                                         <div key={fi}>
-                                          <label className="block text-sm font-medium text-[var(--sf-text-primary)] mb-1">
-                                            {field.name} {field.required && <span className="text-[var(--sf-error)]">*</span>}
+                                          <label className="block text-sm font-medium text-slds-neutral-base mb-1">
+                                            {field.name} {field.required && <span className="text-slds-error-1">*</span>}
                                           </label>
                                           <div className="relative">
                                             <input
                                               type={field.inputType === 'password' ? (smFormPasswordVisible[`${smActiveSolution}-${smActiveStep}-${fi}`] ? 'text' : 'password') : field.inputType}
                                               placeholder={field.placeholder}
-                                              className="w-full px-3 py-2 text-sm border border-[var(--sf-border)] rounded focus:outline-none focus:border-[var(--sf-blue-light)] focus:ring-1 focus:ring-[rgba(27,150,255,0.2)]"
+                                              className="w-full px-3 py-2 text-sm border border-slds-border-1 rounded focus:outline-none focus:border-slds-brand-2 focus:ring-1 focus:ring-[rgba(27,150,255,0.2)]"
                                             />
                                             {field.inputType === 'password' && (
                                               <button
                                                 type="button"
                                                 onClick={() => setSmFormPasswordVisible(prev => ({ ...prev, [`${smActiveSolution}-${smActiveStep}-${fi}`]: !prev[`${smActiveSolution}-${smActiveStep}-${fi}`] }))}
-                                                className="absolute right-2.5 top-1/2 -translate-y-1/2 text-[var(--sf-text-tertiary)] hover:text-[var(--sf-text-primary)]"
+                                                className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slds-neutral-7 hover:text-slds-neutral-base"
                                               >
                                                 {smFormPasswordVisible[`${smActiveSolution}-${smActiveStep}-${fi}`] ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                                               </button>
@@ -1211,7 +1211,7 @@ export default function DataCloudSetupContent({ onBack, demoSession, onDemoSessi
                                         </div>
                                       ))}
                                       {status !== 'completed' && (
-                                        <button onClick={smHandleCompleteStep} className="px-4 py-2 text-sm font-medium text-white bg-[#0070D2] rounded hover:bg-[#005FB2] transition-colors mt-2">
+                                        <button onClick={smHandleCompleteStep} className="px-4 py-2 text-sm font-medium text-white bg-slds-brand rounded hover:bg-[#005FB2] transition-colors mt-2">
                                           Validate Connection
                                         </button>
                                       )}
@@ -1223,7 +1223,7 @@ export default function DataCloudSetupContent({ onBack, demoSession, onDemoSessi
                                     <div className="space-y-5">
                                       {step.groups.map((group, gi) => (
                                         <div key={gi}>
-                                          <div className="text-sm font-semibold text-[var(--sf-text-primary)] mb-2">{group.name}</div>
+                                          <div className="text-sm font-semibold text-slds-neutral-base mb-2">{group.name}</div>
                                           <div className="flex flex-wrap gap-2">
                                             {group.options.map((option, oi) => {
                                               const key = `${smActiveSolution}-${smActiveStep}-${gi}-${oi}`;
@@ -1234,8 +1234,8 @@ export default function DataCloudSetupContent({ onBack, demoSession, onDemoSessi
                                                   onClick={() => setSmMultiselectState(prev => ({ ...prev, [key]: !prev[key] }))}
                                                   className={`px-3 py-2 text-sm rounded border transition-colors ${
                                                     selected
-                                                      ? 'bg-[#EEF4FF] border-[#0070D2] text-[#0070D2] font-medium'
-                                                      : 'bg-white border-[var(--sf-border)] text-[var(--sf-text-secondary)] hover:border-[#0070D2]'
+                                                      ? 'bg-[#EEF4FF] border-slds-brand text-slds-brand font-medium'
+                                                      : 'bg-white border-slds-border-1 text-slds-neutral-9 hover:border-slds-brand'
                                                   }`}
                                                 >
                                                   {selected && <Check className="w-3 h-3 inline mr-1.5" />}
@@ -1261,19 +1261,19 @@ export default function DataCloudSetupContent({ onBack, demoSession, onDemoSessi
                                             onClick={() => setSmRadioState(prev => ({ ...prev, [key]: oi }))}
                                             className={`w-full text-left p-4 rounded-lg border-2 transition-all ${
                                               selected
-                                                ? 'border-[#0070D2] bg-[#EEF4FF]'
-                                                : 'border-[var(--sf-border)] bg-white hover:border-[#B0B0B0]'
+                                                ? 'border-slds-brand bg-[#EEF4FF]'
+                                                : 'border-slds-border-1 bg-white hover:border-[#B0B0B0]'
                                             }`}
                                           >
                                             <div className="flex items-start gap-3">
                                               <div className={`w-4 h-4 rounded-full border-2 flex-shrink-0 mt-0.5 flex items-center justify-center ${
-                                                selected ? 'border-[#0070D2]' : 'border-[#DDDBDA]'
+                                                selected ? 'border-slds-brand' : 'border-slds-border-1'
                                               }`}>
-                                                {selected && <div className="w-2 h-2 rounded-full bg-[#0070D2]" />}
+                                                {selected && <div className="w-2 h-2 rounded-full bg-slds-brand" />}
                                               </div>
                                               <div>
-                                                <div className="text-sm font-semibold text-[var(--sf-text-primary)]">{option.label}</div>
-                                                <p className="text-xs text-[var(--sf-text-secondary)] mt-1 leading-relaxed">{option.description}</p>
+                                                <div className="text-sm font-semibold text-slds-neutral-base">{option.label}</div>
+                                                <p className="text-xs text-slds-neutral-9 mt-1 leading-relaxed">{option.description}</p>
                                               </div>
                                             </div>
                                           </button>
@@ -1286,9 +1286,9 @@ export default function DataCloudSetupContent({ onBack, demoSession, onDemoSessi
                                   return (
                                     <div className="space-y-2">
                                       {step.tables.map((table, ti) => (
-                                        <div key={ti} className="flex items-center justify-between p-3 bg-[#FAFAF9] border border-[var(--sf-border)] rounded">
-                                          <span className="text-sm font-mono text-[var(--sf-text-primary)]">{table}</span>
-                                          <button className="px-3 py-1.5 text-xs font-medium text-[var(--sf-link)] border border-[var(--sf-border)] rounded hover:bg-white transition-colors">
+                                        <div key={ti} className="flex items-center justify-between p-3 bg-[#FAFAF9] border border-slds-border-1 rounded">
+                                          <span className="text-sm font-mono text-slds-neutral-base">{table}</span>
+                                          <button className="px-3 py-1.5 text-xs font-medium text-slds-brand border border-slds-border-1 rounded hover:bg-white transition-colors">
                                             Review Mappings & Create Fields
                                           </button>
                                         </div>
@@ -1301,8 +1301,8 @@ export default function DataCloudSetupContent({ onBack, demoSession, onDemoSessi
                                     <div className="space-y-4">
                                       {step.items.map((item, pi) => (
                                         <div key={pi}>
-                                          <p className="text-sm text-[var(--sf-text-secondary)] mb-2">{item.description}</p>
-                                          <button className="px-3 py-1.5 text-xs font-medium text-[var(--sf-link)] border border-[var(--sf-border)] rounded hover:bg-[#F3F3F3] transition-colors">
+                                          <p className="text-sm text-slds-neutral-9 mb-2">{item.description}</p>
+                                          <button className="px-3 py-1.5 text-xs font-medium text-slds-brand border border-slds-border-1 rounded hover:bg-slds-neutral-2 transition-colors">
                                             {item.name} &rarr;
                                           </button>
                                         </div>
@@ -1314,12 +1314,12 @@ export default function DataCloudSetupContent({ onBack, demoSession, onDemoSessi
                                   return (
                                     <div className="space-y-2">
                                       {step.rules.map((rule, ri) => (
-                                        <div key={ri} className="flex items-center justify-between p-3 bg-[#FAFAF9] border border-[var(--sf-border)] rounded">
+                                        <div key={ri} className="flex items-center justify-between p-3 bg-[#FAFAF9] border border-slds-border-1 rounded">
                                           <div>
-                                            <div className="text-sm font-medium text-[var(--sf-text-primary)]">{rule.name}</div>
-                                            <p className="text-xs text-[var(--sf-text-tertiary)] mt-0.5">{rule.description}</p>
+                                            <div className="text-sm font-medium text-slds-neutral-base">{rule.name}</div>
+                                            <p className="text-xs text-slds-neutral-7 mt-0.5">{rule.description}</p>
                                           </div>
-                                          <button className="px-3 py-1.5 text-xs font-medium text-[var(--sf-link)] border border-[var(--sf-border)] rounded hover:bg-white transition-colors flex-shrink-0 ml-4">
+                                          <button className="px-3 py-1.5 text-xs font-medium text-slds-brand border border-slds-border-1 rounded hover:bg-white transition-colors flex-shrink-0 ml-4">
                                             Configure
                                           </button>
                                         </div>
@@ -1332,15 +1332,15 @@ export default function DataCloudSetupContent({ onBack, demoSession, onDemoSessi
                                   const isOn = smToggleState[toggleKey] || false;
                                   return (
                                     <>
-                                      <p className="text-sm text-[var(--sf-text-secondary)] mb-5 leading-relaxed">{step.description}</p>
+                                      <p className="text-sm text-slds-neutral-9 mb-5 leading-relaxed">{step.description}</p>
                                       <div className="flex items-center gap-3 mb-4">
                                         <button
                                           onClick={() => setSmToggleState(prev => ({ ...prev, [toggleKey]: !prev[toggleKey] }))}
-                                          className={`relative w-12 h-6 rounded-full transition-colors ${isOn ? 'bg-[#0070D2]' : 'bg-[#DDDBDA]'}`}
+                                          className={`relative w-12 h-6 rounded-full transition-colors ${isOn ? 'bg-slds-brand' : 'bg-slds-border-1'}`}
                                         >
                                           <div className={`absolute top-0.5 w-5 h-5 rounded-full bg-white shadow transition-transform ${isOn ? 'left-[26px]' : 'left-0.5'}`} />
                                         </button>
-                                        <span className="text-sm font-medium text-[var(--sf-text-primary)]">
+                                        <span className="text-sm font-medium text-slds-neutral-base">
                                           {isOn ? 'Sync Enabled' : 'Sync Disabled'}
                                         </span>
                                       </div>
@@ -1352,12 +1352,12 @@ export default function DataCloudSetupContent({ onBack, demoSession, onDemoSessi
                                   return (
                                     <div className="space-y-2">
                                       {step.substeps.map((substep, si) => (
-                                        <div key={si} className="flex items-center justify-between p-3 bg-[#FAFAF9] border border-[var(--sf-border)] rounded">
+                                        <div key={si} className="flex items-center justify-between p-3 bg-[#FAFAF9] border border-slds-border-1 rounded">
                                           <div>
-                                            <div className="text-sm font-medium text-[var(--sf-text-primary)]">{substep.name}</div>
-                                            <p className="text-xs text-[var(--sf-text-tertiary)] mt-0.5">{substep.description}</p>
+                                            <div className="text-sm font-medium text-slds-neutral-base">{substep.name}</div>
+                                            <p className="text-xs text-slds-neutral-7 mt-0.5">{substep.description}</p>
                                           </div>
-                                          <a href={substep.link} target="_blank" rel="noopener noreferrer" className="text-xs font-medium text-[var(--sf-link)] hover:underline flex-shrink-0 ml-4 flex items-center gap-1">
+                                          <a href={substep.link} target="_blank" rel="noopener noreferrer" className="text-xs font-medium text-slds-brand hover:underline flex-shrink-0 ml-4 flex items-center gap-1">
                                             View Trailhead <ExternalLink className="w-3 h-3" />
                                           </a>
                                         </div>
@@ -1368,11 +1368,11 @@ export default function DataCloudSetupContent({ onBack, demoSession, onDemoSessi
                                 case 'text-links':
                                   return (
                                     <>
-                                      <div className="text-sm text-[var(--sf-text-secondary)] leading-relaxed mb-5" dangerouslySetInnerHTML={{ __html: step.description }} />
+                                      <div className="text-sm text-slds-neutral-9 leading-relaxed mb-5" dangerouslySetInnerHTML={{ __html: step.description }} />
                                       {step.links.length > 0 && (
                                         <div className="space-y-2">
                                           {step.links.map((link, li) => (
-                                            <a key={li} href={link.url} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-sm text-[var(--sf-link)] hover:underline">
+                                            <a key={li} href={link.url} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-sm text-slds-brand hover:underline">
                                               <ExternalLink className="w-3.5 h-3.5 flex-shrink-0" />
                                               {link.label}
                                             </a>
@@ -1388,23 +1388,23 @@ export default function DataCloudSetupContent({ onBack, demoSession, onDemoSessi
                             };
 
                             return (
-                              <div className={`sf-card mb-4 ${status === 'completed' ? 'ring-2 ring-[#2E844A]/30' : ''}`}>
+                              <div className={`sf-card mb-4 ${status === 'completed' ? 'ring-2 ring-slds-success-1/30' : ''}`}>
                                 <div className="sf-card-header">
                                   <div className="flex items-center gap-3">
                                     <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold ${
-                                      status === 'completed' ? 'bg-[#2E844A] text-white' :
-                                      'bg-[#0070D2] text-white'
+                                      status === 'completed' ? 'bg-slds-success-1 text-white' :
+                                      'bg-slds-brand text-white'
                                     }`}>
                                       {status === 'completed' ? <Check className="w-4 h-4" /> : smActiveStep + 1}
                                     </div>
                                     <div>
-                                      <h3 className="text-sm font-semibold text-[var(--sf-text-primary)]">{step.title}</h3>
-                                      <p className="text-xs text-[var(--sf-text-tertiary)]">{step.headline}</p>
+                                      <h3 className="text-sm font-semibold text-slds-neutral-base">{step.title}</h3>
+                                      <p className="text-xs text-slds-neutral-7">{step.headline}</p>
                                     </div>
                                     {step.type === 'action' && step.system && (
                                       <span className={`ml-auto px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider rounded ${
                                         step.system === 'D360'
-                                          ? 'bg-[#EEF4FF] text-[#0070D2]'
+                                          ? 'bg-[#EEF4FF] text-slds-brand'
                                           : 'bg-[#FFF3ED] text-[#D95800]'
                                       }`}>
                                         {step.system === 'D360' ? '\u2601 ' : '\u2699 '}{step.system}
@@ -1415,19 +1415,19 @@ export default function DataCloudSetupContent({ onBack, demoSession, onDemoSessi
                                 <div className="sf-card-body">
                                   {renderStepBody()}
                                   {status === 'completed' && (
-                                    <div className="flex items-center gap-2 text-sm text-[#2E844A] font-medium mt-4">
+                                    <div className="flex items-center gap-2 text-sm text-slds-success-1 font-medium mt-4">
                                       <CheckCircle2 className="w-4 h-4" />
                                       Step completed
                                     </div>
                                   )}
                                 </div>
                                 {/* Step footer */}
-                                <div className="flex items-center justify-between px-5 py-3 border-t border-[var(--sf-border)] bg-[#FAFAF9]">
+                                <div className="flex items-center justify-between px-5 py-3 border-t border-slds-border-1 bg-[#FAFAF9]">
                                   <div className="flex items-center gap-3">
-                                    <button className="text-xs text-[var(--sf-link)] hover:underline flex items-center gap-1">
+                                    <button className="text-xs text-slds-brand hover:underline flex items-center gap-1">
                                       <FileText className="w-3 h-3" /> Documentation
                                     </button>
-                                    <button className="text-xs text-[var(--sf-link)] hover:underline flex items-center gap-1">
+                                    <button className="text-xs text-slds-brand hover:underline flex items-center gap-1">
                                       <BookOpen className="w-3 h-3" /> Tutorial
                                     </button>
                                   </div>
@@ -1435,7 +1435,7 @@ export default function DataCloudSetupContent({ onBack, demoSession, onDemoSessi
                                     {smActiveStep > 0 && (
                                       <button
                                         onClick={() => smHandleStepClick(smActiveStep - 1)}
-                                        className="px-3 py-1.5 text-xs font-medium text-[var(--sf-text-secondary)] border border-[var(--sf-border)] rounded hover:bg-[#F3F3F3]"
+                                        className="px-3 py-1.5 text-xs font-medium text-slds-neutral-9 border border-slds-border-1 rounded hover:bg-slds-neutral-2"
                                       >
                                         &larr; Previous
                                       </button>
@@ -1443,14 +1443,14 @@ export default function DataCloudSetupContent({ onBack, demoSession, onDemoSessi
                                     {smActiveStep < sol.steps.length - 1 ? (
                                       <button
                                         onClick={smHandleCompleteStep}
-                                        className="px-3 py-1.5 text-xs font-medium text-white bg-[#0070D2] rounded hover:bg-[#005FB2]"
+                                        className="px-3 py-1.5 text-xs font-medium text-white bg-slds-brand rounded hover:bg-[#005FB2]"
                                       >
                                         Next Step &rarr;
                                       </button>
                                     ) : (
                                       <button
                                         onClick={smHandleCompleteStep}
-                                        className="px-3 py-1.5 text-xs font-medium text-white bg-[#2E844A] rounded hover:bg-[#256B3B]"
+                                        className="px-3 py-1.5 text-xs font-medium text-white bg-slds-success-1 rounded hover:bg-[#256B3B]"
                                       >
                                         Complete &#10003;
                                       </button>
@@ -1470,8 +1470,8 @@ export default function DataCloudSetupContent({ onBack, demoSession, onDemoSessi
               /* ── Solution Manager Tiles ── */
               <div className="p-6">
                 <div className="mb-6">
-                  <h1 className="text-2xl font-light text-[var(--sf-text-primary)] mb-1">Solution Manager</h1>
-                  <p className="text-sm text-[var(--sf-text-tertiary)]">Explore and implement data management solutions</p>
+                  <h1 className="text-2xl font-light text-slds-neutral-base mb-1">Solution Manager</h1>
+                  <p className="text-sm text-slds-neutral-7">Explore and implement data management solutions</p>
                 </div>
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
                   {smTiles.map((tile) => {
@@ -1480,23 +1480,23 @@ export default function DataCloudSetupContent({ onBack, demoSession, onDemoSessi
                       <button
                         key={tile.id}
                         onClick={() => { setSmActiveSolution(tile.id); setSmActiveStep(0); }}
-                        className="text-left bg-white border border-[var(--sf-border)] rounded-lg p-6 hover:shadow-lg hover:border-[#0070D2] hover:-translate-y-0.5 transition-all group"
+                        className="text-left bg-white border border-slds-border-1 rounded-lg p-6 hover:shadow-lg hover:border-slds-brand hover:-translate-y-0.5 transition-all group"
                       >
-                        <span className="inline-block px-2 py-1 text-[11px] font-bold text-[#0070D2] bg-[#EEF4FF] rounded mb-3">
+                        <span className="inline-block px-2 py-1 text-[11px] font-bold text-slds-brand bg-[#EEF4FF] rounded mb-3">
                           {tile.badge}
                         </span>
-                        <h3 className="text-base font-semibold text-[#0070D2] mb-2 leading-snug group-hover:underline">{tile.title}</h3>
-                        <p className="text-sm text-[var(--sf-text-secondary)] leading-relaxed mb-3">{tile.description}</p>
+                        <h3 className="text-base font-semibold text-slds-brand mb-2 leading-snug group-hover:underline">{tile.title}</h3>
+                        <p className="text-sm text-slds-neutral-9 leading-relaxed mb-3">{tile.description}</p>
                         {smSolutions[tile.id] && (
                           <div className="flex items-center gap-2">
-                            <div className="flex-1 h-1.5 bg-[#DDDBDA] rounded-full overflow-hidden">
+                            <div className="flex-1 h-1.5 bg-slds-border-1 rounded-full overflow-hidden">
                               <div className="h-full rounded-full" style={{ width: `${progress}%`, background: 'linear-gradient(90deg, #0070D2, #00A1E0)' }} />
                             </div>
-                            <span className="text-[10px] font-bold text-[#0070D2]">{progress}%</span>
+                            <span className="text-[10px] font-bold text-slds-brand">{progress}%</span>
                           </div>
                         )}
                         {tile.id === 'CH' && (
-                          <div className="mt-2 text-xs text-[var(--sf-text-tertiary)] italic">Work in progress</div>
+                          <div className="mt-2 text-xs text-slds-neutral-7 italic">Work in progress</div>
                         )}
                       </button>
                     );
@@ -1514,17 +1514,17 @@ export default function DataCloudSetupContent({ onBack, demoSession, onDemoSessi
                   </div>
                 )}
                 <div className="p-5 flex items-center gap-4">
-                  <div className={`w-12 h-12 rounded-lg flex items-center justify-center flex-shrink-0 ${isInformatica ? 'bg-[#FF4A00]' : 'bg-[#706E6B]'}`}>
+                  <div className={`w-12 h-12 rounded-lg flex items-center justify-center flex-shrink-0 ${isInformatica ? 'bg-[#FF4A00]' : 'bg-slds-neutral-7'}`}>
                     <Settings className="w-6 h-6 text-white" />
                   </div>
                   <div className="flex-1">
-                    <div className="text-xs font-medium text-[var(--sf-blue)] uppercase tracking-wide">SETUP</div>
-                    <h1 className="text-lg font-bold text-[var(--sf-text-primary)]">{connectorName}</h1>
+                    <div className="text-xs font-medium text-slds-brand uppercase tracking-wide">SETUP</div>
+                    <h1 className="text-lg font-bold text-slds-neutral-base">{connectorName}</h1>
                   </div>
                   <button
                     onClick={handleOpenConnectOrg}
                     className={`px-4 py-2 text-sm font-medium text-white rounded transition-colors ${
-                      isInformatica ? 'bg-[#FF4A00] hover:bg-[#E54300]' : 'bg-[var(--sf-blue)] hover:bg-[var(--sf-blue-hover)]'
+                      isInformatica ? 'bg-[#FF4A00] hover:bg-[#E54300]' : 'bg-slds-brand hover:bg-slds-brand-contrast-1'
                     }`}
                   >
                     New
@@ -1536,17 +1536,17 @@ export default function DataCloudSetupContent({ onBack, demoSession, onDemoSessi
               <div className="sf-card mb-6">
                 <div className="sf-card-header">
                   <div className="flex items-center gap-1.5">
-                    <h2 className="text-sm font-semibold text-[var(--sf-text-primary)]">Standard Connections</h2>
-                    <Info className="w-3.5 h-3.5 text-[var(--sf-text-tertiary)]" />
+                    <h2 className="text-sm font-semibold text-slds-neutral-base">Standard Connections</h2>
+                    <Info className="w-3.5 h-3.5 text-slds-neutral-7" />
                   </div>
                 </div>
                 {currentConnections.length === 0 ? (
                   <div className="sf-card-body text-center py-12">
-                    <div className={`w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 ${isInformatica ? 'bg-[#FFF3ED]' : 'bg-[#F3F3F3]'}`}>
-                      <Zap className={`w-7 h-7 ${isInformatica ? 'text-[#FF4A00]' : 'text-[var(--sf-text-tertiary)]'}`} />
+                    <div className={`w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 ${isInformatica ? 'bg-[#FFF3ED]' : 'bg-slds-neutral-2'}`}>
+                      <Zap className={`w-7 h-7 ${isInformatica ? 'text-[#FF4A00]' : 'text-slds-neutral-7'}`} />
                     </div>
-                    <p className="text-sm font-medium text-[var(--sf-text-primary)] mb-1">No connections configured</p>
-                    <p className="text-xs text-[var(--sf-text-tertiary)] mb-4">
+                    <p className="text-sm font-medium text-slds-neutral-base mb-1">No connections configured</p>
+                    <p className="text-xs text-slds-neutral-7 mb-4">
                       {isInformatica
                         ? 'Connect your Informatica MDM instance to start syncing master data with Data Cloud.'
                         : 'Click "New" to connect a Salesforce org.'}
@@ -1554,7 +1554,7 @@ export default function DataCloudSetupContent({ onBack, demoSession, onDemoSessi
                     <button
                       onClick={handleOpenConnectOrg}
                       className={`inline-flex items-center gap-1.5 px-4 py-2 text-sm font-medium text-white rounded transition-colors ${
-                        isInformatica ? 'bg-[#FF4A00] hover:bg-[#E54300]' : 'bg-[var(--sf-blue)] hover:bg-[var(--sf-blue-hover)]'
+                        isInformatica ? 'bg-[#FF4A00] hover:bg-[#E54300]' : 'bg-slds-brand hover:bg-slds-brand-contrast-1'
                       }`}
                     >
                       <Plus className="w-4 h-4" /> Connect {isInformatica ? 'Informatica MDM' : 'an Org'}
@@ -1577,14 +1577,14 @@ export default function DataCloudSetupContent({ onBack, demoSession, onDemoSessi
                       <tbody>
                         {currentConnections.map((conn, i) => (
                           <tr key={conn.id}>
-                            <td className="text-center text-[var(--sf-text-tertiary)]">{i + 1}</td>
+                            <td className="text-center text-slds-neutral-7">{i + 1}</td>
                             <td className="sf-link font-medium">{conn.connectionName}</td>
                             <td>{conn.alias}</td>
                             <td>{conn.connectionStatus}</td>
                             <td>{conn.lastUpdated}</td>
                             <td className="font-mono text-xs">{conn.orgId}</td>
                             <td>
-                              <button className="w-6 h-6 flex items-center justify-center rounded hover:bg-[#F3F3F3] text-[var(--sf-text-tertiary)]">
+                              <button className="w-6 h-6 flex items-center justify-center rounded hover:bg-slds-neutral-2 text-slds-neutral-7">
                                 <ChevronDown className="w-3.5 h-3.5" />
                               </button>
                             </td>
@@ -1601,8 +1601,8 @@ export default function DataCloudSetupContent({ onBack, demoSession, onDemoSessi
               <div className="sf-card">
                 <div className="sf-card-header">
                   <div className="flex items-center gap-1.5">
-                    <h2 className="text-sm font-semibold text-[var(--sf-text-primary)]">Standard Data Bundles</h2>
-                    <Info className="w-3.5 h-3.5 text-[var(--sf-text-tertiary)]" />
+                    <h2 className="text-sm font-semibold text-slds-neutral-base">Standard Data Bundles</h2>
+                    <Info className="w-3.5 h-3.5 text-slds-neutral-7" />
                   </div>
                 </div>
                 <div className="overflow-x-auto">
@@ -1624,7 +1624,7 @@ export default function DataCloudSetupContent({ onBack, demoSession, onDemoSessi
                             <span className="flex items-center gap-2">
                               {bundle.name}
                               {bundle.fieldTag && (
-                                <span className={`px-1.5 py-0.5 text-[9px] font-bold text-white rounded ${isInformatica ? 'bg-[#FF4A00]' : 'bg-[var(--sf-blue)]'}`}>{bundle.fieldTag}</span>
+                                <span className={`px-1.5 py-0.5 text-[9px] font-bold text-white rounded ${isInformatica ? 'bg-[#FF4A00]' : 'bg-slds-brand'}`}>{bundle.fieldTag}</span>
                               )}
                             </span>
                           </td>
@@ -1632,7 +1632,7 @@ export default function DataCloudSetupContent({ onBack, demoSession, onDemoSessi
                           <td>{bundle.latestVersion}</td>
                           <td>
                             {isInstalled ? (
-                              <span className="inline-flex items-center gap-1 text-xs font-medium text-[var(--sf-success)]">
+                              <span className="inline-flex items-center gap-1 text-xs font-medium text-slds-success-1">
                                 <CheckCircle2 className="w-3.5 h-3.5" /> Installed
                               </span>
                             ) : (
@@ -1644,7 +1644,7 @@ export default function DataCloudSetupContent({ onBack, demoSession, onDemoSessi
                                   setInstallModalOpen(true);
                                 }}
                                 className={`px-3 py-1 text-xs font-medium text-white rounded transition-colors ${
-                                  isInformatica ? 'bg-[#FF4A00] hover:bg-[#E54300]' : 'bg-[var(--sf-blue)] hover:bg-[var(--sf-blue-hover)]'
+                                  isInformatica ? 'bg-[#FF4A00] hover:bg-[#E54300]' : 'bg-slds-brand hover:bg-slds-brand-contrast-1'
                                 }`}
                               >
                                 Install
@@ -1666,13 +1666,13 @@ export default function DataCloudSetupContent({ onBack, demoSession, onDemoSessi
                ═══════════════════════════════════════════════════════════ */
             <div>
               {/* Page header */}
-              <div className="bg-white border-b border-[var(--sf-border)] px-6 py-4 flex items-center gap-4">
+              <div className="bg-white border-b border-slds-border-1 px-6 py-4 flex items-center gap-4">
                 <div className="w-10 h-10 rounded bg-[#F49756] flex items-center justify-center flex-shrink-0">
                   <LayoutGrid className="w-5 h-5 text-white" />
                 </div>
                 <div>
-                  <div className="text-xs font-medium text-[var(--sf-blue)] uppercase tracking-wide">SETUP</div>
-                  <h1 className="text-lg font-bold text-[var(--sf-text-primary)]">Installed Packages</h1>
+                  <div className="text-xs font-medium text-slds-brand uppercase tracking-wide">SETUP</div>
+                  <h1 className="text-lg font-bold text-slds-neutral-base">Installed Packages</h1>
                 </div>
               </div>
 
@@ -1682,21 +1682,21 @@ export default function DataCloudSetupContent({ onBack, demoSession, onDemoSessi
                   <div>
                     <div className="flex items-center justify-between mb-4">
                       <div>
-                        <div className="text-xs text-[var(--sf-text-tertiary)] mb-0.5">Package Details</div>
-                        <h2 className="text-xl font-bold text-[var(--sf-text-primary)]">{detailPackage.name} (Managed)</h2>
+                        <div className="text-xs text-slds-neutral-7 mb-0.5">Package Details</div>
+                        <h2 className="text-xl font-bold text-slds-neutral-base">{detailPackage.name} (Managed)</h2>
                       </div>
-                      <button className="text-sm text-[var(--sf-link)] hover:underline">Help for this Page</button>
+                      <button className="text-sm text-slds-brand hover:underline">Help for this Page</button>
                     </div>
 
                     {/* Installed Package Detail card */}
-                    <div className="border border-[var(--sf-border)] rounded mb-6">
-                      <div className={`px-4 py-2.5 border-b flex items-center justify-between ${detailPackage.isInformatica ? 'bg-[#FFF3ED] border-[#FFD6C0]' : 'bg-[#FAFAF9] border-[var(--sf-border)]'}`}>
-                        <span className="text-sm font-semibold text-[var(--sf-text-primary)]">Installed Package Detail</span>
+                    <div className="border border-slds-border-1 rounded mb-6">
+                      <div className={`px-4 py-2.5 border-b flex items-center justify-between ${detailPackage.isInformatica ? 'bg-[#FFF3ED] border-[#FFD6C0]' : 'bg-[#FAFAF9] border-slds-border-1'}`}>
+                        <span className="text-sm font-semibold text-slds-neutral-base">Installed Package Detail</span>
                         <div className="flex items-center gap-2">
-                          <button className="px-3 py-1 text-xs font-medium border border-[var(--sf-border)] rounded hover:bg-[#F3F3F3]">Uninstall</button>
-                          <button onClick={() => setPackageDetailName('__components__:' + detailPackage.name)} className="px-3 py-1 text-xs font-medium border border-[var(--sf-border)] rounded hover:bg-[#F3F3F3]">View Components</button>
-                          <button className="px-3 py-1 text-xs font-medium border border-[var(--sf-border)] rounded hover:bg-[#F3F3F3]">Become Primary Contact</button>
-                          <button className="px-3 py-1 text-xs font-medium border border-[var(--sf-border)] rounded hover:bg-[#F3F3F3]">View Dependencies</button>
+                          <button className="px-3 py-1 text-xs font-medium border border-slds-border-1 rounded hover:bg-slds-neutral-2">Uninstall</button>
+                          <button onClick={() => setPackageDetailName('__components__:' + detailPackage.name)} className="px-3 py-1 text-xs font-medium border border-slds-border-1 rounded hover:bg-slds-neutral-2">View Components</button>
+                          <button className="px-3 py-1 text-xs font-medium border border-slds-border-1 rounded hover:bg-slds-neutral-2">Become Primary Contact</button>
+                          <button className="px-3 py-1 text-xs font-medium border border-slds-border-1 rounded hover:bg-slds-neutral-2">View Dependencies</button>
                         </div>
                       </div>
                       <div className="bg-white">
@@ -1713,28 +1713,28 @@ export default function DataCloudSetupContent({ onBack, demoSession, onDemoSessi
                               ['Description', detailPackage.description || '', '', ''],
                               ['Installed By', `Data Cloud, ${detailPackage.installDate}`, '', ''],
                             ].map(([label1, val1, label2, val2], i) => (
-                              <tr key={i} className="border-b border-[var(--sf-border)] last:border-0">
-                                <td className="px-4 py-2 text-right text-[var(--sf-text-tertiary)] font-medium w-[160px] whitespace-nowrap">{label1}</td>
-                                <td className="px-4 py-2 text-[var(--sf-text-primary)]">{val1}</td>
-                                {label2 && <td className="px-4 py-2 text-right text-[var(--sf-text-tertiary)] font-medium w-[200px] whitespace-nowrap">{label2}</td>}
-                                {label2 && <td className="px-4 py-2 text-[var(--sf-text-primary)]">{val2}</td>}
+                              <tr key={i} className="border-b border-slds-border-1 last:border-0">
+                                <td className="px-4 py-2 text-right text-slds-neutral-7 font-medium w-[160px] whitespace-nowrap">{label1}</td>
+                                <td className="px-4 py-2 text-slds-neutral-base">{val1}</td>
+                                {label2 && <td className="px-4 py-2 text-right text-slds-neutral-7 font-medium w-[200px] whitespace-nowrap">{label2}</td>}
+                                {label2 && <td className="px-4 py-2 text-slds-neutral-base">{val2}</td>}
                                 {!label2 && <td colSpan={2}></td>}
                               </tr>
                             ))}
                           </tbody>
                         </table>
-                        <div className="border-t border-[var(--sf-border)] px-4 py-3 flex items-center gap-8">
+                        <div className="border-t border-slds-border-1 px-4 py-3 flex items-center gap-8">
                           <div className="flex items-center gap-2">
-                            <span className="text-sm text-[var(--sf-text-tertiary)] font-medium">Count Towards Limits</span>
+                            <span className="text-sm text-slds-neutral-7 font-medium">Count Towards Limits</span>
                             <input type="checkbox" checked={detailPackage.limits} readOnly className="w-4 h-4" />
                           </div>
                           <div className="flex items-center gap-8 ml-auto">
-                            <span className="text-sm"><span className="text-[var(--sf-text-tertiary)] font-medium">Tabs</span> {detailPackage.tabs}</span>
+                            <span className="text-sm"><span className="text-slds-neutral-7 font-medium">Tabs</span> {detailPackage.tabs}</span>
                           </div>
                         </div>
-                        <div className="border-t border-[var(--sf-border)] px-4 py-3 flex items-center gap-8">
-                          <span className="text-sm"><span className="text-[var(--sf-text-tertiary)] font-medium">Apps</span> {detailPackage.apps}</span>
-                          <span className="text-sm ml-auto"><span className="text-[var(--sf-text-tertiary)] font-medium">Objects</span> {detailPackage.objects}</span>
+                        <div className="border-t border-slds-border-1 px-4 py-3 flex items-center gap-8">
+                          <span className="text-sm"><span className="text-slds-neutral-7 font-medium">Apps</span> {detailPackage.apps}</span>
+                          <span className="text-sm ml-auto"><span className="text-slds-neutral-7 font-medium">Objects</span> {detailPackage.objects}</span>
                         </div>
                       </div>
                     </div>
@@ -1750,20 +1750,20 @@ export default function DataCloudSetupContent({ onBack, demoSession, onDemoSessi
                       <div>
                         <div className="flex items-center justify-between mb-4">
                           <div>
-                            <div className="text-xs text-[var(--sf-text-tertiary)] mb-0.5">Package Details</div>
-                            <h2 className="text-xl font-bold text-[var(--sf-text-primary)]">{compPkgName} (Managed)</h2>
+                            <div className="text-xs text-slds-neutral-7 mb-0.5">Package Details</div>
+                            <h2 className="text-xl font-bold text-slds-neutral-base">{compPkgName} (Managed)</h2>
                           </div>
-                          <button className="text-sm text-[var(--sf-link)] hover:underline">Help for this Page</button>
+                          <button className="text-sm text-slds-brand hover:underline">Help for this Page</button>
                         </div>
 
                         {/* Installed Package Detail — compact (no View Components button) */}
-                        <div className="border border-[var(--sf-border)] rounded mb-6">
-                          <div className={`px-4 py-2.5 border-b flex items-center justify-between ${compPkg?.isInformatica ? 'bg-[#FFF3ED] border-[#FFD6C0]' : 'bg-[#FAFAF9] border-[var(--sf-border)]'}`}>
-                            <span className="text-sm font-semibold text-[var(--sf-text-primary)]">Installed Package Detail</span>
+                        <div className="border border-slds-border-1 rounded mb-6">
+                          <div className={`px-4 py-2.5 border-b flex items-center justify-between ${compPkg?.isInformatica ? 'bg-[#FFF3ED] border-[#FFD6C0]' : 'bg-[#FAFAF9] border-slds-border-1'}`}>
+                            <span className="text-sm font-semibold text-slds-neutral-base">Installed Package Detail</span>
                             <div className="flex items-center gap-2">
-                              <button className="px-3 py-1 text-xs font-medium border border-[var(--sf-border)] rounded hover:bg-[#F3F3F3]">Uninstall</button>
-                              <button className="px-3 py-1 text-xs font-medium border border-[var(--sf-border)] rounded hover:bg-[#F3F3F3]">Become Primary Contact</button>
-                              <button className="px-3 py-1 text-xs font-medium border border-[var(--sf-border)] rounded hover:bg-[#F3F3F3]">View Dependencies</button>
+                              <button className="px-3 py-1 text-xs font-medium border border-slds-border-1 rounded hover:bg-slds-neutral-2">Uninstall</button>
+                              <button className="px-3 py-1 text-xs font-medium border border-slds-border-1 rounded hover:bg-slds-neutral-2">Become Primary Contact</button>
+                              <button className="px-3 py-1 text-xs font-medium border border-slds-border-1 rounded hover:bg-slds-neutral-2">View Dependencies</button>
                             </div>
                           </div>
                           <div className="bg-white">
@@ -1780,50 +1780,50 @@ export default function DataCloudSetupContent({ onBack, demoSession, onDemoSessi
                                   ['Description', compPkg?.description || '', '', ''],
                                   ['Installed By', `Data Cloud, ${compPkg?.installDate || ''}`, '', ''],
                                 ].map(([label1, val1, label2, val2], i) => (
-                                  <tr key={i} className="border-b border-[var(--sf-border)] last:border-0">
-                                    <td className="px-4 py-2 text-right text-[var(--sf-text-tertiary)] font-medium w-[160px] whitespace-nowrap">{label1}</td>
-                                    <td className="px-4 py-2 text-[var(--sf-text-primary)]">{val1}</td>
-                                    {label2 && <td className="px-4 py-2 text-right text-[var(--sf-text-tertiary)] font-medium w-[200px] whitespace-nowrap">{label2}</td>}
-                                    {label2 && <td className="px-4 py-2 text-[var(--sf-text-primary)]">{val2}</td>}
+                                  <tr key={i} className="border-b border-slds-border-1 last:border-0">
+                                    <td className="px-4 py-2 text-right text-slds-neutral-7 font-medium w-[160px] whitespace-nowrap">{label1}</td>
+                                    <td className="px-4 py-2 text-slds-neutral-base">{val1}</td>
+                                    {label2 && <td className="px-4 py-2 text-right text-slds-neutral-7 font-medium w-[200px] whitespace-nowrap">{label2}</td>}
+                                    {label2 && <td className="px-4 py-2 text-slds-neutral-base">{val2}</td>}
                                     {!label2 && <td colSpan={2}></td>}
                                   </tr>
                                 ))}
                               </tbody>
                             </table>
-                            <div className="border-t border-[var(--sf-border)] px-4 py-3 flex items-center gap-8">
-                              <span className="text-sm"><span className="text-[var(--sf-text-tertiary)] font-medium">Count Towards Limits</span></span>
+                            <div className="border-t border-slds-border-1 px-4 py-3 flex items-center gap-8">
+                              <span className="text-sm"><span className="text-slds-neutral-7 font-medium">Count Towards Limits</span></span>
                               <input type="checkbox" checked={compPkg?.limits || false} readOnly className="w-4 h-4" />
-                              <span className="text-sm ml-auto"><span className="text-[var(--sf-text-tertiary)] font-medium">Tabs</span> {compPkg?.tabs || 0}</span>
+                              <span className="text-sm ml-auto"><span className="text-slds-neutral-7 font-medium">Tabs</span> {compPkg?.tabs || 0}</span>
                             </div>
-                            <div className="border-t border-[var(--sf-border)] px-4 py-3 flex items-center gap-8">
-                              <span className="text-sm"><span className="text-[var(--sf-text-tertiary)] font-medium">Apps</span> {compPkg?.apps || 0}</span>
-                              <span className="text-sm ml-auto"><span className="text-[var(--sf-text-tertiary)] font-medium">Objects</span> {compPkg?.objects || 0}</span>
+                            <div className="border-t border-slds-border-1 px-4 py-3 flex items-center gap-8">
+                              <span className="text-sm"><span className="text-slds-neutral-7 font-medium">Apps</span> {compPkg?.apps || 0}</span>
+                              <span className="text-sm ml-auto"><span className="text-slds-neutral-7 font-medium">Objects</span> {compPkg?.objects || 0}</span>
                             </div>
                           </div>
                         </div>
 
                         {/* Metadata Components Included in Package */}
-                        <div className="border border-[var(--sf-border)] rounded">
-                          <div className={`px-4 py-2.5 border-b ${compPkg?.isInformatica ? 'bg-[#FFF3ED] border-[#FFD6C0]' : 'bg-[#FAFAF9] border-[var(--sf-border)]'}`}>
-                            <span className="text-sm font-semibold text-[var(--sf-text-primary)]">Metadata Components Included in Package</span>
+                        <div className="border border-slds-border-1 rounded">
+                          <div className={`px-4 py-2.5 border-b ${compPkg?.isInformatica ? 'bg-[#FFF3ED] border-[#FFD6C0]' : 'bg-[#FAFAF9] border-slds-border-1'}`}>
+                            <span className="text-sm font-semibold text-slds-neutral-base">Metadata Components Included in Package</span>
                           </div>
                           <div className="overflow-x-auto bg-white">
                             <table className="w-full text-sm">
                               <thead>
-                                <tr className="border-b border-[var(--sf-border)] bg-[#FAFAF9]">
-                                  <th className="px-3 py-2 text-left text-xs font-semibold text-[var(--sf-text-primary)] w-10">Action</th>
-                                  <th className="px-3 py-2 text-left text-xs font-semibold text-[var(--sf-text-primary)]">Component Name</th>
-                                  <th className="px-3 py-2 text-left text-xs font-semibold text-[var(--sf-text-primary)] w-[120px]">Parent Object</th>
-                                  <th className="px-3 py-2 text-left text-xs font-semibold text-[var(--sf-text-primary)] w-[180px]">Type</th>
+                                <tr className="border-b border-slds-border-1 bg-[#FAFAF9]">
+                                  <th className="px-3 py-2 text-left text-xs font-semibold text-slds-neutral-base w-10">Action</th>
+                                  <th className="px-3 py-2 text-left text-xs font-semibold text-slds-neutral-base">Component Name</th>
+                                  <th className="px-3 py-2 text-left text-xs font-semibold text-slds-neutral-base w-[120px]">Parent Object</th>
+                                  <th className="px-3 py-2 text-left text-xs font-semibold text-slds-neutral-base w-[180px]">Type</th>
                                 </tr>
                               </thead>
                               <tbody>
                                 {components.map((comp, i) => (
-                                  <tr key={i} className="border-b border-[var(--sf-border)] last:border-0 hover:bg-[#F9F9F9]">
+                                  <tr key={i} className="border-b border-slds-border-1 last:border-0 hover:bg-[#F9F9F9]">
                                     <td className="px-3 py-1.5"></td>
-                                    <td className="px-3 py-1.5 text-[var(--sf-link)] hover:underline cursor-pointer font-mono text-xs">{comp.name}</td>
-                                    <td className="px-3 py-1.5 text-[var(--sf-text-tertiary)]">{comp.parentObject}</td>
-                                    <td className="px-3 py-1.5 text-[var(--sf-text-primary)]">{comp.type}</td>
+                                    <td className="px-3 py-1.5 text-slds-brand hover:underline cursor-pointer font-mono text-xs">{comp.name}</td>
+                                    <td className="px-3 py-1.5 text-slds-neutral-7">{comp.parentObject}</td>
+                                    <td className="px-3 py-1.5 text-slds-neutral-base">{comp.type}</td>
                                   </tr>
                                 ))}
                               </tbody>
@@ -1839,69 +1839,69 @@ export default function DataCloudSetupContent({ onBack, demoSession, onDemoSessi
                   <div>
                     {/* Intro text */}
                     <div className="mb-6">
-                      <h2 className="text-base font-bold text-[var(--sf-text-primary)] mb-3">Installed Packages</h2>
+                      <h2 className="text-base font-bold text-slds-neutral-base mb-3">Installed Packages</h2>
                       <div className="flex gap-6">
-                        <div className="flex-1 text-sm text-[var(--sf-text-secondary)] space-y-2">
-                          <p>On AppExchange you can browse, test drive, download, and install pre-built apps and components right into your salesforce.com environment. <button className="text-[var(--sf-link)] hover:underline">Learn More about Installing Packages</button>.</p>
+                        <div className="flex-1 text-sm text-slds-neutral-9 space-y-2">
+                          <p>On AppExchange you can browse, test drive, download, and install pre-built apps and components right into your salesforce.com environment. <button className="text-slds-brand hover:underline">Learn More about Installing Packages</button>.</p>
                           <p>Apps and components are installed in packages. Any custom apps, tabs, and custom objects are initially marked as "In Development" and are not deployed to your users. This allows you to test and customize before deploying. You can deploy the components individually using the other features in setup or as a group by clicking Deploy.</p>
                           <p>Depending on the links next to an installed package, you can take different actions from this page.</p>
                           <p>To remove a package, click <strong>Uninstall</strong>. To manage your package licenses, click <strong>Manage Licenses</strong>.</p>
                         </div>
-                        <div className="w-[200px] flex-shrink-0 border border-[var(--sf-border)] rounded-lg p-4 text-center">
-                          <div className="w-full h-12 bg-gradient-to-r from-[#00A1E0] to-[#1B96FF] rounded flex items-center justify-center mb-2">
+                        <div className="w-[200px] flex-shrink-0 border border-slds-border-1 rounded-lg p-4 text-center">
+                          <div className="w-full h-12 bg-gradient-to-r from-[#00A1E0] to-slds-brand-2 rounded flex items-center justify-center mb-2">
                             <span className="text-white font-bold text-xs">salesforce appexchange</span>
                           </div>
-                          <button className="text-sm text-[var(--sf-link)] font-medium hover:underline">Visit AppExchange &raquo;</button>
+                          <button className="text-sm text-slds-brand font-medium hover:underline">Visit AppExchange &raquo;</button>
                         </div>
                       </div>
                     </div>
 
                     {/* Installed Packages table */}
-                    <div className="border border-[var(--sf-border)] rounded mb-6">
-                      <div className="bg-[#FAFAF9] px-4 py-2.5 border-b border-[var(--sf-border)]">
-                        <span className="text-sm font-semibold text-[var(--sf-text-primary)]">Installed Packages</span>
+                    <div className="border border-slds-border-1 rounded mb-6">
+                      <div className="bg-[#FAFAF9] px-4 py-2.5 border-b border-slds-border-1">
+                        <span className="text-sm font-semibold text-slds-neutral-base">Installed Packages</span>
                       </div>
                       <div className="overflow-x-auto bg-white">
                         <table className="w-full text-sm">
                           <thead>
-                            <tr className="border-b border-[var(--sf-border)]">
-                              <th className="px-3 py-2 text-left text-xs font-semibold text-[var(--sf-text-primary)] w-[70px]">Action</th>
-                              <th className="px-3 py-2 text-left text-xs font-semibold text-[var(--sf-text-primary)]">Package Name</th>
-                              <th className="px-3 py-2 text-left text-xs font-semibold text-[var(--sf-text-primary)]">Publisher</th>
-                              <th className="px-3 py-2 text-left text-xs font-semibold text-[var(--sf-text-primary)]">Version Number</th>
-                              <th className="px-3 py-2 text-left text-xs font-semibold text-[var(--sf-text-primary)]">Namespace Prefix</th>
-                              <th className="px-3 py-2 text-left text-xs font-semibold text-[var(--sf-text-primary)]">Install Date</th>
-                              <th className="px-3 py-2 text-center text-xs font-semibold text-[var(--sf-text-primary)] w-[50px]">Limits</th>
-                              <th className="px-3 py-2 text-center text-xs font-semibold text-[var(--sf-text-primary)] w-[40px]">Apps</th>
-                              <th className="px-3 py-2 text-center text-xs font-semibold text-[var(--sf-text-primary)] w-[40px]">Tabs</th>
-                              <th className="px-3 py-2 text-center text-xs font-semibold text-[var(--sf-text-primary)] w-[50px]">Objects</th>
-                              <th className="px-3 py-2 text-left text-xs font-semibold text-[var(--sf-text-primary)]">AppExchange Ready</th>
+                            <tr className="border-b border-slds-border-1">
+                              <th className="px-3 py-2 text-left text-xs font-semibold text-slds-neutral-base w-[70px]">Action</th>
+                              <th className="px-3 py-2 text-left text-xs font-semibold text-slds-neutral-base">Package Name</th>
+                              <th className="px-3 py-2 text-left text-xs font-semibold text-slds-neutral-base">Publisher</th>
+                              <th className="px-3 py-2 text-left text-xs font-semibold text-slds-neutral-base">Version Number</th>
+                              <th className="px-3 py-2 text-left text-xs font-semibold text-slds-neutral-base">Namespace Prefix</th>
+                              <th className="px-3 py-2 text-left text-xs font-semibold text-slds-neutral-base">Install Date</th>
+                              <th className="px-3 py-2 text-center text-xs font-semibold text-slds-neutral-base w-[50px]">Limits</th>
+                              <th className="px-3 py-2 text-center text-xs font-semibold text-slds-neutral-base w-[40px]">Apps</th>
+                              <th className="px-3 py-2 text-center text-xs font-semibold text-slds-neutral-base w-[40px]">Tabs</th>
+                              <th className="px-3 py-2 text-center text-xs font-semibold text-slds-neutral-base w-[50px]">Objects</th>
+                              <th className="px-3 py-2 text-left text-xs font-semibold text-slds-neutral-base">AppExchange Ready</th>
                             </tr>
                           </thead>
                           <tbody>
                             {installedPackages.map((pkg, i) => (
-                              <tr key={i} className="border-b border-[var(--sf-border)] last:border-0 hover:bg-[#F9F9F9]">
-                                <td className="px-3 py-2 text-[var(--sf-link)] hover:underline cursor-pointer text-xs">Uninstall</td>
+                              <tr key={i} className="border-b border-slds-border-1 last:border-0 hover:bg-[#F9F9F9]">
+                                <td className="px-3 py-2 text-slds-brand hover:underline cursor-pointer text-xs">Uninstall</td>
                                 <td className="px-3 py-2">
                                   <button
                                     onClick={() => setPackageDetailName(pkg.name)}
-                                    className={`text-sm hover:underline ${pkg.isInformatica ? 'text-[#FF4A00] font-medium' : 'text-[var(--sf-link)]'}`}
+                                    className={`text-sm hover:underline ${pkg.isInformatica ? 'text-[#FF4A00] font-medium' : 'text-slds-brand'}`}
                                   >
                                     {pkg.name}
                                   </button>
                                   {pkg.description && i === 0 && (
-                                    <div className="text-xs text-[var(--sf-text-tertiary)] mt-0.5 ml-4">{pkg.description}</div>
+                                    <div className="text-xs text-slds-neutral-7 mt-0.5 ml-4">{pkg.description}</div>
                                   )}
                                 </td>
-                                <td className="px-3 py-2 text-[var(--sf-text-primary)]">{pkg.publisher}</td>
-                                <td className="px-3 py-2 text-[var(--sf-text-primary)]">{pkg.versionNumber}</td>
-                                <td className="px-3 py-2 text-[var(--sf-text-primary)]">{pkg.namespacePrefix}</td>
-                                <td className="px-3 py-2 text-[var(--sf-text-primary)] whitespace-nowrap">{pkg.installDate}</td>
-                                <td className="px-3 py-2 text-center">{pkg.limits ? <Check className="w-4 h-4 mx-auto text-[var(--sf-text-primary)]" /> : ''}</td>
-                                <td className="px-3 py-2 text-center text-[var(--sf-text-primary)]">{pkg.apps}</td>
-                                <td className="px-3 py-2 text-center text-[var(--sf-text-primary)]">{pkg.tabs}</td>
-                                <td className="px-3 py-2 text-center text-[var(--sf-text-primary)]">{pkg.objects}</td>
-                                <td className="px-3 py-2 text-[var(--sf-text-primary)]">{pkg.appExchangeReady}</td>
+                                <td className="px-3 py-2 text-slds-neutral-base">{pkg.publisher}</td>
+                                <td className="px-3 py-2 text-slds-neutral-base">{pkg.versionNumber}</td>
+                                <td className="px-3 py-2 text-slds-neutral-base">{pkg.namespacePrefix}</td>
+                                <td className="px-3 py-2 text-slds-neutral-base whitespace-nowrap">{pkg.installDate}</td>
+                                <td className="px-3 py-2 text-center">{pkg.limits ? <Check className="w-4 h-4 mx-auto text-slds-neutral-base" /> : ''}</td>
+                                <td className="px-3 py-2 text-center text-slds-neutral-base">{pkg.apps}</td>
+                                <td className="px-3 py-2 text-center text-slds-neutral-base">{pkg.tabs}</td>
+                                <td className="px-3 py-2 text-center text-slds-neutral-base">{pkg.objects}</td>
+                                <td className="px-3 py-2 text-slds-neutral-base">{pkg.appExchangeReady}</td>
                               </tr>
                             ))}
                           </tbody>
@@ -1910,11 +1910,11 @@ export default function DataCloudSetupContent({ onBack, demoSession, onDemoSessi
                     </div>
 
                     {/* Uninstalled Packages */}
-                    <div className="border border-[var(--sf-border)] rounded">
-                      <div className="bg-[#FAFAF9] px-4 py-2.5 border-b border-[var(--sf-border)]">
-                        <span className="text-sm font-semibold text-[var(--sf-text-primary)]">Uninstalled Packages</span>
+                    <div className="border border-slds-border-1 rounded">
+                      <div className="bg-[#FAFAF9] px-4 py-2.5 border-b border-slds-border-1">
+                        <span className="text-sm font-semibold text-slds-neutral-base">Uninstalled Packages</span>
                       </div>
-                      <div className="bg-white px-4 py-3 text-sm text-[var(--sf-text-tertiary)]">
+                      <div className="bg-white px-4 py-3 text-sm text-slds-neutral-7">
                         No uninstalled package data archives
                       </div>
                     </div>
@@ -1927,10 +1927,10 @@ export default function DataCloudSetupContent({ onBack, demoSession, onDemoSessi
             <div className="p-6">
               <div className="sf-card">
                 <div className="sf-card-header">
-                  <h1 className="text-base font-semibold text-[var(--sf-text-primary)]">{currentPageLabel}</h1>
+                  <h1 className="text-base font-semibold text-slds-neutral-base">{currentPageLabel}</h1>
                 </div>
                 <div className="sf-card-body">
-                  <p className="text-sm text-[var(--sf-text-tertiary)]">Setup content for {currentPageLabel}.</p>
+                  <p className="text-sm text-slds-neutral-7">Setup content for {currentPageLabel}.</p>
                 </div>
               </div>
             </div>
@@ -1948,7 +1948,7 @@ export default function DataCloudSetupContent({ onBack, demoSession, onDemoSessi
           {/* Step: Login */}
           {wizardStep === 'login' ? (
             <div className="relative bg-[#F0F2F5] rounded-lg shadow-2xl w-[480px] flex flex-col items-center py-12 px-8">
-              <button onClick={() => setConnectOrgOpen(false)} className="absolute top-3 right-3 w-7 h-7 flex items-center justify-center rounded hover:bg-black/5 text-[var(--sf-text-tertiary)]">
+              <button onClick={() => setConnectOrgOpen(false)} className="absolute top-3 right-3 w-7 h-7 flex items-center justify-center rounded hover:bg-black/5 text-slds-neutral-7">
                 <X className="w-4 h-4" />
               </button>
               {/* Logo */}
@@ -1964,21 +1964,21 @@ export default function DataCloudSetupContent({ onBack, demoSession, onDemoSessi
               {/* Login form */}
               <div className="w-full bg-white rounded-lg border border-[#D8DDE6] p-6 space-y-4">
                 <div>
-                  <label className="block text-sm text-[var(--sf-link)] mb-1">Username</label>
+                  <label className="block text-sm text-slds-brand mb-1">Username</label>
                   <input
                     type="text"
                     value={loginUsername}
                     onChange={(e) => setLoginUsername(e.target.value)}
-                    className="w-full px-3 py-2.5 text-sm border border-[#D8DDE6] rounded focus:outline-none focus:border-[var(--sf-blue-light)] focus:ring-2 focus:ring-[rgba(27,150,255,0.2)]"
+                    className="w-full px-3 py-2.5 text-sm border border-[#D8DDE6] rounded focus:outline-none focus:border-slds-brand-2 focus:ring-2 focus:ring-[rgba(27,150,255,0.2)]"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm text-[var(--sf-link)] mb-1">Password</label>
+                  <label className="block text-sm text-slds-brand mb-1">Password</label>
                   <input
                     type="password"
                     value={loginPassword}
                     onChange={(e) => setLoginPassword(e.target.value)}
-                    className="w-full px-3 py-2.5 text-sm border border-[#D8DDE6] rounded focus:outline-none focus:border-[var(--sf-blue-light)] focus:ring-2 focus:ring-[rgba(27,150,255,0.2)]"
+                    className="w-full px-3 py-2.5 text-sm border border-[#D8DDE6] rounded focus:outline-none focus:border-slds-brand-2 focus:ring-2 focus:ring-[rgba(27,150,255,0.2)]"
                   />
                 </div>
                 <button
@@ -1988,19 +1988,19 @@ export default function DataCloudSetupContent({ onBack, demoSession, onDemoSessi
                   Log In
                 </button>
                 <label className="flex items-center gap-2 cursor-pointer">
-                  <input type="checkbox" checked={rememberMe} onChange={(e) => setRememberMe(e.target.checked)} className="w-4 h-4 rounded border-[#D8DDE6] text-[var(--sf-blue)]" />
-                  <span className="text-sm text-[var(--sf-text-primary)]">Remember me</span>
+                  <input type="checkbox" checked={rememberMe} onChange={(e) => setRememberMe(e.target.checked)} className="w-4 h-4 rounded border-[#D8DDE6] text-slds-brand" />
+                  <span className="text-sm text-slds-neutral-base">Remember me</span>
                 </label>
                 <div className="border-t border-[#D8DDE6] pt-3 flex items-center justify-between">
-                  <button className="text-sm text-[var(--sf-link)] hover:underline">Forgot Your Password?</button>
-                  <button className="text-sm text-[var(--sf-link)] hover:underline">Use Custom Domain</button>
+                  <button className="text-sm text-slds-brand hover:underline">Forgot Your Password?</button>
+                  <button className="text-sm text-slds-brand hover:underline">Use Custom Domain</button>
                 </div>
               </div>
             </div>
           ) : wizardStep === 'permissions' ? (
             /* Step: Permissions / Allow Access */
             <div className="relative bg-[#F0F2F5] rounded-lg shadow-2xl w-[520px] flex flex-col items-center py-12 px-8">
-              <button onClick={() => setConnectOrgOpen(false)} className="absolute top-3 right-3 w-7 h-7 flex items-center justify-center rounded hover:bg-black/5 text-[var(--sf-text-tertiary)]">
+              <button onClick={() => setConnectOrgOpen(false)} className="absolute top-3 right-3 w-7 h-7 flex items-center justify-center rounded hover:bg-black/5 text-slds-neutral-7">
                 <X className="w-4 h-4" />
               </button>
               {/* Logo */}
@@ -2013,24 +2013,24 @@ export default function DataCloudSetupContent({ onBack, demoSession, onDemoSessi
                   <SalesforceCloudLogo size={100} />
                 </div>
               )}
-              <h2 className="text-2xl text-[var(--sf-text-tertiary)] mb-6">Allow Access?</h2>
+              <h2 className="text-2xl text-slds-neutral-7 mb-6">Allow Access?</h2>
               <div className="w-full bg-white rounded-lg border border-[#D8DDE6] p-6 space-y-4">
-                <p className="text-sm text-[var(--sf-text-secondary)]">
+                <p className="text-sm text-slds-neutral-9">
                   {isInformatica ? 'Informatica MDM' : 'Data Cloud Salesforce'} Org Registration is asking to:
                 </p>
-                <ul className="list-disc ml-6 space-y-1 text-sm text-[var(--sf-text-primary)]">
+                <ul className="list-disc ml-6 space-y-1 text-sm text-slds-neutral-base">
                   <li>Access the identity URL service</li>
                   <li>Access unique user identifiers</li>
                   <li>Manage user data via APIs</li>
                 </ul>
-                <p className="text-sm text-[var(--sf-text-secondary)]">
+                <p className="text-sm text-slds-neutral-9">
                   Do you want to allow access for<br />
-                  {loginUsername}? (<button className="text-[var(--sf-link)] hover:underline">Not you?</button>)
+                  {loginUsername}? (<button className="text-slds-brand hover:underline">Not you?</button>)
                 </p>
                 <div className="flex items-center gap-3 pt-2">
                   <button
                     onClick={() => setConnectOrgOpen(false)}
-                    className="flex-1 py-2.5 text-sm font-medium text-[var(--sf-link)] border border-[#D8DDE6] rounded hover:bg-[#F3F3F3] transition-colors"
+                    className="flex-1 py-2.5 text-sm font-medium text-slds-brand border border-[#D8DDE6] rounded hover:bg-slds-neutral-2 transition-colors"
                   >
                     Deny
                   </button>
@@ -2041,7 +2041,7 @@ export default function DataCloudSetupContent({ onBack, demoSession, onDemoSessi
                     Allow
                   </button>
                 </div>
-                <p className="text-xs text-[var(--sf-text-tertiary)] pt-2">
+                <p className="text-xs text-slds-neutral-7 pt-2">
                   To revoke access at any time, go to your personal settings.
                 </p>
               </div>
@@ -2050,8 +2050,8 @@ export default function DataCloudSetupContent({ onBack, demoSession, onDemoSessi
             /* Steps: select-type & alias */
             <div className="relative bg-white rounded-lg shadow-2xl w-[640px] max-h-[85vh] flex flex-col">
               {/* Header */}
-              <div className="text-center py-6 border-b border-[var(--sf-border)]">
-                <h2 className="text-xl font-normal text-[var(--sf-text-primary)]">
+              <div className="text-center py-6 border-b border-slds-border-1">
+                <h2 className="text-xl font-normal text-slds-neutral-base">
                   {isInformatica ? 'Connect an Informatica Tenant' : 'Connect an Org'}
                 </h2>
               </div>
@@ -2060,18 +2060,18 @@ export default function DataCloudSetupContent({ onBack, demoSession, onDemoSessi
               <div className="flex-1 overflow-y-auto px-8 py-6">
                 {wizardStep === 'select-type' ? (
                   <div className="space-y-6">
-                    <p className="text-sm text-[var(--sf-text-secondary)]">
+                    <p className="text-sm text-slds-neutral-9">
                       {isInformatica
                         ? 'Choose what type of Informatica tenant you would like to connect to as a master data source. '
                         : 'Choose what type of org you would like to connect to as a data source and data action target. '}
-                      <button className="text-[var(--sf-link)] hover:underline">Learn More</button>
+                      <button className="text-slds-brand hover:underline">Learn More</button>
                     </p>
 
                     {/* Org type cards */}
                     <div className="grid grid-cols-2 gap-4">
                       {(['salesforce', 'sandbox'] as const).map((type) => {
                         const selected = selectedOrgType === type;
-                        const accentColor = isInformatica ? '#FF4A00' : 'var(--sf-blue)';
+                        const accentColor = isInformatica ? '#FF4A00' : 'var(--slds-g-color-brand)';
                         return (
                           <button
                             key={type}
@@ -2088,7 +2088,7 @@ export default function DataCloudSetupContent({ onBack, demoSession, onDemoSessi
                                 <Check className="w-3 h-3 text-white absolute top-0.5 right-0.5" />
                               </div>
                             )}
-                            <span className="text-sm text-[var(--sf-text-primary)]">
+                            <span className="text-sm text-slds-neutral-base">
                               {isInformatica
                                 ? (type === 'salesforce' ? 'Connect to a Production Tenant' : 'Connect to a Sandbox Tenant')
                                 : (type === 'salesforce' ? 'Connect to a Salesforce Org' : 'Connect to a Sandbox Org')}
@@ -2101,14 +2101,14 @@ export default function DataCloudSetupContent({ onBack, demoSession, onDemoSessi
                 ) : (
                   /* Alias step */
                   <div className="space-y-6">
-                    <p className="text-sm text-[var(--sf-text-secondary)]">
+                    <p className="text-sm text-slds-neutral-9">
                       {isInformatica
                         ? 'Assign an alias for your Informatica MDM tenant connection that contains up to 15 alphanumeric characters. You can\'t change the alias later. The alias is used in data stream names and helps you identify your tenants.'
                         : `Assign an alias for your ${connectorName} connector that contains up to 15 alphanumeric characters. You can't change the alias later. The alias is used in data stream names and helps you filter your connections.`}
                     </p>
                     <div>
-                      <label className="block text-sm text-[var(--sf-text-primary)] mb-1">
-                        <span className="text-[var(--sf-error)]">*</span> {isInformatica ? 'Tenant Alias' : 'Connection Alias'}
+                      <label className="block text-sm text-slds-neutral-base mb-1">
+                        <span className="text-slds-error-1">*</span> {isInformatica ? 'Tenant Alias' : 'Connection Alias'}
                       </label>
                       <div className="flex items-center gap-2">
                         <input
@@ -2118,10 +2118,10 @@ export default function DataCloudSetupContent({ onBack, demoSession, onDemoSessi
                             if (e.target.value.length <= 15) setConnectionAlias(e.target.value);
                           }}
                           placeholder="Create an alias..."
-                          className="w-72 px-3 py-2 text-sm border-2 border-[var(--sf-blue)] rounded focus:outline-none focus:ring-2 focus:ring-[rgba(27,150,255,0.2)]"
+                          className="w-72 px-3 py-2 text-sm border-2 border-slds-brand rounded focus:outline-none focus:ring-2 focus:ring-[rgba(27,150,255,0.2)]"
                           maxLength={15}
                         />
-                        <span className="text-sm text-[var(--sf-text-tertiary)]">{connectionAlias.length}/15</span>
+                        <span className="text-sm text-slds-neutral-7">{connectionAlias.length}/15</span>
                       </div>
                     </div>
                   </div>
@@ -2129,25 +2129,25 @@ export default function DataCloudSetupContent({ onBack, demoSession, onDemoSessi
               </div>
 
               {/* Footer */}
-              <div className="flex items-center justify-between px-8 py-4 border-t border-[var(--sf-border)] bg-[#FAFAF9]">
+              <div className="flex items-center justify-between px-8 py-4 border-t border-slds-border-1 bg-[#FAFAF9]">
                 {wizardStep === 'select-type' ? (
                   <>
-                    <button onClick={() => setConnectOrgOpen(false)} className="px-4 py-2 text-sm font-medium text-[var(--sf-link)] border border-[var(--sf-border)] rounded hover:bg-[#F3F3F3]">Cancel</button>
+                    <button onClick={() => setConnectOrgOpen(false)} className="px-4 py-2 text-sm font-medium text-slds-brand border border-slds-border-1 rounded hover:bg-slds-neutral-2">Cancel</button>
                     <button
                       onClick={handleWizardNext}
                       disabled={!selectedOrgType}
-                      className="px-5 py-2 text-sm font-medium text-white bg-[var(--sf-blue)] rounded hover:bg-[var(--sf-blue-hover)] disabled:opacity-50 disabled:cursor-not-allowed"
+                      className="px-5 py-2 text-sm font-medium text-white bg-slds-brand rounded hover:bg-slds-brand-contrast-1 disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                       Next
                     </button>
                   </>
                 ) : (
                   <>
-                    <button onClick={handleWizardBack} className="px-4 py-2 text-sm font-medium text-[var(--sf-link)] border border-[var(--sf-border)] rounded hover:bg-[#F3F3F3]">Back</button>
+                    <button onClick={handleWizardBack} className="px-4 py-2 text-sm font-medium text-slds-brand border border-slds-border-1 rounded hover:bg-slds-neutral-2">Back</button>
                     <button
                       onClick={handleWizardNext}
                       disabled={!connectionAlias.trim()}
-                      className="px-5 py-2 text-sm font-medium text-white bg-[var(--sf-blue)] rounded hover:bg-[var(--sf-blue-hover)] disabled:opacity-50 disabled:cursor-not-allowed"
+                      className="px-5 py-2 text-sm font-medium text-white bg-slds-brand rounded hover:bg-slds-brand-contrast-1 disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                       Proceed
                     </button>
@@ -2170,20 +2170,20 @@ export default function DataCloudSetupContent({ onBack, demoSession, onDemoSessi
             /* Loading state */
             <div className="relative bg-white rounded-lg shadow-2xl w-[520px] py-16 px-8 flex flex-col items-center">
               <div className="w-12 h-12 border-4 border-[#E0E0E0] border-t-[#FF4A00] rounded-full animate-spin mb-6" />
-              <p className="text-sm text-[var(--sf-text-primary)] font-medium">
+              <p className="text-sm text-slds-neutral-base font-medium">
                 Installing and granting access to {installModalChoice === 'admins' ? 'admins Only' : installModalChoice === 'all' ? 'all Users' : 'specific Profiles'}...
               </p>
             </div>
           ) : (
             /* Selection step */
             <div className="relative bg-white rounded-lg shadow-2xl w-[600px] max-h-[85vh] flex flex-col">
-              <button onClick={() => setInstallModalOpen(false)} className="absolute top-3 right-3 w-7 h-7 flex items-center justify-center rounded hover:bg-[#F3F3F3] text-[var(--sf-text-tertiary)] z-10">
+              <button onClick={() => setInstallModalOpen(false)} className="absolute top-3 right-3 w-7 h-7 flex items-center justify-center rounded hover:bg-slds-neutral-2 text-slds-neutral-7 z-10">
                 <X className="w-4 h-4" />
               </button>
 
               {/* Header */}
-              <div className="px-8 pt-6 pb-4 border-b border-[var(--sf-border)]">
-                <h2 className="text-xl font-bold text-[var(--sf-text-primary)]">
+              <div className="px-8 pt-6 pb-4 border-b border-slds-border-1">
+                <h2 className="text-xl font-bold text-slds-neutral-base">
                   Install {installModalBundle.name === 'Informatica MDM Cloud' ? 'Customer 360' : installModalBundle.name === 'Informatica Data Quality' ? 'Organization 360' : installModalBundle.name}
                 </h2>
               </div>
@@ -2212,8 +2212,8 @@ export default function DataCloudSetupContent({ onBack, demoSession, onDemoSessi
                           {selected && <div className="w-2.5 h-2.5 rounded-full bg-[#FF4A00]" />}
                         </div>
                         <div>
-                          <div className="text-sm font-semibold text-[var(--sf-text-primary)]">{opt.label}</div>
-                          <div className="text-xs text-[var(--sf-text-tertiary)] mt-1">{opt.desc}</div>
+                          <div className="text-sm font-semibold text-slds-neutral-base">{opt.label}</div>
+                          <div className="text-xs text-slds-neutral-7 mt-1">{opt.desc}</div>
                         </div>
                       </div>
                     </button>
@@ -2221,29 +2221,29 @@ export default function DataCloudSetupContent({ onBack, demoSession, onDemoSessi
                 })}
 
                 {/* Package details summary */}
-                <div className="mt-4 border-t border-[var(--sf-border)] pt-4">
+                <div className="mt-4 border-t border-slds-border-1 pt-4">
                   <div className="grid grid-cols-2 gap-y-2 text-sm">
-                    <div className="text-[var(--sf-text-tertiary)]">App Name</div>
-                    <div className="text-[var(--sf-text-primary)] font-medium">
+                    <div className="text-slds-neutral-7">App Name</div>
+                    <div className="text-slds-neutral-base font-medium">
                       {installModalBundle.name === 'Informatica MDM Cloud' ? 'Customer 360' : installModalBundle.name === 'Informatica Data Quality' ? 'Organization 360' : installModalBundle.name}
                     </div>
-                    <div className="text-[var(--sf-text-tertiary)]">Publisher</div>
-                    <div className="text-[var(--sf-text-primary)]">{informaticaBundles.some((b) => b.name === installModalBundle.name) ? 'Informatica' : 'CDP CRM 1'}</div>
-                    <div className="text-[var(--sf-text-tertiary)]">Version Name</div>
-                    <div className="text-[var(--sf-text-primary)]">Winter 2026</div>
-                    <div className="text-[var(--sf-text-tertiary)]">Version Number</div>
-                    <div className="text-[var(--sf-text-primary)]">{installModalBundle.latestVersion}</div>
-                    <div className="text-[var(--sf-text-tertiary)]">Additional Details</div>
-                    <div><button className="text-sm text-[var(--sf-link)] hover:underline">View Components</button></div>
+                    <div className="text-slds-neutral-7">Publisher</div>
+                    <div className="text-slds-neutral-base">{informaticaBundles.some((b) => b.name === installModalBundle.name) ? 'Informatica' : 'CDP CRM 1'}</div>
+                    <div className="text-slds-neutral-7">Version Name</div>
+                    <div className="text-slds-neutral-base">Winter 2026</div>
+                    <div className="text-slds-neutral-7">Version Number</div>
+                    <div className="text-slds-neutral-base">{installModalBundle.latestVersion}</div>
+                    <div className="text-slds-neutral-7">Additional Details</div>
+                    <div><button className="text-sm text-slds-brand hover:underline">View Components</button></div>
                   </div>
                 </div>
               </div>
 
               {/* Footer */}
-              <div className="flex items-center justify-end gap-3 px-8 py-4 border-t border-[var(--sf-border)] bg-[#FAFAF9]">
+              <div className="flex items-center justify-end gap-3 px-8 py-4 border-t border-slds-border-1 bg-[#FAFAF9]">
                 <button
                   onClick={() => setInstallModalOpen(false)}
-                  className="px-4 py-2 text-sm font-medium text-[var(--sf-link)] border border-[var(--sf-border)] rounded hover:bg-[#F3F3F3]"
+                  className="px-4 py-2 text-sm font-medium text-slds-brand border border-slds-border-1 rounded hover:bg-slds-neutral-2"
                 >
                   Cancel
                 </button>

@@ -31,7 +31,7 @@ export default function AgentPanel({ isMinimized, onToggleMinimize }: AgentPanel
         className="sf-agent-collapsed"
         title="Expand Agentforce"
       >
-        <ChevronLeft className="w-4 h-4 text-[var(--sf-text-tertiary)]" />
+        <ChevronLeft className="w-4 h-4 text-slds-neutral-7" />
       </button>
     );
   }
@@ -50,8 +50,8 @@ export default function AgentPanel({ isMinimized, onToggleMinimize }: AgentPanel
       {/* Header */}
       <div className="sf-agent-header">
         <div className="flex items-center gap-2">
-          <Sparkles className="w-4 h-4 text-[#0176D3]" />
-          <button className="flex items-center gap-1 text-sm font-semibold text-[var(--sf-text-primary)] hover:text-[var(--sf-blue)]">
+          <Sparkles className="w-4 h-4 text-slds-brand" />
+          <button className="flex items-center gap-1 text-sm font-semibold text-slds-neutral-base hover:text-slds-brand">
             Data 360 Agent
             <ChevronDown className="w-3 h-3" />
           </button>
@@ -111,10 +111,10 @@ export default function AgentPanel({ isMinimized, onToggleMinimize }: AgentPanel
 
         {/* Welcome text */}
         <div className="text-center px-4 pb-5">
-          <h3 className="text-base font-semibold text-[var(--sf-text-primary)] mb-1">
+          <h3 className="text-base font-semibold text-slds-neutral-base mb-1">
             Let's chat!
           </h3>
-          <p className="text-xs text-[var(--sf-text-tertiary)] leading-relaxed">
+          <p className="text-xs text-slds-neutral-7 leading-relaxed">
             I'm your Agentforce AI assistant. I can help you search records, create segments,
             analyze data, and more.
           </p>
@@ -128,10 +128,10 @@ export default function AgentPanel({ isMinimized, onToggleMinimize }: AgentPanel
               className="sf-agent-prompt-card"
               onClick={() => setInputValue(prompt)}
             >
-              <span className="text-xs text-[var(--sf-text-secondary)] leading-snug flex-1 text-left">
+              <span className="text-xs text-slds-neutral-9 leading-snug flex-1 text-left">
                 {prompt}
               </span>
-              <Send className="w-3.5 h-3.5 text-[var(--sf-blue)] flex-shrink-0" />
+              <Send className="w-3.5 h-3.5 text-slds-brand flex-shrink-0" />
             </button>
           ))}
         </div>
@@ -150,8 +150,8 @@ export default function AgentPanel({ isMinimized, onToggleMinimize }: AgentPanel
           <button
             className={`absolute right-2 top-1/2 -translate-y-1/2 w-7 h-7 rounded flex items-center justify-center transition-colors ${
               inputValue
-                ? 'bg-[var(--sf-blue)] text-white'
-                : 'text-[var(--sf-text-tertiary)]'
+                ? 'bg-slds-brand text-white'
+                : 'text-slds-neutral-7'
             }`}
           >
             <Send className="w-3.5 h-3.5" />

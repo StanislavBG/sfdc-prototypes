@@ -125,7 +125,7 @@ export default function Layout({ children }: LayoutProps) {
   if (showDataCloudSetup) {
     return (
       <MdsSimulatorProvider>
-      <div className="min-h-screen flex flex-col bg-[var(--sf-content-bg)]">
+      <div className="min-h-screen flex flex-col bg-slds-neutral-2">
         <Header
           appName="Data Cloud Setup"
           currentApp={effectiveApp}
@@ -160,7 +160,7 @@ export default function Layout({ children }: LayoutProps) {
           currentApp={effectiveApp}
         />
         {exportToast && (
-          <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-[100] px-5 py-3 bg-[#032D60] text-white text-sm font-medium rounded-lg shadow-xl animate-[fadeIn_0.2s_ease-out]">
+          <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-[100] px-5 py-3 bg-slds-brand-1 text-white text-sm font-medium rounded-lg shadow-xl animate-[fadeIn_0.2s_ease-out]">
             {exportToast}
           </div>
         )}
@@ -171,7 +171,7 @@ export default function Layout({ children }: LayoutProps) {
 
   return (
     <MdsSimulatorProvider>
-    <div className="min-h-screen flex flex-col bg-[var(--sf-content-bg)]">
+    <div className="min-h-screen flex flex-col bg-slds-neutral-2">
       {/* Single-row header */}
       <Header
         appName={appName}
@@ -212,12 +212,12 @@ export default function Layout({ children }: LayoutProps) {
                 <div className="p-6">
                   <div className="sf-card">
                     <div className="sf-card-header">
-                      <h1 className="text-base font-semibold text-[var(--sf-text-primary)]">
+                      <h1 className="text-base font-semibold text-slds-neutral-base">
                         {activeTab}
                       </h1>
                     </div>
                     <div className="sf-card-body">
-                      <p className="text-sm text-[var(--sf-text-tertiary)]">
+                      <p className="text-sm text-slds-neutral-7">
                         Content area for {activeTab}
                       </p>
                     </div>
@@ -264,7 +264,7 @@ export default function Layout({ children }: LayoutProps) {
 
       {/* Export toast notification */}
       {exportToast && (
-        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-[100] px-5 py-3 bg-[#032D60] text-white text-sm font-medium rounded-lg shadow-xl animate-[fadeIn_0.2s_ease-out]">
+        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-[100] px-5 py-3 bg-slds-brand-1 text-white text-sm font-medium rounded-lg shadow-xl animate-[fadeIn_0.2s_ease-out]">
           {exportToast}
         </div>
       )}

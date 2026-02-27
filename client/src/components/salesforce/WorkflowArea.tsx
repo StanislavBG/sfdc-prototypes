@@ -23,10 +23,10 @@ export default function WorkflowArea({ workflow }: WorkflowAreaProps) {
           <div className="sf-workflow-empty-icon">
             <Sparkles className="w-8 h-8 text-[#9B8BF4]" />
           </div>
-          <h2 className="text-base font-semibold text-[var(--sf-text-primary)] mt-4">
+          <h2 className="text-base font-semibold text-slds-neutral-base mt-4">
             Welcome to Data 360
           </h2>
-          <p className="text-sm text-[var(--sf-text-tertiary)] mt-2 max-w-md text-center leading-relaxed">
+          <p className="text-sm text-slds-neutral-7 mt-2 max-w-md text-center leading-relaxed">
             Select a workflow from the sidebar or describe what you're working on
             to get started. Your AI agent is embedded in every step to help you along
             the way.
@@ -54,10 +54,10 @@ export default function WorkflowArea({ workflow }: WorkflowAreaProps) {
         <div className="sf-workflow-step-card">
           <div className="sf-workflow-step-card-header">
             <div>
-              <h3 className="text-base font-semibold text-[var(--sf-text-primary)]">
+              <h3 className="text-base font-semibold text-slds-neutral-base">
                 {currentStep?.title}
               </h3>
-              <p className="text-xs text-[var(--sf-text-tertiary)] mt-1">
+              <p className="text-xs text-slds-neutral-7 mt-1">
                 {currentStep?.description}
               </p>
             </div>
@@ -81,7 +81,7 @@ export default function WorkflowArea({ workflow }: WorkflowAreaProps) {
           {/* Embedded agent hint */}
           <div className="sf-workflow-agent-hint">
             <Sparkles className="w-3.5 h-3.5 text-[#9B8BF4]" />
-            <span className="text-xs text-[var(--sf-text-tertiary)]">
+            <span className="text-xs text-slds-neutral-7">
               Agent is ready to help with this step. Ask questions or let it configure
               settings for you.
             </span>

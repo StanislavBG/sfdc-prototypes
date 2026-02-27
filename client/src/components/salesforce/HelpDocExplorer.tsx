@@ -249,20 +249,20 @@ export default function HelpDocExplorer() {
       {/* Header row */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <div className="w-9 h-9 rounded-lg bg-[#032D60] flex items-center justify-center">
+          <div className="w-9 h-9 rounded-lg bg-slds-brand-1 flex items-center justify-center">
             <Database className="w-5 h-5 text-white" />
           </div>
           <div>
-            <h1 className="text-base font-semibold text-[var(--sf-text-primary)]">
+            <h1 className="text-base font-semibold text-slds-neutral-base">
               Salesforce Help Documents
             </h1>
-            <p className="text-xs text-[var(--sf-text-tertiary)]">
+            <p className="text-xs text-slds-neutral-7">
               Upload MHTML files to index and search Salesforce documentation
             </p>
           </div>
         </div>
         <div className="flex items-center gap-2">
-          <span className="text-xs text-[var(--sf-text-tertiary)]">
+          <span className="text-xs text-slds-neutral-7">
             {docs.length} document{docs.length !== 1 ? 's' : ''}
           </span>
           <button
@@ -311,13 +311,13 @@ export default function HelpDocExplorer() {
       {diagSteps && (
         <div className="sf-card overflow-hidden">
           <div className="sf-card-header flex items-center justify-between">
-            <h2 className="text-sm font-semibold text-[var(--sf-text-primary)] flex items-center gap-1.5">
+            <h2 className="text-sm font-semibold text-slds-neutral-base flex items-center gap-1.5">
               <Stethoscope className="w-4 h-4" />
               Pipeline Diagnostics
             </h2>
             <button
               onClick={() => { setDiagSteps(null); setDiagContentPreview(null); }}
-              className="p-1 rounded hover:bg-[#E5E5E5] text-[var(--sf-text-tertiary)]"
+              className="p-1 rounded hover:bg-slds-border-2 text-slds-neutral-7"
             >
               <X className="w-3.5 h-3.5" />
             </button>
@@ -346,8 +346,8 @@ export default function HelpDocExplorer() {
               </div>
             ))}
             {diagContentPreview && (
-              <div className="mt-3 p-3 bg-[#FAFAF9] rounded border border-[var(--sf-border-light)] text-xs text-[var(--sf-text-secondary)] whitespace-pre-wrap max-h-[200px] overflow-y-auto">
-                <div className="text-xs font-semibold text-[var(--sf-text-tertiary)] uppercase tracking-wide mb-1">
+              <div className="mt-3 p-3 bg-[#FAFAF9] rounded border border-slds-border-2 text-xs text-slds-neutral-9 whitespace-pre-wrap max-h-[200px] overflow-y-auto">
+                <div className="text-xs font-semibold text-slds-neutral-7 uppercase tracking-wide mb-1">
                   Parsed Content Preview
                 </div>
                 {diagContentPreview}
@@ -371,8 +371,8 @@ export default function HelpDocExplorer() {
             onClick={() => fileRef.current?.click()}
             className={`sf-card flex flex-col items-center justify-center py-8 cursor-pointer transition-all border-2 border-dashed ${
               dragOver
-                ? 'border-[var(--sf-blue)] bg-[#EEF4FF]'
-                : 'border-[var(--sf-border)] hover:border-[var(--sf-blue-light)] hover:bg-[#F9FAFF]'
+                ? 'border-slds-brand bg-[#EEF4FF]'
+                : 'border-slds-border-1 hover:border-slds-brand-2 hover:bg-[#F9FAFF]'
             }`}
           >
             <input
@@ -384,14 +384,14 @@ export default function HelpDocExplorer() {
               onChange={(e) => handleFiles(e.target.files)}
             />
             {uploading ? (
-              <Loader2 className="w-8 h-8 text-[var(--sf-blue)] animate-spin mb-2" />
+              <Loader2 className="w-8 h-8 text-slds-brand animate-spin mb-2" />
             ) : (
-              <Upload className="w-8 h-8 text-[var(--sf-text-tertiary)] mb-2" />
+              <Upload className="w-8 h-8 text-slds-neutral-7 mb-2" />
             )}
-            <span className="text-sm font-medium text-[var(--sf-text-primary)]">
+            <span className="text-sm font-medium text-slds-neutral-base">
               {uploading ? 'Processing...' : 'Drop MHTML files here or click to browse'}
             </span>
-            <span className="text-xs text-[var(--sf-text-tertiary)] mt-1">
+            <span className="text-xs text-slds-neutral-7 mt-1">
               Accepts .mhtml and .mht files up to 20 MB
             </span>
           </div>
@@ -421,54 +421,54 @@ export default function HelpDocExplorer() {
           {/* Document table */}
           <div className="sf-card overflow-hidden">
             <div className="sf-card-header flex items-center justify-between">
-              <h2 className="text-sm font-semibold text-[var(--sf-text-primary)]">
+              <h2 className="text-sm font-semibold text-slds-neutral-base">
                 Indexed Documents
               </h2>
               {docsLoading && (
-                <Loader2 className="w-3.5 h-3.5 text-[var(--sf-text-tertiary)] animate-spin" />
+                <Loader2 className="w-3.5 h-3.5 text-slds-neutral-7 animate-spin" />
               )}
             </div>
             {docs.length === 0 ? (
-              <div className="px-4 py-8 text-center text-sm text-[var(--sf-text-tertiary)]">
+              <div className="px-4 py-8 text-center text-sm text-slds-neutral-7">
                 No documents uploaded yet
               </div>
             ) : (
               <table className="w-full text-sm">
                 <thead>
-                  <tr className="border-b border-[var(--sf-border-light)] bg-[#FAFAF9]">
-                    <th className="text-left px-4 py-2 text-xs font-semibold text-[var(--sf-text-tertiary)] uppercase tracking-wide">
+                  <tr className="border-b border-slds-border-2 bg-[#FAFAF9]">
+                    <th className="text-left px-4 py-2 text-xs font-semibold text-slds-neutral-7 uppercase tracking-wide">
                       Id
                     </th>
-                    <th className="text-left px-4 py-2 text-xs font-semibold text-[var(--sf-text-tertiary)] uppercase tracking-wide">
+                    <th className="text-left px-4 py-2 text-xs font-semibold text-slds-neutral-7 uppercase tracking-wide">
                       File Name
                     </th>
-                    <th className="text-left px-4 py-2 text-xs font-semibold text-[var(--sf-text-tertiary)] uppercase tracking-wide">
+                    <th className="text-left px-4 py-2 text-xs font-semibold text-slds-neutral-7 uppercase tracking-wide">
                       Chunks
                     </th>
-                    <th className="text-right px-4 py-2 text-xs font-semibold text-[var(--sf-text-tertiary)] uppercase tracking-wide">
+                    <th className="text-right px-4 py-2 text-xs font-semibold text-slds-neutral-7 uppercase tracking-wide">
                       Actions
                     </th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-[var(--sf-border-light)]">
+                <tbody className="divide-y divide-slds-border-2">
                   {docs.map((doc) => (
                     <tr
                       key={doc.id}
-                      className="hover:bg-[#F3F3F3] transition-colors"
+                      className="hover:bg-slds-neutral-2 transition-colors"
                     >
-                      <td className="px-4 py-2.5 text-[var(--sf-text-tertiary)] tabular-nums">
+                      <td className="px-4 py-2.5 text-slds-neutral-7 tabular-nums">
                         {doc.id}
                       </td>
                       <td className="px-4 py-2.5">
                         <div className="flex items-center gap-2">
-                          <FileText className="w-4 h-4 text-[var(--sf-blue)] flex-shrink-0" />
-                          <span className="text-[var(--sf-link)] font-medium truncate max-w-[300px]">
+                          <FileText className="w-4 h-4 text-slds-brand flex-shrink-0" />
+                          <span className="text-slds-brand font-medium truncate max-w-[300px]">
                             {doc.fileName}
                           </span>
                         </div>
                       </td>
                       <td className="px-4 py-2.5">
-                        <span className={doc.chunkCount === 0 ? 'text-[var(--sf-warning)] font-medium' : 'text-[var(--sf-text-tertiary)]'}>
+                        <span className={doc.chunkCount === 0 ? 'text-slds-warning-1 font-medium' : 'text-slds-neutral-7'}>
                           {doc.chunkCount}
                         </span>
                       </td>
@@ -478,7 +478,7 @@ export default function HelpDocExplorer() {
                             <button
                               onClick={() => republishDoc(doc.id)}
                               disabled={republishing === doc.id}
-                              className="p-1.5 rounded hover:bg-[#EEF4FF] text-[var(--sf-warning)] hover:text-[var(--sf-blue)] transition-colors disabled:opacity-50"
+                              className="p-1.5 rounded hover:bg-[#EEF4FF] text-slds-warning-1 hover:text-slds-brand transition-colors disabled:opacity-50"
                               title="Re-publish (re-chunk and re-embed)"
                             >
                               {republishing === doc.id ? (
@@ -490,14 +490,14 @@ export default function HelpDocExplorer() {
                           )}
                           <button
                             onClick={() => openPreview(doc.id)}
-                            className="p-1.5 rounded hover:bg-[#E5E5E5] text-[var(--sf-text-tertiary)] hover:text-[var(--sf-blue)] transition-colors"
+                            className="p-1.5 rounded hover:bg-slds-border-2 text-slds-neutral-7 hover:text-slds-brand transition-colors"
                             title="Preview"
                           >
                             <Eye className="w-4 h-4" />
                           </button>
                           <button
                             onClick={() => deleteDoc(doc.id)}
-                            className="p-1.5 rounded hover:bg-red-50 text-[var(--sf-text-tertiary)] hover:text-red-600 transition-colors"
+                            className="p-1.5 rounded hover:bg-red-50 text-slds-neutral-7 hover:text-red-600 transition-colors"
                             title="Delete"
                           >
                             <Trash2 className="w-4 h-4" />
@@ -517,7 +517,7 @@ export default function HelpDocExplorer() {
           {/* Search */}
           <div className="sf-card">
             <div className="sf-card-header">
-              <h2 className="text-sm font-semibold text-[var(--sf-text-primary)]">
+              <h2 className="text-sm font-semibold text-slds-neutral-base">
                 Semantic Search
               </h2>
             </div>
@@ -529,12 +529,12 @@ export default function HelpDocExplorer() {
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   onKeyDown={(e) => e.key === 'Enter' && runSearch()}
-                  className="flex-1 px-3 py-1.5 text-sm border border-[var(--sf-border)] rounded focus:border-[var(--sf-blue)] focus:ring-1 focus:ring-[var(--sf-blue)] outline-none"
+                  className="flex-1 px-3 py-1.5 text-sm border border-slds-border-1 rounded focus:border-slds-brand focus:ring-1 focus:ring-slds-brand outline-none"
                 />
                 <button
                   onClick={runSearch}
                   disabled={searching || !searchQuery.trim()}
-                  className="px-3 py-1.5 text-sm font-medium text-white bg-[var(--sf-blue)] rounded hover:bg-[var(--sf-blue-hover)] disabled:opacity-50 flex items-center gap-1.5"
+                  className="px-3 py-1.5 text-sm font-medium text-white bg-slds-brand rounded hover:bg-slds-brand-contrast-1 disabled:opacity-50 flex items-center gap-1.5"
                 >
                   {searching ? (
                     <Loader2 className="w-3.5 h-3.5 animate-spin" />
@@ -550,17 +550,17 @@ export default function HelpDocExplorer() {
                   {searchResults.map((r, i) => (
                     <div
                       key={r.id}
-                      className="p-3 rounded border border-[var(--sf-border-light)] hover:border-[var(--sf-blue-light)] transition-colors"
+                      className="p-3 rounded border border-slds-border-2 hover:border-slds-brand-2 transition-colors"
                     >
                       <div className="flex items-center justify-between mb-1">
-                        <span className="text-xs font-medium text-[var(--sf-blue)]">
+                        <span className="text-xs font-medium text-slds-brand">
                           {(r.metadata as any)?.file_name || `Result ${i + 1}`}
                         </span>
-                        <span className="text-xs text-[var(--sf-text-tertiary)]">
+                        <span className="text-xs text-slds-neutral-7">
                           {(r.similarity * 100).toFixed(1)}%
                         </span>
                       </div>
-                      <p className="text-xs text-[var(--sf-text-secondary)] line-clamp-4">
+                      <p className="text-xs text-slds-neutral-9 line-clamp-4">
                         {r.content.slice(0, 300)}
                         {r.content.length > 300 ? '...' : ''}
                       </p>
@@ -575,13 +575,13 @@ export default function HelpDocExplorer() {
           {(preview || previewLoading) && (
             <div className="sf-card">
               <div className="sf-card-header flex items-center justify-between">
-                <h2 className="text-sm font-semibold text-[var(--sf-text-primary)] flex items-center gap-1.5">
+                <h2 className="text-sm font-semibold text-slds-neutral-base flex items-center gap-1.5">
                   <Eye className="w-3.5 h-3.5" />
                   Preview
                 </h2>
                 <button
                   onClick={() => setPreview(null)}
-                  className="p-1 rounded hover:bg-[#E5E5E5] text-[var(--sf-text-tertiary)]"
+                  className="p-1 rounded hover:bg-slds-border-2 text-slds-neutral-7"
                 >
                   <X className="w-3.5 h-3.5" />
                 </button>
@@ -589,23 +589,23 @@ export default function HelpDocExplorer() {
               <div className="p-4">
                 {previewLoading ? (
                   <div className="flex items-center justify-center py-6">
-                    <Loader2 className="w-5 h-5 text-[var(--sf-blue)] animate-spin" />
+                    <Loader2 className="w-5 h-5 text-slds-brand animate-spin" />
                   </div>
                 ) : preview ? (
                   <div className="space-y-3">
                     <div>
-                      <div className="text-xs font-medium text-[var(--sf-text-tertiary)] uppercase tracking-wide mb-1">
+                      <div className="text-xs font-medium text-slds-neutral-7 uppercase tracking-wide mb-1">
                         File Name
                       </div>
-                      <div className="text-sm text-[var(--sf-text-primary)] font-medium">
+                      <div className="text-sm text-slds-neutral-base font-medium">
                         {preview.fileName}
                       </div>
                     </div>
                     <div>
-                      <div className="text-xs font-medium text-[var(--sf-text-tertiary)] uppercase tracking-wide mb-1">
+                      <div className="text-xs font-medium text-slds-neutral-7 uppercase tracking-wide mb-1">
                         Content
                       </div>
-                      <div className="text-xs text-[var(--sf-text-secondary)] max-h-[400px] overflow-y-auto whitespace-pre-wrap leading-relaxed bg-[#FAFAF9] rounded p-3 border border-[var(--sf-border-light)]">
+                      <div className="text-xs text-slds-neutral-9 max-h-[400px] overflow-y-auto whitespace-pre-wrap leading-relaxed bg-[#FAFAF9] rounded p-3 border border-slds-border-2">
                         {preview.content.slice(0, 5000)}
                         {preview.content.length > 5000 ? '\n\n... (truncated)' : ''}
                       </div>

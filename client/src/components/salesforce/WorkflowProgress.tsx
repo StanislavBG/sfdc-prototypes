@@ -17,10 +17,10 @@ export default function WorkflowProgress({
   return (
     <div className="sf-wf-progress">
       <div className="sf-wf-progress-header">
-        <h2 className="text-sm font-semibold text-[var(--sf-text-primary)]">
+        <h2 className="text-sm font-semibold text-slds-neutral-base">
           {workflow.title}
         </h2>
-        <span className="text-xs text-[var(--sf-text-tertiary)]">
+        <span className="text-xs text-slds-neutral-7">
           Step {steps.findIndex((s) => s.id === activeStepId) + 1} of {steps.length}
         </span>
       </div>
