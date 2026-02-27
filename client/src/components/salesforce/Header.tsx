@@ -2,9 +2,6 @@ import { useState, useRef, useEffect } from 'react';
 import {
   Clock,
   ChevronDown,
-  Star,
-  Bell,
-  CircleHelp,
   Settings,
   Smile,
   Pencil,
@@ -14,6 +11,7 @@ import {
   Zap,
   Download,
   Clipboard,
+  Diamond,
 } from 'lucide-react';
 import GlobalSearch from './GlobalSearch';
 import { timelines } from './TimeMachine';
@@ -29,6 +27,20 @@ interface HeaderProps {
   onOpenDataCloudSetup?: () => void;
   onExportSvg?: () => void;
   onExportHtml?: () => void;
+  onOpenBSChart?: () => void;
+}
+
+// Figma logo SVG icon
+function FigmaIcon({ className }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 38 57" className={className} fill="currentColor">
+      <path d="M19 28.5a9.5 9.5 0 1 1 19 0 9.5 9.5 0 0 1-19 0z" />
+      <path d="M0 47.5A9.5 9.5 0 0 1 9.5 38H19v9.5a9.5 9.5 0 0 1-19 0z" />
+      <path d="M19 0v19h9.5a9.5 9.5 0 0 0 0-19H19z" />
+      <path d="M0 9.5A9.5 9.5 0 0 0 9.5 19H19V0H9.5A9.5 9.5 0 0 0 0 9.5z" />
+      <path d="M0 28.5A9.5 9.5 0 0 0 9.5 38H19V19H9.5A9.5 9.5 0 0 0 0 28.5z" />
+    </svg>
+  );
 }
 
 // Salesforce cloud logo SVG
@@ -50,27 +62,28 @@ export default function Header({
   onOpenDataCloudSetup,
   onExportSvg,
   onExportHtml,
+  onOpenBSChart,
 }: HeaderProps) {
   const timelineData = timelines.find((t) => t.id === currentTimeline);
   const [setupMenuOpen, setSetupMenuOpen] = useState(false);
   const setupMenuRef = useRef<HTMLDivElement>(null);
-  const [figmaMenuOpen, setFigmaMenuOpen] = useState(false);
-  const figmaMenuRef = useRef<HTMLDivElement>(null);
+  const [toolsMenuOpen, setToolsMenuOpen] = useState(false);
+  const toolsMenuRef = useRef<HTMLDivElement>(null);
 
   // Close dropdowns on outside click
   useEffect(() => {
-    if (!setupMenuOpen && !figmaMenuOpen) return;
+    if (!setupMenuOpen && !toolsMenuOpen) return;
     const handler = (e: MouseEvent) => {
       if (setupMenuOpen && setupMenuRef.current && !setupMenuRef.current.contains(e.target as Node)) {
         setSetupMenuOpen(false);
       }
-      if (figmaMenuOpen && figmaMenuRef.current && !figmaMenuRef.current.contains(e.target as Node)) {
-        setFigmaMenuOpen(false);
+      if (toolsMenuOpen && toolsMenuRef.current && !toolsMenuRef.current.contains(e.target as Node)) {
+        setToolsMenuOpen(false);
       }
     };
     document.addEventListener('mousedown', handler);
     return () => document.removeEventListener('mousedown', handler);
-  }, [setupMenuOpen, figmaMenuOpen]);
+  }, [setupMenuOpen, toolsMenuOpen]);
 
   return (
     <div className="sf-header-row1">
@@ -111,64 +124,64 @@ export default function Header({
 
       {/* Right: Utility icons */}
       <div className="slds-grid slds-grid_vertical-align-center slds-gap_xxx-small slds-shrink-none">
-        <button className="sf-icon-btn" title="Agentforce">
-          <Smile className="slds-icon-size_medium" />
-        </button>
-        <button className="sf-icon-btn" title="Favorites">
-          <Star className="slds-icon-size_medium" />
-        </button>
-        <button className="sf-icon-btn" title="Notifications">
-          <Bell className="slds-icon-size_medium" />
-        </button>
-        <button className="sf-icon-btn" title="Help">
-          <CircleHelp className="slds-icon-size_medium" />
-        </button>
 
-        {/* Figma export dropdown */}
-        <div className="slds-pos-relative" ref={figmaMenuRef}>
+        {/* Global tools dropdown (BS Chart + Figma) — replaces Smile/Star/Bell/Help */}
+        <div className="slds-pos-relative" ref={toolsMenuRef}>
           <button
             className="sf-icon-btn"
-            title="Export to Figma"
-            onClick={() => setFigmaMenuOpen(!figmaMenuOpen)}
+            title="Global Tools"
+            onClick={() => setToolsMenuOpen(!toolsMenuOpen)}
           >
-            <svg viewBox="0 0 38 57" className="slds-icon-size_x-small" fill="currentColor">
-              <path d="M19 28.5a9.5 9.5 0 1 1 19 0 9.5 9.5 0 0 1-19 0z" />
-              <path d="M0 47.5A9.5 9.5 0 0 1 9.5 38H19v9.5a9.5 9.5 0 0 1-19 0z" />
-              <path d="M19 0v19h9.5a9.5 9.5 0 0 0 0-19H19z" />
-              <path d="M0 9.5A9.5 9.5 0 0 0 9.5 19H19V0H9.5A9.5 9.5 0 0 0 0 9.5z" />
-              <path d="M0 28.5A9.5 9.5 0 0 0 9.5 38H19V19H9.5A9.5 9.5 0 0 0 0 28.5z" />
-            </svg>
+            <Smile className="slds-icon-size_medium" />
           </button>
 
-          {figmaMenuOpen && (
+          {toolsMenuOpen && (
             <div className="sf-dropdown" style={{ width: '260px' }}>
               <div className="sf-dropdown-header">
-                <span className="slds-text-size_small slds-font-weight_semibold" style={{ color: 'var(--slds-g-color-neutral-base)' }}>Export to Figma</span>
+                <span className="slds-text-size_small slds-font-weight_semibold" style={{ color: 'var(--slds-g-color-neutral-base)' }}>Global Tools</span>
                 <button
-                  onClick={() => setFigmaMenuOpen(false)}
+                  onClick={() => setToolsMenuOpen(false)}
                   className="sf-dropdown-close"
                 >
                   <X className="slds-icon-size_x-small" />
                 </button>
               </div>
               <div className="slds-p-vertical_xx-small">
+                {/* BS Chart */}
                 <button
-                  onClick={() => { setFigmaMenuOpen(false); onExportSvg?.(); }}
+                  onClick={() => { setToolsMenuOpen(false); onOpenBSChart?.(); }}
                   className="sf-dropdown-item"
                 >
-                  <Download className="slds-icon-size_small" style={{ color: 'var(--slds-g-color-neutral-7)' }} />
+                  <div className="slds-square_large slds-border-radius_medium slds-flex slds-items-center slds-justify-center slds-flex-shrink-0" style={{ background: '#F59E0B' }}>
+                    <Diamond className="slds-icon-size_small slds-text-white" />
+                  </div>
                   <div className="slds-col" style={{ textAlign: 'left' }}>
-                    <span className="slds-text-size_small slds-font-weight_medium" style={{ color: 'var(--slds-g-color-neutral-base)', display: 'block' }}>Download as SVG</span>
-                    <span className="slds-text-size_xx-small" style={{ color: 'var(--slds-g-color-neutral-7)' }}>Editable vectors in Figma</span>
+                    <span className="slds-text-size_small slds-font-weight_medium" style={{ color: 'var(--slds-g-color-neutral-base)', display: 'block' }}>BS Chart</span>
+                    <span className="slds-text-size_xx-small" style={{ color: 'var(--slds-g-color-neutral-7)' }}>Create diagrams & flowcharts</span>
+                  </div>
+                </button>
+                {/* Figma export */}
+                <button
+                  onClick={() => { setToolsMenuOpen(false); onExportSvg?.(); }}
+                  className="sf-dropdown-item"
+                >
+                  <div className="slds-square_large slds-border-radius_medium slds-flex slds-items-center slds-justify-center slds-flex-shrink-0" style={{ background: '#1e1e1e' }}>
+                    <FigmaIcon className="slds-icon-size_small slds-text-white" />
+                  </div>
+                  <div className="slds-col" style={{ textAlign: 'left' }}>
+                    <span className="slds-text-size_small slds-font-weight_medium" style={{ color: 'var(--slds-g-color-neutral-base)', display: 'block' }}>Export SVG</span>
+                    <span className="slds-text-size_xx-small" style={{ color: 'var(--slds-g-color-neutral-7)' }}>Download editable vectors</span>
                   </div>
                 </button>
                 <button
-                  onClick={() => { setFigmaMenuOpen(false); onExportHtml?.(); }}
+                  onClick={() => { setToolsMenuOpen(false); onExportHtml?.(); }}
                   className="sf-dropdown-item"
                 >
-                  <Clipboard className="slds-icon-size_small" style={{ color: 'var(--slds-g-color-neutral-7)' }} />
+                  <div className="slds-square_large slds-border-radius_medium slds-flex slds-items-center slds-justify-center slds-flex-shrink-0" style={{ background: '#1e1e1e' }}>
+                    <Clipboard className="slds-icon-size_small slds-text-white" />
+                  </div>
                   <div className="slds-col" style={{ textAlign: 'left' }}>
-                    <span className="slds-text-size_small slds-font-weight_medium" style={{ color: 'var(--slds-g-color-neutral-base)', display: 'block' }}>Copy HTML for Figma Plugin</span>
+                    <span className="slds-text-size_small slds-font-weight_medium" style={{ color: 'var(--slds-g-color-neutral-base)', display: 'block' }}>Copy HTML for Figma</span>
                     <span className="slds-text-size_xx-small" style={{ color: 'var(--slds-g-color-neutral-7)' }}>Paste into html.to.design</span>
                   </div>
                 </button>
