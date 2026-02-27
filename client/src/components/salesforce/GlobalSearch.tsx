@@ -77,22 +77,18 @@ export default function GlobalSearch({ onSelectResult }: GlobalSearchProps) {
   }, {});
 
   return (
-    <div ref={containerRef} className="relative w-[480px]">
-      <div className="relative flex items-center">
+    <div ref={containerRef} className="slds-pos-relative" style={{ width: '480px' }}>
+      <div className="slds-pos-relative slds-grid slds-grid_vertical-align-center">
         {/* All Sources dropdown */}
         <button
-          className={`sf-search-scope flex items-center gap-1 px-3 h-[32px] text-xs font-medium border rounded-l whitespace-nowrap ${
-            isFocused
-              ? 'bg-white text-slds-neutral-9 border-slds-brand-2 border-r-slds-border-1'
-              : 'bg-white/10 text-white/90 border-white/25 border-r-white/15'
-          }`}
+          className={`sf-search-scope ${isFocused ? 'focused' : ''}`}
         >
           All Sources
-          <ChevronDown className="w-3 h-3" />
+          <ChevronDown className="slds-icon-size_xx-small" />
         </button>
         {/* Search input */}
-        <div className="relative flex-1">
-          <Search className={`absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 ${isFocused ? 'text-slds-neutral-7' : 'text-white/70'}`} />
+        <div className="slds-pos-relative slds-col">
+          <Search className={`sf-search-icon slds-icon-size_small ${isFocused ? 'focused' : ''}`} />
           <input
             ref={inputRef}
             type="text"
@@ -103,7 +99,8 @@ export default function GlobalSearch({ onSelectResult }: GlobalSearchProps) {
               setIsFocused(true);
               if (results.length > 0) setIsOpen(true);
             }}
-            className="sf-search-input w-full pl-9 pr-8 py-1.5 text-sm h-[32px] !rounded-l-none"
+            className="sf-search-input slds-w-full slds-text-size_medium"
+            style={{ paddingLeft: '36px', paddingRight: '32px', height: '32px', borderRadius: '0 4px 4px 0' }}
           />
           {query && (
             <button
@@ -113,9 +110,9 @@ export default function GlobalSearch({ onSelectResult }: GlobalSearchProps) {
                 setIsOpen(false);
                 inputRef.current?.focus();
               }}
-              className={`absolute right-2 top-1/2 -translate-y-1/2 ${isFocused ? 'text-slds-neutral-7' : 'text-white/70'} hover:text-slds-neutral-base`}
+              className={`sf-search-clear ${isFocused ? 'focused' : ''}`}
             >
-              <X className="w-4 h-4" />
+              <X className="slds-icon-size_small" />
             </button>
           )}
         </div>
@@ -125,7 +122,7 @@ export default function GlobalSearch({ onSelectResult }: GlobalSearchProps) {
         <div className="sf-search-results">
           {Object.entries(grouped).map(([type, items]) => (
             <div key={type}>
-              <div className="px-4 py-2 text-xs font-semibold text-slds-neutral-7 uppercase tracking-wide bg-[#FAFAF9] border-b border-slds-border-2">
+              <div className="sf-search-group-header">
                 {type}s
               </div>
               {items.map((item) => {
@@ -133,20 +130,20 @@ export default function GlobalSearch({ onSelectResult }: GlobalSearchProps) {
                 return (
                   <button
                     key={item.id}
-                    className="sf-search-result-item w-full text-left"
+                    className="sf-search-result-item slds-w-full slds-text-left"
                     onClick={() => handleSelect(item.id)}
                   >
                     <div
-                      className="w-7 h-7 rounded flex items-center justify-center flex-shrink-0"
+                      className="sf-search-result-icon"
                       style={{ backgroundColor: typeColors[item.type] || '#7F8DE1' }}
                     >
-                      <IconComponent className="w-4 h-4 text-white" />
+                      <IconComponent className="slds-icon-size_small slds-text-white" />
                     </div>
-                    <div className="min-w-0">
-                      <div className="text-sm font-medium text-slds-neutral-base truncate">
+                    <div className="slds-min-w-0">
+                      <div className="slds-text-size_medium slds-font-weight_medium slds-text-neutral-base slds-truncate">
                         {item.name}
                       </div>
-                      <div className="text-xs text-slds-neutral-7 truncate">
+                      <div className="slds-text-size_small slds-text-neutral-7 slds-truncate">
                         {item.subtitle}
                       </div>
                     </div>

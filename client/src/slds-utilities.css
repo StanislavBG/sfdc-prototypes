@@ -1,0 +1,380 @@
+/* ==========================================
+   SLDS Bridge Utilities
+   Custom utility classes to fill gaps between
+   Tailwind and SLDS utility coverage.
+   Uses SLDS naming conventions where possible.
+   ========================================== */
+
+/* ==========================================
+   Display & Flex shortcuts
+   ========================================== */
+.slds-flex { display: flex; }
+.slds-inline-flex { display: inline-flex; }
+.slds-flex-col { display: flex; flex-direction: column; }
+.slds-flex-1 { flex: 1 1 0%; }
+.slds-flex-auto { flex: 1 1 auto; }
+.slds-flex-none { flex: none; }
+.slds-flex-shrink-0 { flex-shrink: 0; }
+.slds-flex-wrap { flex-wrap: wrap; }
+.slds-items-center { align-items: center; }
+.slds-items-start { align-items: flex-start; }
+.slds-items-end { align-items: flex-end; }
+.slds-items-stretch { align-items: stretch; }
+.slds-justify-center { justify-content: center; }
+.slds-justify-between { justify-content: space-between; }
+.slds-justify-end { justify-content: flex-end; }
+.slds-justify-start { justify-content: flex-start; }
+.slds-self-center { align-self: center; }
+
+/* ==========================================
+   Gap utilities (SLDS has no gap support)
+   ========================================== */
+.slds-gap_xxx-small { gap: 2px; }
+.slds-gap_xx-small { gap: 4px; }
+.slds-gap_x-small { gap: 8px; }
+.slds-gap_small { gap: 12px; }
+.slds-gap_medium { gap: 16px; }
+.slds-gap_large { gap: 24px; }
+.slds-gap_x-large { gap: 32px; }
+
+/* ==========================================
+   Fixed sizing (SLDS has no arbitrary sizing)
+   ========================================== */
+.slds-square_xx-small { width: 16px; height: 16px; }
+.slds-square_x-small { width: 20px; height: 20px; }
+.slds-square_small { width: 24px; height: 24px; }
+.slds-square_medium { width: 28px; height: 28px; }
+.slds-square_large { width: 32px; height: 32px; }
+.slds-square_x-large { width: 40px; height: 40px; }
+.slds-square_xx-large { width: 48px; height: 48px; }
+
+/* Icon sizing */
+.slds-icon-size_xx-small { width: 12px; height: 12px; }
+.slds-icon-size_x-small { width: 14px; height: 14px; }
+.slds-icon-size_small { width: 16px; height: 16px; }
+.slds-icon-size_medium { width: 18px; height: 18px; }
+.slds-icon-size_default { width: 20px; height: 20px; }
+.slds-icon-size_large { width: 24px; height: 24px; }
+
+/* ==========================================
+   Width & Height
+   ========================================== */
+.slds-w-full { width: 100%; }
+.slds-h-full { height: 100%; }
+.slds-min-w-0 { min-width: 0; }
+.slds-w-px { width: 1px; }
+.slds-h-px { height: 1px; }
+
+/* ==========================================
+   Text & Typography
+   ========================================== */
+.slds-text-white { color: #FFFFFF; }
+.slds-text-inverse { color: var(--slds-g-color-on-brand); }
+.slds-font-weight_regular { font-weight: 400; }
+.slds-font-weight_medium { font-weight: 500; }
+.slds-font-weight_semibold { font-weight: 600; }
+.slds-font-weight_bold { font-weight: 700; }
+.slds-text-size_xx-small { font-size: 10px; }
+.slds-text-size_x-small { font-size: 11px; }
+.slds-text-size_small { font-size: 12px; }
+.slds-text-size_default { font-size: 13px; }
+.slds-text-size_medium { font-size: 14px; }
+.slds-text-size_large { font-size: 16px; }
+.slds-text-size_x-large { font-size: 20px; }
+.slds-text-size_xx-large { font-size: 24px; }
+.slds-nowrap { white-space: nowrap; }
+.slds-text-center { text-align: center; }
+.slds-text-left { text-align: left; }
+.slds-text-uppercase { text-transform: uppercase; }
+.slds-leading-relaxed { line-height: 1.625; }
+.slds-tracking-wide { letter-spacing: 0.025em; }
+
+/* ==========================================
+   Background colors
+   ========================================== */
+.slds-bg-white { background: #FFFFFF; }
+.slds-bg-transparent { background: transparent; }
+.slds-bg-brand { background: var(--slds-g-color-brand); }
+.slds-bg-brand-1 { background: var(--slds-g-color-brand-1); }
+.slds-bg-brand-2 { background: var(--slds-g-color-brand-2); }
+.slds-bg-success { background: var(--slds-g-color-success-1); }
+.slds-bg-warning { background: var(--slds-g-color-warning-1); }
+.slds-bg-error { background: var(--slds-g-color-error-1); }
+.slds-bg-neutral-2 { background: var(--slds-g-color-neutral-2); }
+.slds-bg-surface { background: var(--slds-g-color-surface-1); }
+
+/* Text colors */
+.slds-text-brand { color: var(--slds-g-color-brand); }
+.slds-text-brand-1 { color: var(--slds-g-color-brand-1); }
+.slds-text-neutral-base { color: var(--slds-g-color-neutral-base); }
+.slds-text-neutral-9 { color: var(--slds-g-color-neutral-9); }
+.slds-text-neutral-7 { color: var(--slds-g-color-neutral-7); }
+.slds-text-success { color: var(--slds-g-color-success-1); }
+.slds-text-warning { color: var(--slds-g-color-warning-1); }
+.slds-text-error { color: var(--slds-g-color-error-1); }
+
+/* Border colors */
+.slds-border-color_brand { border-color: var(--slds-g-color-brand); }
+.slds-border-color_brand-2 { border-color: var(--slds-g-color-brand-2); }
+.slds-border-color_border-1 { border-color: var(--slds-g-color-border-1); }
+.slds-border-color_border-2 { border-color: var(--slds-g-color-border-2); }
+
+/* ==========================================
+   Borders & Radius
+   ========================================== */
+.slds-border_all { border: 1px solid var(--slds-g-color-border-1); }
+.slds-border-radius_small { border-radius: 4px; }
+.slds-border-radius_medium { border-radius: 6px; }
+.slds-border-radius_large { border-radius: 8px; }
+.slds-border-radius_pill { border-radius: 9999px; }
+.slds-border-radius_circle { border-radius: 50%; }
+
+/* ==========================================
+   Position utilities
+   ========================================== */
+.slds-pos-relative { position: relative; }
+.slds-pos-absolute { position: absolute; }
+.slds-pos-fixed { position: fixed; }
+.slds-pos-sticky { position: sticky; }
+.slds-inset-0 { top: 0; right: 0; bottom: 0; left: 0; }
+.slds-z-10 { z-index: 10; }
+.slds-z-50 { z-index: 50; }
+.slds-z-100 { z-index: 100; }
+.slds-z-200 { z-index: 200; }
+
+/* ==========================================
+   Overflow
+   ========================================== */
+.slds-overflow-hidden { overflow: hidden; }
+.slds-overflow-y-auto { overflow-y: auto; }
+.slds-overflow-x-auto { overflow-x: auto; }
+.slds-overflow-x-hidden { overflow-x: hidden; }
+
+/* ==========================================
+   Cursor
+   ========================================== */
+.slds-cursor-pointer { cursor: pointer; }
+.slds-cursor-not-allowed { cursor: not-allowed; }
+
+/* ==========================================
+   Transitions
+   ========================================== */
+.slds-transition-colors { transition: color 0.15s ease, background-color 0.15s ease, border-color 0.15s ease; }
+.slds-transition-all { transition: all 0.15s ease; }
+.slds-transition-opacity { transition: opacity 0.15s ease; }
+
+/* ==========================================
+   Opacity
+   ========================================== */
+.slds-opacity_40 { opacity: 0.4; }
+.slds-opacity_50 { opacity: 0.5; }
+.slds-opacity_60 { opacity: 0.6; }
+.slds-opacity_80 { opacity: 0.8; }
+.slds-opacity_90 { opacity: 0.9; }
+
+/* ==========================================
+   Shadows
+   ========================================== */
+.slds-shadow_small { box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08); }
+.slds-shadow_medium { box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12); }
+.slds-shadow_large { box-shadow: 0 8px 24px rgba(0, 0, 0, 0.16); }
+.slds-shadow_x-large { box-shadow: 0 12px 36px rgba(0, 0, 0, 0.2); }
+
+/* ==========================================
+   Hover utilities (pseudo-class based)
+   ========================================== */
+.slds-hover-bg-neutral-2:hover { background: var(--slds-g-color-neutral-2); }
+.slds-hover-bg-brand-contrast:hover { background: var(--slds-g-color-brand-contrast-1); }
+.slds-hover-text-brand:hover { color: var(--slds-g-color-brand); }
+.slds-hover-text-primary:hover { color: var(--slds-g-color-neutral-base); }
+.slds-hover-border-brand-2:hover { border-color: var(--slds-g-color-brand-2); }
+.slds-hover-shadow:hover { box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08); }
+
+/* ==========================================
+   Focus utilities
+   ========================================== */
+.slds-focus-border-brand-2:focus { border-color: var(--slds-g-color-brand-2); }
+.slds-focus-ring-brand:focus { box-shadow: 0 0 0 2px rgba(27, 150, 255, 0.3); }
+
+/* ==========================================
+   Grid CSS
+   ========================================== */
+.slds-css-grid { display: grid; }
+.slds-css-grid-cols-2 { grid-template-columns: repeat(2, 1fr); }
+.slds-css-grid-cols-3 { grid-template-columns: repeat(3, 1fr); }
+.slds-css-grid-cols-4 { grid-template-columns: repeat(4, 1fr); }
+
+/* ==========================================
+   Buttons
+   ========================================== */
+.sf-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  font-size: 12px;
+  font-weight: 500;
+  border-radius: 4px;
+  border: none;
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.sf-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.sf-btn-brand {
+  background: var(--slds-g-color-brand);
+  color: white;
+}
+
+.sf-btn-brand:hover:not(:disabled) {
+  background: var(--slds-g-color-brand-contrast-1);
+}
+
+.sf-btn-neutral {
+  background: #54698D;
+  color: white;
+}
+
+.sf-btn-neutral:hover:not(:disabled) {
+  background: #4a5f7d;
+}
+
+/* Action icon buttons (small square buttons for tables) */
+.sf-action-btn {
+  padding: 6px;
+  border-radius: 4px;
+  cursor: pointer;
+  border: none;
+  background: none;
+  color: var(--slds-g-color-neutral-7);
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.sf-action-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.sf-action-btn:hover:not(:disabled) {
+  background: var(--slds-g-color-neutral-2);
+  color: var(--slds-g-color-brand);
+}
+
+.sf-action-btn-danger:hover:not(:disabled) {
+  background: #FEE2E2;
+  color: #DC2626;
+}
+
+.sf-action-btn-warning:hover:not(:disabled) {
+  background: #EEF4FF;
+  color: var(--slds-g-color-brand);
+}
+
+/* ==========================================
+   Status / Diagnostic colors
+   ========================================== */
+.sf-status-ok {
+  background: #DCFCE7;
+  border: 1px solid #BBF7D0;
+}
+
+.sf-status-error {
+  background: #FEE2E2;
+  border: 1px solid #FECACA;
+}
+
+.sf-status-ok-icon { color: #16A34A; }
+.sf-status-error-icon { color: #DC2626; }
+.sf-status-ok-text { color: #166534; }
+.sf-status-error-text { color: #991B1B; }
+
+.sf-alert-error {
+  font-size: 12px;
+  color: #DC2626;
+  background: #FEE2E2;
+  border: 1px solid #FECACA;
+  border-radius: 4px;
+  padding: 8px 12px;
+}
+
+.sf-alert-success {
+  font-size: 12px;
+  color: #166534;
+  background: #DCFCE7;
+  border: 1px solid #BBF7D0;
+  border-radius: 4px;
+  padding: 8px 12px;
+}
+
+/* ==========================================
+   Animations
+   ========================================== */
+.sf-spin {
+  animation: sf-spin 1s linear infinite;
+}
+
+@keyframes sf-spin {
+  to { transform: rotate(360deg); }
+}
+
+/* ==========================================
+   Misc utilities
+   ========================================== */
+.sf-hidden { display: none; }
+
+.sf-line-clamp-4 {
+  display: -webkit-box;
+  -webkit-line-clamp: 4;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.sf-tabular-nums { font-variant-numeric: tabular-nums; }
+
+/* Drop zone */
+.sf-dropzone {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 32px;
+  cursor: pointer;
+  transition: border-color 0.15s ease, background 0.15s ease;
+  border: 2px dashed var(--slds-g-color-border-1);
+}
+
+.sf-dropzone:hover {
+  border-color: var(--slds-g-color-brand-2);
+  background: #F9FAFF;
+}
+
+.sf-dropzone.drag-over {
+  border-color: var(--slds-g-color-brand);
+  background: #EEF4FF;
+}
+
+/* Search/filter input */
+.sf-input {
+  padding: 6px 12px;
+  font-size: 14px;
+  border: 1px solid var(--slds-g-color-border-1);
+  border-radius: 4px;
+  color: var(--slds-g-color-neutral-base);
+  outline: none;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.sf-input:focus {
+  border-color: var(--slds-g-color-brand);
+  box-shadow: 0 0 0 1px var(--slds-g-color-brand);
+}
+
+/* ==========================================
+   Scrollbar hiding
+   ========================================== */
+.slds-scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+.slds-scrollbar-hide::-webkit-scrollbar { display: none; }

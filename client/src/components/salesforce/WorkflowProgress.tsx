@@ -17,10 +17,10 @@ export default function WorkflowProgress({
   return (
     <div className="sf-wf-progress">
       <div className="sf-wf-progress-header">
-        <h2 className="text-sm font-semibold text-slds-neutral-base">
+        <h2 className="slds-text-size_medium slds-font-weight_semibold slds-text-neutral-base">
           {workflow.title}
         </h2>
-        <span className="text-xs text-slds-neutral-7">
+        <span className="slds-text-size_small slds-text-neutral-7">
           Step {steps.findIndex((s) => s.id === activeStepId) + 1} of {steps.length}
         </span>
       </div>
@@ -41,9 +41,9 @@ export default function WorkflowProgress({
                 onClick={() => onStepClick(step.id)}
               >
                 {isCompleted ? (
-                  <Check className="w-3.5 h-3.5" />
+                  <Check className="slds-icon-size_x-small" />
                 ) : (
-                  <span className="text-xs font-semibold">{i + 1}</span>
+                  <span className="slds-text-size_small slds-font-weight_semibold">{i + 1}</span>
                 )}
               </button>
 

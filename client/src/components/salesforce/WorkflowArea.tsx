@@ -21,12 +21,12 @@ export default function WorkflowArea({ workflow }: WorkflowAreaProps) {
       <div className="sf-workflow-empty">
         <div className="sf-workflow-empty-inner">
           <div className="sf-workflow-empty-icon">
-            <Sparkles className="w-8 h-8 text-[#9B8BF4]" />
+            <Sparkles className="slds-square_large" style={{ color: '#9B8BF4' }} />
           </div>
-          <h2 className="text-base font-semibold text-slds-neutral-base mt-4">
+          <h2 className="slds-text-size_large slds-font-weight_semibold slds-text-neutral-base slds-m-top_medium">
             Welcome to Data 360
           </h2>
-          <p className="text-sm text-slds-neutral-7 mt-2 max-w-md text-center leading-relaxed">
+          <p className="slds-text-size_medium slds-text-neutral-7 slds-m-top_x-small slds-text-center slds-leading-relaxed" style={{ maxWidth: '28rem' }}>
             Select a workflow from the sidebar or describe what you're working on
             to get started. Your AI agent is embedded in every step to help you along
             the way.
@@ -54,10 +54,10 @@ export default function WorkflowArea({ workflow }: WorkflowAreaProps) {
         <div className="sf-workflow-step-card">
           <div className="sf-workflow-step-card-header">
             <div>
-              <h3 className="text-base font-semibold text-slds-neutral-base">
+              <h3 className="slds-text-size_large slds-font-weight_semibold slds-text-neutral-base">
                 {currentStep?.title}
               </h3>
-              <p className="text-xs text-slds-neutral-7 mt-1">
+              <p className="slds-text-size_small slds-text-neutral-7 slds-m-top_xx-small">
                 {currentStep?.description}
               </p>
             </div>
@@ -80,8 +80,8 @@ export default function WorkflowArea({ workflow }: WorkflowAreaProps) {
 
           {/* Embedded agent hint */}
           <div className="sf-workflow-agent-hint">
-            <Sparkles className="w-3.5 h-3.5 text-[#9B8BF4]" />
-            <span className="text-xs text-slds-neutral-7">
+            <Sparkles className="slds-icon-size_x-small" style={{ color: '#9B8BF4' }} />
+            <span className="slds-text-size_small slds-text-neutral-7">
               Agent is ready to help with this step. Ask questions or let it configure
               settings for you.
             </span>
@@ -98,7 +98,7 @@ export default function WorkflowArea({ workflow }: WorkflowAreaProps) {
             }
             className="sf-workflow-nav-btn"
           >
-            <ArrowLeft className="w-3.5 h-3.5" />
+            <ArrowLeft className="slds-icon-size_x-small" />
             <span>Previous</span>
           </button>
           <button
@@ -110,7 +110,7 @@ export default function WorkflowArea({ workflow }: WorkflowAreaProps) {
             className="sf-workflow-nav-btn primary"
           >
             <span>Next Step</span>
-            <ArrowRight className="w-3.5 h-3.5" />
+            <ArrowRight className="slds-icon-size_x-small" />
           </button>
         </div>
       </div>

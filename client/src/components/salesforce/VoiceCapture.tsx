@@ -64,14 +64,14 @@ export default function VoiceCapture({
       <div className="sf-voice-modal" onClick={(e) => e.stopPropagation()}>
         {/* Header */}
         <div className="sf-voice-header">
-          <span className="text-sm font-semibold text-slds-neutral-base">
+          <span className="slds-text-size_medium slds-font-weight_semibold slds-text-neutral-base">
             Voice Input
           </span>
           <button
             onClick={onClose}
             className="sf-voice-close-btn"
           >
-            <X className="w-4 h-4" />
+            <X className="slds-icon-size_small" />
           </button>
         </div>
 
@@ -84,9 +84,9 @@ export default function VoiceCapture({
               className={`sf-voice-record-btn ${isRecording ? 'recording' : ''}`}
             >
               {isRecording ? (
-                <MicOff className="w-6 h-6" />
+                <MicOff className="slds-square_small" />
               ) : (
-                <Mic className="w-6 h-6" />
+                <Mic className="slds-square_small" />
               )}
             </button>
             {isRecording && (
@@ -103,7 +103,7 @@ export default function VoiceCapture({
                 ))}
               </div>
             )}
-            <p className="text-xs text-slds-neutral-7 mt-3">
+            <p className="slds-text-size_small slds-text-neutral-7 slds-m-top_small">
               {isRecording
                 ? 'Listening… tap to stop'
                 : capturedText
@@ -115,15 +115,15 @@ export default function VoiceCapture({
           {/* Captured text area */}
           {capturedText && (
             <div className="sf-voice-result">
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-xs font-medium text-slds-neutral-7 uppercase tracking-wide">
+              <div className="slds-grid slds-grid_vertical-align-center slds-grid_align-spread slds-m-bottom_x-small">
+                <span className="slds-text-size_small slds-font-weight_medium slds-text-neutral-7 slds-text-uppercase slds-tracking-wide">
                   Captured Text
                 </span>
                 <button
                   onClick={() => setIsEditing(!isEditing)}
                   className="sf-voice-edit-btn"
                 >
-                  <Edit3 className="w-3 h-3" />
+                  <Edit3 className="slds-icon-size_xx-small" />
                   <span>Edit</span>
                 </button>
               </div>
@@ -136,7 +136,7 @@ export default function VoiceCapture({
                   rows={3}
                 />
               ) : (
-                <p className="text-sm text-slds-neutral-base leading-relaxed">
+                <p className="slds-text-size_medium slds-text-neutral-base slds-leading-relaxed">
                   {capturedText}
                 </p>
               )}
@@ -151,7 +151,7 @@ export default function VoiceCapture({
               Cancel
             </button>
             <button onClick={handleSubmit} className="sf-voice-submit-btn">
-              <Check className="w-3.5 h-3.5" />
+              <Check className="slds-icon-size_x-small" />
               <span>Use This Text</span>
             </button>
           </div>

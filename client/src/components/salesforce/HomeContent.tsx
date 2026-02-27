@@ -32,69 +32,69 @@ const metrics = [
 
 export default function HomeContent() {
   return (
-    <div className="p-6 space-y-6">
+    <div className="slds-p-around_large" style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
       {/* Metrics row */}
-      <div className="grid grid-cols-4 gap-4">
+      <div className="slds-css-grid slds-css-grid-cols-4 slds-gap_medium">
         {metrics.map((m) => {
           const Icon = m.icon;
           return (
-            <div key={m.label} className="sf-card p-4">
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-xs font-medium text-slds-neutral-7 uppercase tracking-wide">
+            <div key={m.label} className="sf-card slds-p-around_medium">
+              <div className="slds-grid slds-grid_vertical-align-center slds-grid_align-spread slds-m-bottom_x-small">
+                <span className="slds-text-size_small slds-font-weight_medium slds-text-neutral-7 slds-text-uppercase slds-tracking-wide">
                   {m.label}
                 </span>
-                <Icon className="w-4 h-4 text-slds-neutral-7" />
+                <Icon className="slds-icon-size_small slds-text-neutral-7" />
               </div>
-              <div className="text-xl font-bold text-slds-neutral-base">{m.value}</div>
-              <div className="text-xs text-slds-success-1 font-medium mt-1">{m.change}</div>
+              <div className="slds-text-size_x-large slds-font-weight_bold slds-text-neutral-base">{m.value}</div>
+              <div className="slds-text-size_small slds-text-success slds-font-weight_medium slds-m-top_xx-small">{m.change}</div>
             </div>
           );
         })}
       </div>
 
-      <div className="grid grid-cols-3 gap-6">
+      <div className="slds-css-grid slds-css-grid-cols-3 slds-gap_large">
         {/* Left 2/3 – Assistant + shortcuts */}
-        <div className="col-span-2 space-y-6">
+        <div style={{ gridColumn: 'span 2', display: 'flex', flexDirection: 'column', gap: '24px' }}>
           {/* Agentforce assistant card */}
           <div className="sf-home-assistant-card">
-            <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-[#9B8BF4] to-[#6B5CE7] flex items-center justify-center flex-shrink-0">
-              <Sparkles className="w-5 h-5 text-white" />
+            <div className="slds-flex slds-items-center slds-justify-center slds-flex-shrink-0" style={{ width: '40px', height: '40px', borderRadius: '8px', background: 'linear-gradient(135deg, #9B8BF4, #6B5CE7)' }}>
+              <Sparkles className="slds-square_x-small slds-text-white" />
             </div>
-            <div className="flex-1 min-w-0">
-              <h3 className="text-sm font-semibold text-slds-neutral-base mb-1">
+            <div className="slds-col slds-min-w-0">
+              <h3 className="slds-text-size_medium slds-font-weight_semibold slds-text-neutral-base slds-m-bottom_xxx-small">
                 Agentforce Assistant
               </h3>
-              <p className="text-xs text-slds-neutral-7 leading-relaxed">
+              <p className="slds-text-size_small slds-text-neutral-7 slds-leading-relaxed">
                 Ask questions about your data, create segments, or get insights. Use the agent panel
                 on the right to start a conversation.
               </p>
             </div>
-            <button className="flex items-center gap-1 text-xs font-medium text-slds-brand hover:text-slds-brand-contrast-1 whitespace-nowrap">
+            <button className="slds-grid slds-grid_vertical-align-center slds-gap_xx-small slds-text-size_small slds-font-weight_medium sf-text-link slds-nowrap">
               Open Agent
-              <ArrowRight className="w-3.5 h-3.5" />
+              <ArrowRight className="slds-icon-size_x-small" />
             </button>
           </div>
 
           {/* Quick access shortcuts */}
           <div>
-            <h2 className="text-sm font-semibold text-slds-neutral-base mb-3">
+            <h2 className="slds-text-size_medium slds-font-weight_semibold slds-text-neutral-base slds-m-bottom_small">
               Quick Access
             </h2>
-            <div className="grid grid-cols-4 gap-3">
+            <div className="slds-css-grid slds-css-grid-cols-4 slds-gap_small">
               {shortcuts.map((s) => {
                 const Icon = s.icon;
                 return (
                   <div key={s.label} className="sf-home-shortcut">
                     <div
-                      className="w-10 h-10 rounded-lg flex items-center justify-center mx-auto mb-2"
-                      style={{ backgroundColor: s.color }}
+                      className="slds-flex slds-items-center slds-justify-center slds-border-radius_large"
+                      style={{ width: '40px', height: '40px', backgroundColor: s.color, margin: '0 auto 8px' }}
                     >
-                      <Icon className="w-5 h-5 text-white" />
+                      <Icon className="slds-square_x-small slds-text-white" />
                     </div>
-                    <div className="text-sm font-medium text-slds-neutral-base">
+                    <div className="slds-text-size_medium slds-font-weight_medium slds-text-neutral-base">
                       {s.label}
                     </div>
-                    <div className="text-xs text-slds-neutral-7 mt-0.5">
+                    <div className="slds-text-size_small slds-text-neutral-7" style={{ marginTop: '2px' }}>
                       {s.description}
                     </div>
                   </div>
@@ -107,20 +107,20 @@ export default function HomeContent() {
         {/* Right 1/3 – Recent items */}
         <div className="sf-card">
           <div className="sf-card-header">
-            <h2 className="text-sm font-semibold text-slds-neutral-base">
+            <h2 className="slds-text-size_medium slds-font-weight_semibold slds-text-neutral-base">
               Recent Items
             </h2>
           </div>
-          <div className="divide-y divide-slds-border-2">
+          <div className="sf-divide-y">
             {recentItems.map((item) => (
               <div
                 key={item.name}
-                className="px-4 py-3 hover:bg-slds-neutral-2 cursor-pointer transition-colors"
+                className="slds-p-horizontal_medium slds-p-vertical_small sf-hover-bg-neutral slds-cursor-pointer slds-transition-colors"
               >
-                <div className="text-sm text-slds-brand font-medium hover:underline">
+                <div className="slds-text-size_medium slds-font-weight_medium sf-text-link sf-hover-underline">
                   {item.name}
                 </div>
-                <div className="text-xs text-slds-neutral-7 mt-0.5">
+                <div className="slds-text-size_small slds-text-neutral-7" style={{ marginTop: '2px' }}>
                   {item.type} &middot; {item.time}
                 </div>
               </div>

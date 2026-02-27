@@ -734,98 +734,98 @@ export default function IdentityResolutionContent({ demoSession, onDemoSessionCh
 
   if (selectedRuleset && selectedRuleset.isBYOM && !selectedRuleset.isCX) {
     return (
-      <div className="h-full flex flex-col">
+      <div className="slds-h-full slds-flex slds-flex-col">
         {/* Breadcrumb */}
-        <div className="bg-white border-b border-slds-border-1 px-6 py-2 flex items-center gap-2">
-          <button onClick={() => setSelectedRuleset(null)} className="flex items-center gap-1 text-xs text-slds-brand hover:underline">
-            <ArrowLeft className="w-3.5 h-3.5" />
+        <div className="slds-bg-white slds-border_bottom slds-border-color_border-1 slds-p-horizontal_large slds-p-vertical_x-small slds-flex slds-items-center slds-gap_x-small">
+          <button onClick={() => setSelectedRuleset(null)} className="slds-flex slds-items-center slds-gap_xx-small slds-text-size_small slds-text-brand sf-hover-underline">
+            <ArrowLeft className="slds-icon-size_x-small" />
             Identity Resolutions
           </button>
-          <ChevronRight className="w-3 h-3 text-slds-neutral-7" />
-          <span className="text-xs font-medium text-slds-neutral-base">{selectedRuleset.rulesetName}</span>
+          <ChevronRight className="slds-icon-size_xx-small slds-text-neutral-7" />
+          <span className="slds-text-size_small slds-font-weight_medium slds-text-neutral-base">{selectedRuleset.rulesetName}</span>
         </div>
 
         {/* BYOM Header */}
-        <div className="bg-white border-b border-slds-border-1 px-6 py-4">
-          <div className="flex items-center justify-between">
+        <div className="slds-bg-white slds-border_bottom slds-border-color_border-1 slds-p-horizontal_large slds-p-vertical_medium">
+          <div className="slds-flex slds-items-center slds-justify-between">
             <div>
-              <p className="text-xs text-slds-neutral-7">Identity Resolution</p>
-              <h1 className="text-xl font-bold text-slds-neutral-base flex items-center gap-3">
-                <div className="w-9 h-9 rounded-full bg-slds-brand-1 flex items-center justify-center flex-shrink-0">
-                  <Fingerprint className="w-4.5 h-4.5 text-white" />
+              <p className="slds-text-size_small slds-text-neutral-7">Identity Resolution</p>
+              <h1 className="slds-text-size_x-large slds-font-weight_bold slds-text-neutral-base slds-flex slds-items-center slds-gap_small">
+                <div className="slds-border-radius_pill slds-bg-brand-1 slds-flex slds-items-center slds-justify-center slds-flex-shrink-0" style={{ width: '36px', height: '36px' }}>
+                  <Fingerprint className="slds-icon-size_medium slds-text-white" />
                 </div>
                 NTO Pro-North America
               </h1>
             </div>
-            <div className="flex items-center gap-2">
-              <button className="px-3 py-1.5 text-xs font-medium border border-slds-border-1 rounded hover:bg-slds-neutral-2 text-slds-neutral-9">Open Page</button>
-              <button className="px-3 py-1.5 text-xs font-medium border border-slds-border-1 rounded hover:bg-slds-neutral-2 text-slds-neutral-9">Publish...</button>
-              <button className="px-3 py-1.5 text-xs font-medium border border-slds-border-1 rounded hover:bg-slds-neutral-2 text-slds-neutral-9">Edit Properties</button>
-              <button className="px-3 py-1.5 text-xs font-medium border border-slds-border-1 rounded hover:bg-slds-neutral-2 text-slds-neutral-9">Clone</button>
-              <button className="w-7 h-7 flex items-center justify-center border border-slds-border-1 rounded hover:bg-slds-neutral-2 text-slds-neutral-7">
-                <ChevronDown className="w-3.5 h-3.5" />
+            <div className="slds-flex slds-items-center slds-gap_x-small">
+              <button className="slds-p-horizontal_small slds-p-vertical_xx-small slds-text-size_small slds-font-weight_medium slds-border_all slds-border-color_border-1 slds-border-radius_small slds-hover-bg-neutral-2 slds-text-neutral-9" style={{ paddingTop: '6px', paddingBottom: '6px' }}>Open Page</button>
+              <button className="slds-p-horizontal_small slds-p-vertical_xx-small slds-text-size_small slds-font-weight_medium slds-border_all slds-border-color_border-1 slds-border-radius_small slds-hover-bg-neutral-2 slds-text-neutral-9" style={{ paddingTop: '6px', paddingBottom: '6px' }}>Publish...</button>
+              <button className="slds-p-horizontal_small slds-p-vertical_xx-small slds-text-size_small slds-font-weight_medium slds-border_all slds-border-color_border-1 slds-border-radius_small slds-hover-bg-neutral-2 slds-text-neutral-9" style={{ paddingTop: '6px', paddingBottom: '6px' }}>Edit Properties</button>
+              <button className="slds-p-horizontal_small slds-p-vertical_xx-small slds-text-size_small slds-font-weight_medium slds-border_all slds-border-color_border-1 slds-border-radius_small slds-hover-bg-neutral-2 slds-text-neutral-9" style={{ paddingTop: '6px', paddingBottom: '6px' }}>Clone</button>
+              <button className="slds-flex slds-items-center slds-justify-center slds-border_all slds-border-color_border-1 slds-border-radius_small slds-hover-bg-neutral-2 slds-text-neutral-7" style={{ width: '28px', height: '28px' }}>
+                <ChevronDown className="slds-icon-size_x-small" />
               </button>
             </div>
           </div>
 
           {/* Info bar */}
-          <div className="flex items-center gap-8 mt-4">
+          <div className="slds-flex slds-items-center slds-gap_x-large slds-m-top_medium">
             <div>
-              <p className="text-[10px] uppercase tracking-wider text-slds-neutral-7">Primary DMO</p>
-              <p className="text-sm font-medium text-slds-neutral-base">{selectedRuleset.primaryDataModelObject}</p>
+              <p className="slds-text-uppercase slds-tracking-wide slds-text-neutral-7" style={{ fontSize: '10px' }}>Primary DMO</p>
+              <p className="slds-text-size_medium slds-font-weight_medium slds-text-neutral-base">{selectedRuleset.primaryDataModelObject}</p>
             </div>
             <div>
-              <p className="text-[10px] uppercase tracking-wider text-slds-neutral-7">Ruleset ID</p>
-              <p className="text-sm font-medium text-slds-neutral-base">{selectedRuleset.rulesetId}</p>
+              <p className="slds-text-uppercase slds-tracking-wide slds-text-neutral-7" style={{ fontSize: '10px' }}>Ruleset ID</p>
+              <p className="slds-text-size_medium slds-font-weight_medium slds-text-neutral-base">{selectedRuleset.rulesetId}</p>
             </div>
             <div>
-              <p className="text-[10px] uppercase tracking-wider text-slds-neutral-7">Data Space</p>
-              <p className="text-sm font-medium text-slds-neutral-base capitalize">{selectedRuleset.dataSpace}</p>
+              <p className="slds-text-uppercase slds-tracking-wide slds-text-neutral-7" style={{ fontSize: '10px' }}>Data Space</p>
+              <p className="slds-text-size_medium slds-font-weight_medium slds-text-neutral-base" style={{ textTransform: 'capitalize' }}>{selectedRuleset.dataSpace}</p>
             </div>
           </div>
         </div>
 
         {/* BYOM Content */}
-        <div className="flex-1 overflow-y-auto bg-slds-neutral-2">
-          <div className="flex gap-4 p-6">
+        <div className="slds-flex-1 slds-overflow-y-auto slds-bg-neutral-2">
+          <div className="slds-flex slds-gap_medium slds-p-around_large">
             {/* Left column */}
-            <div className="flex-1 space-y-4">
+            <div className="slds-flex-1" style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
               {/* "Bring Your Own Identity" — Verification cards */}
               <div className="sf-card">
                 <div className="sf-card-header">
-                  <h2 className="text-base font-bold text-slds-neutral-base">&ldquo;Bring Your Own Identity&rdquo;</h2>
+                  <h2 className="slds-text-size_large slds-font-weight_bold slds-text-neutral-base">&ldquo;Bring Your Own Identity&rdquo;</h2>
                 </div>
-                <div className="sf-card-body space-y-4">
+                <div className="sf-card-body" style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
                   {/* Verify Unified Link DMO */}
-                  <div className="border border-slds-border-1 rounded-lg p-4 flex items-start justify-between">
+                  <div className="slds-border_all slds-border-color_border-1 slds-border-radius_large slds-p-around_medium slds-flex slds-items-start slds-justify-between">
                     <div>
-                      <h3 className="text-sm font-bold text-slds-neutral-base mb-1">Verify Unified Link DMO</h3>
-                      <p className="text-xs text-slds-neutral-7 leading-relaxed">
+                      <h3 className="slds-text-size_medium slds-font-weight_bold slds-text-neutral-base slds-m-bottom_xx-small">Verify Unified Link DMO</h3>
+                      <p className="slds-text-size_small slds-text-neutral-7 slds-leading-relaxed">
                         Explore the Unified Link data model object to understand cross-source identity linkage and resolution quality.
                       </p>
                     </div>
                     <button
                       onClick={() => { setExploreDMO('link'); setExploreOpen(true); }}
-                      className="flex-shrink-0 ml-4 px-4 py-1.5 text-xs font-medium text-white bg-slds-brand rounded hover:bg-slds-brand-contrast-1 flex items-center gap-1.5"
+                      className="slds-flex-shrink-0 slds-p-horizontal_medium slds-text-size_small slds-font-weight_medium slds-text-white slds-bg-brand slds-border-radius_small slds-flex slds-items-center slds-gap_xx-small" style={{ marginLeft: '16px', paddingTop: '6px', paddingBottom: '6px' }}
                     >
-                      <Search className="w-3.5 h-3.5" />
+                      <Search className="slds-icon-size_x-small" />
                       Explore
                     </button>
                   </div>
 
                   {/* Verify Primary Unified DMO */}
-                  <div className="border border-slds-border-1 rounded-lg p-4 flex items-start justify-between">
+                  <div className="slds-border_all slds-border-color_border-1 slds-border-radius_large slds-p-around_medium slds-flex slds-items-start slds-justify-between">
                     <div>
-                      <h3 className="text-sm font-bold text-slds-neutral-base mb-1">Verify Primary Unified DMO</h3>
-                      <p className="text-xs text-slds-neutral-7 leading-relaxed">
+                      <h3 className="slds-text-size_medium slds-font-weight_bold slds-text-neutral-base slds-m-bottom_xx-small">Verify Primary Unified DMO</h3>
+                      <p className="slds-text-size_small slds-text-neutral-7 slds-leading-relaxed">
                         Explore the Primary Unified data model object to review merged profile quality and field completeness.
                       </p>
                     </div>
                     <button
                       onClick={() => { setExploreDMO('unified'); setExploreOpen(true); }}
-                      className="flex-shrink-0 ml-4 px-4 py-1.5 text-xs font-medium text-white bg-slds-brand rounded hover:bg-slds-brand-contrast-1 flex items-center gap-1.5"
+                      className="slds-flex-shrink-0 slds-p-horizontal_medium slds-text-size_small slds-font-weight_medium slds-text-white slds-bg-brand slds-border-radius_small slds-flex slds-items-center slds-gap_xx-small" style={{ marginLeft: '16px', paddingTop: '6px', paddingBottom: '6px' }}
                     >
-                      <Search className="w-3.5 h-3.5" />
+                      <Search className="slds-icon-size_x-small" />
                       Explore
                     </button>
                   </div>
@@ -834,9 +834,9 @@ export default function IdentityResolutionContent({ demoSession, onDemoSessionCh
 
               {/* "Bring Your Own Identity" — Mapping status (toggles based on datakit install) */}
               <div className="sf-card">
-                <div className="sf-card-header flex items-center justify-between">
-                  <h2 className="text-base font-bold text-slds-neutral-base">&ldquo;Bring Your Own Identity&rdquo;</h2>
-                  <span className={`text-xs font-medium ${byomMappingPopulated ? 'text-slds-success-1' : 'text-slds-neutral-7'}`}>
+                <div className="sf-card-header slds-flex slds-items-center slds-justify-between">
+                  <h2 className="slds-text-size_large slds-font-weight_bold slds-text-neutral-base">&ldquo;Bring Your Own Identity&rdquo;</h2>
+                  <span className={`slds-text-size_small slds-font-weight_medium ${byomMappingPopulated ? 'slds-text-success' : 'slds-text-neutral-7'}`}>
                     {byomMappingPopulated ? '87 / 87 Fields Mapped' : '0 / 87 Fields Mapped'}
                   </span>
                 </div>
@@ -844,35 +844,35 @@ export default function IdentityResolutionContent({ demoSession, onDemoSessionCh
                   {byomMappingPopulated ? (
                     <>
                       {/* Populated mapping status */}
-                      <div className="flex items-center justify-between mb-4">
-                        <div className="flex items-center gap-2">
-                          <CheckCircle2 className="w-5 h-5 text-slds-success-1" />
-                          <p className="text-sm text-slds-neutral-9">
-                            <span className="sf-link font-medium">Your Mapping</span> is complete. 3rd party rules active.
+                      <div className="slds-flex slds-items-center slds-justify-between slds-m-bottom_medium">
+                        <div className="slds-flex slds-items-center slds-gap_x-small">
+                          <CheckCircle2 className="slds-icon-size_default slds-text-success" />
+                          <p className="slds-text-size_medium slds-text-neutral-9">
+                            <span className="sf-link slds-font-weight_medium">Your Mapping</span> is complete. 3rd party rules active.
                           </p>
                         </div>
-                        <button className="px-4 py-1.5 text-xs font-medium border border-slds-border-1 rounded hover:bg-slds-neutral-2 text-slds-neutral-9">
+                        <button className="slds-p-horizontal_medium slds-text-size_small slds-font-weight_medium slds-border_all slds-border-color_border-1 slds-border-radius_small slds-hover-bg-neutral-2 slds-text-neutral-9" style={{ paddingTop: '6px', paddingBottom: '6px' }}>
                           Convert to Regular IR
                         </button>
                       </div>
 
                       {/* Populated mapping canvas — all connected */}
-                      <div className="border border-slds-border-1 rounded-lg bg-[#FAFAF9] p-4">
-                        <div className="flex items-start gap-0 relative">
+                      <div className="slds-border_all slds-border-color_border-1 slds-border-radius_large slds-p-around_medium" style={{ backgroundColor: '#FAFAF9' }}>
+                        <div className="slds-flex slds-items-start slds-pos-relative" style={{ gap: 0 }}>
                           {/* Source fields column */}
-                          <div className="w-[200px] flex-shrink-0">
-                            <div className="text-[10px] uppercase tracking-wider text-slds-neutral-7 font-medium mb-2 px-2">Source Fields</div>
+                          <div className="slds-flex-shrink-0" style={{ width: '200px' }}>
+                            <div className="slds-text-uppercase slds-tracking-wide slds-text-neutral-7 slds-font-weight_medium slds-m-bottom_x-small slds-p-horizontal_x-small" style={{ fontSize: '10px' }}>Source Fields</div>
                             {['First Name', 'Last Name', 'Email', 'Phone', 'Address Line 1', 'City', 'State', 'Postal Code'].map((f) => (
-                              <div key={f} className="flex items-center gap-2 px-2 py-1.5 text-xs text-slds-neutral-base border-b border-slds-border-1 last:border-0">
-                                <div className="w-2 h-2 rounded-full bg-slds-success-1" />
+                              <div key={f} className="slds-flex slds-items-center slds-gap_x-small slds-p-horizontal_x-small slds-text-size_small slds-text-neutral-base slds-border_bottom slds-border-color_border-1" style={{ paddingTop: '6px', paddingBottom: '6px' }}>
+                                <div className="slds-border-radius_pill slds-bg-success" style={{ width: '8px', height: '8px' }} />
                                 {f}
                               </div>
                             ))}
                           </div>
 
                           {/* Center — SVG connection lines */}
-                          <div className="flex-1 min-h-[220px] relative">
-                            <svg className="w-full h-full absolute inset-0" viewBox="0 0 200 260" preserveAspectRatio="none">
+                          <div className="slds-flex-1 slds-pos-relative" style={{ minHeight: '220px' }}>
+                            <svg className="slds-w-full slds-h-full slds-pos-absolute slds-inset-0" viewBox="0 0 200 260" preserveAspectRatio="none">
                               {[0,1,2,3,4,5,6,7].map((i) => {
                                 const y = 30 + i * 29;
                                 return <line key={i} x1="0" y1={y} x2="200" y2={y} stroke="#4BC076" strokeWidth="1.5" strokeDasharray="4 2" opacity="0.6" />;
@@ -881,12 +881,12 @@ export default function IdentityResolutionContent({ demoSession, onDemoSessionCh
                           </div>
 
                           {/* Target DMO column */}
-                          <div className="w-[200px] flex-shrink-0">
-                            <div className="text-[10px] uppercase tracking-wider text-slds-neutral-7 font-medium mb-2 px-2">Target DMO</div>
+                          <div className="slds-flex-shrink-0" style={{ width: '200px' }}>
+                            <div className="slds-text-uppercase slds-tracking-wide slds-text-neutral-7 slds-font-weight_medium slds-m-bottom_x-small slds-p-horizontal_x-small" style={{ fontSize: '10px' }}>Target DMO</div>
                             {['ssot__FirstName__c', 'ssot__LastName__c', 'ssot__Email__c', 'ssot__Phone__c', 'ssot__Street__c', 'ssot__City__c', 'ssot__State__c', 'ssot__PostalCode__c'].map((f) => (
-                              <div key={f} className="flex items-center justify-end gap-2 px-2 py-1.5 text-xs text-slds-neutral-base border-b border-slds-border-1 last:border-0">
+                              <div key={f} className="slds-flex slds-items-center slds-justify-end slds-gap_x-small slds-p-horizontal_x-small slds-text-size_small slds-text-neutral-base slds-border_bottom slds-border-color_border-1" style={{ paddingTop: '6px', paddingBottom: '6px' }}>
                                 {f}
-                                <div className="w-2 h-2 rounded-full bg-slds-success-1" />
+                                <div className="slds-border-radius_pill slds-bg-success" style={{ width: '8px', height: '8px' }} />
                               </div>
                             ))}
                           </div>
@@ -896,45 +896,45 @@ export default function IdentityResolutionContent({ demoSession, onDemoSessionCh
                   ) : (
                     <>
                       {/* Empty mapping status */}
-                      <div className="flex items-center justify-between mb-4">
-                        <div className="flex items-center gap-2">
-                          <AlertTriangle className="w-5 h-5 text-slds-warning-1" />
-                          <p className="text-sm text-slds-neutral-9">
-                            <span className="font-medium">No mappings configured.</span> Map source fields to target DMOs to activate identity resolution.
+                      <div className="slds-flex slds-items-center slds-justify-between slds-m-bottom_medium">
+                        <div className="slds-flex slds-items-center slds-gap_x-small">
+                          <AlertTriangle className="slds-icon-size_default slds-text-warning" />
+                          <p className="slds-text-size_medium slds-text-neutral-9">
+                            <span className="slds-font-weight_medium">No mappings configured.</span> Map source fields to target DMOs to activate identity resolution.
                           </p>
                         </div>
-                        <button className="px-4 py-1.5 text-xs font-medium text-white bg-slds-brand rounded hover:bg-slds-brand-contrast-1">
+                        <button className="slds-p-horizontal_medium slds-text-size_small slds-font-weight_medium slds-text-white slds-bg-brand slds-border-radius_small" style={{ paddingTop: '6px', paddingBottom: '6px' }}>
                           Start Mapping
                         </button>
                       </div>
 
                       {/* Empty mapping canvas */}
-                      <div className="border border-slds-border-1 rounded-lg bg-[#FAFAF9] p-4">
-                        <div className="flex items-start gap-0">
-                          <div className="w-[200px] flex-shrink-0">
-                            <div className="text-[10px] uppercase tracking-wider text-slds-neutral-7 font-medium mb-2 px-2">Source Fields</div>
+                      <div className="slds-border_all slds-border-color_border-1 slds-border-radius_large slds-p-around_medium" style={{ backgroundColor: '#FAFAF9' }}>
+                        <div className="slds-flex slds-items-start" style={{ gap: 0 }}>
+                          <div className="slds-flex-shrink-0" style={{ width: '200px' }}>
+                            <div className="slds-text-uppercase slds-tracking-wide slds-text-neutral-7 slds-font-weight_medium slds-m-bottom_x-small slds-p-horizontal_x-small" style={{ fontSize: '10px' }}>Source Fields</div>
                             {['First Name', 'Last Name', 'Email', 'Phone', 'Address Line 1', 'City', 'State', 'Postal Code'].map((f) => (
-                              <div key={f} className="flex items-center gap-2 px-2 py-1.5 text-xs text-slds-neutral-9 border-b border-slds-border-1 last:border-0">
-                                <div className="w-2 h-2 rounded-full bg-[#D8DDE6]" />
+                              <div key={f} className="slds-flex slds-items-center slds-gap_x-small slds-p-horizontal_x-small slds-text-size_small slds-text-neutral-9 slds-border_bottom slds-border-color_border-1" style={{ paddingTop: '6px', paddingBottom: '6px' }}>
+                                <div className="slds-border-radius_pill" style={{ width: '8px', height: '8px', backgroundColor: '#D8DDE6' }} />
                                 {f}
                               </div>
                             ))}
                           </div>
-                          <div className="flex-1 flex items-center justify-center min-h-[220px]">
-                            <div className="text-center">
-                              <div className="w-12 h-12 mx-auto mb-2 rounded-full bg-slds-border-2 flex items-center justify-center">
-                                <ArrowRight className="w-5 h-5 text-[#B0B0B0]" />
+                          <div className="slds-flex-1 slds-flex slds-items-center slds-justify-center" style={{ minHeight: '220px' }}>
+                            <div className="slds-text-center">
+                              <div className="slds-border-radius_pill slds-flex slds-items-center slds-justify-center slds-m-bottom_x-small" style={{ width: '48px', height: '48px', margin: '0 auto 8px', backgroundColor: 'var(--slds-g-color-border-2)' }}>
+                                <ArrowRight className="slds-icon-size_default" style={{ color: '#B0B0B0' }} />
                               </div>
-                              <p className="text-xs text-slds-neutral-7">No connections</p>
-                              <p className="text-[10px] text-slds-neutral-7 mt-0.5">Drag fields to create mappings</p>
+                              <p className="slds-text-size_small slds-text-neutral-7">No connections</p>
+                              <p className="slds-text-neutral-7 slds-m-top_xx-small" style={{ fontSize: '10px' }}>Drag fields to create mappings</p>
                             </div>
                           </div>
-                          <div className="w-[200px] flex-shrink-0">
-                            <div className="text-[10px] uppercase tracking-wider text-slds-neutral-7 font-medium mb-2 px-2">Target DMO</div>
+                          <div className="slds-flex-shrink-0" style={{ width: '200px' }}>
+                            <div className="slds-text-uppercase slds-tracking-wide slds-text-neutral-7 slds-font-weight_medium slds-m-bottom_x-small slds-p-horizontal_x-small" style={{ fontSize: '10px' }}>Target DMO</div>
                             {['ssot__FirstName__c', 'ssot__LastName__c', 'ssot__Email__c', 'ssot__Phone__c', 'ssot__Street__c', 'ssot__City__c', 'ssot__State__c', 'ssot__PostalCode__c'].map((f) => (
-                              <div key={f} className="flex items-center justify-end gap-2 px-2 py-1.5 text-xs text-slds-neutral-9 border-b border-slds-border-1 last:border-0">
+                              <div key={f} className="slds-flex slds-items-center slds-justify-end slds-gap_x-small slds-p-horizontal_x-small slds-text-size_small slds-text-neutral-9 slds-border_bottom slds-border-color_border-1" style={{ paddingTop: '6px', paddingBottom: '6px' }}>
                                 {f}
-                                <div className="w-2 h-2 rounded-full bg-[#D8DDE6]" />
+                                <div className="slds-border-radius_pill" style={{ width: '8px', height: '8px', backgroundColor: '#D8DDE6' }} />
                               </div>
                             ))}
                           </div>
@@ -944,16 +944,16 @@ export default function IdentityResolutionContent({ demoSession, onDemoSessionCh
                   )}
 
                   {/* Collapsible Details */}
-                  <div className="border-t border-slds-border-1 pt-3 mt-4">
+                  <div className="slds-border_top slds-border-color_border-1 slds-p-top_small slds-m-top_medium">
                     <button
                       onClick={() => setByomDetailsOpen(!byomDetailsOpen)}
-                      className="flex items-center gap-1.5 text-sm font-medium text-slds-neutral-base mb-3"
+                      className="slds-flex slds-items-center slds-gap_xx-small slds-text-size_medium slds-font-weight_medium slds-text-neutral-base slds-m-bottom_small"
                     >
-                      {byomDetailsOpen ? <ChevronDown className="w-4 h-4" /> : <ChevronRight className="w-4 h-4" />}
+                      {byomDetailsOpen ? <ChevronDown className="slds-icon-size_small" /> : <ChevronRight className="slds-icon-size_small" />}
                       Details
                     </button>
                     {byomDetailsOpen && (
-                      <div className="sf-detail-grid pl-5">
+                      <div className="sf-detail-grid slds-p-left_medium" style={{ paddingLeft: '20px' }}>
                         <div className="sf-detail-field">
                           <div className="sf-detail-label">Source</div>
                           <div className="sf-detail-value">{selectedRuleset.byomSource || 'External MDM'}</div>
@@ -986,16 +986,16 @@ export default function IdentityResolutionContent({ demoSession, onDemoSessionCh
             </div>
 
             {/* Right column */}
-            <div className="w-[320px] flex-shrink-0 space-y-4">
+            <div className="slds-flex-shrink-0" style={{ width: '320px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
               {/* Resolution Summary */}
               <div className="sf-card">
-                <div className="px-4 py-3 border-b-2 border-slds-brand">
-                  <h3 className="text-sm font-semibold text-slds-brand">Resolution Summary</h3>
+                <div className="slds-p-horizontal_medium slds-p-vertical_small slds-border_bottom slds-border-color_brand" style={{ borderBottomWidth: '2px' }}>
+                  <h3 className="slds-text-size_medium slds-font-weight_semibold slds-text-brand">Resolution Summary</h3>
                 </div>
-                <div className="p-6 text-center">
+                <div className="slds-p-around_large slds-text-center">
                   {/* Desert/cactus illustration placeholder */}
-                  <div className="mx-auto mb-4 w-32 h-24 flex items-center justify-center">
-                    <svg viewBox="0 0 128 96" className="w-full h-full text-[#B0C4DE]" fill="none" stroke="currentColor" strokeWidth="1.5">
+                  <div className="slds-flex slds-items-center slds-justify-center slds-m-bottom_medium" style={{ width: '128px', height: '96px', margin: '0 auto 16px' }}>
+                    <svg viewBox="0 0 128 96" className="slds-w-full slds-h-full" style={{ color: '#B0C4DE' }} fill="none" stroke="currentColor" strokeWidth="1.5">
                       <circle cx="80" cy="30" r="18" strokeDasharray="4 3" />
                       <circle cx="90" cy="25" r="10" strokeDasharray="3 2" />
                       <path d="M20 80 Q35 20 40 40 Q42 50 44 40 Q48 20 50 80" />
@@ -1006,16 +1006,16 @@ export default function IdentityResolutionContent({ demoSession, onDemoSessionCh
                       <path d="M90 80 Q95 75 100 80" />
                     </svg>
                   </div>
-                  <p className="text-xs text-slds-neutral-7 leading-relaxed mb-4">
+                  <p className="slds-text-size_small slds-text-neutral-7 slds-leading-relaxed slds-m-bottom_medium">
                     Nothing here yet. If you enable, you can see summaries of your last run job to help you analyze further configurations etc.{' '}
                     <span className="sf-link">Learn More</span>
                   </p>
-                  <div className="flex items-center justify-center gap-3">
-                    <button className="px-4 py-1.5 text-xs font-medium border border-slds-border-1 rounded hover:bg-slds-neutral-2 text-slds-neutral-9">
+                  <div className="slds-flex slds-items-center slds-justify-center slds-gap_small">
+                    <button className="slds-p-horizontal_medium slds-text-size_small slds-font-weight_medium slds-border_all slds-border-color_border-1 slds-border-radius_small slds-hover-bg-neutral-2 slds-text-neutral-9" style={{ paddingTop: '6px', paddingBottom: '6px' }}>
                       Enable
                     </button>
-                    <button className="w-7 h-7 flex items-center justify-center border border-slds-border-1 rounded hover:bg-slds-neutral-2 text-slds-neutral-7">
-                      <Camera className="w-3.5 h-3.5" />
+                    <button className="slds-flex slds-items-center slds-justify-center slds-border_all slds-border-color_border-1 slds-border-radius_small slds-hover-bg-neutral-2 slds-text-neutral-7" style={{ width: '28px', height: '28px' }}>
+                      <Camera className="slds-icon-size_x-small" />
                     </button>
                   </div>
                 </div>
@@ -1023,45 +1023,46 @@ export default function IdentityResolutionContent({ demoSession, onDemoSessionCh
 
               {/* Post / Poll / Question activity card */}
               <div className="sf-card">
-                <div className="flex border-b border-slds-border-1">
+                <div className="slds-flex slds-border_bottom slds-border-color_border-1">
                   {['Post', 'Poll', 'Question'].map((tab) => (
                     <button
                       key={tab}
-                      className={`px-4 py-2.5 text-xs font-medium border-b-2 transition-colors ${
+                      className={`slds-p-horizontal_medium slds-text-size_small slds-font-weight_medium slds-transition-colors ${
                         tab === 'Post'
-                          ? 'border-slds-brand text-slds-brand'
-                          : 'border-transparent text-slds-neutral-7 hover:text-slds-neutral-9'
+                          ? 'slds-border-color_brand slds-text-brand'
+                          : 'slds-text-neutral-7'
                       }`}
+                      style={{ paddingTop: '10px', paddingBottom: '10px', borderBottomWidth: '2px', borderBottomStyle: 'solid', borderBottomColor: tab === 'Post' ? undefined : 'transparent' }}
                     >
                       {tab}
                     </button>
                   ))}
                 </div>
-                <div className="p-3">
-                  <div className="flex items-center gap-2">
+                <div className="slds-p-around_small">
+                  <div className="slds-flex slds-items-center slds-gap_x-small">
                     <input
                       type="text"
                       placeholder="Share an update..."
-                      className="flex-1 px-3 py-1.5 text-xs border border-slds-border-1 rounded focus:outline-none focus:border-slds-brand-2"
+                      className="slds-flex-1 slds-p-horizontal_small slds-text-size_small slds-border_all slds-border-color_border-1 slds-border-radius_small" style={{ paddingTop: '6px', paddingBottom: '6px', outline: 'none' }}
                     />
-                    <button className="px-3 py-1.5 text-xs font-medium text-white bg-slds-brand rounded hover:bg-slds-brand-contrast-1">
+                    <button className="slds-p-horizontal_small slds-text-size_small slds-font-weight_medium slds-text-white slds-bg-brand slds-border-radius_small" style={{ paddingTop: '6px', paddingBottom: '6px' }}>
                       Share
                     </button>
                   </div>
                 </div>
-                <div className="px-3 pb-3 flex items-center justify-between">
-                  <button className="flex items-center gap-1 text-xs text-slds-neutral-7 hover:text-slds-neutral-9">
-                    <RefreshCw className="w-3 h-3" />
+                <div className="slds-p-horizontal_small slds-p-bottom_small slds-flex slds-items-center slds-justify-between">
+                  <button className="slds-flex slds-items-center slds-gap_xx-small slds-text-size_small slds-text-neutral-7">
+                    <RefreshCw className="slds-icon-size_xx-small" />
                   </button>
-                  <div className="flex items-center gap-1.5">
-                    <Search className="w-3.5 h-3.5 text-slds-neutral-7" />
+                  <div className="slds-flex slds-items-center slds-gap_xx-small">
+                    <Search className="slds-icon-size_x-small slds-text-neutral-7" />
                     <input
                       type="text"
                       placeholder="Search..."
-                      className="w-28 px-2 py-1 text-xs border border-slds-border-1 rounded focus:outline-none"
+                      className="slds-p-horizontal_x-small slds-text-size_small slds-border_all slds-border-color_border-1 slds-border-radius_small" style={{ width: '112px', paddingTop: '4px', paddingBottom: '4px', outline: 'none' }}
                     />
-                    <button className="w-6 h-6 flex items-center justify-center rounded hover:bg-slds-neutral-2 text-slds-neutral-7">
-                      <RefreshCw className="w-3 h-3" />
+                    <button className="slds-flex slds-items-center slds-justify-center slds-border-radius_small slds-hover-bg-neutral-2 slds-text-neutral-7" style={{ width: '24px', height: '24px' }}>
+                      <RefreshCw className="slds-icon-size_xx-small" />
                     </button>
                   </div>
                 </div>
@@ -1072,48 +1073,48 @@ export default function IdentityResolutionContent({ demoSession, onDemoSessionCh
 
         {/* ── Data Exploration Modal ─────────────────────────────── */}
         {exploreOpen && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center">
-            <div className="absolute inset-0 bg-black/40" onClick={() => setExploreOpen(false)} />
-            <div className="relative bg-white rounded-lg shadow-2xl w-[720px] max-h-[80vh] overflow-hidden">
+          <div className="slds-pos-fixed slds-inset-0 slds-z-50 slds-flex slds-items-center slds-justify-center">
+            <div className="slds-pos-absolute slds-inset-0" style={{ backgroundColor: 'rgba(0,0,0,0.4)' }} onClick={() => setExploreOpen(false)} />
+            <div className="slds-pos-relative slds-bg-white slds-border-radius_large slds-shadow_large slds-overflow-hidden" style={{ width: '720px', maxHeight: '80vh' }}>
               {/* Header */}
-              <div className="px-6 py-4 border-b border-slds-border-1 flex items-center justify-between">
+              <div className="slds-p-horizontal_large slds-p-vertical_medium slds-border_bottom slds-border-color_border-1 slds-flex slds-items-center slds-justify-between">
                 <div>
-                  <h2 className="text-base font-bold text-slds-neutral-base">
+                  <h2 className="slds-text-size_large slds-font-weight_bold slds-text-neutral-base">
                     Data Explorer — {exploreDMO === 'link' ? 'Unified Link DMO' : 'Primary Unified DMO'}
                   </h2>
-                  <p className="text-xs text-slds-neutral-7 mt-0.5">
+                  <p className="slds-text-size_small slds-text-neutral-7 slds-m-top_xx-small">
                     {exploreDMO === 'link' ? 'ssot__UnifiedLink__dlm' : `ssot__${selectedRuleset.primaryDataModelObject}__dlm`}
                   </p>
                 </div>
-                <button onClick={() => setExploreOpen(false)} className="w-7 h-7 flex items-center justify-center rounded hover:bg-slds-neutral-2 text-slds-neutral-7">
-                  <X className="w-4 h-4" />
+                <button onClick={() => setExploreOpen(false)} className="slds-flex slds-items-center slds-justify-center slds-border-radius_small slds-hover-bg-neutral-2 slds-text-neutral-7" style={{ width: '28px', height: '28px' }}>
+                  <X className="slds-icon-size_small" />
                 </button>
               </div>
 
               {/* Chart grid */}
-              <div className="p-6 overflow-y-auto max-h-[65vh] space-y-6">
+              <div className="slds-p-around_large slds-overflow-y-auto" style={{ maxHeight: '65vh', display: 'flex', flexDirection: 'column', gap: '24px' }}>
                 {/* Row 1: Record counts + match rate */}
-                <div className="grid grid-cols-3 gap-4">
-                  <div className="border border-slds-border-1 rounded-lg p-4 text-center">
-                    <p className="text-[10px] uppercase tracking-wider text-slds-neutral-7 mb-1">Total Records</p>
-                    <p className="text-2xl font-bold text-slds-brand">{exploreDMO === 'link' ? '45,892' : '38,241'}</p>
+                <div className="slds-css-grid slds-css-grid-cols-3 slds-gap_medium">
+                  <div className="slds-border_all slds-border-color_border-1 slds-border-radius_large slds-p-around_medium slds-text-center">
+                    <p className="slds-text-uppercase slds-tracking-wide slds-text-neutral-7 slds-m-bottom_xx-small" style={{ fontSize: '10px' }}>Total Records</p>
+                    <p className="slds-text-size_xx-large slds-font-weight_bold slds-text-brand">{exploreDMO === 'link' ? '45,892' : '38,241'}</p>
                   </div>
-                  <div className="border border-slds-border-1 rounded-lg p-4 text-center">
-                    <p className="text-[10px] uppercase tracking-wider text-slds-neutral-7 mb-1">{exploreDMO === 'link' ? 'Linked Pairs' : 'Unified Profiles'}</p>
-                    <p className="text-2xl font-bold text-slds-success-1">{exploreDMO === 'link' ? '12,547' : '10,594'}</p>
+                  <div className="slds-border_all slds-border-color_border-1 slds-border-radius_large slds-p-around_medium slds-text-center">
+                    <p className="slds-text-uppercase slds-tracking-wide slds-text-neutral-7 slds-m-bottom_xx-small" style={{ fontSize: '10px' }}>{exploreDMO === 'link' ? 'Linked Pairs' : 'Unified Profiles'}</p>
+                    <p className="slds-text-size_xx-large slds-font-weight_bold slds-text-success">{exploreDMO === 'link' ? '12,547' : '10,594'}</p>
                   </div>
-                  <div className="border border-slds-border-1 rounded-lg p-4 text-center">
-                    <p className="text-[10px] uppercase tracking-wider text-slds-neutral-7 mb-1">{exploreDMO === 'link' ? 'Link Rate' : 'Consolidation'}</p>
-                    <p className="text-2xl font-bold text-[#FF4A00]">{exploreDMO === 'link' ? '27.3%' : '72.3%'}</p>
+                  <div className="slds-border_all slds-border-color_border-1 slds-border-radius_large slds-p-around_medium slds-text-center">
+                    <p className="slds-text-uppercase slds-tracking-wide slds-text-neutral-7 slds-m-bottom_xx-small" style={{ fontSize: '10px' }}>{exploreDMO === 'link' ? 'Link Rate' : 'Consolidation'}</p>
+                    <p className="slds-text-size_xx-large slds-font-weight_bold" style={{ color: '#FF4A00' }}>{exploreDMO === 'link' ? '27.3%' : '72.3%'}</p>
                   </div>
                 </div>
 
                 {/* Chart: Source Distribution (bar chart via SVG) */}
-                <div className="border border-slds-border-1 rounded-lg p-4">
-                  <h3 className="text-sm font-semibold text-slds-neutral-base mb-3">
+                <div className="slds-border_all slds-border-color_border-1 slds-border-radius_large slds-p-around_medium">
+                  <h3 className="slds-text-size_medium slds-font-weight_semibold slds-text-neutral-base slds-m-bottom_small">
                     {exploreDMO === 'link' ? 'Links by Source System' : 'Records by Data Source'}
                   </h3>
-                  <svg viewBox="0 0 600 140" className="w-full">
+                  <svg viewBox="0 0 600 140" className="slds-w-full">
                     {[
                       { label: 'Informatica MDM', value: 0.72, color: '#FF4A00' },
                       { label: 'Salesforce CRM', value: 0.45, color: 'var(--slds-g-color-brand)' },
@@ -1130,31 +1131,31 @@ export default function IdentityResolutionContent({ demoSession, onDemoSessionCh
                 </div>
 
                 {/* Chart: Field Completeness (horizontal segments) */}
-                <div className="border border-slds-border-1 rounded-lg p-4">
-                  <h3 className="text-sm font-semibold text-slds-neutral-base mb-3">Field Completeness</h3>
-                  <div className="space-y-2">
+                <div className="slds-border_all slds-border-color_border-1 slds-border-radius_large slds-p-around_medium">
+                  <h3 className="slds-text-size_medium slds-font-weight_semibold slds-text-neutral-base slds-m-bottom_small">Field Completeness</h3>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                     {(exploreDMO === 'link'
                       ? [{ f: 'Source Record ID', pct: 100 }, { f: 'Target Record ID', pct: 100 }, { f: 'Link Confidence', pct: 94 }, { f: 'Match Rule', pct: 91 }, { f: 'Created Date', pct: 100 }]
                       : [{ f: 'First Name', pct: 98 }, { f: 'Last Name', pct: 99 }, { f: 'Email', pct: 87 }, { f: 'Phone', pct: 72 }, { f: 'Address', pct: 64 }, { f: 'Date of Birth', pct: 41 }]
                     ).map((row) => (
-                      <div key={row.f} className="flex items-center gap-3">
-                        <span className="text-xs text-slds-neutral-9 w-32 flex-shrink-0">{row.f}</span>
-                        <div className="flex-1 h-3 bg-slds-border-2 rounded-full overflow-hidden">
-                          <div className="h-full rounded-full" style={{ width: `${row.pct}%`, backgroundColor: row.pct > 90 ? '#4BC076' : row.pct > 70 ? '#FF9800' : '#E91E63' }} />
+                      <div key={row.f} className="slds-flex slds-items-center slds-gap_small">
+                        <span className="slds-text-size_small slds-text-neutral-9 slds-flex-shrink-0" style={{ width: '128px' }}>{row.f}</span>
+                        <div className="slds-flex-1 slds-border-radius_pill slds-overflow-hidden" style={{ height: '12px', backgroundColor: 'var(--slds-g-color-border-2)' }}>
+                          <div className="slds-h-full slds-border-radius_pill" style={{ width: `${row.pct}%`, backgroundColor: row.pct > 90 ? '#4BC076' : row.pct > 70 ? '#FF9800' : '#E91E63' }} />
                         </div>
-                        <span className="text-xs font-medium text-slds-neutral-base w-10 text-right">{row.pct}%</span>
+                        <span className="slds-text-size_small slds-font-weight_medium slds-text-neutral-base" style={{ width: '40px', textAlign: 'right' }}>{row.pct}%</span>
                       </div>
                     ))}
                   </div>
                 </div>
 
                 {/* Chart: Match Quality Distribution (donut via SVG) */}
-                <div className="border border-slds-border-1 rounded-lg p-4">
-                  <h3 className="text-sm font-semibold text-slds-neutral-base mb-3">
+                <div className="slds-border_all slds-border-color_border-1 slds-border-radius_large slds-p-around_medium">
+                  <h3 className="slds-text-size_medium slds-font-weight_semibold slds-text-neutral-base slds-m-bottom_small">
                     {exploreDMO === 'link' ? 'Link Confidence Distribution' : 'Match Quality Score'}
                   </h3>
-                  <div className="flex items-center gap-8">
-                    <svg viewBox="0 0 120 120" className="w-28 h-28 flex-shrink-0">
+                  <div className="slds-flex slds-items-center slds-gap_x-large">
+                    <svg viewBox="0 0 120 120" className="slds-flex-shrink-0" style={{ width: '112px', height: '112px' }}>
                       <circle cx="60" cy="60" r="52" fill="none" stroke="#E5E5E5" strokeWidth="12" />
                       <circle cx="60" cy="60" r="52" fill="none" stroke="#4BC076" strokeWidth="12" strokeDasharray={`${0.68 * 327} ${327}`} strokeDashoffset="0" transform="rotate(-90 60 60)" />
                       <circle cx="60" cy="60" r="52" fill="none" stroke="#FF9800" strokeWidth="12" strokeDasharray={`${0.22 * 327} ${327}`} strokeDashoffset={`${-0.68 * 327}`} transform="rotate(-90 60 60)" />
@@ -1162,10 +1163,10 @@ export default function IdentityResolutionContent({ demoSession, onDemoSessionCh
                       <text x="60" y="56" textAnchor="middle" fontSize="18" fontWeight="bold" fill="#1B1C1D">68%</text>
                       <text x="60" y="72" textAnchor="middle" fontSize="9" fill="#706E6B">High</text>
                     </svg>
-                    <div className="space-y-2">
-                      <div className="flex items-center gap-2"><div className="w-3 h-3 rounded-full bg-[#4BC076]" /><span className="text-xs text-slds-neutral-9">High confidence (68%)</span></div>
-                      <div className="flex items-center gap-2"><div className="w-3 h-3 rounded-full bg-[#FF9800]" /><span className="text-xs text-slds-neutral-9">Medium confidence (22%)</span></div>
-                      <div className="flex items-center gap-2"><div className="w-3 h-3 rounded-full bg-[#E91E63]" /><span className="text-xs text-slds-neutral-9">Low confidence (10%)</span></div>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                      <div className="slds-flex slds-items-center slds-gap_x-small"><div className="slds-border-radius_pill" style={{ width: '12px', height: '12px', backgroundColor: '#4BC076' }} /><span className="slds-text-size_small slds-text-neutral-9">High confidence (68%)</span></div>
+                      <div className="slds-flex slds-items-center slds-gap_x-small"><div className="slds-border-radius_pill" style={{ width: '12px', height: '12px', backgroundColor: '#FF9800' }} /><span className="slds-text-size_small slds-text-neutral-9">Medium confidence (22%)</span></div>
+                      <div className="slds-flex slds-items-center slds-gap_x-small"><div className="slds-border-radius_pill" style={{ width: '12px', height: '12px', backgroundColor: '#E91E63' }} /><span className="slds-text-size_small slds-text-neutral-9">Low confidence (10%)</span></div>
                     </div>
                   </div>
                 </div>
@@ -1182,54 +1183,54 @@ export default function IdentityResolutionContent({ demoSession, onDemoSessionCh
   // ──────────────────────────────────────────────────────────────────
   if (selectedRuleset) {
     return (
-      <div className="h-full flex flex-col">
+      <div className="slds-h-full slds-flex slds-flex-col">
         {/* Breadcrumb */}
-        <div className="bg-white border-b border-slds-border-1 px-6 py-2 flex items-center gap-2">
-          <button onClick={() => setSelectedRuleset(null)} className="flex items-center gap-1 text-xs text-slds-brand hover:underline">
-            <ArrowLeft className="w-3.5 h-3.5" />
+        <div className="slds-bg-white slds-border_bottom slds-border-color_border-1 slds-p-horizontal_large slds-p-vertical_x-small slds-flex slds-items-center slds-gap_x-small">
+          <button onClick={() => setSelectedRuleset(null)} className="slds-flex slds-items-center slds-gap_xx-small slds-text-size_small slds-text-brand sf-hover-underline">
+            <ArrowLeft className="slds-icon-size_x-small" />
             Identity Resolutions
           </button>
-          <ChevronRight className="w-3 h-3 text-slds-neutral-7" />
-          <span className="text-xs font-medium text-slds-neutral-base">{selectedRuleset.rulesetName}</span>
+          <ChevronRight className="slds-icon-size_xx-small slds-text-neutral-7" />
+          <span className="slds-text-size_small slds-font-weight_medium slds-text-neutral-base">{selectedRuleset.rulesetName}</span>
         </div>
 
         {/* Header */}
-        <div className="bg-white border-b border-slds-border-1 px-6 py-4">
-          <div className="flex items-start gap-4">
-            <div className="w-10 h-10 rounded-lg bg-slds-brand-1 flex items-center justify-center flex-shrink-0">
-              <Fingerprint className="w-5 h-5 text-white" />
+        <div className="slds-bg-white slds-border_bottom slds-border-color_border-1 slds-p-horizontal_large slds-p-vertical_medium">
+          <div className="slds-flex slds-items-start slds-gap_medium">
+            <div className="slds-border-radius_medium slds-bg-brand-1 slds-flex slds-items-center slds-justify-center slds-flex-shrink-0" style={{ width: '40px', height: '40px' }}>
+              <Fingerprint className="slds-icon-size_default slds-text-white" />
             </div>
-            <div className="flex-1">
-              <p className="text-xs text-slds-neutral-7">Identity Resolution</p>
-              <h1 className="text-lg font-bold text-slds-neutral-base">{selectedRuleset.rulesetName}</h1>
+            <div className="slds-flex-1">
+              <p className="slds-text-size_small slds-text-neutral-7">Identity Resolution</p>
+              <h1 className="slds-font-weight_bold slds-text-neutral-base" style={{ fontSize: '18px' }}>{selectedRuleset.rulesetName}</h1>
             </div>
           </div>
 
           {/* Metadata bar */}
-          <div className="flex flex-wrap items-center gap-x-8 gap-y-2 mt-4">
+          <div className="slds-flex slds-flex-wrap slds-items-center slds-m-top_medium" style={{ columnGap: '32px', rowGap: '8px' }}>
             <div>
-              <p className="text-[10px] uppercase tracking-wider text-slds-neutral-7">Data Space</p>
-              <p className="text-sm font-medium text-slds-neutral-base capitalize">{selectedRuleset.dataSpace}</p>
+              <p className="slds-text-uppercase slds-tracking-wide slds-text-neutral-7" style={{ fontSize: '10px' }}>Data Space</p>
+              <p className="slds-text-size_medium slds-font-weight_medium slds-text-neutral-base" style={{ textTransform: 'capitalize' }}>{selectedRuleset.dataSpace}</p>
             </div>
             <div>
-              <p className="text-[10px] uppercase tracking-wider text-slds-neutral-7">Primary Data Model Object</p>
-              <p className="text-sm font-medium text-slds-neutral-base">{selectedRuleset.primaryDataModelObject}</p>
+              <p className="slds-text-uppercase slds-tracking-wide slds-text-neutral-7" style={{ fontSize: '10px' }}>Primary Data Model Object</p>
+              <p className="slds-text-size_medium slds-font-weight_medium slds-text-neutral-base">{selectedRuleset.primaryDataModelObject}</p>
             </div>
             <div>
-              <p className="text-[10px] uppercase tracking-wider text-slds-neutral-7">Ruleset ID</p>
-              <p className="text-sm font-medium text-slds-neutral-base">{selectedRuleset.rulesetId}</p>
+              <p className="slds-text-uppercase slds-tracking-wide slds-text-neutral-7" style={{ fontSize: '10px' }}>Ruleset ID</p>
+              <p className="slds-text-size_medium slds-font-weight_medium slds-text-neutral-base">{selectedRuleset.rulesetId}</p>
             </div>
             <div>
-              <p className="text-[10px] uppercase tracking-wider text-slds-neutral-7">Ruleset Status</p>
-              <p className="text-sm">{statusBadge(selectedRuleset.rulesetStatus)}</p>
+              <p className="slds-text-uppercase slds-tracking-wide slds-text-neutral-7" style={{ fontSize: '10px' }}>Ruleset Status</p>
+              <p className="slds-text-size_medium">{statusBadge(selectedRuleset.rulesetStatus)}</p>
             </div>
             <div>
-              <p className="text-[10px] uppercase tracking-wider text-slds-neutral-7">Last Job Status</p>
-              <p className="text-sm">{statusBadge(selectedRuleset.lastJobStatus === 'Completed' ? 'Succeeded' : selectedRuleset.lastJobStatus)}</p>
+              <p className="slds-text-uppercase slds-tracking-wide slds-text-neutral-7" style={{ fontSize: '10px' }}>Last Job Status</p>
+              <p className="slds-text-size_medium">{statusBadge(selectedRuleset.lastJobStatus === 'Completed' ? 'Succeeded' : selectedRuleset.lastJobStatus)}</p>
             </div>
             <div>
-              <p className="text-[10px] uppercase tracking-wider text-slds-neutral-7">Last Job Completed</p>
-              <p className="text-sm font-medium text-slds-neutral-base">{selectedRuleset.lastJobCompleted}</p>
+              <p className="slds-text-uppercase slds-tracking-wide slds-text-neutral-7" style={{ fontSize: '10px' }}>Last Job Completed</p>
+              <p className="slds-text-size_medium slds-font-weight_medium slds-text-neutral-base">{selectedRuleset.lastJobCompleted}</p>
             </div>
           </div>
         </div>
@@ -1247,39 +1248,39 @@ export default function IdentityResolutionContent({ demoSession, onDemoSessionCh
         </div>
 
         {/* Tab Content */}
-        <div className="flex-1 overflow-y-auto bg-slds-neutral-2">
+        <div className="slds-flex-1 slds-overflow-y-auto slds-bg-neutral-2">
 
           {/* ── DETAILS TAB ── */}
           {detailTab === 'details' && (
-            <div className="flex gap-4 p-6">
+            <div className="slds-flex slds-gap_medium slds-p-around_large">
               {/* Left column — Match Rules + Reconciliation Rules */}
-              <div className="flex-1 space-y-4 min-w-0">
+              <div className="slds-flex-1 slds-min-w-0" style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
                 {/* Match Rules card */}
                 <div className="sf-card">
                   <div className="sf-card-header">
-                    <h2 className="text-sm font-semibold text-slds-neutral-base">
-                      Match Rules <span className="text-xs font-normal text-slds-neutral-7">({selectedRuleset.matchRules.length})</span>
+                    <h2 className="slds-text-size_medium slds-font-weight_semibold slds-text-neutral-base">
+                      Match Rules <span className="slds-text-size_small slds-font-weight_regular slds-text-neutral-7">({selectedRuleset.matchRules.length})</span>
                     </h2>
-                    <button onClick={handleOpenEditMatchRules} className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-white bg-slds-brand rounded hover:bg-slds-brand-contrast-1 transition-colors">
-                      <Edit3 className="w-3.5 h-3.5" />
+                    <button onClick={handleOpenEditMatchRules} className="slds-flex slds-items-center slds-gap_xx-small slds-p-horizontal_small slds-text-size_small slds-font-weight_medium slds-text-white slds-bg-brand slds-border-radius_small slds-transition-colors" style={{ paddingTop: '6px', paddingBottom: '6px' }}>
+                      <Edit3 className="slds-icon-size_x-small" />
                       Edit
                     </button>
                   </div>
                   {selectedRuleset.matchRules.length === 0 ? (
-                    <div className="sf-card-body text-center py-8 text-sm text-slds-neutral-7">No match rules configured.</div>
+                    <div className="sf-card-body slds-text-center slds-p-vertical_x-large slds-text-size_medium slds-text-neutral-7">No match rules configured.</div>
                   ) : (
-                    <div className="sf-card-body space-y-2">
+                    <div className="sf-card-body" style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                       {selectedRuleset.matchRules.map((rule, ri) => (
-                        <div key={rule.id} className="flex items-start gap-3">
-                          {ri > 0 && <span className="text-xs font-bold text-slds-neutral-7 mt-1 w-6 text-center flex-shrink-0">OR</span>}
-                          {ri === 0 && <span className="w-6 flex-shrink-0" />}
-                          <div className={`flex-1 flex items-center gap-2 px-3 py-2.5 rounded-lg border ${
-                            rule.ruleName === 'Unique Identifier 01' ? 'border-[#FFB75D] bg-[#FFFBF5]' : 'border-slds-border-1 bg-[#FAFAF9]'
-                          }`}>
+                        <div key={rule.id} className="slds-flex slds-items-start slds-gap_small">
+                          {ri > 0 && <span className="slds-text-size_small slds-font-weight_bold slds-text-neutral-7 slds-m-top_xx-small slds-text-center slds-flex-shrink-0" style={{ width: '24px' }}>OR</span>}
+                          {ri === 0 && <span className="slds-flex-shrink-0" style={{ width: '24px' }} />}
+                          <div className={`slds-flex-1 slds-flex slds-items-center slds-gap_x-small slds-p-horizontal_small slds-border-radius_large slds-border_all ${
+                            rule.ruleName === 'Unique Identifier 01' ? 'slds-border-color_border-1' : 'slds-border-color_border-1'
+                          }`} style={{ paddingTop: '10px', paddingBottom: '10px', borderColor: rule.ruleName === 'Unique Identifier 01' ? '#FFB75D' : undefined, backgroundColor: rule.ruleName === 'Unique Identifier 01' ? '#FFFBF5' : '#FAFAF9' }}>
                             {rule.ruleName === 'Unique Identifier 01' && (
-                              <AlertTriangle className="w-4 h-4 text-[#FFB75D] flex-shrink-0" />
+                              <AlertTriangle className="slds-icon-size_small slds-flex-shrink-0" style={{ color: '#FFB75D' }} />
                             )}
-                            <span className="text-sm text-slds-neutral-base">{rule.ruleName}</span>
+                            <span className="slds-text-size_medium slds-text-neutral-base">{rule.ruleName}</span>
                           </div>
                         </div>
                       ))}
@@ -1291,11 +1292,11 @@ export default function IdentityResolutionContent({ demoSession, onDemoSessionCh
                 <div className="sf-card">
                   <div className="sf-card-header">
                     <div>
-                      <h2 className="text-sm font-semibold text-slds-neutral-base">Reconciliation Rules</h2>
-                      <p className="text-xs text-slds-neutral-7 mt-0.5">Reconciliation rules determine which field value to keep when source profiles are merged into a unified profile.</p>
+                      <h2 className="slds-text-size_medium slds-font-weight_semibold slds-text-neutral-base">Reconciliation Rules</h2>
+                      <p className="slds-text-size_small slds-text-neutral-7 slds-m-top_xx-small">Reconciliation rules determine which field value to keep when source profiles are merged into a unified profile.</p>
                     </div>
                     {selectedReconFields.size > 0 && (
-                      <button onClick={handleUpdateSelected} className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-white bg-slds-brand rounded hover:bg-slds-brand-contrast-1 transition-colors">
+                      <button onClick={handleUpdateSelected} className="slds-flex slds-items-center slds-gap_xx-small slds-p-horizontal_small slds-text-size_small slds-font-weight_medium slds-text-white slds-bg-brand slds-border-radius_small slds-transition-colors" style={{ paddingTop: '6px', paddingBottom: '6px' }}>
                         Update Selected ({selectedReconFields.size})
                       </button>
                     )}
@@ -1304,21 +1305,21 @@ export default function IdentityResolutionContent({ demoSession, onDemoSessionCh
                     {selectedRuleset.reconciliationGroups.map((group) => {
                       const isOpen = reconGroupsOpen[group.dmoName] !== false;
                       return (
-                        <div key={group.dmoName} className="border-b border-slds-border-2 last:border-b-0">
-                          <button onClick={() => toggleReconGroup(group.dmoName)} className="w-full flex items-center justify-between px-4 py-3 hover:bg-[#FAFAF9] transition-colors">
-                            <div className="flex items-center gap-2">
-                              {isOpen ? <ChevronDown className="w-4 h-4 text-slds-neutral-7" /> : <ChevronRight className="w-4 h-4 text-slds-neutral-7" />}
-                              <span className="text-sm font-semibold text-slds-neutral-base">{group.dmoName}</span>
+                        <div key={group.dmoName} className="slds-border_bottom slds-border-color_border-2">
+                          <button onClick={() => toggleReconGroup(group.dmoName)} className="slds-w-full slds-flex slds-items-center slds-justify-between slds-p-horizontal_medium slds-p-vertical_small slds-transition-colors" style={{ backgroundColor: 'transparent' }} onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#FAFAF9'} onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}>
+                            <div className="slds-flex slds-items-center slds-gap_x-small">
+                              {isOpen ? <ChevronDown className="slds-icon-size_small slds-text-neutral-7" /> : <ChevronRight className="slds-icon-size_small slds-text-neutral-7" />}
+                              <span className="slds-text-size_medium slds-font-weight_semibold slds-text-neutral-base">{group.dmoName}</span>
                             </div>
-                            <div className="flex items-center gap-2 text-xs text-slds-neutral-7">
+                            <div className="slds-flex slds-items-center slds-gap_x-small slds-text-size_small slds-text-neutral-7">
                               <span>Default Reconciliation Rule:</span>
-                              <span className="font-medium text-slds-neutral-9">{group.defaultRule}</span>
+                              <span className="slds-font-weight_medium slds-text-neutral-9">{group.defaultRule}</span>
                               <button
                                 onClick={(e) => { e.stopPropagation(); }}
-                                className="w-6 h-6 flex items-center justify-center rounded hover:bg-slds-border-2 text-slds-neutral-7"
+                                className="slds-flex slds-items-center slds-justify-center slds-border-radius_small slds-text-neutral-7" style={{ width: '24px', height: '24px' }}
                                 title="Edit Default Reconciliation Rule"
                               >
-                                <Pencil className="w-3 h-3" />
+                                <Pencil className="slds-icon-size_xx-small" />
                               </button>
                             </div>
                           </button>
@@ -1326,10 +1327,10 @@ export default function IdentityResolutionContent({ demoSession, onDemoSessionCh
                             <table className="sf-table">
                               <thead>
                                 <tr>
-                                  <th className="w-10"></th>
+                                  <th style={{ width: '40px' }}></th>
                                   <th>Field</th>
                                   <th>Reconciliation Rule</th>
-                                  <th className="w-24 text-center">Using Default?</th>
+                                  <th className="slds-text-center" style={{ width: '96px' }}>Using Default?</th>
                                 </tr>
                               </thead>
                               <tbody>
@@ -1340,7 +1341,7 @@ export default function IdentityResolutionContent({ demoSession, onDemoSessionCh
                                         type="checkbox"
                                         checked={selectedReconFields.has(field.id)}
                                         onChange={() => toggleReconFieldSelection(field.id)}
-                                        className="w-4 h-4 rounded border-slds-border-1"
+                                        className="slds-icon-size_small slds-border-radius_small slds-border-color_border-1"
                                       />
                                     </td>
                                     <td>
@@ -1349,8 +1350,8 @@ export default function IdentityResolutionContent({ demoSession, onDemoSessionCh
                                       </button>
                                     </td>
                                     <td>{field.reconciliationRule}</td>
-                                    <td className="text-center">
-                                      {field.usingDefault && <Check className="w-4 h-4 text-slds-success-1 mx-auto" />}
+                                    <td className="slds-text-center">
+                                      {field.usingDefault && <Check className="slds-icon-size_small slds-text-success" style={{ margin: '0 auto' }} />}
                                     </td>
                                   </tr>
                                 ))}
@@ -1365,48 +1366,48 @@ export default function IdentityResolutionContent({ demoSession, onDemoSessionCh
               </div>
 
               {/* Right sidebar — Resolution Summary + Warnings + Feed */}
-              <div className="w-[320px] flex-shrink-0 space-y-4">
+              <div className="slds-flex-shrink-0" style={{ width: '320px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
                 {/* Resolution Summary */}
                 <div className="sf-card">
-                  <div className="px-4 py-3 border-b-2 border-slds-brand">
-                    <h3 className="text-sm font-semibold text-slds-brand">Resolution Summary</h3>
+                  <div className="slds-p-horizontal_medium slds-p-vertical_small slds-border_bottom slds-border-color_brand" style={{ borderBottomWidth: '2px' }}>
+                    <h3 className="slds-text-size_medium slds-font-weight_semibold slds-text-brand">Resolution Summary</h3>
                   </div>
-                  <div className="p-4 space-y-3">
-                    <div className="flex items-center justify-between">
-                      <span className="text-xs text-slds-neutral-7">Total Unified Profiles</span>
-                      <span className="text-sm font-bold text-slds-neutral-base">{fmt(selectedRuleset.totalUnifiedProfiles)}</span>
+                  <div className="slds-p-around_medium" style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                    <div className="slds-flex slds-items-center slds-justify-between">
+                      <span className="slds-text-size_small slds-text-neutral-7">Total Unified Profiles</span>
+                      <span className="slds-text-size_medium slds-font-weight_bold slds-text-neutral-base">{fmt(selectedRuleset.totalUnifiedProfiles)}</span>
                     </div>
-                    <div className="text-xs text-slds-neutral-7">/ {fmt(selectedRuleset.sourceProfiles)} Source Profiles</div>
-                    <div className="flex items-center justify-between">
-                      <span className="text-xs text-slds-neutral-7">Consolidation Rate</span>
-                      <span className="text-sm font-bold text-slds-neutral-base">{selectedRuleset.consolidationRate}%</span>
+                    <div className="slds-text-size_small slds-text-neutral-7">/ {fmt(selectedRuleset.sourceProfiles)} Source Profiles</div>
+                    <div className="slds-flex slds-items-center slds-justify-between">
+                      <span className="slds-text-size_small slds-text-neutral-7">Consolidation Rate</span>
+                      <span className="slds-text-size_medium slds-font-weight_bold slds-text-neutral-base">{selectedRuleset.consolidationRate}%</span>
                     </div>
-                    <div className="flex items-center justify-between">
-                      <span className="text-xs text-slds-neutral-7">Known Unified Profiles</span>
-                      <span className="text-sm font-medium text-slds-neutral-base">{fmt(selectedRuleset.totalUnifiedProfiles)}</span>
+                    <div className="slds-flex slds-items-center slds-justify-between">
+                      <span className="slds-text-size_small slds-text-neutral-7">Known Unified Profiles</span>
+                      <span className="slds-text-size_medium slds-font-weight_medium slds-text-neutral-base">{fmt(selectedRuleset.totalUnifiedProfiles)}</span>
                     </div>
-                    <div className="flex items-center justify-between">
-                      <span className="text-xs text-slds-neutral-7">Anonymous Unified Profiles</span>
-                      <span className="text-sm font-medium text-slds-neutral-base">8</span>
+                    <div className="slds-flex slds-items-center slds-justify-between">
+                      <span className="slds-text-size_small slds-text-neutral-7">Anonymous Unified Profiles</span>
+                      <span className="slds-text-size_medium slds-font-weight_medium slds-text-neutral-base">8</span>
                     </div>
                   </div>
                 </div>
 
                 {/* Warnings */}
                 <div className="sf-card">
-                  <div className="px-4 py-3 border-b border-slds-border-1">
-                    <div className="flex items-center gap-2">
-                      <AlertTriangle className="w-4 h-4 text-[#FFB75D]" />
-                      <h3 className="text-sm font-semibold text-slds-neutral-base">Warnings (2)</h3>
+                  <div className="slds-p-horizontal_medium slds-p-vertical_small slds-border_bottom slds-border-color_border-1">
+                    <div className="slds-flex slds-items-center slds-gap_x-small">
+                      <AlertTriangle className="slds-icon-size_small" style={{ color: '#FFB75D' }} />
+                      <h3 className="slds-text-size_medium slds-font-weight_semibold slds-text-neutral-base">Warnings (2)</h3>
                     </div>
                   </div>
-                  <div className="p-4 space-y-2">
-                    <div className="flex items-start gap-2 text-xs text-slds-neutral-9">
-                      <AlertTriangle className="w-3.5 h-3.5 text-[#FFB75D] flex-shrink-0 mt-0.5" />
+                  <div className="slds-p-around_medium" style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                    <div className="slds-flex slds-items-start slds-gap_x-small slds-text-size_small slds-text-neutral-9">
+                      <AlertTriangle className="slds-icon-size_x-small slds-flex-shrink-0 slds-m-top_xx-small" style={{ color: '#FFB75D' }} />
                       <span>Match rule &ldquo;Unique Identifier 01&rdquo; may produce false positives with non-unique identifiers.</span>
                     </div>
-                    <div className="flex items-start gap-2 text-xs text-slds-neutral-9">
-                      <AlertTriangle className="w-3.5 h-3.5 text-[#FFB75D] flex-shrink-0 mt-0.5" />
+                    <div className="slds-flex slds-items-start slds-gap_x-small slds-text-size_small slds-text-neutral-9">
+                      <AlertTriangle className="slds-icon-size_x-small slds-flex-shrink-0 slds-m-top_xx-small" style={{ color: '#FFB75D' }} />
                       <span>Consolidation rate below 15% — consider reviewing match rules for better coverage.</span>
                     </div>
                   </div>
@@ -1414,28 +1415,29 @@ export default function IdentityResolutionContent({ demoSession, onDemoSessionCh
 
                 {/* Post / Poll / Question feed */}
                 <div className="sf-card">
-                  <div className="flex border-b border-slds-border-1">
+                  <div className="slds-flex slds-border_bottom slds-border-color_border-1">
                     {['Post', 'Poll', 'Question'].map((tab) => (
                       <button
                         key={tab}
-                        className={`px-4 py-2.5 text-xs font-medium border-b-2 transition-colors ${
+                        className={`slds-p-horizontal_medium slds-text-size_small slds-font-weight_medium slds-transition-colors ${
                           tab === 'Post'
-                            ? 'border-slds-brand text-slds-brand'
-                            : 'border-transparent text-slds-neutral-7 hover:text-slds-neutral-9'
+                            ? 'slds-border-color_brand slds-text-brand'
+                            : 'slds-text-neutral-7'
                         }`}
+                        style={{ paddingTop: '10px', paddingBottom: '10px', borderBottomWidth: '2px', borderBottomStyle: 'solid', borderBottomColor: tab === 'Post' ? undefined : 'transparent' }}
                       >
                         {tab}
                       </button>
                     ))}
                   </div>
-                  <div className="p-3">
-                    <div className="flex items-center gap-2">
+                  <div className="slds-p-around_small">
+                    <div className="slds-flex slds-items-center slds-gap_x-small">
                       <input
                         type="text"
                         placeholder="Share an update..."
-                        className="flex-1 px-3 py-1.5 text-xs border border-slds-border-1 rounded focus:outline-none focus:border-slds-brand-2"
+                        className="slds-flex-1 slds-p-horizontal_small slds-text-size_small slds-border_all slds-border-color_border-1 slds-border-radius_small" style={{ paddingTop: '6px', paddingBottom: '6px', outline: 'none' }}
                       />
-                      <button className="px-3 py-1.5 text-xs font-medium text-white bg-slds-brand rounded hover:bg-slds-brand-contrast-1">
+                      <button className="slds-p-horizontal_small slds-text-size_small slds-font-weight_medium slds-text-white slds-bg-brand slds-border-radius_small" style={{ paddingTop: '6px', paddingBottom: '6px' }}>
                         Share
                       </button>
                     </div>
@@ -1447,9 +1449,9 @@ export default function IdentityResolutionContent({ demoSession, onDemoSessionCh
 
           {/* ── RULESET PROPERTIES TAB ── */}
           {detailTab === 'properties' && (
-            <div className="p-6">
+            <div className="slds-p-around_large">
               <div className="sf-card">
-                <div className="sf-card-header"><h2 className="text-sm font-semibold text-slds-neutral-base">Ruleset Configuration</h2></div>
+                <div className="sf-card-header"><h2 className="slds-text-size_medium slds-font-weight_semibold slds-text-neutral-base">Ruleset Configuration</h2></div>
                 <div className="sf-detail-grid">
                   {[
                     ['Ruleset Name', selectedRuleset.rulesetName],
@@ -1471,44 +1473,44 @@ export default function IdentityResolutionContent({ demoSession, onDemoSessionCh
 
           {/* ── PROCESSING HISTORY TAB ── */}
           {detailTab === 'history' && (
-            <div className="p-6 space-y-4">
-              <p className="text-sm text-slds-neutral-9">
+            <div className="slds-p-around_large" style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+              <p className="slds-text-size_medium slds-text-neutral-9">
                 Daily summaries contain the aggregate results of all runs of this ruleset from a single date.
               </p>
-              <div className="flex items-center justify-end gap-2 text-xs text-slds-neutral-7">
-                <Info className="w-3.5 h-3.5" />
+              <div className="slds-flex slds-items-center slds-justify-end slds-gap_x-small slds-text-size_small slds-text-neutral-7">
+                <Info className="slds-icon-size_x-small" />
                 <span>Automatic runs:</span>
-                <span className="font-medium text-slds-neutral-9">{selectedRuleset.isScheduled ? 'Enabled' : 'Disabled'}</span>
+                <span className="slds-font-weight_medium slds-text-neutral-9">{selectedRuleset.isScheduled ? 'Enabled' : 'Disabled'}</span>
               </div>
               <div className="sf-card">
                 <div className="sf-card-header">
-                  <h2 className="text-sm font-semibold text-slds-neutral-base">Daily Processing Summary</h2>
+                  <h2 className="slds-text-size_medium slds-font-weight_semibold slds-text-neutral-base">Daily Processing Summary</h2>
                 </div>
                 {selectedRuleset.processingHistory.length === 0 ? (
-                  <div className="sf-card-body text-center py-12">
-                    <Clock className="w-8 h-8 text-slds-neutral-7 mx-auto mb-2" />
-                    <p className="text-sm text-slds-neutral-7">No processing history available</p>
+                  <div className="sf-card-body slds-text-center slds-p-vertical_x-large" style={{ paddingTop: '48px', paddingBottom: '48px' }}>
+                    <Clock className="slds-text-neutral-7 slds-m-bottom_x-small" style={{ width: '32px', height: '32px', margin: '0 auto 8px' }} />
+                    <p className="slds-text-size_medium slds-text-neutral-7">No processing history available</p>
                   </div>
                 ) : (
-                  <div className="overflow-x-auto">
+                  <div className="slds-overflow-x-auto">
                     <table className="sf-table">
                       <thead>
                         <tr>
-                          <th className="w-12"></th>
-                          <th><div className="flex items-center gap-1">Date <ChevronDown className="w-3 h-3" /></div></th>
-                          <th><div className="flex items-center gap-1">Total Source P... <ChevronDown className="w-3 h-3" /></div></th>
-                          <th><div className="flex items-center gap-1">Total Unified P... <ChevronDown className="w-3 h-3" /></div></th>
-                          <th><div className="flex items-center gap-1">Total Known P... <ChevronDown className="w-3 h-3" /></div></th>
-                          <th><div className="flex items-center gap-1">Consolidation ... <ChevronDown className="w-3 h-3" /></div></th>
-                          <th><div className="flex items-center gap-1">Total Unknow... <ChevronDown className="w-3 h-3" /></div></th>
-                          <th><div className="flex items-center gap-1">Processed Re... <ChevronDown className="w-3 h-3" /></div></th>
-                          <th><div className="flex items-center gap-1">Aggregate Sta... <ChevronDown className="w-3 h-3" /></div></th>
+                          <th style={{ width: '48px' }}></th>
+                          <th><div className="slds-flex slds-items-center slds-gap_xx-small">Date <ChevronDown className="slds-icon-size_xx-small" /></div></th>
+                          <th><div className="slds-flex slds-items-center slds-gap_xx-small">Total Source P... <ChevronDown className="slds-icon-size_xx-small" /></div></th>
+                          <th><div className="slds-flex slds-items-center slds-gap_xx-small">Total Unified P... <ChevronDown className="slds-icon-size_xx-small" /></div></th>
+                          <th><div className="slds-flex slds-items-center slds-gap_xx-small">Total Known P... <ChevronDown className="slds-icon-size_xx-small" /></div></th>
+                          <th><div className="slds-flex slds-items-center slds-gap_xx-small">Consolidation ... <ChevronDown className="slds-icon-size_xx-small" /></div></th>
+                          <th><div className="slds-flex slds-items-center slds-gap_xx-small">Total Unknow... <ChevronDown className="slds-icon-size_xx-small" /></div></th>
+                          <th><div className="slds-flex slds-items-center slds-gap_xx-small">Processed Re... <ChevronDown className="slds-icon-size_xx-small" /></div></th>
+                          <th><div className="slds-flex slds-items-center slds-gap_xx-small">Aggregate Sta... <ChevronDown className="slds-icon-size_xx-small" /></div></th>
                         </tr>
                       </thead>
                       <tbody>
                         {selectedRuleset.processingHistory.map((entry) => (
                           <tr key={entry.id}>
-                            <td className="text-center text-slds-neutral-7">{entry.rowNum}</td>
+                            <td className="slds-text-center slds-text-neutral-7">{entry.rowNum}</td>
                             <td>{entry.date}</td>
                             <td>{fmt(entry.totalSourceProfiles)}</td>
                             <td>{fmt(entry.totalUnifiedProfiles)}</td>
@@ -1517,8 +1519,8 @@ export default function IdentityResolutionContent({ demoSession, onDemoSessionCh
                             <td>{entry.totalUnknown}</td>
                             <td>{fmt(entry.processedRecords)}</td>
                             <td>
-                              <div className="flex items-center gap-1.5">
-                                <AlertTriangle className="w-3.5 h-3.5 text-[#B7791F]" />
+                              <div className="slds-flex slds-items-center slds-gap_xx-small">
+                                <AlertTriangle className="slds-icon-size_x-small" style={{ color: '#B7791F' }} />
                                 <span>{entry.aggregateStatus}</span>
                               </div>
                             </td>
@@ -1537,33 +1539,33 @@ export default function IdentityResolutionContent({ demoSession, onDemoSessionCh
             MODAL: Edit Match Rules (Instructions → Rules list)
            ═══════════════════════════════════════════════════════════ */}
         {editMatchRulesOpen && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center">
-            <div className="absolute inset-0 bg-black/40" onClick={() => setEditMatchRulesOpen(false)} />
-            <div className="relative bg-white rounded-lg shadow-2xl w-[760px] max-h-[85vh] flex flex-col">
-              <div className="flex items-center justify-between px-6 py-4 border-b border-slds-border-1">
-                <h2 className="text-base font-semibold text-slds-neutral-base">
+          <div className="slds-pos-fixed slds-inset-0 slds-z-50 slds-flex slds-items-center slds-justify-center">
+            <div className="slds-pos-absolute slds-inset-0" style={{ backgroundColor: 'rgba(0,0,0,0.4)' }} onClick={() => setEditMatchRulesOpen(false)} />
+            <div className="slds-pos-relative slds-bg-white slds-border-radius_large slds-shadow_large slds-flex slds-flex-col" style={{ width: '760px', maxHeight: '85vh' }}>
+              <div className="slds-flex slds-items-center slds-justify-between slds-p-horizontal_large slds-p-vertical_medium slds-border_bottom slds-border-color_border-1">
+                <h2 className="slds-text-size_large slds-font-weight_semibold slds-text-neutral-base">
                   {matchRulesStep === 'instructions' ? 'Match Rule Instructions' : 'Edit Match Rules'}
                 </h2>
-                <button onClick={() => setEditMatchRulesOpen(false)} className="w-7 h-7 flex items-center justify-center rounded hover:bg-slds-neutral-2 text-slds-neutral-7">
-                  <X className="w-4 h-4" />
+                <button onClick={() => setEditMatchRulesOpen(false)} className="slds-flex slds-items-center slds-justify-center slds-border-radius_small slds-hover-bg-neutral-2 slds-text-neutral-7" style={{ width: '28px', height: '28px' }}>
+                  <X className="slds-icon-size_small" />
                 </button>
               </div>
-              <div className="flex-1 overflow-y-auto px-6 py-5">
+              <div className="slds-flex-1 slds-overflow-y-auto slds-p-horizontal_large" style={{ paddingTop: '20px', paddingBottom: '20px' }}>
                 {matchRulesStep === 'instructions' ? (
-                  <div className="flex items-start gap-3 p-4 bg-[#E1F5FE] rounded-lg">
-                    <Info className="w-5 h-5 text-slds-brand flex-shrink-0 mt-0.5" />
-                    <div className="text-sm text-slds-neutral-9 leading-relaxed space-y-3">
-                      <p className="font-semibold text-slds-neutral-base">How Match Rules Work</p>
+                  <div className="slds-flex slds-items-start slds-gap_small slds-p-around_medium slds-border-radius_large" style={{ backgroundColor: '#E1F5FE' }}>
+                    <Info className="slds-icon-size_default slds-text-brand slds-flex-shrink-0 slds-m-top_xx-small" />
+                    <div className="slds-text-size_medium slds-text-neutral-9 slds-leading-relaxed" style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                      <p className="slds-font-weight_semibold slds-text-neutral-base">How Match Rules Work</p>
                       <p>Match rules define how source profiles are compared and grouped into unified profiles. Rules are evaluated in priority order.</p>
                       <p>Each match rule specifies:</p>
-                      <ul className="list-disc ml-4 space-y-1">
+                      <ul className="slds-m-left_medium" style={{ listStyleType: 'disc', display: 'flex', flexDirection: 'column', gap: '4px' }}>
                         <li><strong>Match Fields</strong> — The fields used to compare source profiles.</li>
                         <li><strong>Match Type</strong> — Whether the comparison is Exact, Fuzzy, or Normalized.</li>
                         <li><strong>Priority</strong> — The order in which rules are evaluated.</li>
                       </ul>
-                      <div className="mt-2 p-3 bg-white rounded border border-slds-border-2">
-                        <p className="text-xs font-semibold text-slds-neutral-base mb-1">Best Practices</p>
-                        <ul className="text-xs space-y-1 text-slds-neutral-9">
+                      <div className="slds-m-top_x-small slds-p-around_small slds-bg-white slds-border-radius_small slds-border_all slds-border-color_border-2">
+                        <p className="slds-text-size_small slds-font-weight_semibold slds-text-neutral-base slds-m-bottom_xx-small">Best Practices</p>
+                        <ul className="slds-text-size_small slds-text-neutral-9" style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
                           <li>Start with strict (Exact) rules at high priority and add fuzzy rules at lower priority.</li>
                           <li>Use multiple fields in a single rule for more precise matching.</li>
                           <li>Test your rules with a sample batch before running a full job.</li>
@@ -1572,38 +1574,38 @@ export default function IdentityResolutionContent({ demoSession, onDemoSessionCh
                     </div>
                   </div>
                 ) : (
-                  <div className="space-y-4">
-                    <div className="flex items-center justify-between">
-                      <p className="text-sm text-slds-neutral-9">{localMatchRules.length} match rule{localMatchRules.length !== 1 ? 's' : ''} configured.</p>
-                      <button onClick={handleAddNewMatchRule} className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-white bg-slds-brand rounded hover:bg-slds-brand-contrast-1 transition-colors">
-                        <Plus className="w-3.5 h-3.5" /> Add Rule
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                    <div className="slds-flex slds-items-center slds-justify-between">
+                      <p className="slds-text-size_medium slds-text-neutral-9">{localMatchRules.length} match rule{localMatchRules.length !== 1 ? 's' : ''} configured.</p>
+                      <button onClick={handleAddNewMatchRule} className="slds-flex slds-items-center slds-gap_xx-small slds-p-horizontal_small slds-text-size_small slds-font-weight_medium slds-text-white slds-bg-brand slds-border-radius_small slds-transition-colors" style={{ paddingTop: '6px', paddingBottom: '6px' }}>
+                        <Plus className="slds-icon-size_x-small" /> Add Rule
                       </button>
                     </div>
                     {localMatchRules.length === 0 ? (
-                      <div className="text-center py-12 text-sm text-slds-neutral-7">No match rules configured yet.</div>
+                      <div className="slds-text-center slds-text-size_medium slds-text-neutral-7" style={{ paddingTop: '48px', paddingBottom: '48px' }}>No match rules configured yet.</div>
                     ) : (
                       <table className="sf-table">
-                        <thead><tr><th className="w-8"></th><th>Priority</th><th>Rule Name</th><th>Criteria</th><th className="w-28">Actions</th></tr></thead>
+                        <thead><tr><th style={{ width: '32px' }}></th><th>Priority</th><th>Rule Name</th><th>Criteria</th><th style={{ width: '112px' }}>Actions</th></tr></thead>
                         <tbody>
                           {localMatchRules.map((rule) => (
                             <tr key={rule.id}>
-                              <td><GripVertical className="w-4 h-4 text-slds-neutral-7 cursor-grab" /></td>
-                              <td className="font-medium">{rule.priority}</td>
-                              <td className="sf-link cursor-pointer" onClick={() => handleConfigureRule(rule)}>{rule.ruleName}</td>
+                              <td><GripVertical className="slds-icon-size_small slds-text-neutral-7 slds-cursor-pointer" /></td>
+                              <td className="slds-font-weight_medium">{rule.priority}</td>
+                              <td className="sf-link slds-cursor-pointer" onClick={() => handleConfigureRule(rule)}>{rule.ruleName}</td>
                               <td>
-                                <div className="flex flex-wrap gap-1">
+                                <div className="slds-flex slds-flex-wrap slds-gap_xx-small">
                                   {rule.criteria.map((c) => (
                                     <span key={c.id} className="sf-badge sf-badge-info">{c.field || 'Unconfigured'}</span>
                                   ))}
                                 </div>
                               </td>
                               <td>
-                                <div className="flex items-center gap-1">
-                                  <button onClick={() => handleConfigureRule(rule)} className="w-7 h-7 flex items-center justify-center rounded hover:bg-slds-neutral-2 text-slds-neutral-7 hover:text-slds-brand" title="Configure">
-                                    <Edit3 className="w-3.5 h-3.5" />
+                                <div className="slds-flex slds-items-center slds-gap_xx-small">
+                                  <button onClick={() => handleConfigureRule(rule)} className="slds-flex slds-items-center slds-justify-center slds-border-radius_small slds-hover-bg-neutral-2 slds-text-neutral-7" style={{ width: '28px', height: '28px' }} title="Configure">
+                                    <Edit3 className="slds-icon-size_x-small" />
                                   </button>
-                                  <button onClick={() => handleDeleteMatchRule(rule.id)} className="w-7 h-7 flex items-center justify-center rounded hover:bg-[#FDE8E8] text-slds-neutral-7 hover:text-slds-error-1" title="Delete">
-                                    <Trash2 className="w-3.5 h-3.5" />
+                                  <button onClick={() => handleDeleteMatchRule(rule.id)} className="slds-flex slds-items-center slds-justify-center slds-border-radius_small slds-text-neutral-7" style={{ width: '28px', height: '28px' }} title="Delete">
+                                    <Trash2 className="slds-icon-size_x-small" />
                                   </button>
                                 </div>
                               </td>
@@ -1615,16 +1617,16 @@ export default function IdentityResolutionContent({ demoSession, onDemoSessionCh
                   </div>
                 )}
               </div>
-              <div className="flex items-center justify-end gap-3 px-6 py-4 border-t border-slds-border-1">
+              <div className="slds-flex slds-items-center slds-justify-end slds-gap_small slds-p-horizontal_large slds-p-vertical_medium slds-border_top slds-border-color_border-1">
                 {matchRulesStep === 'instructions' ? (
                   <>
-                    <button onClick={() => setEditMatchRulesOpen(false)} className="px-4 py-2 text-sm font-medium text-slds-neutral-9 border border-slds-border-1 rounded hover:bg-slds-neutral-2">Cancel</button>
-                    <button onClick={() => setMatchRulesStep('rules')} className="px-4 py-2 text-sm font-medium text-white bg-slds-brand rounded hover:bg-slds-brand-contrast-1">Continue</button>
+                    <button onClick={() => setEditMatchRulesOpen(false)} className="slds-p-horizontal_medium slds-p-vertical_x-small slds-text-size_medium slds-font-weight_medium slds-text-neutral-9 slds-border_all slds-border-color_border-1 slds-border-radius_small slds-hover-bg-neutral-2">Cancel</button>
+                    <button onClick={() => setMatchRulesStep('rules')} className="slds-p-horizontal_medium slds-p-vertical_x-small slds-text-size_medium slds-font-weight_medium slds-text-white slds-bg-brand slds-border-radius_small">Continue</button>
                   </>
                 ) : (
                   <>
-                    <button onClick={() => setMatchRulesStep('instructions')} className="px-4 py-2 text-sm font-medium text-slds-neutral-9 border border-slds-border-1 rounded hover:bg-slds-neutral-2">Back</button>
-                    <button onClick={handleSaveMatchRules} className="px-4 py-2 text-sm font-medium text-white bg-slds-brand rounded hover:bg-slds-brand-contrast-1">Save Match Rules</button>
+                    <button onClick={() => setMatchRulesStep('instructions')} className="slds-p-horizontal_medium slds-p-vertical_x-small slds-text-size_medium slds-font-weight_medium slds-text-neutral-9 slds-border_all slds-border-color_border-1 slds-border-radius_small slds-hover-bg-neutral-2">Back</button>
+                    <button onClick={handleSaveMatchRules} className="slds-p-horizontal_medium slds-p-vertical_x-small slds-text-size_medium slds-font-weight_medium slds-text-white slds-bg-brand slds-border-radius_small">Save Match Rules</button>
                   </>
                 )}
               </div>
@@ -1636,42 +1638,42 @@ export default function IdentityResolutionContent({ demoSession, onDemoSessionCh
             MODAL: Configure Match Criteria
            ═══════════════════════════════════════════════════════════ */}
         {configureRuleOpen && editingRule && (
-          <div className="fixed inset-0 z-[60] flex items-center justify-center">
-            <div className="absolute inset-0 bg-black/40" onClick={() => setConfigureRuleOpen(false)} />
-            <div className="relative bg-white rounded-lg shadow-2xl w-[820px] max-h-[85vh] flex flex-col">
-              <div className="flex items-center justify-between px-6 py-4 border-b border-slds-border-1">
-                <h2 className="text-base font-semibold text-slds-neutral-base">Configure Match Criteria</h2>
-                <button onClick={() => setConfigureRuleOpen(false)} className="w-7 h-7 flex items-center justify-center rounded hover:bg-slds-neutral-2 text-slds-neutral-7">
-                  <X className="w-4 h-4" />
+          <div className="slds-pos-fixed slds-inset-0 slds-flex slds-items-center slds-justify-center" style={{ zIndex: 60 }}>
+            <div className="slds-pos-absolute slds-inset-0" style={{ backgroundColor: 'rgba(0,0,0,0.4)' }} onClick={() => setConfigureRuleOpen(false)} />
+            <div className="slds-pos-relative slds-bg-white slds-border-radius_large slds-shadow_large slds-flex slds-flex-col" style={{ width: '820px', maxHeight: '85vh' }}>
+              <div className="slds-flex slds-items-center slds-justify-between slds-p-horizontal_large slds-p-vertical_medium slds-border_bottom slds-border-color_border-1">
+                <h2 className="slds-text-size_large slds-font-weight_semibold slds-text-neutral-base">Configure Match Criteria</h2>
+                <button onClick={() => setConfigureRuleOpen(false)} className="slds-flex slds-items-center slds-justify-center slds-border-radius_small slds-hover-bg-neutral-2 slds-text-neutral-7" style={{ width: '28px', height: '28px' }}>
+                  <X className="slds-icon-size_small" />
                 </button>
               </div>
-              <div className="flex-1 overflow-y-auto px-6 py-5 space-y-5">
-                <p className="text-sm text-slds-neutral-9">
+              <div className="slds-flex-1 slds-overflow-y-auto slds-p-horizontal_large" style={{ paddingTop: '20px', paddingBottom: '20px', display: 'flex', flexDirection: 'column', gap: '20px' }}>
+                <p className="slds-text-size_medium slds-text-neutral-9">
                   Configure at least one match criterion. Values in the specified fields will be compared for matches.
                 </p>
                 {/* Rule Name */}
                 <div>
-                  <label className="block text-xs font-medium text-slds-neutral-7 uppercase tracking-wide mb-1">Match Rule Name</label>
+                  <label className="slds-text-size_small slds-font-weight_medium slds-text-neutral-7 slds-text-uppercase slds-tracking-wide slds-m-bottom_xx-small" style={{ display: 'block' }}>Match Rule Name</label>
                   <input
                     type="text"
                     value={editingRule.ruleName}
                     onChange={(e) => setEditingRule({ ...editingRule, ruleName: e.target.value })}
                     placeholder="e.g., Fuzzy Name and Normalized Email"
-                    className="w-full px-3 py-2 text-sm border border-slds-border-1 rounded focus:outline-none focus:border-slds-brand-2 focus:ring-2 focus:ring-[rgba(27,150,255,0.2)]"
+                    className="slds-w-full slds-p-horizontal_small slds-p-vertical_x-small slds-text-size_medium slds-border_all slds-border-color_border-1 slds-border-radius_small" style={{ outline: 'none' }}
                   />
                 </div>
                 {/* Match Criteria table */}
                 <div>
-                  <label className="block text-xs font-medium text-slds-neutral-7 uppercase tracking-wide mb-2">Match Criteria</label>
-                  <div className="border border-slds-border-1 rounded overflow-hidden">
+                  <label className="slds-text-size_small slds-font-weight_medium slds-text-neutral-7 slds-text-uppercase slds-tracking-wide slds-m-bottom_x-small" style={{ display: 'block' }}>Match Criteria</label>
+                  <div className="slds-border_all slds-border-color_border-1 slds-border-radius_small slds-overflow-hidden">
                     <table className="sf-table">
                       <thead>
                         <tr>
                           <th>Data Model Object</th>
                           <th>Field</th>
                           <th>Match Method</th>
-                          <th className="w-28">Advanced Settings</th>
-                          <th className="w-10"></th>
+                          <th style={{ width: '112px' }}>Advanced Settings</th>
+                          <th style={{ width: '40px' }}></th>
                         </tr>
                       </thead>
                       <tbody>
@@ -1681,7 +1683,7 @@ export default function IdentityResolutionContent({ demoSession, onDemoSessionCh
                               <select
                                 value={criterion.dataModelObject}
                                 onChange={(e) => updateCriterion(criterion.id, { dataModelObject: e.target.value, field: '' })}
-                                className="w-full px-2 py-1.5 text-xs border border-slds-border-1 rounded bg-white focus:outline-none focus:border-slds-brand-2"
+                                className="slds-w-full slds-p-horizontal_x-small slds-text-size_small slds-border_all slds-border-color_border-1 slds-border-radius_small slds-bg-white" style={{ paddingTop: '6px', paddingBottom: '6px', outline: 'none' }}
                               >
                                 <option value="">Select...</option>
                                 {dataModelObjects.map((dmo) => (
@@ -1693,7 +1695,7 @@ export default function IdentityResolutionContent({ demoSession, onDemoSessionCh
                               <select
                                 value={criterion.field}
                                 onChange={(e) => updateCriterion(criterion.id, { field: e.target.value })}
-                                className="w-full px-2 py-1.5 text-xs border border-slds-border-1 rounded bg-white focus:outline-none focus:border-slds-brand-2"
+                                className="slds-w-full slds-p-horizontal_x-small slds-text-size_small slds-border_all slds-border-color_border-1 slds-border-radius_small slds-bg-white" style={{ paddingTop: '6px', paddingBottom: '6px', outline: 'none' }}
                                 disabled={!criterion.dataModelObject}
                               >
                                 <option value="">Select...</option>
@@ -1706,7 +1708,7 @@ export default function IdentityResolutionContent({ demoSession, onDemoSessionCh
                               <select
                                 value={criterion.matchMethod}
                                 onChange={(e) => updateCriterion(criterion.id, { matchMethod: e.target.value })}
-                                className="w-full px-2 py-1.5 text-xs border border-slds-border-1 rounded bg-white focus:outline-none focus:border-slds-brand-2"
+                                className="slds-w-full slds-p-horizontal_x-small slds-text-size_small slds-border_all slds-border-color_border-1 slds-border-radius_small slds-bg-white" style={{ paddingTop: '6px', paddingBottom: '6px', outline: 'none' }}
                               >
                                 <option value="">Select...</option>
                                 {matchMethods.map((m) => (
@@ -1714,18 +1716,18 @@ export default function IdentityResolutionContent({ demoSession, onDemoSessionCh
                                 ))}
                               </select>
                             </td>
-                            <td className="text-center">
+                            <td className="slds-text-center">
                               <button
                                 onClick={() => handleOpenAdvanced(criterion.id)}
-                                className="text-xs text-slds-brand hover:underline"
+                                className="slds-text-size_small slds-text-brand sf-hover-underline"
                               >
                                 Configure
                               </button>
                             </td>
                             <td>
                               {editingRule.criteria.length > 1 && (
-                                <button onClick={() => handleDeleteCriterion(criterion.id)} className="w-7 h-7 flex items-center justify-center rounded hover:bg-[#FDE8E8] text-slds-neutral-7 hover:text-slds-error-1">
-                                  <Trash2 className="w-3.5 h-3.5" />
+                                <button onClick={() => handleDeleteCriterion(criterion.id)} className="slds-flex slds-items-center slds-justify-center slds-border-radius_small slds-text-neutral-7" style={{ width: '28px', height: '28px' }}>
+                                  <Trash2 className="slds-icon-size_x-small" />
                                 </button>
                               )}
                             </td>
@@ -1734,17 +1736,17 @@ export default function IdentityResolutionContent({ demoSession, onDemoSessionCh
                       </tbody>
                     </table>
                   </div>
-                  <button onClick={handleAddCriterion} className="flex items-center gap-1 mt-3 text-xs font-medium text-slds-brand hover:underline">
-                    <Plus className="w-3.5 h-3.5" /> Add Criteria
+                  <button onClick={handleAddCriterion} className="slds-flex slds-items-center slds-gap_xx-small slds-m-top_small slds-text-size_small slds-font-weight_medium slds-text-brand sf-hover-underline">
+                    <Plus className="slds-icon-size_x-small" /> Add Criteria
                   </button>
                 </div>
               </div>
-              <div className="flex items-center justify-end gap-3 px-6 py-4 border-t border-slds-border-1">
-                <button onClick={() => setConfigureRuleOpen(false)} className="px-4 py-2 text-sm font-medium text-slds-neutral-9 border border-slds-border-1 rounded hover:bg-slds-neutral-2">Cancel</button>
+              <div className="slds-flex slds-items-center slds-justify-end slds-gap_small slds-p-horizontal_large slds-p-vertical_medium slds-border_top slds-border-color_border-1">
+                <button onClick={() => setConfigureRuleOpen(false)} className="slds-p-horizontal_medium slds-p-vertical_x-small slds-text-size_medium slds-font-weight_medium slds-text-neutral-9 slds-border_all slds-border-color_border-1 slds-border-radius_small slds-hover-bg-neutral-2">Cancel</button>
                 <button
                   onClick={handleSaveConfiguredRule}
                   disabled={!editingRule.ruleName.trim() || editingRule.criteria.every((c) => !c.field)}
-                  className="px-4 py-2 text-sm font-medium text-white bg-slds-brand rounded hover:bg-slds-brand-contrast-1 disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="slds-p-horizontal_medium slds-p-vertical_x-small slds-text-size_medium slds-font-weight_medium slds-text-white slds-bg-brand slds-border-radius_small slds-opacity_50 slds-cursor-not-allowed" style={{ opacity: (!editingRule.ruleName.trim() || editingRule.criteria.every((c) => !c.field)) ? 0.5 : 1, cursor: (!editingRule.ruleName.trim() || editingRule.criteria.every((c) => !c.field)) ? 'not-allowed' : 'pointer' }}
                 >
                   Next
                 </button>
@@ -1757,38 +1759,38 @@ export default function IdentityResolutionContent({ demoSession, onDemoSessionCh
             MODAL: Advanced Match Criteria Settings
            ═══════════════════════════════════════════════════════════ */}
         {advancedSettingsOpen && advancedCriterion && (
-          <div className="fixed inset-0 z-[70] flex items-center justify-center">
-            <div className="absolute inset-0 bg-black/40" onClick={() => setAdvancedSettingsOpen(false)} />
-            <div className="relative bg-white rounded-lg shadow-2xl w-[640px] max-h-[80vh] flex flex-col">
-              <div className="flex items-center justify-between px-6 py-4 border-b border-slds-border-1">
-                <h2 className="text-base font-semibold text-slds-neutral-base">Advanced Match Criteria Settings</h2>
-                <button onClick={() => setAdvancedSettingsOpen(false)} className="w-7 h-7 flex items-center justify-center rounded hover:bg-slds-neutral-2 text-slds-neutral-7">
-                  <X className="w-4 h-4" />
+          <div className="slds-pos-fixed slds-inset-0 slds-flex slds-items-center slds-justify-center" style={{ zIndex: 70 }}>
+            <div className="slds-pos-absolute slds-inset-0" style={{ backgroundColor: 'rgba(0,0,0,0.4)' }} onClick={() => setAdvancedSettingsOpen(false)} />
+            <div className="slds-pos-relative slds-bg-white slds-border-radius_large slds-shadow_large slds-flex slds-flex-col" style={{ width: '640px', maxHeight: '80vh' }}>
+              <div className="slds-flex slds-items-center slds-justify-between slds-p-horizontal_large slds-p-vertical_medium slds-border_bottom slds-border-color_border-1">
+                <h2 className="slds-text-size_large slds-font-weight_semibold slds-text-neutral-base">Advanced Match Criteria Settings</h2>
+                <button onClick={() => setAdvancedSettingsOpen(false)} className="slds-flex slds-items-center slds-justify-center slds-border-radius_small slds-hover-bg-neutral-2 slds-text-neutral-7" style={{ width: '28px', height: '28px' }}>
+                  <X className="slds-icon-size_small" />
                 </button>
               </div>
-              <div className="flex-1 overflow-y-auto px-6 py-5 space-y-6">
+              <div className="slds-flex-1 slds-overflow-y-auto slds-p-horizontal_large" style={{ paddingTop: '20px', paddingBottom: '20px', display: 'flex', flexDirection: 'column', gap: '24px' }}>
                 {/* Cross-Field Match Settings */}
                 <div>
-                  <h3 className="text-sm font-semibold text-slds-neutral-base mb-3">Cross-Field Match Settings</h3>
-                  <div className="border border-slds-border-1 rounded overflow-hidden">
+                  <h3 className="slds-text-size_medium slds-font-weight_semibold slds-text-neutral-base slds-m-bottom_small">Cross-Field Match Settings</h3>
+                  <div className="slds-border_all slds-border-color_border-1 slds-border-radius_small slds-overflow-hidden">
                     <table className="sf-table">
                       <thead>
                         <tr><th></th><th>Data Model Object</th><th>Match Field</th><th>Scheduled Match Method</th></tr>
                       </thead>
                       <tbody>
                         <tr>
-                          <td className="text-xs font-medium text-slds-neutral-7">Primary DMO</td>
-                          <td className="text-xs text-slds-neutral-9">{advancedCriterion.dataModelObject || '—'}</td>
-                          <td className="text-xs text-slds-neutral-9">{advancedCriterion.field || '—'}</td>
-                          <td className="text-xs text-slds-neutral-9">{advancedCriterion.matchMethod || '—'}</td>
+                          <td className="slds-text-size_small slds-font-weight_medium slds-text-neutral-7">Primary DMO</td>
+                          <td className="slds-text-size_small slds-text-neutral-9">{advancedCriterion.dataModelObject || '—'}</td>
+                          <td className="slds-text-size_small slds-text-neutral-9">{advancedCriterion.field || '—'}</td>
+                          <td className="slds-text-size_small slds-text-neutral-9">{advancedCriterion.matchMethod || '—'}</td>
                         </tr>
                         <tr>
-                          <td className="text-xs font-medium text-slds-neutral-7">Match to Individual</td>
+                          <td className="slds-text-size_small slds-font-weight_medium slds-text-neutral-7">Match to Individual</td>
                           <td>
                             <select
                               value={advancedCriterion.crossFieldDMO}
                               onChange={(e) => updateCriterion(advancedCriterion.id, { crossFieldDMO: e.target.value, crossFieldMatchField: '' })}
-                              className="w-full px-2 py-1.5 text-xs border border-slds-border-1 rounded bg-white"
+                              className="slds-w-full slds-p-horizontal_x-small slds-text-size_small slds-border_all slds-border-color_border-1 slds-border-radius_small slds-bg-white" style={{ paddingTop: '6px', paddingBottom: '6px' }}
                             >
                               <option value="">Select...</option>
                               {dataModelObjects.map((dmo) => (
@@ -1800,7 +1802,7 @@ export default function IdentityResolutionContent({ demoSession, onDemoSessionCh
                             <select
                               value={advancedCriterion.crossFieldMatchField}
                               onChange={(e) => updateCriterion(advancedCriterion.id, { crossFieldMatchField: e.target.value })}
-                              className="w-full px-2 py-1.5 text-xs border border-slds-border-1 rounded bg-white"
+                              className="slds-w-full slds-p-horizontal_x-small slds-text-size_small slds-border_all slds-border-color_border-1 slds-border-radius_small slds-bg-white" style={{ paddingTop: '6px', paddingBottom: '6px' }}
                               disabled={!advancedCriterion.crossFieldDMO}
                             >
                               <option value="">Select...</option>
@@ -1817,34 +1819,34 @@ export default function IdentityResolutionContent({ demoSession, onDemoSessionCh
                 </div>
                 {/* Match Method Refinements */}
                 <div>
-                  <h3 className="text-sm font-semibold text-slds-neutral-base mb-3">Match Method Refinements</h3>
-                  <div className="space-y-3">
-                    <label className="flex items-center gap-3 cursor-pointer">
+                  <h3 className="slds-text-size_medium slds-font-weight_semibold slds-text-neutral-base slds-m-bottom_small">Match Method Refinements</h3>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                    <label className="slds-flex slds-items-center slds-gap_small slds-cursor-pointer">
                       <input
                         type="checkbox"
                         checked={advancedCriterion.matchOnBlank}
                         onChange={(e) => updateCriterion(advancedCriterion.id, { matchOnBlank: e.target.checked })}
-                        className="w-4 h-4 rounded border-slds-border-1"
+                        className="slds-icon-size_small slds-border-radius_small slds-border-color_border-1"
                       />
-                      <span className="text-sm text-slds-neutral-base">Match on Blank</span>
-                      <Info className="w-3.5 h-3.5 text-slds-neutral-7" />
+                      <span className="slds-text-size_medium slds-text-neutral-base">Match on Blank</span>
+                      <Info className="slds-icon-size_x-small slds-text-neutral-7" />
                     </label>
-                    <label className="flex items-center gap-3 cursor-pointer">
+                    <label className="slds-flex slds-items-center slds-gap_small slds-cursor-pointer">
                       <input
                         type="checkbox"
                         checked={advancedCriterion.caseSensitive}
                         onChange={(e) => updateCriterion(advancedCriterion.id, { caseSensitive: e.target.checked })}
-                        className="w-4 h-4 rounded border-slds-border-1"
+                        className="slds-icon-size_small slds-border-radius_small slds-border-color_border-1"
                       />
-                      <span className="text-sm text-slds-neutral-base">Case Sensitive</span>
-                      <Info className="w-3.5 h-3.5 text-slds-neutral-7" />
+                      <span className="slds-text-size_medium slds-text-neutral-base">Case Sensitive</span>
+                      <Info className="slds-icon-size_x-small slds-text-neutral-7" />
                     </label>
                   </div>
                 </div>
               </div>
-              <div className="flex items-center justify-end gap-3 px-6 py-4 border-t border-slds-border-1">
-                <button onClick={() => setAdvancedSettingsOpen(false)} className="px-4 py-2 text-sm font-medium text-slds-neutral-9 border border-slds-border-1 rounded hover:bg-slds-neutral-2">Cancel</button>
-                <button onClick={handleSaveAdvanced} className="px-4 py-2 text-sm font-medium text-white bg-slds-brand rounded hover:bg-slds-brand-contrast-1">Back To Basic Setting</button>
+              <div className="slds-flex slds-items-center slds-justify-end slds-gap_small slds-p-horizontal_large slds-p-vertical_medium slds-border_top slds-border-color_border-1">
+                <button onClick={() => setAdvancedSettingsOpen(false)} className="slds-p-horizontal_medium slds-p-vertical_x-small slds-text-size_medium slds-font-weight_medium slds-text-neutral-9 slds-border_all slds-border-color_border-1 slds-border-radius_small slds-hover-bg-neutral-2">Cancel</button>
+                <button onClick={handleSaveAdvanced} className="slds-p-horizontal_medium slds-p-vertical_x-small slds-text-size_medium slds-font-weight_medium slds-text-white slds-bg-brand slds-border-radius_small">Back To Basic Setting</button>
               </div>
             </div>
           </div>
@@ -1854,66 +1856,67 @@ export default function IdentityResolutionContent({ demoSession, onDemoSessionCh
             MODAL: Edit Reconciliation Rule
            ═══════════════════════════════════════════════════════════ */}
         {editReconRuleOpen && editingReconField && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center">
-            <div className="absolute inset-0 bg-black/40" onClick={() => setEditReconRuleOpen(false)} />
-            <div className="relative bg-white rounded-lg shadow-2xl w-[520px] flex flex-col">
-              <div className="flex items-center justify-between px-6 py-4 border-b border-slds-border-1">
-                <h2 className="text-base font-semibold text-slds-neutral-base">
+          <div className="slds-pos-fixed slds-inset-0 slds-z-50 slds-flex slds-items-center slds-justify-center">
+            <div className="slds-pos-absolute slds-inset-0" style={{ backgroundColor: 'rgba(0,0,0,0.4)' }} onClick={() => setEditReconRuleOpen(false)} />
+            <div className="slds-pos-relative slds-bg-white slds-border-radius_large slds-shadow_large slds-flex slds-flex-col" style={{ width: '520px' }}>
+              <div className="slds-flex slds-items-center slds-justify-between slds-p-horizontal_large slds-p-vertical_medium slds-border_bottom slds-border-color_border-1">
+                <h2 className="slds-text-size_large slds-font-weight_semibold slds-text-neutral-base">
                   Edit Reconciliation Rule for {editingReconField.fieldName}
                 </h2>
-                <button onClick={() => setEditReconRuleOpen(false)} className="w-7 h-7 flex items-center justify-center rounded hover:bg-slds-neutral-2 text-slds-neutral-7">
-                  <X className="w-4 h-4" />
+                <button onClick={() => setEditReconRuleOpen(false)} className="slds-flex slds-items-center slds-justify-center slds-border-radius_small slds-hover-bg-neutral-2 slds-text-neutral-7" style={{ width: '28px', height: '28px' }}>
+                  <X className="slds-icon-size_small" />
                 </button>
               </div>
-              <div className="px-6 py-5 space-y-5">
-                <p className="text-sm text-slds-neutral-9">
+              <div className="slds-p-horizontal_large" style={{ paddingTop: '20px', paddingBottom: '20px', display: 'flex', flexDirection: 'column', gap: '20px' }}>
+                <p className="slds-text-size_medium slds-text-neutral-9">
                   When the default reconciliation rule is enabled, this field inherits the rule set at the DMO level.
                 </p>
                 {/* Default toggle */}
                 <div>
-                  <label className="block text-xs font-medium text-slds-neutral-7 uppercase tracking-wide mb-2">Default Reconciliation Rule</label>
-                  <div className="flex items-center gap-3">
+                  <label className="slds-text-size_small slds-font-weight_medium slds-text-neutral-7 slds-text-uppercase slds-tracking-wide slds-m-bottom_x-small" style={{ display: 'block' }}>Default Reconciliation Rule</label>
+                  <div className="slds-flex slds-items-center slds-gap_small">
                     <button
                       onClick={() => setEditReconUseDefault(!editReconUseDefault)}
-                      className={`relative w-10 h-5 rounded-full transition-colors ${editReconUseDefault ? 'bg-slds-brand' : 'bg-slds-border-1'}`}
+                      className={`slds-pos-relative slds-border-radius_pill slds-transition-colors ${editReconUseDefault ? 'slds-bg-brand' : ''}`}
+                      style={{ width: '40px', height: '20px', backgroundColor: editReconUseDefault ? undefined : 'var(--slds-g-color-border-1)' }}
                     >
-                      <span className={`absolute top-0.5 w-4 h-4 rounded-full bg-white shadow transition-transform ${editReconUseDefault ? 'left-[22px]' : 'left-0.5'}`} />
+                      <span className={`slds-pos-absolute slds-border-radius_pill slds-bg-white slds-shadow_small slds-transition-all`} style={{ top: '2px', width: '16px', height: '16px', left: editReconUseDefault ? '22px' : '2px' }} />
                     </button>
-                    <span className="text-sm text-slds-neutral-base">{editReconUseDefault ? 'Enabled' : 'Disabled'}</span>
+                    <span className="slds-text-size_medium slds-text-neutral-base">{editReconUseDefault ? 'Enabled' : 'Disabled'}</span>
                   </div>
                 </div>
                 {/* Field Reconciliation Rule dropdown */}
                 {!editReconUseDefault && (
                   <div>
-                    <label className="block text-xs font-medium text-slds-neutral-7 uppercase tracking-wide mb-1">Field Reconciliation Rule</label>
-                    <div className="relative">
+                    <label className="slds-text-size_small slds-font-weight_medium slds-text-neutral-7 slds-text-uppercase slds-tracking-wide slds-m-bottom_xx-small" style={{ display: 'block' }}>Field Reconciliation Rule</label>
+                    <div className="slds-pos-relative">
                       <select
                         value={editReconRuleValue}
                         onChange={(e) => setEditReconRuleValue(e.target.value)}
-                        className="w-full px-3 py-2 text-sm border border-slds-border-1 rounded appearance-none bg-white focus:outline-none focus:border-slds-brand-2 focus:ring-2 focus:ring-[rgba(27,150,255,0.2)]"
+                        className="slds-w-full slds-p-horizontal_small slds-p-vertical_x-small slds-text-size_medium slds-border_all slds-border-color_border-1 slds-border-radius_small slds-bg-white" style={{ appearance: 'none', outline: 'none' }}
                       >
                         <option value="Most Recent">Last Updated</option>
                         <option value="Most Frequent">Most Frequent</option>
                         <option value="Source Priority">Source Priority</option>
                       </select>
-                      <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slds-neutral-7 pointer-events-none" />
+                      <ChevronDown className="slds-pos-absolute slds-icon-size_small slds-text-neutral-7" style={{ right: '12px', top: '50%', transform: 'translateY(-50%)', pointerEvents: 'none' }} />
                     </div>
                   </div>
                 )}
                 {/* Ignore Empty Values */}
-                <label className="flex items-center gap-3 cursor-pointer">
+                <label className="slds-flex slds-items-center slds-gap_small slds-cursor-pointer">
                   <input
                     type="checkbox"
                     checked={editReconIgnoreEmpty}
                     onChange={(e) => setEditReconIgnoreEmpty(e.target.checked)}
-                    className="w-4 h-4 rounded border-slds-border-1"
+                    className="slds-icon-size_small slds-border-radius_small slds-border-color_border-1"
                   />
-                  <span className="text-sm text-slds-neutral-base">Ignore Empty Values</span>
+                  <span className="slds-text-size_medium slds-text-neutral-base">Ignore Empty Values</span>
                 </label>
               </div>
-              <div className="flex items-center justify-end gap-3 px-6 py-4 border-t border-slds-border-1">
-                <button onClick={() => setEditReconRuleOpen(false)} className="px-4 py-2 text-sm font-medium text-slds-neutral-9 border border-slds-border-1 rounded hover:bg-slds-neutral-2">Cancel</button>
-                <button onClick={handleSaveReconRule} className="px-4 py-2 text-sm font-medium text-white bg-slds-brand rounded hover:bg-slds-brand-contrast-1">Save</button>
+              <div className="slds-flex slds-items-center slds-justify-end slds-gap_small slds-p-horizontal_large slds-p-vertical_medium slds-border_top slds-border-color_border-1">
+                <button onClick={() => setEditReconRuleOpen(false)} className="slds-p-horizontal_medium slds-p-vertical_x-small slds-text-size_medium slds-font-weight_medium slds-text-neutral-9 slds-border_all slds-border-color_border-1 slds-border-radius_small slds-hover-bg-neutral-2">Cancel</button>
+                <button onClick={handleSaveReconRule} className="slds-p-horizontal_medium slds-p-vertical_x-small slds-text-size_medium slds-font-weight_medium slds-text-white slds-bg-brand slds-border-radius_small">Save</button>
               </div>
             </div>
           </div>
@@ -1932,22 +1935,22 @@ export default function IdentityResolutionContent({ demoSession, onDemoSessionCh
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center h-64">
-        <Loader2 className="w-6 h-6 animate-spin text-slds-brand" />
-        <span className="ml-2 text-sm text-slds-neutral-9">Loading rulesets...</span>
+      <div className="slds-flex slds-items-center slds-justify-center" style={{ height: '256px' }}>
+        <Loader2 className="slds-icon-size_large sf-spin slds-text-brand" />
+        <span className="slds-m-left_x-small slds-text-size_medium slds-text-neutral-9">Loading rulesets...</span>
       </div>
     );
   }
 
   return (
-    <div className="p-6">
-      <div className="flex items-center justify-between mb-4">
+    <div className="slds-p-around_large">
+      <div className="slds-flex slds-items-center slds-justify-between slds-m-bottom_medium">
         <div>
-          <h1 className="text-lg font-bold text-slds-neutral-base">Identity Resolutions</h1>
-          <p className="text-xs text-slds-neutral-7 mt-0.5">Manage rulesets that match and unify source profiles into unified profiles.</p>
+          <h1 className="slds-font-weight_bold slds-text-neutral-base" style={{ fontSize: '18px' }}>Identity Resolutions</h1>
+          <p className="slds-text-size_small slds-text-neutral-7 slds-m-top_xx-small">Manage rulesets that match and unify source profiles into unified profiles.</p>
         </div>
-        <button onClick={handleOpenNewRuleset} className="flex items-center gap-1.5 px-4 py-2 text-sm font-medium text-white bg-slds-brand rounded hover:bg-slds-brand-contrast-1 transition-colors">
-          <Plus className="w-4 h-4" /> New Ruleset
+        <button onClick={handleOpenNewRuleset} className="slds-flex slds-items-center slds-gap_xx-small slds-p-horizontal_medium slds-p-vertical_x-small slds-text-size_medium slds-font-weight_medium slds-text-white slds-bg-brand slds-border-radius_small slds-transition-colors">
+          <Plus className="slds-icon-size_small" /> New Ruleset
         </button>
       </div>
       {is264Release ? (
@@ -1958,8 +1961,8 @@ export default function IdentityResolutionContent({ demoSession, onDemoSessionCh
           if (sessionRulesets.length === 0) {
             return (
               <div className="sf-card">
-                <div className="flex flex-col items-center justify-center py-20 px-6 text-center">
-                  <svg viewBox="0 0 140 100" className="w-32 h-24 mb-6 opacity-30">
+                <div className="slds-flex slds-flex-col slds-items-center slds-justify-center slds-p-horizontal_large slds-text-center" style={{ paddingTop: '80px', paddingBottom: '80px' }}>
+                  <svg viewBox="0 0 140 100" className="slds-m-bottom_large slds-opacity_50" style={{ width: '128px', height: '96px', opacity: 0.3 }}>
                     <defs>
                       <linearGradient id="irEmptyGrad" x1="0%" y1="0%" x2="100%" y2="100%">
                         <stop offset="0%" stopColor="#69B4F0" />
@@ -1972,9 +1975,9 @@ export default function IdentityResolutionContent({ demoSession, onDemoSessionCh
                       salesforce
                     </text>
                   </svg>
-                  <h2 className="text-base font-semibold text-slds-neutral-base mb-2">No Identity Resolution Rulesets</h2>
-                  <p className="text-sm text-slds-neutral-7 max-w-md">
-                    Get started by creating a new ruleset. Use <span className="font-semibold text-[#FF5D2D]">Install from Datakits</span> to set up Informatica MDM identity resolution.
+                  <h2 className="slds-text-size_large slds-font-weight_semibold slds-text-neutral-base slds-m-bottom_x-small">No Identity Resolution Rulesets</h2>
+                  <p className="slds-text-size_medium slds-text-neutral-7" style={{ maxWidth: '28rem' }}>
+                    Get started by creating a new ruleset. Use <span className="slds-font-weight_semibold" style={{ color: '#FF5D2D' }}>Install from Datakits</span> to set up Informatica MDM identity resolution.
                   </p>
                 </div>
               </div>
@@ -1983,11 +1986,11 @@ export default function IdentityResolutionContent({ demoSession, onDemoSessionCh
           return (
             <div className="sf-card">
               <div className="sf-card-header">
-                <h2 className="text-sm font-semibold text-slds-neutral-base">
-                  Identity Resolution Rulesets <span className="text-xs font-normal text-slds-neutral-7">({sessionRulesets.length})</span>
+                <h2 className="slds-text-size_medium slds-font-weight_semibold slds-text-neutral-base">
+                  Identity Resolution Rulesets <span className="slds-text-size_small slds-font-weight_regular slds-text-neutral-7">({sessionRulesets.length})</span>
                 </h2>
               </div>
-              <div className="overflow-x-auto">
+              <div className="slds-overflow-x-auto">
                 <table className="sf-table">
                   <thead>
                     <tr>
@@ -2006,7 +2009,7 @@ export default function IdentityResolutionContent({ demoSession, onDemoSessionCh
                   <tbody>
                     {sessionRulesets.map((rs) => (
                       <tr key={rs.id}>
-                        <td><button onClick={() => { setSelectedRuleset(rs); setDetailTab('details'); }} className="sf-link font-medium">{rs.rulesetName}</button></td>
+                        <td><button onClick={() => { setSelectedRuleset(rs); setDetailTab('details'); }} className="sf-link slds-font-weight_medium">{rs.rulesetName}</button></td>
                         <td>{rs.rulesetId}</td>
                         <td>{rs.dataSpace}</td>
                         <td>{rs.primaryDataModelObject}</td>
@@ -2028,11 +2031,11 @@ export default function IdentityResolutionContent({ demoSession, onDemoSessionCh
         /* Today: full data table with all rulesets */
         <div className="sf-card">
           <div className="sf-card-header">
-            <h2 className="text-sm font-semibold text-slds-neutral-base">
-              All Identity Resolution Rulesets <span className="text-xs font-normal text-slds-neutral-7">({rulesets.length})</span>
+            <h2 className="slds-text-size_medium slds-font-weight_semibold slds-text-neutral-base">
+              All Identity Resolution Rulesets <span className="slds-text-size_small slds-font-weight_regular slds-text-neutral-7">({rulesets.length})</span>
             </h2>
           </div>
-          <div className="overflow-x-auto">
+          <div className="slds-overflow-x-auto">
             <table className="sf-table">
               <thead>
                 <tr>
@@ -2051,7 +2054,7 @@ export default function IdentityResolutionContent({ demoSession, onDemoSessionCh
               <tbody>
                 {rulesets.map((rs) => (
                   <tr key={rs.id}>
-                    <td><button onClick={() => { setSelectedRuleset(rs); setDetailTab('details'); }} className="sf-link font-medium">{rs.rulesetName}</button></td>
+                    <td><button onClick={() => { setSelectedRuleset(rs); setDetailTab('details'); }} className="sf-link slds-font-weight_medium">{rs.rulesetName}</button></td>
                     <td>{rs.rulesetId}</td>
                     <td>{rs.dataSpace}</td>
                     <td>{rs.primaryDataModelObject}</td>
@@ -2073,26 +2076,26 @@ export default function IdentityResolutionContent({ demoSession, onDemoSessionCh
           MODAL: New Ruleset Wizard (3 steps)
          ═══════════════════════════════════════════════════════════ */}
       {newRulesetOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center">
-          <div className="absolute inset-0 bg-black/40" onClick={() => setNewRulesetOpen(false)} />
-          <div className={`relative bg-white rounded-lg shadow-2xl max-h-[85vh] flex flex-col transition-all ${newRulesetStep === 2 && newRulesetOption === 'datakit' ? 'w-[860px]' : 'w-[640px]'}`}>
+        <div className="slds-pos-fixed slds-inset-0 slds-z-50 slds-flex slds-items-center slds-justify-center">
+          <div className="slds-pos-absolute slds-inset-0" style={{ backgroundColor: 'rgba(0,0,0,0.4)' }} onClick={() => setNewRulesetOpen(false)} />
+          <div className={`slds-pos-relative slds-bg-white slds-border-radius_large slds-shadow_large slds-flex slds-flex-col slds-transition-all`} style={{ maxHeight: '85vh', width: newRulesetStep === 2 && newRulesetOption === 'datakit' ? '860px' : '640px' }}>
             {/* Header */}
-            <div className="flex items-center justify-between px-6 py-4 border-b border-slds-border-1">
+            <div className="slds-flex slds-items-center slds-justify-between slds-p-horizontal_large slds-p-vertical_medium slds-border_bottom slds-border-color_border-1">
               <div>
-                <h2 className="text-base font-semibold text-slds-neutral-base">New Ruleset</h2>
-                <p className="text-xs text-slds-neutral-7 mt-0.5">
+                <h2 className="slds-text-size_large slds-font-weight_semibold slds-text-neutral-base">New Ruleset</h2>
+                <p className="slds-text-size_small slds-text-neutral-7 slds-m-top_xx-small">
                   {newRulesetStep === 1 ? 'Select an option to continue.' : newRulesetStep === 2 ? 'Configure your new ruleset.' : 'Review and confirm.'}
                 </p>
               </div>
-              <button onClick={() => setNewRulesetOpen(false)} className="w-7 h-7 flex items-center justify-center rounded hover:bg-slds-neutral-2 text-slds-neutral-7">
-                <X className="w-4 h-4" />
+              <button onClick={() => setNewRulesetOpen(false)} className="slds-flex slds-items-center slds-justify-center slds-border-radius_small slds-hover-bg-neutral-2 slds-text-neutral-7" style={{ width: '28px', height: '28px' }}>
+                <X className="slds-icon-size_small" />
               </button>
             </div>
 
             {/* Body */}
-            <div className="flex-1 overflow-y-auto px-6 py-6">
+            <div className="slds-flex-1 slds-overflow-y-auto slds-p-horizontal_large slds-p-vertical_large">
               {newRulesetStep === 1 && (
-                <div className="grid grid-cols-2 gap-4">
+                <div className="slds-css-grid slds-css-grid-cols-2 slds-gap_medium">
                   {([
                     { key: 'create' as const, icon: Plus, label: 'Create New Ruleset', desc: 'Build a custom identity resolution ruleset from scratch.' },
                     { key: 'datakit' as const, icon: Download, label: 'Install from Datakits', desc: 'Install a pre-built ruleset from available datakits.' },
@@ -2102,22 +2105,23 @@ export default function IdentityResolutionContent({ demoSession, onDemoSessionCh
                       <button
                         key={opt.key}
                         onClick={() => setNewRulesetOption(opt.key)}
-                        className={`relative flex flex-col items-center justify-center h-40 rounded-lg border-2 transition-all text-center px-4 ${
+                        className={`slds-pos-relative slds-flex slds-flex-col slds-items-center slds-justify-center slds-border-radius_large slds-transition-all slds-text-center slds-p-horizontal_medium ${
                           selected
-                            ? 'border-slds-brand bg-white shadow-sm'
-                            : 'border-[#D8DDE6] bg-white hover:border-[#B0B0B0]'
+                            ? 'slds-border-color_brand slds-bg-white slds-shadow_small'
+                            : 'slds-bg-white'
                         }`}
+                        style={{ height: '160px', borderWidth: '2px', borderStyle: 'solid', borderColor: selected ? undefined : '#D8DDE6' }}
                       >
                         {selected && (
-                          <div className="absolute top-0 right-0 w-7 h-7 bg-slds-brand flex items-center justify-center" style={{ clipPath: 'polygon(0 0, 100% 0, 100% 100%)' }}>
-                            <Check className="w-3 h-3 text-white absolute top-0.5 right-0.5" />
+                          <div className="slds-pos-absolute slds-bg-brand slds-flex slds-items-center slds-justify-center" style={{ top: 0, right: 0, width: '28px', height: '28px', clipPath: 'polygon(0 0, 100% 0, 100% 100%)' }}>
+                            <Check className="slds-icon-size_xx-small slds-text-white slds-pos-absolute" style={{ top: '2px', right: '2px' }} />
                           </div>
                         )}
-                        <div className={`w-10 h-10 rounded-full flex items-center justify-center mb-3 ${selected ? 'bg-[#EEF4FF]' : 'bg-slds-neutral-2'}`}>
-                          <opt.icon className={`w-5 h-5 ${selected ? 'text-slds-brand' : 'text-slds-neutral-7'}`} />
+                        <div className={`slds-border-radius_pill slds-flex slds-items-center slds-justify-center slds-m-bottom_small ${selected ? '' : 'slds-bg-neutral-2'}`} style={{ width: '40px', height: '40px', backgroundColor: selected ? '#EEF4FF' : undefined }}>
+                          <opt.icon className={`slds-icon-size_default ${selected ? 'slds-text-brand' : 'slds-text-neutral-7'}`} />
                         </div>
-                        <span className="text-sm font-medium text-slds-neutral-base">{opt.label}</span>
-                        <span className="text-xs text-slds-neutral-7 mt-1">{opt.desc}</span>
+                        <span className="slds-text-size_medium slds-font-weight_medium slds-text-neutral-base">{opt.label}</span>
+                        <span className="slds-text-size_small slds-text-neutral-7 slds-m-top_xx-small">{opt.desc}</span>
                       </button>
                     );
                   })}
@@ -2125,27 +2129,27 @@ export default function IdentityResolutionContent({ demoSession, onDemoSessionCh
               )}
 
               {newRulesetStep === 2 && newRulesetOption === 'create' && (
-                <div className="space-y-5">
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
                   <div>
-                    <label className="block text-xs font-medium text-slds-neutral-7 uppercase tracking-wide mb-1">
-                      <span className="text-slds-error-1">*</span> Ruleset Name
+                    <label className="slds-text-size_small slds-font-weight_medium slds-text-neutral-7 slds-text-uppercase slds-tracking-wide slds-m-bottom_xx-small" style={{ display: 'block' }}>
+                      <span className="slds-text-error">*</span> Ruleset Name
                     </label>
                     <input
                       type="text"
                       value={newRulesetName}
                       onChange={(e) => setNewRulesetName(e.target.value)}
                       placeholder="e.g., Individual (Main)"
-                      className="w-full px-3 py-2 text-sm border border-slds-border-1 rounded focus:outline-none focus:border-slds-brand-2 focus:ring-2 focus:ring-[rgba(27,150,255,0.2)]"
+                      className="slds-w-full slds-p-horizontal_small slds-p-vertical_x-small slds-text-size_medium slds-border_all slds-border-color_border-1 slds-border-radius_small" style={{ outline: 'none' }}
                     />
                   </div>
                   <div>
-                    <label className="block text-xs font-medium text-slds-neutral-7 uppercase tracking-wide mb-1">
-                      <span className="text-slds-error-1">*</span> Primary Data Model Object
+                    <label className="slds-text-size_small slds-font-weight_medium slds-text-neutral-7 slds-text-uppercase slds-tracking-wide slds-m-bottom_xx-small" style={{ display: 'block' }}>
+                      <span className="slds-text-error">*</span> Primary Data Model Object
                     </label>
                     <select
                       value={newRulesetPrimaryDMO}
                       onChange={(e) => setNewRulesetPrimaryDMO(e.target.value)}
-                      className="w-full px-3 py-2 text-sm border border-slds-border-1 rounded bg-white focus:outline-none focus:border-slds-brand-2 focus:ring-2 focus:ring-[rgba(27,150,255,0.2)]"
+                      className="slds-w-full slds-p-horizontal_small slds-p-vertical_x-small slds-text-size_medium slds-border_all slds-border-color_border-1 slds-border-radius_small slds-bg-white" style={{ outline: 'none' }}
                     >
                       {dataModelObjects.map((dmo) => (
                         <option key={dmo} value={dmo}>{dmo}</option>
@@ -2153,11 +2157,11 @@ export default function IdentityResolutionContent({ demoSession, onDemoSessionCh
                     </select>
                   </div>
                   <div>
-                    <label className="block text-xs font-medium text-slds-neutral-7 uppercase tracking-wide mb-1">Data Space</label>
+                    <label className="slds-text-size_small slds-font-weight_medium slds-text-neutral-7 slds-text-uppercase slds-tracking-wide slds-m-bottom_xx-small" style={{ display: 'block' }}>Data Space</label>
                     <select
                       value={newRulesetDataSpace}
                       onChange={(e) => setNewRulesetDataSpace(e.target.value)}
-                      className="w-full px-3 py-2 text-sm border border-slds-border-1 rounded bg-white focus:outline-none focus:border-slds-brand-2 focus:ring-2 focus:ring-[rgba(27,150,255,0.2)]"
+                      className="slds-w-full slds-p-horizontal_small slds-p-vertical_x-small slds-text-size_medium slds-border_all slds-border-color_border-1 slds-border-radius_small slds-bg-white" style={{ outline: 'none' }}
                     >
                       <option value="default">default</option>
                     </select>
@@ -2166,19 +2170,19 @@ export default function IdentityResolutionContent({ demoSession, onDemoSessionCh
               )}
 
               {newRulesetStep === 2 && newRulesetOption === 'datakit' && (
-                <div className="flex gap-0 -mx-6 -my-6 h-[420px]">
+                <div className="slds-flex" style={{ gap: 0, margin: '-24px', height: '420px' }}>
                   {/* Left sidebar: datakit categories */}
-                  <div className="w-[220px] flex-shrink-0 border-r border-slds-border-1 bg-[#FAFAF9] overflow-y-auto">
-                    <div className="px-3 py-3">
+                  <div className="slds-flex-shrink-0 slds-overflow-y-auto" style={{ width: '220px', borderRight: '1px solid var(--slds-g-color-border-1)', backgroundColor: '#FAFAF9' }}>
+                    <div className="slds-p-around_small">
                       <input
                         type="text"
                         value={datakitSearch}
                         onChange={(e) => setDatakitSearch(e.target.value)}
                         placeholder="Search datakits..."
-                        className="w-full px-2.5 py-1.5 text-xs border border-slds-border-1 rounded focus:outline-none focus:border-slds-brand-2"
+                        className="slds-w-full slds-p-horizontal_x-small slds-text-size_small slds-border_all slds-border-color_border-1 slds-border-radius_small" style={{ paddingTop: '6px', paddingBottom: '6px', outline: 'none' }}
                       />
                     </div>
-                    <nav className="px-1 pb-3">
+                    <nav className="slds-p-horizontal_xx-small slds-p-bottom_small">
                       {datakitCategories
                         .filter((cat) => cat.toLowerCase().includes(datakitSearch.toLowerCase()))
                         .map((cat) => {
@@ -2188,19 +2192,23 @@ export default function IdentityResolutionContent({ demoSession, onDemoSessionCh
                             <button
                               key={cat}
                               onClick={() => triggerDelay(() => { setSelectedDatakit(cat); setSelectedDatakitRuleset(null); })}
-                              className={`w-full text-left px-3 py-2 text-sm rounded-md mb-0.5 transition-colors ${
+                              className={`slds-w-full slds-text-left slds-p-horizontal_small slds-p-vertical_x-small slds-text-size_medium slds-border-radius_medium slds-m-bottom_xx-small slds-transition-colors ${
                                 isActive && isInformatica
-                                  ? 'bg-[#FFF3ED] text-[#FF4A00] font-semibold'
+                                  ? 'slds-font-weight_semibold'
                                   : isActive
-                                    ? 'bg-[#EEF4FF] text-slds-brand font-semibold'
+                                    ? 'slds-text-brand slds-font-weight_semibold'
                                     : isInformatica
-                                      ? 'text-[#FF4A00] font-medium hover:bg-[#FFF8F5]'
-                                      : 'text-slds-neutral-9 hover:bg-white'
+                                      ? 'slds-font-weight_medium'
+                                      : 'slds-text-neutral-9'
                               }`}
+                              style={{
+                                backgroundColor: isActive && isInformatica ? '#FFF3ED' : isActive ? '#EEF4FF' : undefined,
+                                color: isInformatica ? '#FF4A00' : undefined,
+                              }}
                             >
                               {cat}
                               {isInformatica && !isActive && (
-                                <span className="ml-1.5 inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-bold bg-[#FF4A00] text-white">NEW</span>
+                                <span className="slds-m-left_xx-small slds-inline-flex slds-items-center slds-p-horizontal_xx-small slds-border-radius_small slds-font-weight_bold slds-text-white" style={{ fontSize: '10px', paddingTop: '2px', paddingBottom: '2px', backgroundColor: '#FF4A00' }}>NEW</span>
                               )}
                             </button>
                           );
@@ -2209,18 +2217,18 @@ export default function IdentityResolutionContent({ demoSession, onDemoSessionCh
                   </div>
 
                   {/* Right side: rulesets table */}
-                  <div className="flex-1 overflow-y-auto">
-                    <div className="px-4 py-3 border-b border-slds-border-1">
-                      <h3 className="text-sm font-semibold text-slds-neutral-base">Datakit Selection</h3>
-                      <p className="text-xs text-slds-neutral-7 mt-0.5">{selectedDatakit} — select a ruleset to install</p>
+                  <div className="slds-flex-1 slds-overflow-y-auto">
+                    <div className="slds-p-horizontal_medium slds-p-vertical_small slds-border_bottom slds-border-color_border-1">
+                      <h3 className="slds-text-size_medium slds-font-weight_semibold slds-text-neutral-base">Datakit Selection</h3>
+                      <p className="slds-text-size_small slds-text-neutral-7 slds-m-top_xx-small">{selectedDatakit} — select a ruleset to install</p>
                       {/* Session context: show remembered connections + bundles */}
                       {demoSession && demoSession.informaticaConnections.length > 0 && selectedDatakit === 'Informatica MDM' && (
-                        <div className="mt-2 px-3 py-2 bg-[#FFF3ED] rounded-md border border-[#FFD6C0]">
-                          <p className="text-[11px] font-medium text-[#B33500]">
+                        <div className="slds-m-top_x-small slds-p-horizontal_small slds-p-vertical_x-small slds-border-radius_medium slds-border_all" style={{ backgroundColor: '#FFF3ED', borderColor: '#FFD6C0' }}>
+                          <p className="slds-font-weight_medium" style={{ fontSize: '11px', color: '#B33500' }}>
                             Connected: {demoSession.informaticaConnections.map((c) => c.alias).join(', ')}
                           </p>
                           {demoSession.selectedBundles.length > 0 && (
-                            <p className="text-[11px] text-[#B33500] mt-0.5">
+                            <p className="slds-m-top_xx-small" style={{ fontSize: '11px', color: '#B33500' }}>
                               Installed Bundles: {demoSession.selectedBundles.join(', ')}
                             </p>
                           )}
@@ -2228,14 +2236,14 @@ export default function IdentityResolutionContent({ demoSession, onDemoSessionCh
                       )}
                     </div>
                     {(datakitRulesets[selectedDatakit] || []).length === 0 ? (
-                      <div className="flex items-center justify-center h-48 text-sm text-slds-neutral-7">
+                      <div className="slds-flex slds-items-center slds-justify-center slds-text-size_medium slds-text-neutral-7" style={{ height: '192px' }}>
                         No rulesets available for {selectedDatakit}.
                       </div>
                     ) : (
                       <table className="sf-table">
                         <thead>
                           <tr>
-                            <th className="w-10"></th>
+                            <th style={{ width: '40px' }}></th>
                             <th>Ruleset Name</th>
                             <th>Description</th>
                           </tr>
@@ -2246,7 +2254,8 @@ export default function IdentityResolutionContent({ demoSession, onDemoSessionCh
                             return (
                             <tr
                               key={rs.id}
-                              className={`${isPhase2 ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'} ${selectedDatakitRuleset === rs.id && !isPhase2 ? 'bg-[#EEF4FF]' : 'hover:bg-[#FAFAF9]'}`}
+                              className={`${isPhase2 ? 'slds-opacity_50 slds-cursor-not-allowed' : 'slds-cursor-pointer'}`}
+                              style={{ backgroundColor: selectedDatakitRuleset === rs.id && !isPhase2 ? '#EEF4FF' : undefined }}
                               onClick={() => { if (!isPhase2) setSelectedDatakitRuleset(rs.id); }}
                             >
                               <td>
@@ -2256,18 +2265,18 @@ export default function IdentityResolutionContent({ demoSession, onDemoSessionCh
                                   checked={selectedDatakitRuleset === rs.id}
                                   onChange={() => { if (!isPhase2) setSelectedDatakitRuleset(rs.id); }}
                                   disabled={isPhase2}
-                                  className="w-4 h-4 accent-slds-brand"
+                                  className="slds-icon-size_small" style={{ accentColor: 'var(--slds-g-color-brand)' }}
                                 />
                               </td>
                               <td>
-                                <div className="flex items-center gap-2">
-                                  <span className={`text-sm font-medium ${isPhase2 ? 'text-slds-neutral-7' : 'text-slds-neutral-base'}`}>{rs.name}</span>
+                                <div className="slds-flex slds-items-center slds-gap_x-small">
+                                  <span className={`slds-text-size_medium slds-font-weight_medium ${isPhase2 ? 'slds-text-neutral-7' : 'slds-text-neutral-base'}`}>{rs.name}</span>
                                   {isPhase2 && (
                                     <span className="sf-badge sf-badge-neutral" style={{ opacity: 0.6 }}>Phase-2</span>
                                   )}
                                 </div>
                               </td>
-                              <td className="text-sm text-slds-neutral-7">
+                              <td className="slds-text-size_medium slds-text-neutral-7">
                                 {rs.primaryDMO} resolution — {rs.dataSpace} data space
                               </td>
                             </tr>
@@ -2281,10 +2290,10 @@ export default function IdentityResolutionContent({ demoSession, onDemoSessionCh
               )}
 
               {newRulesetStep === 3 && (
-                <div className="space-y-4">
-                  <div className="flex items-start gap-3 p-4 bg-[#E1F5FE] rounded-lg">
-                    <Info className="w-5 h-5 text-slds-brand flex-shrink-0 mt-0.5" />
-                    <div className="text-sm text-slds-neutral-9">
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                  <div className="slds-flex slds-items-start slds-gap_small slds-p-around_medium slds-border-radius_large" style={{ backgroundColor: '#E1F5FE' }}>
+                    <Info className="slds-icon-size_default slds-text-brand slds-flex-shrink-0 slds-m-top_xx-small" />
+                    <div className="slds-text-size_medium slds-text-neutral-9">
                       {newRulesetOption === 'datakit'
                         ? <>Your ruleset will be created with defaults from <strong>{selectedDatakit}</strong>. Review and click <strong>Save</strong>.</>
                         : <>Review the details below and click <strong>Save</strong> to create your new ruleset.</>
@@ -2293,7 +2302,7 @@ export default function IdentityResolutionContent({ demoSession, onDemoSessionCh
                   </div>
                   <div className="sf-card">
                     <div className="sf-detail-grid">
-                      <div className="sf-detail-field"><div className="sf-detail-label">Ruleset Name</div><div className="sf-detail-value font-medium">{newRulesetName}</div></div>
+                      <div className="sf-detail-field"><div className="sf-detail-label">Ruleset Name</div><div className="sf-detail-value slds-font-weight_medium">{newRulesetName}</div></div>
                       <div className="sf-detail-field"><div className="sf-detail-label">Primary DMO</div><div className="sf-detail-value">{newRulesetPrimaryDMO}</div></div>
                       <div className="sf-detail-field"><div className="sf-detail-label">Data Space</div><div className="sf-detail-value">{newRulesetDataSpace}</div></div>
                       <div className="sf-detail-field"><div className="sf-detail-label">Status</div><div className="sf-detail-value"><span className="sf-badge sf-badge-warning">Draft</span></div></div>
@@ -2327,50 +2336,50 @@ export default function IdentityResolutionContent({ demoSession, onDemoSessionCh
             </div>
 
             {/* Footer with step indicator */}
-            <div className="flex items-center justify-between px-6 py-4 border-t border-slds-border-1 bg-[#FAFAF9]">
-              <div className="flex items-center gap-2">
+            <div className="slds-flex slds-items-center slds-justify-between slds-p-horizontal_large slds-p-vertical_medium slds-border_top slds-border-color_border-1" style={{ backgroundColor: '#FAFAF9' }}>
+              <div className="slds-flex slds-items-center slds-gap_x-small">
                 {[1, 2, 3].map((s) => (
-                  <div key={s} className="flex items-center gap-1.5">
-                    <div className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-medium ${
-                      s < newRulesetStep ? 'bg-slds-success-1 text-white' :
-                      s === newRulesetStep ? 'bg-slds-brand text-white' :
-                      'bg-slds-border-2 text-slds-neutral-7'
-                    }`}>
-                      {s < newRulesetStep ? <Check className="w-3 h-3" /> : s}
+                  <div key={s} className="slds-flex slds-items-center slds-gap_xx-small">
+                    <div className={`slds-border-radius_pill slds-flex slds-items-center slds-justify-center slds-text-size_small slds-font-weight_medium ${
+                      s < newRulesetStep ? 'slds-bg-success slds-text-white' :
+                      s === newRulesetStep ? 'slds-bg-brand slds-text-white' :
+                      'slds-text-neutral-7'
+                    }`} style={{ width: '24px', height: '24px', backgroundColor: s > newRulesetStep ? 'var(--slds-g-color-border-2)' : undefined }}>
+                      {s < newRulesetStep ? <Check className="slds-icon-size_xx-small" /> : s}
                     </div>
-                    {s < 3 && <div className={`w-6 h-0.5 ${s < newRulesetStep ? 'bg-slds-success-1' : 'bg-slds-border-2'}`} />}
+                    {s < 3 && <div style={{ width: '24px', height: '2px', backgroundColor: s < newRulesetStep ? 'var(--slds-g-color-success)' : 'var(--slds-g-color-border-2)' }} />}
                   </div>
                 ))}
               </div>
-              <div className="flex items-center gap-3">
+              <div className="slds-flex slds-items-center slds-gap_small">
                 {newRulesetStep === 1 ? (
                   <>
-                    <button onClick={() => setNewRulesetOpen(false)} className="px-4 py-2 text-sm font-medium text-slds-neutral-9 border border-slds-border-1 rounded hover:bg-slds-neutral-2">Cancel</button>
+                    <button onClick={() => setNewRulesetOpen(false)} className="slds-p-horizontal_medium slds-p-vertical_x-small slds-text-size_medium slds-font-weight_medium slds-text-neutral-9 slds-border_all slds-border-color_border-1 slds-border-radius_small slds-hover-bg-neutral-2">Cancel</button>
                     <button
                       onClick={handleNewRulesetNext}
                       disabled={!newRulesetOption}
-                      className="px-5 py-2 text-sm font-medium text-white bg-slds-brand rounded hover:bg-slds-brand-contrast-1 disabled:opacity-50 disabled:cursor-not-allowed"
+                      className="slds-p-vertical_x-small slds-text-size_medium slds-font-weight_medium slds-text-white slds-bg-brand slds-border-radius_small" style={{ paddingLeft: '20px', paddingRight: '20px', opacity: !newRulesetOption ? 0.5 : 1, cursor: !newRulesetOption ? 'not-allowed' : 'pointer' }}
                     >
                       Next
                     </button>
                   </>
                 ) : newRulesetStep === 2 ? (
                   <>
-                    <button onClick={handleNewRulesetBack} className="px-4 py-2 text-sm font-medium text-slds-neutral-9 border border-slds-border-1 rounded hover:bg-slds-neutral-2">Back</button>
+                    <button onClick={handleNewRulesetBack} className="slds-p-horizontal_medium slds-p-vertical_x-small slds-text-size_medium slds-font-weight_medium slds-text-neutral-9 slds-border_all slds-border-color_border-1 slds-border-radius_small slds-hover-bg-neutral-2">Back</button>
                     <button
                       onClick={handleNewRulesetNext}
                       disabled={newRulesetOption === 'create' ? !newRulesetName.trim() : !selectedDatakitRuleset}
-                      className="px-5 py-2 text-sm font-medium text-white bg-slds-brand rounded hover:bg-slds-brand-contrast-1 disabled:opacity-50 disabled:cursor-not-allowed"
+                      className="slds-p-vertical_x-small slds-text-size_medium slds-font-weight_medium slds-text-white slds-bg-brand slds-border-radius_small" style={{ paddingLeft: '20px', paddingRight: '20px', opacity: (newRulesetOption === 'create' ? !newRulesetName.trim() : !selectedDatakitRuleset) ? 0.5 : 1, cursor: (newRulesetOption === 'create' ? !newRulesetName.trim() : !selectedDatakitRuleset) ? 'not-allowed' : 'pointer' }}
                     >
                       Next
                     </button>
                   </>
                 ) : (
                   <>
-                    <button onClick={handleNewRulesetBack} className="px-4 py-2 text-sm font-medium text-slds-neutral-9 border border-slds-border-1 rounded hover:bg-slds-neutral-2">Back</button>
+                    <button onClick={handleNewRulesetBack} className="slds-p-horizontal_medium slds-p-vertical_x-small slds-text-size_medium slds-font-weight_medium slds-text-neutral-9 slds-border_all slds-border-color_border-1 slds-border-radius_small slds-hover-bg-neutral-2">Back</button>
                     <button
                       onClick={handleNewRulesetSave}
-                      className="px-5 py-2 text-sm font-medium text-white bg-slds-brand rounded hover:bg-slds-brand-contrast-1"
+                      className="slds-p-vertical_x-small slds-text-size_medium slds-font-weight_medium slds-text-white slds-bg-brand slds-border-radius_small" style={{ paddingLeft: '20px', paddingRight: '20px' }}
                     >
                       Save
                     </button>

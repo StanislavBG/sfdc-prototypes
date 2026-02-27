@@ -47,22 +47,22 @@ export default function AppLauncher({ isOpen, onClose, onSelectApp, currentApp }
   return (
     <div
       ref={overlayRef}
-      className="fixed inset-0 z-50"
+      className="sf-overlay"
       onClick={(e) => {
         if (e.target === overlayRef.current) onClose();
       }}
     >
-      <div className="absolute left-0 top-[44px] w-[400px] bg-white rounded-b-lg shadow-xl border border-slds-border-1">
+      <div className="sf-panel" style={{ width: '400px' }}>
         {/* Search */}
-        <div className="p-4 border-b border-slds-border-1">
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slds-neutral-7" />
+        <div className="slds-p-around_medium slds-border_bottom" style={{ borderColor: 'var(--slds-g-color-border-1)' }}>
+          <div className="slds-pos-relative">
+            <Search className="slds-icon-size_small slds-text-neutral-7" style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)' }} />
             <input
               type="text"
               placeholder="Search apps..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-9 pr-4 py-2 border border-slds-border-1 rounded text-sm focus:outline-none focus:border-slds-brand-2 focus:ring-2 focus:ring-slds-brand-2/30"
+              className="sf-app-search-input"
               autoFocus
             />
           </div>
@@ -76,19 +76,19 @@ export default function AppLauncher({ isOpen, onClose, onSelectApp, currentApp }
             return (
               <button
                 key={app.id}
-                className={`sf-app-tile ${isActive ? 'bg-slds-neutral-2 ring-2 ring-slds-brand/30' : ''}`}
+                className={`sf-app-tile ${isActive ? 'active' : ''}`}
                 onClick={() => {
                   onSelectApp(app.id);
                   onClose();
                 }}
               >
                 <div
-                  className="sf-app-tile-icon text-white"
+                  className="sf-app-tile-icon slds-text-white"
                   style={{ backgroundColor: app.color }}
                 >
-                  <IconComponent className="w-6 h-6" />
+                  <IconComponent className="slds-square_small" />
                 </div>
-                <span className="text-xs font-medium text-slds-neutral-base text-center leading-tight">
+                <span className="slds-text-size_small slds-font-weight_medium slds-text-neutral-base slds-text-center" style={{ lineHeight: '1.25' }}>
                   {app.name}
                 </span>
               </button>
@@ -97,7 +97,7 @@ export default function AppLauncher({ isOpen, onClose, onSelectApp, currentApp }
         </div>
 
         {filteredApps.length === 0 && (
-          <div className="p-8 text-center text-sm text-slds-neutral-7">
+          <div className="slds-p-around_x-large slds-text-center slds-text-size_medium slds-text-neutral-7">
             No apps found matching "{searchQuery}"
           </div>
         )}

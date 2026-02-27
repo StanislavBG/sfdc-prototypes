@@ -125,7 +125,7 @@ export default function Layout({ children }: LayoutProps) {
   if (showDataCloudSetup) {
     return (
       <MdsSimulatorProvider>
-      <div className="min-h-screen flex flex-col bg-slds-neutral-2">
+      <div className="sf-layout-root">
         <Header
           appName="Data Cloud Setup"
           currentApp={effectiveApp}
@@ -142,8 +142,8 @@ export default function Layout({ children }: LayoutProps) {
           onExportSvg={handleExportSvg}
           onExportHtml={handleExportHtml}
         />
-        <div className="flex flex-1 overflow-hidden">
-          <main ref={mainRef} className="flex-1 overflow-y-auto">
+        <div className="sf-layout-body">
+          <main ref={mainRef} className="sf-layout-main">
             <DataCloudSetupContent onBack={() => setShowDataCloudSetup(false)} demoSession={demoSession} onDemoSessionChange={setDemoSession} currentTimeline={currentTimeline} />
           </main>
         </div>
@@ -160,7 +160,7 @@ export default function Layout({ children }: LayoutProps) {
           currentApp={effectiveApp}
         />
         {exportToast && (
-          <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-[100] px-5 py-3 bg-slds-brand-1 text-white text-sm font-medium rounded-lg shadow-xl animate-[fadeIn_0.2s_ease-out]">
+          <div className="sf-export-toast">
             {exportToast}
           </div>
         )}
@@ -171,7 +171,7 @@ export default function Layout({ children }: LayoutProps) {
 
   return (
     <MdsSimulatorProvider>
-    <div className="min-h-screen flex flex-col bg-slds-neutral-2">
+    <div className="sf-layout-root">
       {/* Single-row header */}
       <Header
         appName={appName}
@@ -192,13 +192,13 @@ export default function Layout({ children }: LayoutProps) {
       {/* Body: conditionally render based on timeline */}
       {showTodayLayout ? (
         /* Today / Context Explorer view: LeftNav + Content + AgentPanel */
-        <div className="flex flex-1 overflow-hidden">
+        <div className="sf-layout-body">
           <LeftNav
             currentApp={effectiveApp}
             activeTab={activeTab}
             onChangeTab={setActiveTab}
           />
-          <main ref={mainRef} className="flex-1 overflow-y-auto">
+          <main ref={mainRef} className="sf-layout-main">
             {children || (
               activeTab === 'Home' ? (
                 <HomeContent />
@@ -209,15 +209,15 @@ export default function Layout({ children }: LayoutProps) {
               ) : activeTab === 'Data Streams' ? (
                 <DataStreamsContent demoSession={demoSession} currentTimeline={currentTimeline} />
               ) : (
-                <div className="p-6">
+                <div className="slds-p-around_large">
                   <div className="sf-card">
                     <div className="sf-card-header">
-                      <h1 className="text-base font-semibold text-slds-neutral-base">
+                      <h1 className="slds-text-size_large slds-font-weight_semibold slds-text-neutral-base">
                         {activeTab}
                       </h1>
                     </div>
                     <div className="sf-card-body">
-                      <p className="text-sm text-slds-neutral-7">
+                      <p className="slds-text-size_medium slds-text-neutral-7">
                         Content area for {activeTab}
                       </p>
                     </div>
@@ -235,12 +235,12 @@ export default function Layout({ children }: LayoutProps) {
         </div>
       ) : (
         /* 2 Years view: WorkflowSidebar + WorkflowArea */
-        <div className="flex flex-1 overflow-hidden">
+        <div className="sf-layout-body">
           <WorkflowSidebar
             activeWorkflow={activeWorkflow}
             onSelectWorkflow={setActiveWorkflow}
           />
-          <main className="flex-1 overflow-y-auto">
+          <main className="sf-layout-main">
             {children || <WorkflowArea workflow={activeWorkflow} />}
           </main>
         </div>
@@ -264,7 +264,7 @@ export default function Layout({ children }: LayoutProps) {
 
       {/* Export toast notification */}
       {exportToast && (
-        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-[100] px-5 py-3 bg-slds-brand-1 text-white text-sm font-medium rounded-lg shadow-xl animate-[fadeIn_0.2s_ease-out]">
+        <div className="sf-export-toast">
           {exportToast}
         </div>
       )}

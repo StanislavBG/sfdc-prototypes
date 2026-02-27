@@ -688,43 +688,44 @@ export default function DataStreamsContent({ demoSession, currentTimeline }: Dat
     const autoMappedCount = allFields.filter((f) => f.mappingStatus === 'Auto-Mapped').length;
 
     return (
-      <div className="h-full flex flex-col bg-slds-neutral-2">
+      <div className="slds-h-full slds-flex slds-flex-col slds-bg-neutral-2">
         {/* Breadcrumb header */}
-        <div className="bg-white border-b border-slds-border-1 px-6 py-3 flex items-center gap-2">
-          <button onClick={() => setReviewFieldId(null)} className="flex items-center gap-1 text-sm text-slds-brand hover:underline">
-            <ArrowLeft className="w-4 h-4" />
+        <div className="slds-bg-white slds-border_bottom slds-border-color_border-1 slds-p-horizontal_large slds-p-vertical_small slds-flex slds-items-center slds-gap_x-small">
+          <button onClick={() => setReviewFieldId(null)} className="slds-flex slds-items-center slds-gap_xx-small slds-text-size_medium slds-text-brand sf-hover-underline">
+            <ArrowLeft className="slds-icon-size_small" />
             {selectedStream.name}
           </button>
-          <ChevronRight className="w-3 h-3 text-slds-neutral-7" />
-          <span className="text-sm font-medium text-slds-neutral-base">Field Mapping</span>
+          <ChevronRight className="slds-icon-size_xx-small slds-text-neutral-7" />
+          <span className="slds-text-size_medium slds-font-weight_medium slds-text-neutral-base">Field Mapping</span>
         </div>
 
         {/* 3-panel layout */}
-        <div className="flex-1 overflow-hidden flex">
+        <div className="slds-flex-1 slds-overflow-hidden slds-flex">
           {/* LEFT: Source Fields */}
-          <div className="w-[360px] flex-shrink-0 border-r border-slds-border-1 bg-white flex flex-col">
-            <div className="px-4 py-3 border-b border-slds-border-1 flex items-center gap-2">
-              <div className="w-6 h-6 rounded bg-[#FF4A00] flex items-center justify-center flex-shrink-0">
-                <svg viewBox="0 0 24 24" className="w-4 h-4"><text x="12" y="16" textAnchor="middle" fill="white" fontSize="8" fontWeight="bold">IN</text></svg>
+          <div className="slds-flex-shrink-0 slds-border_right slds-border-color_border-1 slds-bg-white slds-flex slds-flex-col" style={{ width: '360px' }}>
+            <div className="slds-p-horizontal_medium slds-p-vertical_small slds-border_bottom slds-border-color_border-1 slds-flex slds-items-center slds-gap_x-small">
+              <div className="slds-icon-size_large slds-border-radius_small slds-flex slds-items-center slds-justify-center slds-flex-shrink-0" style={{ backgroundColor: '#FF4A00' }}>
+                <svg viewBox="0 0 24 24" className="slds-icon-size_small"><text x="12" y="16" textAnchor="middle" fill="white" fontSize="8" fontWeight="bold">IN</text></svg>
               </div>
-              <h3 className="text-sm font-semibold text-slds-neutral-base">Source Fields</h3>
-              <span className="text-xs text-slds-neutral-7 ml-auto">{allFields.length} fields</span>
+              <h3 className="slds-text-size_medium slds-font-weight_semibold slds-text-neutral-base">Source Fields</h3>
+              <span className="slds-text-size_small slds-text-neutral-7" style={{ marginLeft: 'auto' }}>{allFields.length} fields</span>
             </div>
-            <div className="flex-1 overflow-y-auto">
+            <div className="slds-flex-1 slds-overflow-y-auto">
               {allFields.map((field) => {
                 const isActive = field.id === reviewFieldId;
                 return (
                   <button
                     key={field.id}
                     onClick={() => setReviewFieldId(field.id)}
-                    className={`w-full text-left px-4 py-2.5 flex items-center gap-3 border-b border-slds-border-1 transition-colors ${isActive ? 'bg-[#FFF3ED]' : 'hover:bg-[#FAFAF9]'}`}
+                    className={`slds-w-full slds-text-left slds-p-horizontal_medium slds-flex slds-items-center slds-gap_small slds-border_bottom slds-border-color_border-1 slds-transition-colors ${isActive ? '' : 'sf-hover-bg-neutral'}`}
+                    style={{ paddingTop: '10px', paddingBottom: '10px', ...(isActive ? { backgroundColor: '#FFF3ED' } : {}) }}
                   >
-                    <div className={`w-2 h-2 rounded-full flex-shrink-0 ${field.mappingStatus === 'Auto-Mapped' ? 'bg-slds-success-1' : field.mappingStatus === 'Unmapped' ? 'bg-[#BA0517]' : 'bg-[#FFB75D]'}`} />
-                    <div className="flex-1 min-w-0">
-                      <div className="text-xs font-mono font-medium text-slds-neutral-base truncate">{field.fieldName}</div>
-                      <div className="text-[10px] text-slds-neutral-7">{field.dataType}</div>
+                    <div className={`slds-border-radius_pill slds-flex-shrink-0 ${field.mappingStatus === 'Auto-Mapped' ? 'slds-bg-success' : ''}`} style={{ width: '8px', height: '8px', ...(field.mappingStatus === 'Unmapped' ? { backgroundColor: '#BA0517' } : field.mappingStatus !== 'Auto-Mapped' ? { backgroundColor: '#FFB75D' } : {}) }} />
+                    <div className="slds-flex-1 slds-min-w-0">
+                      <div className="slds-text-size_small slds-font-weight_medium slds-text-neutral-base slds-truncate" style={{ fontFamily: 'monospace' }}>{field.fieldName}</div>
+                      <div className="slds-text-neutral-7" style={{ fontSize: '10px' }}>{field.dataType}</div>
                     </div>
-                    {field.mappingStatus === 'Auto-Mapped' && <Check className="w-3.5 h-3.5 text-slds-success-1 flex-shrink-0" />}
+                    {field.mappingStatus === 'Auto-Mapped' && <Check className="slds-icon-size_x-small slds-text-success slds-flex-shrink-0" />}
                   </button>
                 );
               })}
@@ -732,8 +733,8 @@ export default function DataStreamsContent({ demoSession, currentTimeline }: Dat
           </div>
 
           {/* CENTER: Connection lines */}
-          <div className="w-[120px] flex-shrink-0 flex items-stretch bg-[#F9F9F9] relative">
-            <svg className="w-full h-full" preserveAspectRatio="none" viewBox={`0 0 120 ${Math.max(allFields.length * 40, 400)}`}>
+          <div className="slds-flex-shrink-0 slds-flex slds-items-stretch slds-pos-relative" style={{ width: '120px', backgroundColor: '#F9F9F9' }}>
+            <svg className="slds-w-full slds-h-full" preserveAspectRatio="none" viewBox={`0 0 120 ${Math.max(allFields.length * 40, 400)}`}>
               {allFields.map((field, i) => {
                 const dmoKeys = Object.keys(dmoGroups);
                 let rightY = 0;
@@ -771,19 +772,19 @@ export default function DataStreamsContent({ demoSession, currentTimeline }: Dat
           </div>
 
           {/* RIGHT: Target DMO */}
-          <div className="flex-1 bg-white flex flex-col border-l border-slds-border-1">
-            <div className="px-4 py-3 border-b border-slds-border-1 flex items-center gap-2">
-              <div className="w-6 h-6 rounded bg-slds-brand flex items-center justify-center flex-shrink-0">
-                <Database className="w-3.5 h-3.5 text-white" />
+          <div className="slds-flex-1 slds-bg-white slds-flex slds-flex-col slds-border_left slds-border-color_border-1">
+            <div className="slds-p-horizontal_medium slds-p-vertical_small slds-border_bottom slds-border-color_border-1 slds-flex slds-items-center slds-gap_x-small">
+              <div className="slds-icon-size_large slds-border-radius_small slds-bg-brand slds-flex slds-items-center slds-justify-center slds-flex-shrink-0">
+                <Database className="slds-icon-size_x-small slds-text-white" />
               </div>
-              <h3 className="text-sm font-semibold text-slds-neutral-base">Target DMO</h3>
-              <span className="text-xs text-slds-neutral-7 ml-auto">{objectName}</span>
+              <h3 className="slds-text-size_medium slds-font-weight_semibold slds-text-neutral-base">Target DMO</h3>
+              <span className="slds-text-size_small slds-text-neutral-7" style={{ marginLeft: 'auto' }}>{objectName}</span>
             </div>
-            <div className="flex-1 overflow-y-auto">
+            <div className="slds-flex-1 slds-overflow-y-auto">
               {Object.entries(dmoGroups).map(([dmoName, fields]) => (
                 <div key={dmoName}>
-                  <div className="px-4 py-2.5 bg-[#F9F9F9] border-b border-slds-border-1">
-                    <span className="text-xs font-semibold text-slds-brand">{dmoName}</span>
+                  <div className="slds-p-horizontal_medium slds-border_bottom slds-border-color_border-1" style={{ paddingTop: '10px', paddingBottom: '10px', backgroundColor: '#F9F9F9' }}>
+                    <span className="slds-text-size_small slds-font-weight_semibold slds-text-brand">{dmoName}</span>
                   </div>
                   {fields.map((field) => {
                     const isActive = field.id === reviewFieldId;
@@ -791,12 +792,13 @@ export default function DataStreamsContent({ demoSession, currentTimeline }: Dat
                       <button
                         key={field.id}
                         onClick={() => setReviewFieldId(field.id)}
-                        className={`w-full text-left px-4 py-2.5 flex items-center gap-3 border-b border-slds-border-1 transition-colors ${isActive ? 'bg-[#EEF4FF]' : 'hover:bg-[#FAFAF9]'}`}
+                        className={`slds-w-full slds-text-left slds-p-horizontal_medium slds-flex slds-items-center slds-gap_small slds-border_bottom slds-border-color_border-1 slds-transition-colors ${isActive ? '' : 'sf-hover-bg-neutral'}`}
+                        style={{ paddingTop: '10px', paddingBottom: '10px', ...(isActive ? { backgroundColor: '#EEF4FF' } : {}) }}
                       >
-                        <div className={`w-2 h-2 rounded-full flex-shrink-0 ${field.mappingStatus === 'Auto-Mapped' ? 'bg-slds-success-1' : 'bg-[#FFB75D]'}`} />
-                        <div className="flex-1 min-w-0">
-                          <div className="text-xs font-mono font-medium text-slds-neutral-base truncate">{field.targetField}</div>
-                          <div className="text-[10px] text-slds-neutral-7">{field.dataType}</div>
+                        <div className={`slds-border-radius_pill slds-flex-shrink-0 ${field.mappingStatus === 'Auto-Mapped' ? 'slds-bg-success' : ''}`} style={{ width: '8px', height: '8px', ...(field.mappingStatus !== 'Auto-Mapped' ? { backgroundColor: '#FFB75D' } : {}) }} />
+                        <div className="slds-flex-1 slds-min-w-0">
+                          <div className="slds-text-size_small slds-font-weight_medium slds-text-neutral-base slds-truncate" style={{ fontFamily: 'monospace' }}>{field.targetField}</div>
+                          <div className="slds-text-neutral-7" style={{ fontSize: '10px' }}>{field.dataType}</div>
                         </div>
                       </button>
                     );
@@ -808,18 +810,18 @@ export default function DataStreamsContent({ demoSession, currentTimeline }: Dat
         </div>
 
         {/* Footer */}
-        <div className="bg-white border-t border-slds-border-1 px-6 py-3 flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <button onClick={() => setReviewFieldId(null)} className="px-4 py-2 text-sm font-medium text-slds-neutral-9 border border-slds-border-1 rounded hover:bg-slds-neutral-2">
+        <div className="slds-bg-white slds-border_top slds-border-color_border-1 slds-p-horizontal_large slds-p-vertical_small slds-flex slds-items-center slds-justify-between">
+          <div className="slds-flex slds-items-center slds-gap_medium">
+            <button onClick={() => setReviewFieldId(null)} className="slds-p-horizontal_medium slds-p-vertical_x-small slds-text-size_medium slds-font-weight_medium slds-text-neutral-9 slds-border_all slds-border-color_border-1 slds-border-radius_small sf-hover-bg-neutral">
               Back
             </button>
-            <div className="flex items-center gap-4 text-xs text-slds-neutral-7">
-              <div className="flex items-center gap-1.5"><div className="w-2 h-2 rounded-full bg-slds-success-1" /> Auto-Mapped ({autoMappedCount})</div>
-              <div className="flex items-center gap-1.5"><div className="w-2 h-2 rounded-full bg-[#FFB75D]" /> Review Needed</div>
-              <div className="flex items-center gap-1.5"><div className="w-2 h-2 rounded-full bg-[#BA0517]" /> Unmapped</div>
+            <div className="slds-flex slds-items-center slds-gap_medium slds-text-size_small slds-text-neutral-7">
+              <div className="slds-flex slds-items-center slds-gap_xx-small"><div className="slds-border-radius_pill slds-bg-success" style={{ width: '8px', height: '8px' }} /> Auto-Mapped ({autoMappedCount})</div>
+              <div className="slds-flex slds-items-center slds-gap_xx-small"><div className="slds-border-radius_pill" style={{ width: '8px', height: '8px', backgroundColor: '#FFB75D' }} /> Review Needed</div>
+              <div className="slds-flex slds-items-center slds-gap_xx-small"><div className="slds-border-radius_pill" style={{ width: '8px', height: '8px', backgroundColor: '#BA0517' }} /> Unmapped</div>
             </div>
           </div>
-          <button className="px-5 py-2 text-sm font-medium text-white bg-slds-brand rounded hover:bg-slds-brand-contrast-1">
+          <button className="slds-p-horizontal_large slds-p-vertical_x-small slds-text-size_medium slds-font-weight_medium slds-text-white slds-bg-brand slds-border-radius_small" style={{ cursor: 'pointer' }}>
             Approve Mapping
           </button>
         </div>
@@ -837,41 +839,41 @@ export default function DataStreamsContent({ demoSession, currentTimeline }: Dat
     const isInfaStream = selectedStream.sourceType === 'informatica';
 
     return (
-      <div className="h-full flex flex-col">
+      <div className="slds-h-full slds-flex slds-flex-col">
         {/* Breadcrumb */}
-        <div className="bg-white border-b border-slds-border-1 px-6 py-2 flex items-center gap-2">
-          <button onClick={() => { setSelectedStream(null); setDetailTab('fields'); }} className="flex items-center gap-1 text-xs text-slds-brand hover:underline">
-            <ArrowLeft className="w-3.5 h-3.5" />
+        <div className="slds-bg-white slds-border_bottom slds-border-color_border-1 slds-p-horizontal_large slds-p-vertical_x-small slds-flex slds-items-center slds-gap_x-small">
+          <button onClick={() => { setSelectedStream(null); setDetailTab('fields'); }} className="slds-flex slds-items-center slds-gap_xx-small slds-text-size_small slds-text-brand sf-hover-underline">
+            <ArrowLeft className="slds-icon-size_x-small" />
             Data Streams
           </button>
-          <ChevronRight className="w-3 h-3 text-slds-neutral-7" />
-          <span className="text-xs font-medium text-slds-neutral-base">{selectedStream.name}</span>
+          <ChevronRight className="slds-icon-size_xx-small slds-text-neutral-7" />
+          <span className="slds-text-size_small slds-font-weight_medium slds-text-neutral-base">{selectedStream.name}</span>
         </div>
 
         {/* Header */}
-        <div className="bg-white border-b border-slds-border-1 px-6 py-4">
-          <div className="flex items-start gap-4">
-            <div className={`w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0 ${isInfaStream ? 'bg-[#FF4A00]' : 'bg-slds-brand-1'}`}>
+        <div className="slds-bg-white slds-border_bottom slds-border-color_border-1 slds-p-horizontal_large slds-p-vertical_medium">
+          <div className="slds-flex slds-items-start slds-gap_medium">
+            <div className={`slds-border-radius_large slds-flex slds-items-center slds-justify-center slds-flex-shrink-0 ${isInfaStream ? '' : 'slds-bg-brand-1'}`} style={{ width: '40px', height: '40px', ...(isInfaStream ? { backgroundColor: '#FF4A00' } : {}) }}>
               {isInfaStream ? (
-                <svg viewBox="0 0 32 32" className="w-6 h-6"><text x="16" y="22" textAnchor="middle" fill="white" fontSize="10" fontWeight="bold">INFA</text></svg>
+                <svg viewBox="0 0 32 32" className="slds-icon-size_large"><text x="16" y="22" textAnchor="middle" fill="white" fontSize="10" fontWeight="bold">INFA</text></svg>
               ) : (
-                <Database className="w-5 h-5 text-white" />
+                <Database className="slds-icon-size_default slds-text-white" />
               )}
             </div>
-            <div className="flex-1">
-              <h1 className="text-lg font-bold text-slds-neutral-base">{selectedStream.name}</h1>
-              <p className="text-xs text-slds-neutral-7 mt-0.5">Data Stream &middot; {selectedStream.source}</p>
+            <div className="slds-flex-1">
+              <h1 className="slds-font-weight_bold slds-text-neutral-base" style={{ fontSize: '18px' }}>{selectedStream.name}</h1>
+              <p className="slds-text-size_small slds-text-neutral-7 slds-m-top_xx-small">Data Stream &middot; {selectedStream.source}</p>
             </div>
-            <div className="flex items-center gap-2">
-              <button className="px-3 py-1.5 text-xs font-medium border border-slds-border-1 rounded hover:bg-slds-neutral-2 text-slds-neutral-9">
-                <RefreshCw className="w-3.5 h-3.5 inline mr-1" />Refresh Now
+            <div className="slds-flex slds-items-center slds-gap_x-small">
+              <button className="slds-p-horizontal_small slds-text-size_small slds-font-weight_medium slds-border_all slds-border-color_border-1 slds-border-radius_small sf-hover-bg-neutral slds-text-neutral-9" style={{ paddingTop: '6px', paddingBottom: '6px' }}>
+                <RefreshCw className="slds-icon-size_x-small" style={{ display: 'inline', marginRight: '4px' }} />Refresh Now
               </button>
-              <button className="px-3 py-1.5 text-xs font-medium border border-slds-border-1 rounded hover:bg-slds-neutral-2 text-slds-neutral-9">Edit</button>
+              <button className="slds-p-horizontal_small slds-text-size_small slds-font-weight_medium slds-border_all slds-border-color_border-1 slds-border-radius_small sf-hover-bg-neutral slds-text-neutral-9" style={{ paddingTop: '6px', paddingBottom: '6px' }}>Edit</button>
             </div>
           </div>
 
           {/* Metadata strip */}
-          <div className="flex flex-wrap items-center gap-x-8 gap-y-2 mt-4 pb-1">
+          <div className="slds-flex slds-flex-wrap slds-items-center slds-m-top_medium" style={{ columnGap: '32px', rowGap: '8px', paddingBottom: '4px' }}>
             {[
               ['Source', selectedStream.source],
               ['Object', selectedStream.object],
@@ -882,16 +884,16 @@ export default function DataStreamsContent({ demoSession, currentTimeline }: Dat
               ['Data Space', selectedStream.dataSpace],
             ].map(([label, value]) => (
               <div key={label}>
-                <p className="text-[10px] uppercase tracking-wider text-slds-neutral-7">{label}</p>
-                {value === '__badge__' ? <div className="mt-0.5">{statusBadge(selectedStream.status)}</div> : (
-                  <p className="text-sm font-medium text-slds-neutral-base capitalize">{value}</p>
+                <p className="slds-text-uppercase slds-tracking-wide slds-text-neutral-7" style={{ fontSize: '10px' }}>{label}</p>
+                {value === '__badge__' ? <div className="slds-m-top_xx-small">{statusBadge(selectedStream.status)}</div> : (
+                  <p className="slds-text-size_medium slds-font-weight_medium slds-text-neutral-base" style={{ textTransform: 'capitalize' }}>{value}</p>
                 )}
               </div>
             ))}
           </div>
 
           {/* Tabs */}
-          <div className="flex items-center gap-0 mt-2 -mb-4 border-b-0">
+          <div className="slds-flex slds-items-center slds-m-top_x-small" style={{ gap: '0px', marginBottom: '-16px', borderBottom: '0' }}>
             {(['fields', 'details', 'refresh-history'] as const).map((tab) => {
               const labels: Record<string, string> = { 'fields': 'Fields', 'details': 'Details', 'refresh-history': 'Refresh History' };
               const active = detailTab === tab;
@@ -899,9 +901,10 @@ export default function DataStreamsContent({ demoSession, currentTimeline }: Dat
                 <button
                   key={tab}
                   onClick={() => setDetailTab(tab)}
-                  className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${
-                    active ? 'border-slds-brand text-slds-brand' : 'border-transparent text-slds-neutral-7 hover:text-slds-neutral-9'
+                  className={`slds-p-horizontal_medium slds-p-vertical_x-small slds-text-size_medium slds-font-weight_medium slds-transition-colors ${
+                    active ? 'slds-text-brand' : 'slds-text-neutral-7'
                   }`}
+                  style={{ borderBottom: active ? '2px solid var(--slds-g-color-brand-1)' : '2px solid transparent' }}
                 >
                   {labels[tab]}
                 </button>
@@ -911,23 +914,23 @@ export default function DataStreamsContent({ demoSession, currentTimeline }: Dat
         </div>
 
         {/* Tab content + Data Mapping sidebar */}
-        <div className="flex-1 overflow-y-auto bg-slds-neutral-2">
-          <div className="flex gap-6 p-6">
+        <div className="slds-flex-1 slds-overflow-y-auto slds-bg-neutral-2">
+          <div className="slds-flex slds-gap_large slds-p-around_large">
             {/* Main content area */}
-            <div className="flex-1 min-w-0">
+            <div className="slds-flex-1 slds-min-w-0">
               {detailTab === 'fields' && (
                 <div className="sf-card">
                   <div className="sf-card-header">
-                    <h2 className="text-sm font-semibold text-slds-neutral-base">
-                      Fields <span className="text-xs font-normal text-slds-neutral-7">({fields.length})</span>
+                    <h2 className="slds-text-size_medium slds-font-weight_semibold slds-text-neutral-base">
+                      Fields <span className="slds-text-size_small slds-font-weight_regular slds-text-neutral-7">({fields.length})</span>
                     </h2>
                   </div>
                   {fields.length > 0 ? (
-                    <div className="overflow-x-auto">
+                    <div className="slds-overflow-x-auto">
                       <table className="sf-table">
                         <thead>
                           <tr>
-                            <th><div className="flex items-center gap-1">Field Name <ChevronDown className="w-3 h-3 opacity-50" /></div></th>
+                            <th><div className="slds-flex slds-items-center slds-gap_xx-small">Field Name <ChevronDown className="slds-icon-size_xx-small slds-opacity_50" /></div></th>
                             <th>Data Type</th>
                             <th>Is Required</th>
                           </tr>
@@ -935,18 +938,18 @@ export default function DataStreamsContent({ demoSession, currentTimeline }: Dat
                         <tbody>
                           {fields.map((field) => (
                             <tr key={field.id}>
-                              <td><span className="font-mono text-sm">{field.fieldName}</span></td>
-                              <td><span className="text-xs px-1.5 py-0.5 bg-slds-neutral-2 rounded font-mono">{field.dataType}</span></td>
-                              <td><span className="text-xs text-slds-neutral-7">{field.fieldName.includes('id') || field.fieldName.includes('name') ? 'Yes' : 'No'}</span></td>
+                              <td><span className="slds-text-size_medium" style={{ fontFamily: 'monospace' }}>{field.fieldName}</span></td>
+                              <td><span className="slds-text-size_small slds-bg-neutral-2 slds-border-radius_small" style={{ fontFamily: 'monospace', paddingLeft: '6px', paddingRight: '6px', paddingTop: '2px', paddingBottom: '2px' }}>{field.dataType}</span></td>
+                              <td><span className="slds-text-size_small slds-text-neutral-7">{field.fieldName.includes('id') || field.fieldName.includes('name') ? 'Yes' : 'No'}</span></td>
                             </tr>
                           ))}
                         </tbody>
                       </table>
                     </div>
                   ) : (
-                    <div className="sf-card-body text-center py-12">
-                      <Database className="w-10 h-10 text-slds-neutral-7 mx-auto mb-3 opacity-40" />
-                      <p className="text-sm text-slds-neutral-7">No fields available for this data stream.</p>
+                    <div className="sf-card-body slds-text-center slds-p-vertical_x-large" style={{ paddingTop: '48px', paddingBottom: '48px' }}>
+                      <Database className="slds-text-neutral-7 slds-opacity_50 slds-m-bottom_small" style={{ width: '40px', height: '40px', margin: '0 auto 12px' }} />
+                      <p className="slds-text-size_medium slds-text-neutral-7">No fields available for this data stream.</p>
                     </div>
                   )}
                 </div>
@@ -955,10 +958,10 @@ export default function DataStreamsContent({ demoSession, currentTimeline }: Dat
               {detailTab === 'details' && (
                 <div className="sf-card">
                   <div className="sf-card-header">
-                    <h2 className="text-sm font-semibold text-slds-neutral-base">Stream Details</h2>
+                    <h2 className="slds-text-size_medium slds-font-weight_semibold slds-text-neutral-base">Stream Details</h2>
                   </div>
                   <div className="sf-card-body">
-                    <div className="grid grid-cols-2 gap-y-4 gap-x-8 text-sm">
+                    <div className="slds-css-grid slds-css-grid-cols-2 slds-text-size_medium" style={{ rowGap: '16px', columnGap: '32px' }}>
                       {[
                         ['Data Stream Name', selectedStream.name],
                         ['Source', selectedStream.source],
@@ -971,8 +974,8 @@ export default function DataStreamsContent({ demoSession, currentTimeline }: Dat
                         ...(selectedStream.tenant ? [['Tenant', selectedStream.tenant]] : []),
                       ].map(([label, value]) => (
                         <div key={label}>
-                          <p className="text-xs text-slds-neutral-7 mb-0.5">{label}</p>
-                          <p className="text-slds-neutral-base font-medium">{value}</p>
+                          <p className="slds-text-size_small slds-text-neutral-7 slds-m-bottom_xx-small">{label}</p>
+                          <p className="slds-text-neutral-base slds-font-weight_medium">{value}</p>
                         </div>
                       ))}
                     </div>
@@ -983,9 +986,9 @@ export default function DataStreamsContent({ demoSession, currentTimeline }: Dat
               {detailTab === 'refresh-history' && (
                 <div className="sf-card">
                   <div className="sf-card-header">
-                    <h2 className="text-sm font-semibold text-slds-neutral-base">Refresh History</h2>
+                    <h2 className="slds-text-size_medium slds-font-weight_semibold slds-text-neutral-base">Refresh History</h2>
                   </div>
-                  <div className="overflow-x-auto">
+                  <div className="slds-overflow-x-auto">
                     <table className="sf-table">
                       <thead>
                         <tr>
@@ -1003,7 +1006,7 @@ export default function DataStreamsContent({ demoSession, currentTimeline }: Dat
                             <tr><td>02/23/2026, 3:45 PM</td><td><span className="sf-badge sf-badge-success">Success</span></td><td>{fmt(Math.floor(selectedStream.recordsProcessed * 0.95))}</td><td>2m 45s</td></tr>
                           </>
                         ) : (
-                          <tr><td colSpan={4} className="text-center py-8 text-sm text-slds-neutral-7">No refresh history yet — stream is pending first refresh.</td></tr>
+                          <tr><td colSpan={4} className="slds-text-center slds-p-vertical_x-large slds-text-size_medium slds-text-neutral-7">No refresh history yet — stream is pending first refresh.</td></tr>
                         )}
                       </tbody>
                     </table>
@@ -1014,50 +1017,50 @@ export default function DataStreamsContent({ demoSession, currentTimeline }: Dat
 
             {/* Data Mapping sidebar */}
             {isInfaStream && (
-              <div className="w-[280px] flex-shrink-0">
+              <div className="slds-flex-shrink-0" style={{ width: '280px' }}>
                 <div className="sf-card">
                   <div className="sf-card-header">
-                    <h3 className="text-sm font-semibold text-slds-neutral-base">Data Mapping</h3>
+                    <h3 className="slds-text-size_medium slds-font-weight_semibold slds-text-neutral-base">Data Mapping</h3>
                   </div>
                   <div className="sf-card-body">
                     {hasMappingDatakit ? (
                       /* Initialized state (Image 1) — datakit installed */
-                      <div className="space-y-4">
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
                         <div>
-                          <p className="text-[10px] uppercase tracking-wider text-slds-neutral-7 mb-0.5">Data Space</p>
-                          <p className="text-sm font-medium text-slds-neutral-base capitalize">{selectedStream.dataSpace}</p>
+                          <p className="slds-text-uppercase slds-tracking-wide slds-text-neutral-7 slds-m-bottom_xx-small" style={{ fontSize: '10px' }}>Data Space</p>
+                          <p className="slds-text-size_medium slds-font-weight_medium slds-text-neutral-base" style={{ textTransform: 'capitalize' }}>{selectedStream.dataSpace}</p>
                         </div>
                         <div>
-                          <p className="text-[10px] uppercase tracking-wider text-slds-neutral-7 mb-1">Mapping Status</p>
-                          <div className="flex items-center gap-2">
-                            <div className="flex-1 h-2 bg-[#E0E0E0] rounded-full overflow-hidden">
-                              <div className="h-full bg-slds-success-1 rounded-full" style={{ width: fields.length ? `${(autoMapped / fields.length) * 100}%` : '0%' }} />
+                          <p className="slds-text-uppercase slds-tracking-wide slds-text-neutral-7 slds-m-bottom_xx-small" style={{ fontSize: '10px' }}>Mapping Status</p>
+                          <div className="slds-flex slds-items-center slds-gap_x-small">
+                            <div className="slds-flex-1 slds-border-radius_pill slds-overflow-hidden" style={{ height: '8px', backgroundColor: '#E0E0E0' }}>
+                              <div className="slds-h-full slds-bg-success slds-border-radius_pill" style={{ width: fields.length ? `${(autoMapped / fields.length) * 100}%` : '0%' }} />
                             </div>
-                            <span className="text-xs font-medium text-slds-neutral-base">{autoMapped}/{fields.length}</span>
+                            <span className="slds-text-size_small slds-font-weight_medium slds-text-neutral-base">{autoMapped}/{fields.length}</span>
                           </div>
-                          <p className="text-xs text-slds-neutral-7 mt-1">
+                          <p className="slds-text-size_small slds-text-neutral-7 slds-m-top_xx-small">
                             {autoMapped} of {fields.length} fields auto-mapped
                           </p>
                         </div>
                         <button
                           onClick={() => setReviewFieldId(fields[0]?.id || '__all__')}
-                          className="w-full px-4 py-2 text-sm font-medium text-white bg-slds-brand rounded hover:bg-slds-brand-contrast-1 transition-colors"
+                          className="slds-w-full slds-p-horizontal_medium slds-p-vertical_x-small slds-text-size_medium slds-font-weight_medium slds-text-white slds-bg-brand slds-border-radius_small slds-transition-colors slds-cursor-pointer"
                         >
                           Review Mapping
                         </button>
                       </div>
                     ) : (
                       /* Empty state (Image 3) — no datakit installed */
-                      <div className="text-center py-6">
-                        <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-slds-neutral-2 flex items-center justify-center">
-                          <svg viewBox="0 0 24 24" className="w-8 h-8 text-slds-neutral-7 opacity-50" fill="none" stroke="currentColor" strokeWidth="1.5">
+                      <div className="slds-text-center slds-p-vertical_large">
+                        <div className="slds-border-radius_pill slds-bg-neutral-2 slds-flex slds-items-center slds-justify-center slds-m-bottom_medium" style={{ width: '64px', height: '64px', margin: '0 auto 16px' }}>
+                          <svg viewBox="0 0 24 24" className="slds-text-neutral-7 slds-opacity_50" style={{ width: '32px', height: '32px' }} fill="none" stroke="currentColor" strokeWidth="1.5">
                             <path d="M4 6h16M4 12h16M4 18h8" strokeLinecap="round" />
                             <circle cx="19" cy="17" r="3" />
                             <path d="M19 15v4M17 17h4" strokeLinecap="round" />
                           </svg>
                         </div>
-                        <h4 className="text-sm font-semibold text-slds-neutral-base mb-1">No Data Mapping Available</h4>
-                        <p className="text-xs text-slds-neutral-7 leading-relaxed">
+                        <h4 className="slds-text-size_medium slds-font-weight_semibold slds-text-neutral-base slds-m-bottom_xx-small">No Data Mapping Available</h4>
+                        <p className="slds-text-size_small slds-text-neutral-7 slds-leading-relaxed">
                           Install a Data Kit from Identity Resolution to enable field mapping for this data stream.
                         </p>
                       </div>
@@ -1076,45 +1079,46 @@ export default function DataStreamsContent({ demoSession, currentTimeline }: Dat
   // LIST VIEW
   // ──────────────────────────────────────────────────────────────────
   return (
-    <div className="h-full flex flex-col">
+    <div className="slds-h-full slds-flex slds-flex-col">
       {/* Page header */}
-      <div className="bg-white border-b border-slds-border-1 px-6 py-4">
-        <div className="flex items-start gap-4">
-          <div className="w-10 h-10 rounded-lg bg-slds-brand-1 flex items-center justify-center flex-shrink-0">
-            <Database className="w-5 h-5 text-white" />
+      <div className="slds-bg-white slds-border_bottom slds-border-color_border-1 slds-p-horizontal_large slds-p-vertical_medium">
+        <div className="slds-flex slds-items-start slds-gap_medium">
+          <div className="slds-border-radius_large slds-bg-brand-1 slds-flex slds-items-center slds-justify-center slds-flex-shrink-0" style={{ width: '40px', height: '40px' }}>
+            <Database className="slds-icon-size_default slds-text-white" />
           </div>
-          <div className="flex-1">
-            <h1 className="text-lg font-bold text-slds-neutral-base">Data Streams</h1>
-            <p className="text-xs text-slds-neutral-7 mt-0.5">Manage data ingestion streams from connected sources</p>
+          <div className="slds-flex-1">
+            <h1 className="slds-font-weight_bold slds-text-neutral-base" style={{ fontSize: '18px' }}>Data Streams</h1>
+            <p className="slds-text-size_small slds-text-neutral-7 slds-m-top_xx-small">Manage data ingestion streams from connected sources</p>
           </div>
           <button
             onClick={handleOpenNew}
-            className="flex items-center gap-1.5 px-4 py-2 text-sm font-medium text-white bg-slds-brand rounded hover:bg-slds-brand-contrast-1 transition-colors"
+            className="slds-flex slds-items-center slds-gap_xx-small slds-p-horizontal_medium slds-p-vertical_x-small slds-text-size_medium slds-font-weight_medium slds-text-white slds-bg-brand slds-border-radius_small slds-transition-colors slds-cursor-pointer"
           >
-            <Plus className="w-4 h-4" />
+            <Plus className="slds-icon-size_small" />
             New Data Stream
           </button>
         </div>
       </div>
 
       {/* Toolbar */}
-      <div className="bg-white border-b border-slds-border-1 px-6 py-2.5 flex items-center gap-3">
-        <div className="relative flex-1 max-w-sm">
-          <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slds-neutral-7" />
+      <div className="slds-bg-white slds-border_bottom slds-border-color_border-1 slds-p-horizontal_large slds-flex slds-items-center slds-gap_small" style={{ paddingTop: '10px', paddingBottom: '10px' }}>
+        <div className="slds-pos-relative slds-flex-1" style={{ maxWidth: '384px' }}>
+          <Search className="slds-pos-absolute slds-icon-size_x-small slds-text-neutral-7" style={{ left: '10px', top: '50%', transform: 'translateY(-50%)' }} />
           <input
             type="text"
             placeholder="Search data streams..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-8 pr-3 py-1.5 text-xs border border-slds-border-1 rounded focus:outline-none focus:border-slds-brand-2 focus:ring-1 focus:ring-[rgba(27,150,255,0.2)]"
+            className="slds-w-full slds-text-size_small slds-border_all slds-border-color_border-1 slds-border-radius_small sf-input"
+            style={{ paddingLeft: '32px', paddingRight: '12px', paddingTop: '6px', paddingBottom: '6px' }}
           />
         </div>
-        <div className="flex items-center gap-1.5">
-          <Filter className="w-3.5 h-3.5 text-slds-neutral-7" />
+        <div className="slds-flex slds-items-center slds-gap_xx-small">
+          <Filter className="slds-icon-size_x-small slds-text-neutral-7" />
           <select
             value={filterSource}
             onChange={(e) => setFilterSource(e.target.value)}
-            className="px-2 py-1.5 text-xs border border-slds-border-1 rounded bg-white focus:outline-none"
+            className="slds-text-size_small slds-border_all slds-border-color_border-1 slds-border-radius_small slds-bg-white" style={{ paddingLeft: '8px', paddingRight: '8px', paddingTop: '6px', paddingBottom: '6px', outline: 'none' }}
           >
             <option value="all">All Sources</option>
             <option value="salesforce">Salesforce CRM</option>
@@ -1122,29 +1126,29 @@ export default function DataStreamsContent({ demoSession, currentTimeline }: Dat
             <option value="api">Ingestion API</option>
           </select>
         </div>
-        <div className="ml-auto flex items-center gap-2">
-          <span className="text-xs text-slds-neutral-7">{filteredStreams.length} streams</span>
-          <button className="w-7 h-7 flex items-center justify-center rounded hover:bg-slds-neutral-2 text-slds-neutral-7">
-            <RefreshCw className="w-3.5 h-3.5" />
+        <div className="slds-flex slds-items-center slds-gap_x-small" style={{ marginLeft: 'auto' }}>
+          <span className="slds-text-size_small slds-text-neutral-7">{filteredStreams.length} streams</span>
+          <button className="slds-flex slds-items-center slds-justify-center slds-border-radius_small sf-hover-bg-neutral slds-text-neutral-7" style={{ width: '28px', height: '28px' }}>
+            <RefreshCw className="slds-icon-size_x-small" />
           </button>
         </div>
       </div>
 
       {/* Data Streams Table */}
-      <div className="flex-1 overflow-y-auto bg-slds-neutral-2">
-        <div className="p-6">
+      <div className="slds-flex-1 slds-overflow-y-auto slds-bg-neutral-2">
+        <div className="slds-p-around_large">
           <div className="sf-card">
             <div className="sf-card-header">
-              <h2 className="text-sm font-semibold text-slds-neutral-base">
-                All Data Streams <span className="text-xs font-normal text-slds-neutral-7">({filteredStreams.length})</span>
+              <h2 className="slds-text-size_medium slds-font-weight_semibold slds-text-neutral-base">
+                All Data Streams <span className="slds-text-size_small slds-font-weight_regular slds-text-neutral-7">({filteredStreams.length})</span>
               </h2>
             </div>
-            <div className="overflow-x-auto">
+            <div className="slds-overflow-x-auto">
               <table className="sf-table">
                 <thead>
                   <tr>
-                    <th><div className="flex items-center gap-1">Data Stream Name <ChevronDown className="w-3 h-3 opacity-50" /></div></th>
-                    <th><div className="flex items-center gap-1">Source <ChevronDown className="w-3 h-3 opacity-50" /></div></th>
+                    <th><div className="slds-flex slds-items-center slds-gap_xx-small">Data Stream Name <ChevronDown className="slds-icon-size_xx-small slds-opacity_50" /></div></th>
+                    <th><div className="slds-flex slds-items-center slds-gap_xx-small">Source <ChevronDown className="slds-icon-size_xx-small slds-opacity_50" /></div></th>
                     <th>Object</th>
                     <th>Status</th>
                     <th>Records Processed</th>
@@ -1155,11 +1159,11 @@ export default function DataStreamsContent({ demoSession, currentTimeline }: Dat
                 </thead>
                 <tbody>
                   {filteredStreams.map((ds) => (
-                    <tr key={ds.id} className="cursor-pointer hover:bg-slds-neutral-2" onClick={() => setSelectedStream(ds)}>
+                    <tr key={ds.id} className="slds-cursor-pointer sf-hover-bg-neutral" onClick={() => setSelectedStream(ds)}>
                       <td>
-                        <div className="flex items-center gap-2">
+                        <div className="slds-flex slds-items-center slds-gap_x-small">
                           <span>{sourceIcon(ds.sourceType)}</span>
-                          <span className="sf-link font-medium">{ds.name}</span>
+                          <span className="sf-link slds-font-weight_medium">{ds.name}</span>
                         </div>
                       </td>
                       <td>{ds.source}</td>
@@ -1173,7 +1177,7 @@ export default function DataStreamsContent({ demoSession, currentTimeline }: Dat
                   ))}
                   {filteredStreams.length === 0 && (
                     <tr>
-                      <td colSpan={8} className="text-center py-8 text-sm text-slds-neutral-7">
+                      <td colSpan={8} className="slds-text-center slds-p-vertical_x-large slds-text-size_medium slds-text-neutral-7">
                         No data streams found.
                       </td>
                     </tr>
@@ -1189,24 +1193,24 @@ export default function DataStreamsContent({ demoSession, currentTimeline }: Dat
           MODAL: New Data Stream Wizard
          ═══════════════════════════════════════════════════════════ */}
       {newModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center">
-          <div className="absolute inset-0 bg-black/40" onClick={() => setNewModalOpen(false)} />
-          <div className={`relative bg-white rounded-lg shadow-2xl max-h-[90vh] flex flex-col transition-all ${newModalStep === 1 || newModalStep === 2 ? 'w-[900px]' : newModalStep === 4 ? 'w-[960px]' : 'w-[640px]'}`}>
+        <div className="slds-pos-fixed slds-inset-0 slds-z-50 slds-flex slds-items-center slds-justify-center">
+          <div className="slds-pos-absolute slds-inset-0 sf-overlay" onClick={() => setNewModalOpen(false)} />
+          <div className={`slds-pos-relative slds-bg-white slds-border-radius_large slds-shadow_large slds-flex slds-flex-col slds-transition-all`} style={{ maxHeight: '90vh', width: newModalStep === 1 || newModalStep === 2 ? '900px' : newModalStep === 4 ? '960px' : '640px' }}>
             {/* Header */}
-            <div className="flex items-center justify-between px-6 py-4 border-b border-slds-border-1">
+            <div className="slds-flex slds-items-center slds-justify-between slds-p-horizontal_large slds-p-vertical_medium slds-border_bottom slds-border-color_border-1">
               <div>
-                <h2 className="text-base font-semibold text-slds-neutral-base">New Data Stream</h2>
-                <p className="text-xs text-slds-neutral-7 mt-0.5">
+                <h2 className="slds-text-size_large slds-font-weight_semibold slds-text-neutral-base">New Data Stream</h2>
+                <p className="slds-text-size_small slds-text-neutral-7 slds-m-top_xx-small">
                   {newModalStep === 1 ? 'Select a data source to connect.' : newModalStep === 2 ? 'Configure your data stream.' : newModalStep === 3 ? 'Review and confirm.' : 'Put the finishing touches on your data stream(s).'}
                 </p>
               </div>
-              <button onClick={() => setNewModalOpen(false)} className="w-7 h-7 flex items-center justify-center rounded hover:bg-slds-neutral-2 text-slds-neutral-7">
-                <X className="w-4 h-4" />
+              <button onClick={() => setNewModalOpen(false)} className="slds-flex slds-items-center slds-justify-center slds-border-radius_small sf-hover-bg-neutral slds-text-neutral-7" style={{ width: '28px', height: '28px' }}>
+                <X className="slds-icon-size_small" />
               </button>
             </div>
 
             {/* Body */}
-            <div className="flex-1 overflow-y-auto px-6 py-6">
+            <div className="slds-flex-1 slds-overflow-y-auto slds-p-horizontal_large slds-p-vertical_large">
               {/* Step 1: Source selection — matches Salesforce reference layout */}
               {newModalStep === 1 && (() => {
                 const filteredConnectors = explorerConnectors.filter((c) => {
@@ -1215,39 +1219,40 @@ export default function DataStreamsContent({ demoSession, currentTimeline }: Dat
                   return matchSearch && matchCat;
                 });
                 return (
-                  <div className="space-y-6">
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
                     {/* Info banner */}
-                    <div className="flex items-start gap-3 p-4 bg-[#E1F5FE] rounded-lg">
-                      <Info className="w-5 h-5 text-slds-brand flex-shrink-0 mt-0.5" />
-                      <div className="text-sm text-slds-neutral-9">
+                    <div className="slds-flex slds-items-start slds-gap_small slds-p-around_medium slds-border-radius_large" style={{ backgroundColor: '#E1F5FE' }}>
+                      <Info className="slds-icon-size_default slds-text-brand slds-flex-shrink-0 slds-m-top_xx-small" />
+                      <div className="slds-text-size_medium slds-text-neutral-9">
                         Select the data source from which you can ingest or federate data. Only sources that are already connected to Data Cloud appear on this list. <span className="sf-link">Learn More</span>
                       </div>
                     </div>
 
                     {/* ─── Connected Sources ─── */}
                     <div>
-                      <h3 className="text-sm font-semibold text-slds-neutral-base mb-3">Connected Sources</h3>
-                      <div className="grid grid-cols-3 gap-4">
+                      <h3 className="slds-text-size_medium slds-font-weight_semibold slds-text-neutral-base slds-m-bottom_small">Connected Sources</h3>
+                      <div className="slds-css-grid slds-css-grid-cols-3 slds-gap_medium">
                         {/* Ingestion API */}
                         {(() => {
                           const isSelected = selectedSource === 'src-api';
                           return (
                             <button
                               onClick={() => setSelectedSource('src-api')}
-                              className={`relative flex flex-col items-center text-center rounded-lg border-2 p-6 transition-all ${
-                                isSelected ? 'border-slds-brand bg-[#EEF4FF] shadow-sm' : 'border-[#D8DDE6] bg-white hover:border-[#B0B0B0]'
+                              className={`slds-pos-relative slds-flex slds-flex-col slds-items-center slds-text-center slds-border-radius_large slds-p-around_large slds-transition-all ${
+                                isSelected ? 'slds-border-color_brand slds-shadow_small' : 'slds-bg-white'
                               }`}
+                              style={{ border: isSelected ? '2px solid var(--slds-g-color-brand-1)' : '2px solid #D8DDE6', backgroundColor: isSelected ? '#EEF4FF' : undefined }}
                             >
                               {isSelected && (
-                                <div className="absolute top-0 right-0 w-6 h-6 bg-slds-brand flex items-center justify-center" style={{ clipPath: 'polygon(0 0, 100% 0, 100% 100%)' }}>
-                                  <Check className="w-2.5 h-2.5 text-white absolute top-0.5 right-0.5" />
+                                <div className="slds-pos-absolute slds-bg-brand slds-flex slds-items-center slds-justify-center" style={{ top: 0, right: 0, width: '24px', height: '24px', clipPath: 'polygon(0 0, 100% 0, 100% 100%)' }}>
+                                  <Check className="slds-text-white slds-pos-absolute" style={{ width: '10px', height: '10px', top: '2px', right: '2px' }} />
                                 </div>
                               )}
-                              <div className="w-14 h-14 rounded-lg flex items-center justify-center mb-3 bg-slds-neutral-2">
-                                <Server className="w-8 h-8 text-slds-neutral-7" />
+                              <div className="slds-border-radius_large slds-flex slds-items-center slds-justify-center slds-m-bottom_small slds-bg-neutral-2" style={{ width: '56px', height: '56px' }}>
+                                <Server className="slds-text-neutral-7" style={{ width: '32px', height: '32px' }} />
                               </div>
-                              <div className="text-sm font-semibold text-slds-neutral-base">Ingestion API</div>
-                              <div className="text-xs text-slds-neutral-7 mt-1">Stream and/or bulk upload data from external sources</div>
+                              <div className="slds-text-size_medium slds-font-weight_semibold slds-text-neutral-base">Ingestion API</div>
+                              <div className="slds-text-size_small slds-text-neutral-7 slds-m-top_xx-small">Stream and/or bulk upload data from external sources</div>
                             </button>
                           );
                         })()}
@@ -1258,20 +1263,21 @@ export default function DataStreamsContent({ demoSession, currentTimeline }: Dat
                           return (
                             <button
                               onClick={() => setSelectedSource('salesforce')}
-                              className={`relative flex flex-col items-center text-center rounded-lg border-2 p-6 transition-all ${
-                                isSelected ? 'border-slds-brand bg-[#EEF4FF] shadow-sm' : 'border-[#D8DDE6] bg-white hover:border-[#B0B0B0]'
+                              className={`slds-pos-relative slds-flex slds-flex-col slds-items-center slds-text-center slds-border-radius_large slds-p-around_large slds-transition-all ${
+                                isSelected ? 'slds-border-color_brand slds-shadow_small' : 'slds-bg-white'
                               }`}
+                              style={{ border: isSelected ? '2px solid var(--slds-g-color-brand-1)' : '2px solid #D8DDE6', backgroundColor: isSelected ? '#EEF4FF' : undefined }}
                             >
                               {isSelected && (
-                                <div className="absolute top-0 right-0 w-6 h-6 bg-slds-brand flex items-center justify-center" style={{ clipPath: 'polygon(0 0, 100% 0, 100% 100%)' }}>
-                                  <Check className="w-2.5 h-2.5 text-white absolute top-0.5 right-0.5" />
+                                <div className="slds-pos-absolute slds-bg-brand slds-flex slds-items-center slds-justify-center" style={{ top: 0, right: 0, width: '24px', height: '24px', clipPath: 'polygon(0 0, 100% 0, 100% 100%)' }}>
+                                  <Check className="slds-text-white slds-pos-absolute" style={{ width: '10px', height: '10px', top: '2px', right: '2px' }} />
                                 </div>
                               )}
-                              <div className="w-14 h-14 rounded-lg flex items-center justify-center mb-3 bg-[#E8F4FD]">
-                                <svg viewBox="0 0 48 48" className="w-9 h-9 text-[#00A1E0]"><path fill="currentColor" d="M20.5 8.5c2.3-2.4 5.5-3.9 9-3.9 4.8 0 9 2.8 11 6.8 1.5-.6 3.1-1 4.8-1 7 0 12.7 5.7 12.7 12.7S52.3 35.8 45.3 35.8c-1.3 0-2.5-.2-3.7-.6-1.8 3.5-5.4 5.9-9.6 5.9-1.8 0-3.5-.4-5-1.2-1.8 2.8-4.9 4.6-8.5 4.6-4.5 0-8.3-3-9.6-7.1-.8.1-1.6.2-2.4.2C2.9 37.6 0 34.7 0 29.1s4.5-8.5 8.5-8.5c.6 0 1.2.1 1.8.2C11.2 14.7 15.4 10.3 20.5 8.5z" transform="scale(0.7) translate(2,5)"/></svg>
+                              <div className="slds-border-radius_large slds-flex slds-items-center slds-justify-center slds-m-bottom_small" style={{ width: '56px', height: '56px', backgroundColor: '#E8F4FD' }}>
+                                <svg viewBox="0 0 48 48" style={{ width: '36px', height: '36px', color: '#00A1E0' }}><path fill="currentColor" d="M20.5 8.5c2.3-2.4 5.5-3.9 9-3.9 4.8 0 9 2.8 11 6.8 1.5-.6 3.1-1 4.8-1 7 0 12.7 5.7 12.7 12.7S52.3 35.8 45.3 35.8c-1.3 0-2.5-.2-3.7-.6-1.8 3.5-5.4 5.9-9.6 5.9-1.8 0-3.5-.4-5-1.2-1.8 2.8-4.9 4.6-8.5 4.6-4.5 0-8.3-3-9.6-7.1-.8.1-1.6.2-2.4.2C2.9 37.6 0 34.7 0 29.1s4.5-8.5 8.5-8.5c.6 0 1.2.1 1.8.2C11.2 14.7 15.4 10.3 20.5 8.5z" transform="scale(0.7) translate(2,5)"/></svg>
                               </div>
-                              <div className="text-sm font-semibold text-slds-neutral-base">Salesforce CRM</div>
-                              <div className="text-xs text-slds-neutral-7 mt-1">Import objects from Salesforce CRM</div>
+                              <div className="slds-text-size_medium slds-font-weight_semibold slds-text-neutral-base">Salesforce CRM</div>
+                              <div className="slds-text-size_small slds-text-neutral-7 slds-m-top_xx-small">Import objects from Salesforce CRM</div>
                             </button>
                           );
                         })()}
@@ -1282,20 +1288,21 @@ export default function DataStreamsContent({ demoSession, currentTimeline }: Dat
                           return (
                             <button
                               onClick={() => setSelectedSource('src-s2s')}
-                              className={`relative flex flex-col items-center text-center rounded-lg border-2 p-6 transition-all ${
-                                isSelected ? 'border-slds-brand bg-[#EEF4FF] shadow-sm' : 'border-[#D8DDE6] bg-white hover:border-[#B0B0B0]'
+                              className={`slds-pos-relative slds-flex slds-flex-col slds-items-center slds-text-center slds-border-radius_large slds-p-around_large slds-transition-all ${
+                                isSelected ? 'slds-border-color_brand slds-shadow_small' : 'slds-bg-white'
                               }`}
+                              style={{ border: isSelected ? '2px solid var(--slds-g-color-brand-1)' : '2px solid #D8DDE6', backgroundColor: isSelected ? '#EEF4FF' : undefined }}
                             >
                               {isSelected && (
-                                <div className="absolute top-0 right-0 w-6 h-6 bg-slds-brand flex items-center justify-center" style={{ clipPath: 'polygon(0 0, 100% 0, 100% 100%)' }}>
-                                  <Check className="w-2.5 h-2.5 text-white absolute top-0.5 right-0.5" />
+                                <div className="slds-pos-absolute slds-bg-brand slds-flex slds-items-center slds-justify-center" style={{ top: 0, right: 0, width: '24px', height: '24px', clipPath: 'polygon(0 0, 100% 0, 100% 100%)' }}>
+                                  <Check className="slds-text-white slds-pos-absolute" style={{ width: '10px', height: '10px', top: '2px', right: '2px' }} />
                                 </div>
                               )}
-                              <div className="w-14 h-14 rounded-lg flex items-center justify-center mb-3 bg-slds-neutral-2">
-                                <Globe className="w-8 h-8 text-slds-neutral-7" />
+                              <div className="slds-border-radius_large slds-flex slds-items-center slds-justify-center slds-m-bottom_small slds-bg-neutral-2" style={{ width: '56px', height: '56px' }}>
+                                <Globe className="slds-text-neutral-7" style={{ width: '32px', height: '32px' }} />
                               </div>
-                              <div className="text-sm font-semibold text-slds-neutral-base">Server To Server</div>
-                              <div className="text-xs text-slds-neutral-7 mt-1">Manually configure an authenticated connection</div>
+                              <div className="slds-text-size_medium slds-font-weight_semibold slds-text-neutral-base">Server To Server</div>
+                              <div className="slds-text-size_small slds-text-neutral-7 slds-m-top_xx-small">Manually configure an authenticated connection</div>
                             </button>
                           );
                         })()}
@@ -1303,28 +1310,29 @@ export default function DataStreamsContent({ demoSession, currentTimeline }: Dat
 
                       {/* Informatica MDM — extra row, only when connected */}
                       {hasInformaticaConn && (
-                        <div className="grid grid-cols-3 gap-4 mt-4">
+                        <div className="slds-css-grid slds-css-grid-cols-3 slds-gap_medium slds-m-top_medium">
                           {(() => {
                             const isSelected = selectedSource === 'informatica';
                             return (
                               <button
                                 onClick={() => setSelectedSource('informatica')}
-                                className={`relative flex flex-col items-center text-center rounded-lg border-2 p-6 transition-all ${
-                                  isSelected ? 'border-slds-brand bg-[#EEF4FF] shadow-sm' : 'border-[#D8DDE6] bg-white hover:border-[#B0B0B0]'
+                                className={`slds-pos-relative slds-flex slds-flex-col slds-items-center slds-text-center slds-border-radius_large slds-p-around_large slds-transition-all ${
+                                  isSelected ? 'slds-border-color_brand slds-shadow_small' : 'slds-bg-white'
                                 }`}
+                                style={{ border: isSelected ? '2px solid var(--slds-g-color-brand-1)' : '2px solid #D8DDE6', backgroundColor: isSelected ? '#EEF4FF' : undefined }}
                               >
                                 {isSelected && (
-                                  <div className="absolute top-0 right-0 w-6 h-6 bg-slds-brand flex items-center justify-center" style={{ clipPath: 'polygon(0 0, 100% 0, 100% 100%)' }}>
-                                    <Check className="w-2.5 h-2.5 text-white absolute top-0.5 right-0.5" />
+                                  <div className="slds-pos-absolute slds-bg-brand slds-flex slds-items-center slds-justify-center" style={{ top: 0, right: 0, width: '24px', height: '24px', clipPath: 'polygon(0 0, 100% 0, 100% 100%)' }}>
+                                    <Check className="slds-text-white slds-pos-absolute" style={{ width: '10px', height: '10px', top: '2px', right: '2px' }} />
                                   </div>
                                 )}
-                                <div className="w-14 h-14 rounded flex items-center justify-center mb-3 bg-[#FF4A00]">
-                                  <svg viewBox="0 0 40 40" className="w-9 h-9">
+                                <div className="slds-border-radius_small slds-flex slds-items-center slds-justify-center slds-m-bottom_small" style={{ width: '56px', height: '56px', backgroundColor: '#FF4A00' }}>
+                                  <svg viewBox="0 0 40 40" style={{ width: '36px', height: '36px' }}>
                                     <text x="20" y="26" textAnchor="middle" fill="white" fontSize="12" fontWeight="bold">INFA</text>
                                   </svg>
                                 </div>
-                                <div className="text-sm font-semibold text-slds-neutral-base">Informatica MDM</div>
-                                <div className="text-xs text-slds-neutral-7 mt-1">Ingest master data entities from Informatica MDM</div>
+                                <div className="slds-text-size_medium slds-font-weight_semibold slds-text-neutral-base">Informatica MDM</div>
+                                <div className="slds-text-size_small slds-text-neutral-7 slds-m-top_xx-small">Ingest master data entities from Informatica MDM</div>
                               </button>
                             );
                           })()}
@@ -1334,9 +1342,9 @@ export default function DataStreamsContent({ demoSession, currentTimeline }: Dat
 
                     {/* ─── Other Sources ─── */}
                     <div>
-                      <h3 className="text-sm font-semibold text-slds-neutral-base mb-1">Other Sources</h3>
-                      <p className="text-xs text-slds-neutral-7 mb-3">Load a sample file in order to teach the system about your file&apos;s structure, or connect additional data sources.</p>
-                      <div className="grid grid-cols-3 gap-4">
+                      <h3 className="slds-text-size_medium slds-font-weight_semibold slds-text-neutral-base slds-m-bottom_xx-small">Other Sources</h3>
+                      <p className="slds-text-size_small slds-text-neutral-7 slds-m-bottom_small">Load a sample file in order to teach the system about your file&apos;s structure, or connect additional data sources.</p>
+                      <div className="slds-css-grid slds-css-grid-cols-3 slds-gap_medium">
                         {[
                           { id: 'src-upload', name: 'File Upload', icon: 'upload' as const, color: '#706E6B', desc: 'Upload CSV, JSON, or Parquet files' },
                           { id: 'src-kits', name: 'Installed Data Kits & Packages', icon: 'pkg' as const, color: '#00A1E0', desc: 'Installed data kits and managed packages' },
@@ -1347,22 +1355,23 @@ export default function DataStreamsContent({ demoSession, currentTimeline }: Dat
                             <button
                               key={src.id}
                               onClick={() => setSelectedSource(src.id)}
-                              className={`relative flex flex-col items-center text-center rounded-lg border-2 p-6 transition-all ${
-                                isSelected ? 'border-slds-brand bg-[#EEF4FF] shadow-sm' : 'border-[#D8DDE6] bg-white hover:border-[#B0B0B0]'
+                              className={`slds-pos-relative slds-flex slds-flex-col slds-items-center slds-text-center slds-border-radius_large slds-p-around_large slds-transition-all ${
+                                isSelected ? 'slds-border-color_brand slds-shadow_small' : 'slds-bg-white'
                               }`}
+                              style={{ border: isSelected ? '2px solid var(--slds-g-color-brand-1)' : '2px solid #D8DDE6', backgroundColor: isSelected ? '#EEF4FF' : undefined }}
                             >
                               {isSelected && (
-                                <div className="absolute top-0 right-0 w-5 h-5 bg-slds-brand flex items-center justify-center" style={{ clipPath: 'polygon(0 0, 100% 0, 100% 100%)' }}>
-                                  <Check className="w-2 h-2 text-white absolute top-0.5 right-0.5" />
+                                <div className="slds-pos-absolute slds-bg-brand slds-flex slds-items-center slds-justify-center" style={{ top: 0, right: 0, width: '20px', height: '20px', clipPath: 'polygon(0 0, 100% 0, 100% 100%)' }}>
+                                  <Check className="slds-text-white slds-pos-absolute" style={{ width: '8px', height: '8px', top: '2px', right: '2px' }} />
                                 </div>
                               )}
-                              <div className="w-14 h-14 rounded-lg flex items-center justify-center mb-3" style={{ backgroundColor: src.color + '18' }}>
-                                {src.icon === 'upload' ? <Upload className="w-8 h-8" style={{ color: src.color }} /> :
-                                 src.icon === 'pkg' ? <Database className="w-8 h-8" style={{ color: src.color }} /> :
-                                 <svg viewBox="0 0 24 24" className="w-8 h-8"><circle cx="12" cy="12" r="10" fill={src.color} /><text x="12" y="16" textAnchor="middle" fill="white" fontSize="8" fontWeight="bold">SF</text></svg>}
+                              <div className="slds-border-radius_large slds-flex slds-items-center slds-justify-center slds-m-bottom_small" style={{ width: '56px', height: '56px', backgroundColor: src.color + '18' }}>
+                                {src.icon === 'upload' ? <Upload style={{ width: '32px', height: '32px', color: src.color }} /> :
+                                 src.icon === 'pkg' ? <Database style={{ width: '32px', height: '32px', color: src.color }} /> :
+                                 <svg viewBox="0 0 24 24" style={{ width: '32px', height: '32px' }}><circle cx="12" cy="12" r="10" fill={src.color} /><text x="12" y="16" textAnchor="middle" fill="white" fontSize="8" fontWeight="bold">SF</text></svg>}
                               </div>
-                              <div className="text-sm font-semibold text-slds-neutral-base">{src.name}</div>
-                              <div className="text-xs text-slds-neutral-7 mt-1">{src.desc}</div>
+                              <div className="slds-text-size_medium slds-font-weight_semibold slds-text-neutral-base">{src.name}</div>
+                              <div className="slds-text-size_small slds-text-neutral-7 slds-m-top_xx-small">{src.desc}</div>
                             </button>
                           );
                         })}
@@ -1371,35 +1380,36 @@ export default function DataStreamsContent({ demoSession, currentTimeline }: Dat
 
                     {/* ─── Explore Other Connectors ─── */}
                     <div>
-                      <div className="flex items-center justify-between mb-3">
-                        <h3 className="text-xs font-semibold uppercase tracking-wider text-slds-neutral-7">
-                          Explore Other Connectors <span className="text-[10px] font-normal normal-case">({filteredConnectors.length})</span>
+                      <div className="slds-flex slds-items-center slds-justify-between slds-m-bottom_small">
+                        <h3 className="slds-text-size_small slds-font-weight_semibold slds-text-uppercase slds-tracking-wide slds-text-neutral-7">
+                          Explore Other Connectors <span className="slds-font-weight_regular" style={{ fontSize: '10px', textTransform: 'none' }}>({filteredConnectors.length})</span>
                         </h3>
                       </div>
                       {/* Search + filter checkboxes */}
-                      <div className="flex items-center gap-3 mb-3">
-                        <div className="relative flex-1">
-                          <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slds-neutral-7" />
+                      <div className="slds-flex slds-items-center slds-gap_small slds-m-bottom_small">
+                        <div className="slds-pos-relative slds-flex-1">
+                          <Search className="slds-pos-absolute slds-icon-size_x-small slds-text-neutral-7" style={{ left: '10px', top: '50%', transform: 'translateY(-50%)' }} />
                           <input
                             type="text"
                             placeholder="Filter Connectors"
                             value={connectorSearch}
                             onChange={(e) => setConnectorSearch(e.target.value)}
-                            className="w-full pl-8 pr-3 py-1.5 text-xs border border-slds-border-1 rounded focus:outline-none focus:border-slds-brand-2 focus:ring-1 focus:ring-[rgba(27,150,255,0.2)]"
+                            className="slds-w-full slds-text-size_small slds-border_all slds-border-color_border-1 slds-border-radius_small sf-input"
+                            style={{ paddingLeft: '32px', paddingRight: '12px', paddingTop: '6px', paddingBottom: '6px' }}
                           />
                         </div>
-                        <label className="flex items-center gap-1.5 text-xs text-slds-neutral-9 cursor-pointer">
-                          <input type="checkbox" defaultChecked className="w-3.5 h-3.5 rounded border-slds-border-1 accent-slds-brand" />
+                        <label className="slds-flex slds-items-center slds-gap_xx-small slds-text-size_small slds-text-neutral-9 slds-cursor-pointer">
+                          <input type="checkbox" defaultChecked className="slds-border-radius_small slds-border-color_border-1" style={{ width: '14px', height: '14px', accentColor: 'var(--slds-g-color-brand-1)' }} />
                           Generally Available
                         </label>
-                        <label className="flex items-center gap-1.5 text-xs text-slds-neutral-9 cursor-pointer">
-                          <input type="checkbox" defaultChecked className="w-3.5 h-3.5 rounded border-slds-border-1 accent-slds-brand" />
+                        <label className="slds-flex slds-items-center slds-gap_xx-small slds-text-size_small slds-text-neutral-9 slds-cursor-pointer">
+                          <input type="checkbox" defaultChecked className="slds-border-radius_small slds-border-color_border-1" style={{ width: '14px', height: '14px', accentColor: 'var(--slds-g-color-brand-1)' }} />
                           Beta
                         </label>
                         <select
                           value={connectorCategory}
                           onChange={(e) => setConnectorCategory(e.target.value)}
-                          className="px-2 py-1.5 text-xs border border-slds-border-1 rounded bg-white focus:outline-none"
+                          className="slds-text-size_small slds-border_all slds-border-color_border-1 slds-border-radius_small slds-bg-white" style={{ paddingLeft: '8px', paddingRight: '8px', paddingTop: '6px', paddingBottom: '6px', outline: 'none' }}
                         >
                           <option value="all">All Categories</option>
                           {connectorCategories.map((cat) => (
@@ -1408,40 +1418,41 @@ export default function DataStreamsContent({ demoSession, currentTimeline }: Dat
                         </select>
                       </div>
                       {/* Scrollable connector grid */}
-                      <div className="max-h-[260px] overflow-y-auto border border-slds-border-1 rounded-lg bg-[#FAFAF9] p-3">
-                        <div className="grid grid-cols-4 gap-2">
+                      <div className="slds-overflow-y-auto slds-border_all slds-border-color_border-1 slds-border-radius_large slds-p-around_small" style={{ maxHeight: '260px', backgroundColor: '#FAFAF9' }}>
+                        <div className="slds-css-grid slds-css-grid-cols-4 slds-gap_x-small">
                           {filteredConnectors.map((conn) => {
                             const isSelected = selectedSource === conn.id;
                             return (
                               <button
                                 key={conn.id}
                                 onClick={() => setSelectedSource(conn.id)}
-                                className={`relative flex items-center gap-2.5 p-2.5 rounded-lg border-2 transition-all text-left group ${
+                                className={`slds-pos-relative slds-flex slds-items-center slds-text-left slds-border-radius_large slds-transition-all ${
                                   isSelected
-                                    ? 'border-slds-brand bg-[#EEF4FF] shadow-sm'
-                                    : 'border-slds-border-1 bg-white hover:border-[#B0B0B0] hover:shadow-sm'
+                                    ? 'slds-border-color_brand slds-shadow_small'
+                                    : 'slds-border-color_border-1 slds-bg-white'
                                 }`}
+                                style={{ gap: '10px', padding: '10px', border: isSelected ? '2px solid var(--slds-g-color-brand-1)' : '2px solid var(--slds-g-color-border-1)', backgroundColor: isSelected ? '#EEF4FF' : undefined }}
                               >
                                 {isSelected && (
-                                  <div className="absolute top-0 right-0 w-5 h-5 bg-slds-brand flex items-center justify-center" style={{ clipPath: 'polygon(0 0, 100% 0, 100% 100%)' }}>
-                                    <Check className="w-2 h-2 text-white absolute top-0.5 right-0.5" />
+                                  <div className="slds-pos-absolute slds-bg-brand slds-flex slds-items-center slds-justify-center" style={{ top: 0, right: 0, width: '20px', height: '20px', clipPath: 'polygon(0 0, 100% 0, 100% 100%)' }}>
+                                    <Check className="slds-text-white slds-pos-absolute" style={{ width: '8px', height: '8px', top: '2px', right: '2px' }} />
                                   </div>
                                 )}
-                                <div className="w-8 h-8 rounded flex items-center justify-center flex-shrink-0" style={{ backgroundColor: conn.color }}>
-                                  <span className="text-[9px] font-bold text-white leading-none">{conn.icon}</span>
+                                <div className="slds-border-radius_small slds-flex slds-items-center slds-justify-center slds-flex-shrink-0" style={{ width: '32px', height: '32px', backgroundColor: conn.color }}>
+                                  <span className="slds-font-weight_bold slds-text-white" style={{ fontSize: '9px', lineHeight: '1' }}>{conn.icon}</span>
                                 </div>
-                                <div className="flex-1 min-w-0">
-                                  <div className="flex items-center gap-1.5">
-                                    <span className="text-[11px] font-medium text-slds-neutral-base truncate leading-tight">{conn.name}</span>
-                                    <span className="px-1 py-0 text-[7px] font-semibold uppercase tracking-wider border border-slds-border-1 text-slds-neutral-7 rounded flex-shrink-0">Beta</span>
+                                <div className="slds-flex-1 slds-min-w-0">
+                                  <div className="slds-flex slds-items-center slds-gap_xx-small">
+                                    <span className="slds-font-weight_medium slds-text-neutral-base slds-truncate" style={{ fontSize: '11px', lineHeight: 'tight' }}>{conn.name}</span>
+                                    <span className="slds-font-weight_semibold slds-text-uppercase slds-tracking-wide slds-border_all slds-border-color_border-1 slds-text-neutral-7 slds-border-radius_small slds-flex-shrink-0" style={{ paddingLeft: '4px', paddingRight: '4px', paddingTop: '0', fontSize: '7px' }}>Beta</span>
                                   </div>
-                                  <div className="text-[9px] text-slds-neutral-7 truncate">{conn.category}</div>
+                                  <div className="slds-text-neutral-7 slds-truncate" style={{ fontSize: '9px' }}>{conn.category}</div>
                                 </div>
                               </button>
                             );
                           })}
                           {filteredConnectors.length === 0 && (
-                            <div className="col-span-4 py-8 text-center text-xs text-slds-neutral-7">
+                            <div className="slds-p-vertical_x-large slds-text-center slds-text-size_small slds-text-neutral-7" style={{ gridColumn: 'span 4' }}>
                               No connectors match your search.
                             </div>
                           )}
@@ -1459,66 +1470,66 @@ export default function DataStreamsContent({ demoSession, currentTimeline }: Dat
                 );
                 const focusedSfBundle = salesforceStandardBundles.find((b) => b.id === focusedSfBundleId);
                 return (
-                  <div className="space-y-4">
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
                     {/* Info banner */}
-                    <div className="flex items-start gap-3 p-4 bg-[#E1F5FE] rounded-lg">
-                      <Info className="w-5 h-5 text-slds-brand flex-shrink-0 mt-0.5" />
-                      <div className="text-sm text-slds-neutral-9">
+                    <div className="slds-flex slds-items-start slds-gap_small slds-p-around_medium slds-border-radius_large" style={{ backgroundColor: '#E1F5FE' }}>
+                      <Info className="slds-icon-size_default slds-text-brand slds-flex-shrink-0 slds-m-top_xx-small" />
+                      <div className="slds-text-size_medium slds-text-neutral-9">
                         To ensure data is ingested from fields and objects created in the future, we recommend granting <strong>View All Fields (Global)</strong> and <strong>View All Data</strong> permission to the integration user profile. <span className="sf-link">Learn More</span>
                       </div>
                     </div>
 
-                    <p className="text-xs text-slds-neutral-7">
+                    <p className="slds-text-size_small slds-text-neutral-7">
                       Select an org to ingest data from, then select an object or data bundle.
                     </p>
 
                     {/* Org selector + view toggle */}
-                    <div className="flex items-end gap-3">
-                      <div className="flex-1">
-                        <label className="block text-xs font-medium text-slds-neutral-7 mb-1">* Salesforce Org</label>
-                        <select className="w-full px-3 py-2 text-sm border border-slds-border-1 rounded bg-white focus:outline-none">
+                    <div className="slds-flex slds-items-end slds-gap_small">
+                      <div className="slds-flex-1">
+                        <label className="slds-text-size_small slds-font-weight_medium slds-text-neutral-7 slds-m-bottom_xx-small" style={{ display: 'block' }}>* Salesforce Org</label>
+                        <select className="slds-w-full slds-p-horizontal_small slds-p-vertical_x-small slds-text-size_medium slds-border_all slds-border-color_border-1 slds-border-radius_small slds-bg-white" style={{ outline: 'none' }}>
                           <option>Data Cloud SG</option>
                         </select>
                       </div>
-                      <div className="flex items-center border border-slds-border-1 rounded overflow-hidden">
+                      <div className="slds-flex slds-items-center slds-border_all slds-border-color_border-1 slds-border-radius_small slds-overflow-hidden">
                         <button
                           onClick={() => setSfViewMode('bundles')}
-                          className={`px-3 py-2 text-xs font-medium ${sfViewMode === 'bundles' ? 'bg-slds-brand text-white' : 'bg-white text-slds-neutral-9 hover:bg-slds-neutral-2'}`}
+                          className={`slds-p-horizontal_small slds-p-vertical_x-small slds-text-size_small slds-font-weight_medium ${sfViewMode === 'bundles' ? 'slds-bg-brand slds-text-white' : 'slds-bg-white slds-text-neutral-9 sf-hover-bg-neutral'}`}
                         >View Bundles</button>
                         <button
                           onClick={() => setSfViewMode('objects')}
-                          className={`px-3 py-2 text-xs font-medium ${sfViewMode === 'objects' ? 'bg-slds-brand text-white' : 'bg-white text-slds-neutral-9 hover:bg-slds-neutral-2'}`}
+                          className={`slds-p-horizontal_small slds-p-vertical_x-small slds-text-size_small slds-font-weight_medium ${sfViewMode === 'objects' ? 'slds-bg-brand slds-text-white' : 'slds-bg-white slds-text-neutral-9 sf-hover-bg-neutral'}`}
                         >View Objects</button>
                       </div>
                     </div>
 
                     {/* Loading spinner state */}
                     {step2Loading ? (
-                      <div className="flex flex-col items-center justify-center py-20">
-                        <div className="flex gap-1.5 mb-3">
-                          <div className="w-2.5 h-2.5 rounded-full bg-slds-brand animate-bounce" style={{ animationDelay: '0ms' }} />
-                          <div className="w-2.5 h-2.5 rounded-full bg-slds-brand animate-bounce" style={{ animationDelay: '150ms' }} />
-                          <div className="w-2.5 h-2.5 rounded-full bg-slds-brand animate-bounce" style={{ animationDelay: '300ms' }} />
+                      <div className="slds-flex slds-flex-col slds-items-center slds-justify-center" style={{ paddingTop: '80px', paddingBottom: '80px' }}>
+                        <div className="slds-flex slds-gap_xx-small slds-m-bottom_small">
+                          <div className="slds-border-radius_pill slds-bg-brand" style={{ width: '10px', height: '10px', animation: 'bounce 1s infinite', animationDelay: '0ms' }} />
+                          <div className="slds-border-radius_pill slds-bg-brand" style={{ width: '10px', height: '10px', animation: 'bounce 1s infinite', animationDelay: '150ms' }} />
+                          <div className="slds-border-radius_pill slds-bg-brand" style={{ width: '10px', height: '10px', animation: 'bounce 1s infinite', animationDelay: '300ms' }} />
                         </div>
-                        <p className="text-sm text-slds-neutral-7">Loading bundles...</p>
+                        <p className="slds-text-size_medium slds-text-neutral-7">Loading bundles...</p>
                       </div>
                     ) : (
                     <>
                     {/* Bundle view */}
                     {sfViewMode === 'bundles' && (
-                      <div className="flex gap-4">
+                      <div className="slds-flex slds-gap_medium">
                         {/* Bundle grid */}
-                        <div className="flex-1 min-w-0">
-                          <div className="flex items-center justify-between mb-2">
-                            <h4 className="text-sm font-semibold text-slds-neutral-base">Standard Bundles ({salesforceStandardBundles.length})</h4>
-                            <div className="relative w-48">
-                              <Search className="absolute left-2 top-1/2 -translate-y-1/2 w-3 h-3 text-slds-neutral-7" />
+                        <div className="slds-flex-1 slds-min-w-0">
+                          <div className="slds-flex slds-items-center slds-justify-between slds-m-bottom_x-small">
+                            <h4 className="slds-text-size_medium slds-font-weight_semibold slds-text-neutral-base">Standard Bundles ({salesforceStandardBundles.length})</h4>
+                            <div className="slds-pos-relative" style={{ width: '192px' }}>
+                              <Search className="slds-pos-absolute slds-icon-size_xx-small slds-text-neutral-7" style={{ left: '8px', top: '50%', transform: 'translateY(-50%)' }} />
                               <input type="text" placeholder="Search..." value={sfBundleSearch} onChange={(e) => setSfBundleSearch(e.target.value)}
-                                className="w-full pl-7 pr-2 py-1 text-xs border border-slds-border-1 rounded focus:outline-none focus:border-slds-brand-2" />
+                                className="slds-w-full slds-text-size_small slds-border_all slds-border-color_border-1 slds-border-radius_small sf-input" style={{ paddingLeft: '28px', paddingRight: '8px', paddingTop: '4px', paddingBottom: '4px' }} />
                             </div>
                           </div>
-                          <div className="max-h-[320px] overflow-y-auto border border-slds-border-1 rounded-lg">
-                            <div className="grid grid-cols-3 gap-0">
+                          <div className="slds-overflow-y-auto slds-border_all slds-border-color_border-1 slds-border-radius_large" style={{ maxHeight: '320px' }}>
+                            <div className="slds-css-grid slds-css-grid-cols-3" style={{ gap: '0px' }}>
                               {filteredSfBundles.map((bundle) => {
                                 const isSelected = selectedSfBundles.has(bundle.id);
                                 const isFocused = focusedSfBundleId === bundle.id;
@@ -1530,18 +1541,19 @@ export default function DataStreamsContent({ demoSession, currentTimeline }: Dat
                                       setSelectedSfBundles((prev) => { const n = new Set(prev); if (n.has(bundle.id)) n.delete(bundle.id); else n.add(bundle.id); return n; });
                                     }}
                                     onMouseEnter={() => setFocusedSfBundleId(bundle.id)}
-                                    className={`flex items-center gap-3 p-3 text-left border border-slds-border-1 transition-all ${
-                                      isSelected ? 'bg-[#EEF4FF] border-slds-brand' : isFocused ? 'bg-[#FAFAF9]' : 'bg-white hover:bg-[#FAFAF9]'
+                                    className={`slds-flex slds-items-center slds-gap_small slds-p-around_small slds-text-left slds-border_all slds-border-color_border-1 slds-transition-all ${
+                                      isSelected ? 'slds-border-color_brand' : ''
                                     }`}
+                                    style={{ backgroundColor: isSelected ? '#EEF4FF' : isFocused ? '#FAFAF9' : 'white' }}
                                   >
-                                    <div className="w-8 h-8 rounded flex items-center justify-center flex-shrink-0" style={{ backgroundColor: bundle.iconColor }}>
-                                      <span className="text-[9px] font-bold text-white">{bundle.icon}</span>
+                                    <div className="slds-border-radius_small slds-flex slds-items-center slds-justify-center slds-flex-shrink-0" style={{ width: '32px', height: '32px', backgroundColor: bundle.iconColor }}>
+                                      <span className="slds-font-weight_bold slds-text-white" style={{ fontSize: '9px' }}>{bundle.icon}</span>
                                     </div>
-                                    <div className="flex-1 min-w-0">
-                                      <div className="text-xs font-medium text-slds-neutral-base truncate">{bundle.name}</div>
-                                      <div className="text-[10px] text-slds-neutral-7">{bundle.objectCount} Objects &middot; Created by Salesforce</div>
+                                    <div className="slds-flex-1 slds-min-w-0">
+                                      <div className="slds-text-size_small slds-font-weight_medium slds-text-neutral-base slds-truncate">{bundle.name}</div>
+                                      <div className="slds-text-neutral-7" style={{ fontSize: '10px' }}>{bundle.objectCount} Objects &middot; Created by Salesforce</div>
                                     </div>
-                                    {isSelected && <Check className="w-4 h-4 text-slds-brand flex-shrink-0" />}
+                                    {isSelected && <Check className="slds-icon-size_small slds-text-brand slds-flex-shrink-0" />}
                                   </button>
                                 );
                               })}
@@ -1551,21 +1563,21 @@ export default function DataStreamsContent({ demoSession, currentTimeline }: Dat
 
                         {/* Bundle detail sidebar */}
                         {focusedSfBundle && (
-                          <div className="w-[220px] flex-shrink-0">
-                            <div className="border border-slds-border-1 rounded-lg bg-white p-4">
-                              <h4 className="text-sm font-semibold text-slds-neutral-base mb-1">Bundle Details</h4>
-                              <div className="flex items-center gap-2 mb-3">
-                                <div className="w-6 h-6 rounded flex items-center justify-center" style={{ backgroundColor: focusedSfBundle.iconColor }}>
-                                  <span className="text-[7px] font-bold text-white">{focusedSfBundle.icon}</span>
+                          <div className="slds-flex-shrink-0" style={{ width: '220px' }}>
+                            <div className="slds-border_all slds-border-color_border-1 slds-border-radius_large slds-bg-white slds-p-around_medium">
+                              <h4 className="slds-text-size_medium slds-font-weight_semibold slds-text-neutral-base slds-m-bottom_xx-small">Bundle Details</h4>
+                              <div className="slds-flex slds-items-center slds-gap_x-small slds-m-bottom_small">
+                                <div className="slds-border-radius_small slds-flex slds-items-center slds-justify-center" style={{ width: '24px', height: '24px', backgroundColor: focusedSfBundle.iconColor }}>
+                                  <span className="slds-font-weight_bold slds-text-white" style={{ fontSize: '7px' }}>{focusedSfBundle.icon}</span>
                                 </div>
-                                <span className="text-xs font-medium text-slds-neutral-base">{focusedSfBundle.name}</span>
+                                <span className="slds-text-size_small slds-font-weight_medium slds-text-neutral-base">{focusedSfBundle.name}</span>
                               </div>
-                              <div className="text-[10px] text-slds-neutral-7 mb-1">Type: <span className="text-slds-neutral-9">Standard Data Bundle</span></div>
-                              <div className="text-[10px] text-slds-neutral-7 mb-3">Description:</div>
-                              <div className="text-[10px] font-medium text-slds-neutral-base mb-2">Objects included ({focusedSfBundle.objectCount})</div>
-                              <div className="flex flex-wrap gap-1">
+                              <div className="slds-text-neutral-7 slds-m-bottom_xx-small" style={{ fontSize: '10px' }}>Type: <span className="slds-text-neutral-9">Standard Data Bundle</span></div>
+                              <div className="slds-text-neutral-7 slds-m-bottom_small" style={{ fontSize: '10px' }}>Description:</div>
+                              <div className="slds-font-weight_medium slds-text-neutral-base slds-m-bottom_x-small" style={{ fontSize: '10px' }}>Objects included ({focusedSfBundle.objectCount})</div>
+                              <div className="slds-flex slds-flex-wrap slds-gap_xx-small">
                                 {focusedSfBundle.objects.map((obj) => (
-                                  <span key={obj} className="px-1.5 py-0.5 text-[9px] bg-slds-neutral-2 text-slds-neutral-9 rounded font-mono">{obj}</span>
+                                  <span key={obj} className="slds-bg-neutral-2 slds-text-neutral-9 slds-border-radius_small" style={{ paddingLeft: '6px', paddingRight: '6px', paddingTop: '2px', paddingBottom: '2px', fontSize: '9px', fontFamily: 'monospace' }}>{obj}</span>
                                 ))}
                               </div>
                             </div>
@@ -1576,18 +1588,18 @@ export default function DataStreamsContent({ demoSession, currentTimeline }: Dat
 
                     {/* Object view (simple select) */}
                     {sfViewMode === 'objects' && (
-                      <div className="space-y-3">
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
                         <div>
-                          <label className="block text-xs font-medium text-slds-neutral-7 uppercase tracking-wide mb-1">Salesforce Object</label>
-                          <select className="w-full px-3 py-2 text-sm border border-slds-border-1 rounded bg-white focus:outline-none">
+                          <label className="slds-text-size_small slds-font-weight_medium slds-text-neutral-7 slds-text-uppercase slds-tracking-wide slds-m-bottom_xx-small" style={{ display: 'block' }}>Salesforce Object</label>
+                          <select className="slds-w-full slds-p-horizontal_small slds-p-vertical_x-small slds-text-size_medium slds-border_all slds-border-color_border-1 slds-border-radius_small slds-bg-white" style={{ outline: 'none' }}>
                             <option>Account</option><option>Contact</option><option>Lead</option><option>Opportunity</option>
                             <option>Case</option><option>Campaign</option><option>EmailMessage</option><option>Event</option>
                             <option>Task</option><option>Order</option><option>Product2</option><option>PricebookEntry</option>
                           </select>
                         </div>
                         <div>
-                          <label className="block text-xs font-medium text-slds-neutral-7 uppercase tracking-wide mb-1">Refresh Frequency</label>
-                          <select className="w-full px-3 py-2 text-sm border border-slds-border-1 rounded bg-white focus:outline-none">
+                          <label className="slds-text-size_small slds-font-weight_medium slds-text-neutral-7 slds-text-uppercase slds-tracking-wide slds-m-bottom_xx-small" style={{ display: 'block' }}>Refresh Frequency</label>
+                          <select className="slds-w-full slds-p-horizontal_small slds-p-vertical_x-small slds-text-size_medium slds-border_all slds-border-color_border-1 slds-border-radius_small slds-bg-white" style={{ outline: 'none' }}>
                             <option>Every 1 hour</option><option>Every 6 hours</option><option>Every 12 hours</option>
                             <option>Daily</option><option>Manual</option>
                           </select>
@@ -1604,27 +1616,27 @@ export default function DataStreamsContent({ demoSession, currentTimeline }: Dat
               {newModalStep === 2 && selectedSource === 'informatica' && (() => {
                 const focusedBundle = informaticaBundles.find((b) => b.id === focusedBundleId);
                 return (
-                  <div className="space-y-4">
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
                     {/* Info banner */}
-                    <div className="flex items-start gap-3 p-4 bg-[#E1F5FE] rounded-lg">
-                      <Info className="w-5 h-5 text-slds-brand flex-shrink-0 mt-0.5" />
-                      <div className="text-sm text-slds-neutral-9">
+                    <div className="slds-flex slds-items-start slds-gap_small slds-p-around_medium slds-border-radius_large" style={{ backgroundColor: '#E1F5FE' }}>
+                      <Info className="slds-icon-size_default slds-text-brand slds-flex-shrink-0 slds-m-top_xx-small" />
+                      <div className="slds-text-size_medium slds-text-neutral-9">
                         To ensure data is ingested from fields and objects created in the future, we recommend granting <strong>View All Fields (Global)</strong> system permission on the Data Cloud Informatica MDM Connector permission set. <span className="sf-link">Learn More</span>
                       </div>
                     </div>
 
-                    <p className="text-xs text-slds-neutral-7">
+                    <p className="slds-text-size_small slds-text-neutral-7">
                       Select a tenant to ingest data from, then select an object or data bundle.
                     </p>
 
                     {/* Tenant selector + view toggle */}
-                    <div className="flex items-end gap-3">
-                      <div className="flex-1">
-                        <label className="block text-xs font-medium text-slds-neutral-7 mb-1">* Informatica Tenant</label>
+                    <div className="slds-flex slds-items-end slds-gap_small">
+                      <div className="slds-flex-1">
+                        <label className="slds-text-size_small slds-font-weight_medium slds-text-neutral-7 slds-m-bottom_xx-small" style={{ display: 'block' }}>* Informatica Tenant</label>
                         <select
                           value={selectedTenant}
                           onChange={(e) => setSelectedTenant(e.target.value)}
-                          className="w-full px-3 py-2 text-sm border border-slds-border-1 rounded bg-white focus:outline-none"
+                          className="slds-w-full slds-p-horizontal_small slds-p-vertical_x-small slds-text-size_medium slds-border_all slds-border-color_border-1 slds-border-radius_small slds-bg-white" style={{ outline: 'none' }}
                         >
                           {sessionTenants.length > 0 ? (
                             sessionTenants.map((alias) => (
@@ -1635,32 +1647,32 @@ export default function DataStreamsContent({ demoSession, currentTimeline }: Dat
                           )}
                         </select>
                       </div>
-                      <div className="flex items-center border border-slds-border-1 rounded overflow-hidden">
-                        <button className="px-3 py-2 text-xs font-medium bg-slds-brand text-white">View Bundles</button>
-                        <button className="px-3 py-2 text-xs font-medium bg-white text-slds-neutral-9 hover:bg-slds-neutral-2">View Objects</button>
+                      <div className="slds-flex slds-items-center slds-border_all slds-border-color_border-1 slds-border-radius_small slds-overflow-hidden">
+                        <button className="slds-p-horizontal_small slds-p-vertical_x-small slds-text-size_small slds-font-weight_medium slds-bg-brand slds-text-white">View Bundles</button>
+                        <button className="slds-p-horizontal_small slds-p-vertical_x-small slds-text-size_small slds-font-weight_medium slds-bg-white slds-text-neutral-9 sf-hover-bg-neutral">View Objects</button>
                       </div>
                     </div>
 
                     {/* Loading spinner state */}
                     {step2Loading ? (
-                      <div className="flex flex-col items-center justify-center py-20">
-                        <div className="flex gap-1.5 mb-3">
-                          <div className="w-2.5 h-2.5 rounded-full bg-slds-brand animate-bounce" style={{ animationDelay: '0ms' }} />
-                          <div className="w-2.5 h-2.5 rounded-full bg-slds-brand animate-bounce" style={{ animationDelay: '150ms' }} />
-                          <div className="w-2.5 h-2.5 rounded-full bg-slds-brand animate-bounce" style={{ animationDelay: '300ms' }} />
+                      <div className="slds-flex slds-flex-col slds-items-center slds-justify-center" style={{ paddingTop: '80px', paddingBottom: '80px' }}>
+                        <div className="slds-flex slds-gap_xx-small slds-m-bottom_small">
+                          <div className="slds-border-radius_pill slds-bg-brand" style={{ width: '10px', height: '10px', animation: 'bounce 1s infinite', animationDelay: '0ms' }} />
+                          <div className="slds-border-radius_pill slds-bg-brand" style={{ width: '10px', height: '10px', animation: 'bounce 1s infinite', animationDelay: '150ms' }} />
+                          <div className="slds-border-radius_pill slds-bg-brand" style={{ width: '10px', height: '10px', animation: 'bounce 1s infinite', animationDelay: '300ms' }} />
                         </div>
-                        <p className="text-sm text-slds-neutral-7">Loading bundles...</p>
+                        <p className="slds-text-size_medium slds-text-neutral-7">Loading bundles...</p>
                       </div>
                     ) : (
                     <>
                     {/* Bundle grid + detail sidebar */}
-                    <div className="flex gap-4">
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center justify-between mb-2">
-                          <h4 className="text-sm font-semibold text-slds-neutral-base">Standard Bundles ({informaticaBundles.length})</h4>
+                    <div className="slds-flex slds-gap_medium">
+                      <div className="slds-flex-1 slds-min-w-0">
+                        <div className="slds-flex slds-items-center slds-justify-between slds-m-bottom_x-small">
+                          <h4 className="slds-text-size_medium slds-font-weight_semibold slds-text-neutral-base">Standard Bundles ({informaticaBundles.length})</h4>
                         </div>
-                        <div className="max-h-[320px] overflow-y-auto border border-slds-border-1 rounded-lg">
-                          <div className="grid grid-cols-2 gap-0">
+                        <div className="slds-overflow-y-auto slds-border_all slds-border-color_border-1 slds-border-radius_large" style={{ maxHeight: '320px' }}>
+                          <div className="slds-css-grid slds-css-grid-cols-2" style={{ gap: '0px' }}>
                             {informaticaBundles.map((bundle) => {
                               const isSelected = selectedBundles.has(bundle.id);
                               const isFocused = focusedBundleId === bundle.id;
@@ -1669,20 +1681,21 @@ export default function DataStreamsContent({ demoSession, currentTimeline }: Dat
                                   key={bundle.id}
                                   onClick={() => { toggleBundle(bundle.id); setFocusedBundleId(bundle.id); }}
                                   onMouseEnter={() => setFocusedBundleId(bundle.id)}
-                                  className={`flex items-center gap-3 p-3 text-left border border-slds-border-1 transition-all ${
-                                    isSelected ? 'bg-[#EEF4FF] border-slds-brand' : isFocused ? 'bg-[#FAFAF9]' : 'bg-white hover:bg-[#FAFAF9]'
+                                  className={`slds-flex slds-items-center slds-gap_small slds-p-around_small slds-text-left slds-border_all slds-border-color_border-1 slds-transition-all ${
+                                    isSelected ? 'slds-border-color_brand' : ''
                                   }`}
+                                  style={{ backgroundColor: isSelected ? '#EEF4FF' : isFocused ? '#FAFAF9' : 'white' }}
                                 >
-                                  <div className="w-8 h-8 rounded flex items-center justify-center flex-shrink-0 bg-[#FF4A00]">
-                                    <svg viewBox="0 0 32 32" className="w-5 h-5">
+                                  <div className="slds-border-radius_small slds-flex slds-items-center slds-justify-center slds-flex-shrink-0" style={{ width: '32px', height: '32px', backgroundColor: '#FF4A00' }}>
+                                    <svg viewBox="0 0 32 32" className="slds-icon-size_default">
                                       <text x="16" y="22" textAnchor="middle" fill="white" fontSize="10" fontWeight="bold">INFA</text>
                                     </svg>
                                   </div>
-                                  <div className="flex-1 min-w-0">
-                                    <div className="text-xs font-medium text-slds-neutral-base truncate">{bundle.name}</div>
-                                    <div className="text-[10px] text-slds-neutral-7">{bundle.entities.length} Entities &middot; Informatica MDM</div>
+                                  <div className="slds-flex-1 slds-min-w-0">
+                                    <div className="slds-text-size_small slds-font-weight_medium slds-text-neutral-base slds-truncate">{bundle.name}</div>
+                                    <div className="slds-text-neutral-7" style={{ fontSize: '10px' }}>{bundle.entities.length} Entities &middot; Informatica MDM</div>
                                   </div>
-                                  {isSelected && <Check className="w-4 h-4 text-slds-brand flex-shrink-0" />}
+                                  {isSelected && <Check className="slds-icon-size_small slds-text-brand slds-flex-shrink-0" />}
                                 </button>
                               );
                             })}
@@ -1692,23 +1705,23 @@ export default function DataStreamsContent({ demoSession, currentTimeline }: Dat
 
                       {/* Bundle detail sidebar */}
                       {focusedBundle && (
-                        <div className="w-[220px] flex-shrink-0">
-                          <div className="border border-slds-border-1 rounded-lg bg-white p-4">
-                            <h4 className="text-sm font-semibold text-slds-neutral-base mb-1">Bundle Details</h4>
-                            <div className="flex items-center gap-2 mb-3">
-                              <div className="w-6 h-6 rounded flex items-center justify-center bg-[#FF4A00]">
-                                <svg viewBox="0 0 32 32" className="w-4 h-4">
+                        <div className="slds-flex-shrink-0" style={{ width: '220px' }}>
+                          <div className="slds-border_all slds-border-color_border-1 slds-border-radius_large slds-bg-white slds-p-around_medium">
+                            <h4 className="slds-text-size_medium slds-font-weight_semibold slds-text-neutral-base slds-m-bottom_xx-small">Bundle Details</h4>
+                            <div className="slds-flex slds-items-center slds-gap_x-small slds-m-bottom_small">
+                              <div className="slds-border-radius_small slds-flex slds-items-center slds-justify-center" style={{ width: '24px', height: '24px', backgroundColor: '#FF4A00' }}>
+                                <svg viewBox="0 0 32 32" className="slds-icon-size_small">
                                   <text x="16" y="22" textAnchor="middle" fill="white" fontSize="12" fontWeight="bold">IN</text>
                                 </svg>
                               </div>
-                              <span className="text-xs font-medium text-slds-neutral-base">{focusedBundle.name}</span>
+                              <span className="slds-text-size_small slds-font-weight_medium slds-text-neutral-base">{focusedBundle.name}</span>
                             </div>
-                            <div className="text-[10px] text-slds-neutral-7 mb-1">Type: <span className="text-slds-neutral-9">MDM Business Entity Bundle</span></div>
-                            <div className="text-[10px] text-slds-neutral-7 mb-3">Description: <span className="text-slds-neutral-9">{focusedBundle.description}</span></div>
-                            <div className="text-[10px] font-medium text-slds-neutral-base mb-2">Entities included ({focusedBundle.entities.length})</div>
-                            <div className="flex flex-wrap gap-1">
+                            <div className="slds-text-neutral-7 slds-m-bottom_xx-small" style={{ fontSize: '10px' }}>Type: <span className="slds-text-neutral-9">MDM Business Entity Bundle</span></div>
+                            <div className="slds-text-neutral-7 slds-m-bottom_small" style={{ fontSize: '10px' }}>Description: <span className="slds-text-neutral-9">{focusedBundle.description}</span></div>
+                            <div className="slds-font-weight_medium slds-text-neutral-base slds-m-bottom_x-small" style={{ fontSize: '10px' }}>Entities included ({focusedBundle.entities.length})</div>
+                            <div className="slds-flex slds-flex-wrap slds-gap_xx-small">
                               {focusedBundle.entities.map((entity) => (
-                                <span key={entity.name} className="px-1.5 py-0.5 text-[9px] bg-slds-neutral-2 text-slds-neutral-9 rounded font-mono">{entity.name}</span>
+                                <span key={entity.name} className="slds-bg-neutral-2 slds-text-neutral-9 slds-border-radius_small" style={{ paddingLeft: '6px', paddingRight: '6px', paddingTop: '2px', paddingBottom: '2px', fontSize: '9px', fontFamily: 'monospace' }}>{entity.name}</span>
                               ))}
                             </div>
                           </div>
@@ -1723,10 +1736,10 @@ export default function DataStreamsContent({ demoSession, currentTimeline }: Dat
 
               {/* Step 3: Review */}
               {newModalStep === 3 && (
-                <div className="space-y-4">
-                  <div className="flex items-start gap-3 p-4 bg-[#E1F5FE] rounded-lg">
-                    <Info className="w-5 h-5 text-slds-brand flex-shrink-0 mt-0.5" />
-                    <div className="text-sm text-slds-neutral-9">
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                  <div className="slds-flex slds-items-start slds-gap_small slds-p-around_medium slds-border-radius_large" style={{ backgroundColor: '#E1F5FE' }}>
+                    <Info className="slds-icon-size_default slds-text-brand slds-flex-shrink-0 slds-m-top_xx-small" />
+                    <div className="slds-text-size_medium slds-text-neutral-9">
                       Review the details below and click <strong>Next</strong> to configure the data space.
                     </div>
                   </div>
@@ -1734,7 +1747,7 @@ export default function DataStreamsContent({ demoSession, currentTimeline }: Dat
                     <div className="sf-detail-grid">
                       <div className="sf-detail-field">
                         <div className="sf-detail-label">Source</div>
-                        <div className="sf-detail-value font-medium">{resolveSourceInfo(selectedSource).name}</div>
+                        <div className="sf-detail-value slds-font-weight_medium">{resolveSourceInfo(selectedSource).name}</div>
                       </div>
                       {selectedSource === 'informatica' && (
                         <>
@@ -1745,11 +1758,11 @@ export default function DataStreamsContent({ demoSession, currentTimeline }: Dat
                           <div className="sf-detail-field">
                             <div className="sf-detail-label">Bundles</div>
                             <div className="sf-detail-value">
-                              <div className="flex flex-wrap gap-1">
+                              <div className="slds-flex slds-flex-wrap slds-gap_xx-small">
                                 {Array.from(selectedBundles).map((id) => {
                                   const bundle = informaticaBundles.find((b) => b.id === id);
                                   return bundle ? (
-                                    <span key={id} className="px-2 py-0.5 text-xs font-medium bg-[#FFF3ED] text-[#FF4A00] rounded">{bundle.name}</span>
+                                    <span key={id} className="slds-text-size_small slds-font-weight_medium slds-border-radius_small" style={{ paddingLeft: '8px', paddingRight: '8px', paddingTop: '2px', paddingBottom: '2px', backgroundColor: '#FFF3ED', color: '#FF4A00' }}>{bundle.name}</span>
                                   ) : null;
                                 })}
                               </div>
@@ -1819,37 +1832,37 @@ export default function DataStreamsContent({ demoSession, currentTimeline }: Dat
                   );
                 }
                 return (
-                  <div className="flex gap-5">
+                  <div className="slds-flex" style={{ gap: '20px' }}>
                     {/* Left content */}
-                    <div className="flex-1 min-w-0 space-y-4">
+                    <div className="slds-flex-1 slds-min-w-0" style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
                       {/* Data Space selector */}
                       <div>
-                        <label className="flex items-center gap-1 text-xs font-medium text-slds-neutral-base mb-1">
-                          <span className="text-[#C23934]">*</span> Data Space
-                          <Info className="w-3 h-3 text-slds-neutral-7" />
+                        <label className="slds-flex slds-items-center slds-gap_xx-small slds-text-size_small slds-font-weight_medium slds-text-neutral-base slds-m-bottom_xx-small">
+                          <span style={{ color: '#C23934' }}>*</span> Data Space
+                          <Info className="slds-icon-size_xx-small slds-text-neutral-7" />
                         </label>
-                        <div className="relative">
+                        <div className="slds-pos-relative">
                           <button
                             onClick={() => setDataSpaceDropdownOpen(!dataSpaceDropdownOpen)}
-                            className="w-full max-w-sm flex items-center justify-between px-3 py-2 text-sm border-2 border-slds-brand rounded bg-white focus:outline-none"
+                            className="slds-w-full slds-flex slds-items-center slds-justify-between slds-p-horizontal_small slds-p-vertical_x-small slds-text-size_medium slds-border-radius_small slds-bg-white"
+                            style={{ maxWidth: '384px', border: '2px solid var(--slds-g-color-brand-1)', outline: 'none' }}
                           >
-                            <span className={selectedDataSpace ? 'text-slds-neutral-base' : 'text-slds-neutral-7'}>
+                            <span className={selectedDataSpace ? 'slds-text-neutral-base' : 'slds-text-neutral-7'}>
                               {selectedDataSpace ? dataSpaces.find((d) => d.id === selectedDataSpace)?.label || selectedDataSpace : 'Select Data Space'}
                             </span>
-                            <ChevronDown className="w-4 h-4 text-slds-neutral-7" />
+                            <ChevronDown className="slds-icon-size_small slds-text-neutral-7" />
                           </button>
                           {dataSpaceDropdownOpen && (
-                            <div className="absolute z-10 top-full left-0 mt-1 w-full max-w-sm bg-white border border-slds-border-1 rounded-lg shadow-lg overflow-hidden">
+                            <div className="slds-pos-absolute slds-z-10 slds-w-full slds-bg-white slds-border_all slds-border-color_border-1 slds-border-radius_large slds-shadow_large slds-overflow-hidden" style={{ top: '100%', left: 0, marginTop: '4px', maxWidth: '384px' }}>
                               {dataSpaces.map((ds) => (
                                 <button
                                   key={ds.id}
                                   onClick={() => { setSelectedDataSpace(ds.id); setDataSpaceDropdownOpen(false); }}
-                                  className={`w-full text-left px-4 py-2.5 hover:bg-[#EEF4FF] transition-colors border-b border-slds-border-1 last:border-b-0 ${
-                                    selectedDataSpace === ds.id ? 'bg-[#EEF4FF]' : ''
-                                  }`}
+                                  className={`slds-w-full slds-text-left slds-p-horizontal_medium slds-border_bottom slds-border-color_border-1 slds-transition-colors`}
+                                  style={{ paddingTop: '10px', paddingBottom: '10px', backgroundColor: selectedDataSpace === ds.id ? '#EEF4FF' : undefined }}
                                 >
-                                  <div className="text-sm font-medium text-slds-neutral-base">{ds.label}</div>
-                                  {ds.description && <div className="text-xs text-slds-neutral-7 mt-0.5">{ds.description}</div>}
+                                  <div className="slds-text-size_medium slds-font-weight_medium slds-text-neutral-base">{ds.label}</div>
+                                  {ds.description && <div className="slds-text-size_small slds-text-neutral-7 slds-m-top_xx-small">{ds.description}</div>}
                                 </button>
                               ))}
                             </div>
@@ -1859,42 +1872,42 @@ export default function DataStreamsContent({ demoSession, currentTimeline }: Dat
 
                       {/* Objects table */}
                       {objectRows.length > 0 && (
-                        <div className="border border-slds-border-1 rounded-lg overflow-hidden">
-                          <table className="w-full text-xs">
+                        <div className="slds-border_all slds-border-color_border-1 slds-border-radius_large slds-overflow-hidden">
+                          <table className="slds-w-full slds-text-size_small">
                             <thead>
-                              <tr className="bg-[#FAFAF9] border-b border-slds-border-1">
-                                <th className="px-3 py-2 text-left font-medium text-slds-neutral-7 w-8">
-                                  <input type="checkbox" className="rounded border-slds-border-1" defaultChecked />
+                              <tr className="slds-border_bottom slds-border-color_border-1" style={{ backgroundColor: '#FAFAF9' }}>
+                                <th className="slds-p-horizontal_small slds-p-vertical_x-small slds-text-left slds-font-weight_medium slds-text-neutral-7" style={{ width: '32px' }}>
+                                  <input type="checkbox" className="slds-border-radius_small slds-border-color_border-1" defaultChecked />
                                 </th>
-                                <th className="px-3 py-2 text-left font-medium text-slds-neutral-7">
-                                  <div className="flex items-center gap-1">Object <ChevronDown className="w-3 h-3 opacity-50" /></div>
+                                <th className="slds-p-horizontal_small slds-p-vertical_x-small slds-text-left slds-font-weight_medium slds-text-neutral-7">
+                                  <div className="slds-flex slds-items-center slds-gap_xx-small">Object <ChevronDown className="slds-icon-size_xx-small slds-opacity_50" /></div>
                                 </th>
-                                <th className="px-3 py-2 text-left font-medium text-slds-neutral-7">
-                                  <div className="flex items-center gap-1">Category <ChevronDown className="w-3 h-3 opacity-50" /></div>
+                                <th className="slds-p-horizontal_small slds-p-vertical_x-small slds-text-left slds-font-weight_medium slds-text-neutral-7">
+                                  <div className="slds-flex slds-items-center slds-gap_xx-small">Category <ChevronDown className="slds-icon-size_xx-small slds-opacity_50" /></div>
                                 </th>
-                                <th className="px-3 py-2 text-left font-medium text-slds-neutral-7">
-                                  <div className="flex items-center gap-1">Refresh Mode <ChevronDown className="w-3 h-3 opacity-50" /></div>
+                                <th className="slds-p-horizontal_small slds-p-vertical_x-small slds-text-left slds-font-weight_medium slds-text-neutral-7">
+                                  <div className="slds-flex slds-items-center slds-gap_xx-small">Refresh Mode <ChevronDown className="slds-icon-size_xx-small slds-opacity_50" /></div>
                                 </th>
-                                <th className="px-3 py-2 text-left font-medium text-slds-neutral-7">
-                                  <div className="flex items-center gap-1">Full Refresh Interval <ChevronDown className="w-3 h-3 opacity-50" /></div>
+                                <th className="slds-p-horizontal_small slds-p-vertical_x-small slds-text-left slds-font-weight_medium slds-text-neutral-7">
+                                  <div className="slds-flex slds-items-center slds-gap_xx-small">Full Refresh Interval <ChevronDown className="slds-icon-size_xx-small slds-opacity_50" /></div>
                                 </th>
-                                <th className="px-3 py-2 text-left font-medium text-slds-neutral-7">
-                                  <div className="flex items-center gap-1">Data Space Filtering <ChevronDown className="w-3 h-3 opacity-50" /></div>
+                                <th className="slds-p-horizontal_small slds-p-vertical_x-small slds-text-left slds-font-weight_medium slds-text-neutral-7">
+                                  <div className="slds-flex slds-items-center slds-gap_xx-small">Data Space Filtering <ChevronDown className="slds-icon-size_xx-small slds-opacity_50" /></div>
                                 </th>
                               </tr>
                             </thead>
-                            <tbody className="max-h-[220px] overflow-y-auto">
+                            <tbody className="slds-overflow-y-auto" style={{ maxHeight: '220px' }}>
                               {objectRows.map((obj, i) => (
-                                <tr key={i} className="border-b border-slds-border-1 last:border-b-0 hover:bg-[#FAFAF9]">
-                                  <td className="px-3 py-2 text-center text-slds-neutral-7">{i + 1}</td>
-                                  <td className="px-3 py-2">
-                                    <span className="text-slds-brand hover:underline cursor-pointer font-medium">{obj.name}</span>
+                                <tr key={i} className="slds-border_bottom slds-border-color_border-1 sf-hover-bg-neutral">
+                                  <td className="slds-p-horizontal_small slds-p-vertical_x-small slds-text-center slds-text-neutral-7">{i + 1}</td>
+                                  <td className="slds-p-horizontal_small slds-p-vertical_x-small">
+                                    <span className="slds-text-brand sf-hover-underline slds-cursor-pointer slds-font-weight_medium">{obj.name}</span>
                                   </td>
-                                  <td className="px-3 py-2 text-slds-neutral-9">{obj.category}</td>
-                                  <td className="px-3 py-2 text-slds-neutral-9">Upsert</td>
-                                  <td className="px-3 py-2 text-slds-neutral-9">None</td>
-                                  <td className="px-3 py-2">
-                                    <span className="text-slds-brand hover:underline cursor-pointer">Set Filters</span>
+                                  <td className="slds-p-horizontal_small slds-p-vertical_x-small slds-text-neutral-9">{obj.category}</td>
+                                  <td className="slds-p-horizontal_small slds-p-vertical_x-small slds-text-neutral-9">Upsert</td>
+                                  <td className="slds-p-horizontal_small slds-p-vertical_x-small slds-text-neutral-9">None</td>
+                                  <td className="slds-p-horizontal_small slds-p-vertical_x-small">
+                                    <span className="slds-text-brand sf-hover-underline slds-cursor-pointer">Set Filters</span>
                                   </td>
                                 </tr>
                               ))}
@@ -1905,29 +1918,29 @@ export default function DataStreamsContent({ demoSession, currentTimeline }: Dat
                     </div>
 
                     {/* Right sidebar — FAQs */}
-                    <div className="w-[260px] flex-shrink-0">
-                      <div className="border border-slds-border-1 rounded-lg bg-white overflow-hidden">
-                        <div className="px-4 py-3 border-b border-slds-border-1 bg-[#FAFAF9]">
-                          <h4 className="text-sm font-semibold text-slds-neutral-base">Frequently Asked Questions</h4>
+                    <div className="slds-flex-shrink-0" style={{ width: '260px' }}>
+                      <div className="slds-border_all slds-border-color_border-1 slds-border-radius_large slds-bg-white slds-overflow-hidden">
+                        <div className="slds-p-horizontal_medium slds-p-vertical_small slds-border_bottom slds-border-color_border-1" style={{ backgroundColor: '#FAFAF9' }}>
+                          <h4 className="slds-text-size_medium slds-font-weight_semibold slds-text-neutral-base">Frequently Asked Questions</h4>
                         </div>
-                        <div className="p-4 space-y-4">
+                        <div className="slds-p-around_medium" style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
                           <div>
-                            <h5 className="text-xs font-bold text-slds-neutral-base mb-1">What are data space filters?</h5>
-                            <p className="text-[11px] text-slds-neutral-7 leading-relaxed">
+                            <h5 className="slds-text-size_small slds-font-weight_bold slds-text-neutral-base slds-m-bottom_xx-small">What are data space filters?</h5>
+                            <p className="slds-text-neutral-7 slds-leading-relaxed" style={{ fontSize: '11px' }}>
                               Data space filters let you determine which records from the data lake object are available in the context of a data space.
                             </p>
                           </div>
                           <div>
-                            <h5 className="text-xs font-bold text-slds-neutral-base mb-1">What is a refresh mode?</h5>
-                            <p className="text-[11px] text-slds-neutral-7 leading-relaxed">
+                            <h5 className="slds-text-size_small slds-font-weight_bold slds-text-neutral-base slds-m-bottom_xx-small">What is a refresh mode?</h5>
+                            <p className="slds-text-neutral-7 slds-leading-relaxed" style={{ fontSize: '11px' }}>
                               After the initial data ingestion, you can opt to replace only the fields for which new data was received (partial refresh) or to replace the entire record with the data received (incremental refresh). When refresh mode is incremental, existing values can be replaced by blank values.
                             </p>
                           </div>
                           <div>
-                            <h5 className="text-xs font-bold text-slds-neutral-base mb-1">What is the full refresh interval?</h5>
-                            <p className="text-[11px] text-slds-neutral-7 leading-relaxed">
+                            <h5 className="slds-text-size_small slds-font-weight_bold slds-text-neutral-base slds-m-bottom_xx-small">What is the full refresh interval?</h5>
+                            <p className="slds-text-neutral-7 slds-leading-relaxed" style={{ fontSize: '11px' }}>
                               The full refresh interval helps determine when a periodic full refresh is triggered. By default it's disabled, but you can enable and configure it to a desired interval.
-                              <span className="text-slds-brand hover:underline cursor-pointer ml-1">Learn more</span>
+                              <span className="slds-text-brand sf-hover-underline slds-cursor-pointer slds-m-left_xx-small">Learn more</span>
                             </p>
                           </div>
                         </div>
@@ -1939,36 +1952,37 @@ export default function DataStreamsContent({ demoSession, currentTimeline }: Dat
             </div>
 
             {/* Footer with step indicator */}
-            <div className="flex items-center justify-between px-6 py-4 border-t border-slds-border-1 bg-[#FAFAF9]">
-              <div className="flex items-center gap-2">
+            <div className="slds-flex slds-items-center slds-justify-between slds-p-horizontal_large slds-p-vertical_medium slds-border_top slds-border-color_border-1" style={{ backgroundColor: '#FAFAF9' }}>
+              <div className="slds-flex slds-items-center slds-gap_x-small">
                 {newModalStep > 1 && (
-                  <button onClick={handleNewBack} className="px-4 py-2 text-sm font-medium text-slds-neutral-9 border border-slds-border-1 rounded hover:bg-slds-neutral-2">
+                  <button onClick={handleNewBack} className="slds-p-horizontal_medium slds-p-vertical_x-small slds-text-size_medium slds-font-weight_medium slds-text-neutral-9 slds-border_all slds-border-color_border-1 slds-border-radius_small sf-hover-bg-neutral">
                     Previous
                   </button>
                 )}
-                <div className="flex items-center gap-1 ml-4">
+                <div className="slds-flex slds-items-center slds-gap_xx-small slds-m-left_medium">
                   {[1, 2, 3, 4].map((s) => (
-                    <div key={s} className="flex items-center gap-1">
-                      <div className={`w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-medium ${
-                        s < newModalStep ? 'bg-slds-success-1 text-white' :
-                        s === newModalStep ? 'bg-slds-brand text-white' :
-                        'bg-slds-border-2 text-slds-neutral-7'
-                      }`}>
-                        {s < newModalStep ? <Check className="w-2.5 h-2.5" /> : s}
+                    <div key={s} className="slds-flex slds-items-center slds-gap_xx-small">
+                      <div className={`slds-border-radius_pill slds-flex slds-items-center slds-justify-center slds-font-weight_medium ${
+                        s < newModalStep ? 'slds-bg-success slds-text-white' :
+                        s === newModalStep ? 'slds-bg-brand slds-text-white' :
+                        'slds-bg-neutral-2 slds-text-neutral-7'
+                      }`} style={{ width: '20px', height: '20px', fontSize: '10px' }}>
+                        {s < newModalStep ? <Check style={{ width: '10px', height: '10px' }} /> : s}
                       </div>
-                      {s < 4 && <div className={`w-16 h-0.5 ${s < newModalStep ? 'bg-slds-success-1' : 'bg-slds-border-2'}`} />}
+                      {s < 4 && <div className={`${s < newModalStep ? 'slds-bg-success' : 'slds-bg-neutral-2'}`} style={{ width: '64px', height: '2px' }} />}
                     </div>
                   ))}
                 </div>
               </div>
-              <div className="flex items-center gap-3">
+              <div className="slds-flex slds-items-center slds-gap_small">
                 {newModalStep === 1 && (
                   <>
-                    <button onClick={() => setNewModalOpen(false)} className="px-4 py-2 text-sm font-medium text-slds-neutral-9 border border-slds-border-1 rounded hover:bg-slds-neutral-2">Cancel</button>
+                    <button onClick={() => setNewModalOpen(false)} className="slds-p-horizontal_medium slds-p-vertical_x-small slds-text-size_medium slds-font-weight_medium slds-text-neutral-9 slds-border_all slds-border-color_border-1 slds-border-radius_small sf-hover-bg-neutral">Cancel</button>
                     <button
                       onClick={handleNewNext}
                       disabled={!selectedSource}
-                      className="px-5 py-2 text-sm font-medium text-white bg-slds-brand rounded hover:bg-slds-brand-contrast-1 disabled:opacity-50 disabled:cursor-not-allowed"
+                      className="slds-p-horizontal_large slds-p-vertical_x-small slds-text-size_medium slds-font-weight_medium slds-text-white slds-bg-brand slds-border-radius_small slds-cursor-pointer"
+                      style={{ opacity: !selectedSource ? 0.5 : 1, cursor: !selectedSource ? 'not-allowed' : 'pointer' }}
                     >
                       Next
                     </button>
@@ -1978,7 +1992,8 @@ export default function DataStreamsContent({ demoSession, currentTimeline }: Dat
                   <button
                     onClick={handleNewNext}
                     disabled={selectedSource === 'informatica' && selectedBundles.size === 0}
-                    className="px-5 py-2 text-sm font-medium text-white bg-slds-brand rounded hover:bg-slds-brand-contrast-1 disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="slds-p-horizontal_large slds-p-vertical_x-small slds-text-size_medium slds-font-weight_medium slds-text-white slds-bg-brand slds-border-radius_small slds-cursor-pointer"
+                    style={{ opacity: (selectedSource === 'informatica' && selectedBundles.size === 0) ? 0.5 : 1, cursor: (selectedSource === 'informatica' && selectedBundles.size === 0) ? 'not-allowed' : 'pointer' }}
                   >
                     Next
                   </button>
@@ -1986,7 +2001,7 @@ export default function DataStreamsContent({ demoSession, currentTimeline }: Dat
                 {newModalStep === 3 && (
                   <button
                     onClick={handleNewNext}
-                    className="px-5 py-2 text-sm font-medium text-white bg-slds-brand rounded hover:bg-slds-brand-contrast-1"
+                    className="slds-p-horizontal_large slds-p-vertical_x-small slds-text-size_medium slds-font-weight_medium slds-text-white slds-bg-brand slds-border-radius_small slds-cursor-pointer"
                   >
                     Next
                   </button>
@@ -1994,7 +2009,7 @@ export default function DataStreamsContent({ demoSession, currentTimeline }: Dat
                 {newModalStep === 4 && (
                   <button
                     onClick={handleCreateStreams}
-                    className="px-5 py-2 text-sm font-medium text-white bg-slds-brand rounded hover:bg-slds-brand-contrast-1"
+                    className="slds-p-horizontal_large slds-p-vertical_x-small slds-text-size_medium slds-font-weight_medium slds-text-white slds-bg-brand slds-border-radius_small slds-cursor-pointer"
                   >
                     Deploy
                   </button>

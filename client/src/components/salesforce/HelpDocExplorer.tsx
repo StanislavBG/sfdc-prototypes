@@ -245,39 +245,36 @@ export default function HelpDocExplorer() {
   // ------ Render ------
 
   return (
-    <div className="p-6 space-y-6">
+    <div className="slds-p-around_large" style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
       {/* Header row */}
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <div className="w-9 h-9 rounded-lg bg-slds-brand-1 flex items-center justify-center">
-            <Database className="w-5 h-5 text-white" />
+      <div className="slds-grid slds-grid_vertical-align-center slds-grid_align-spread">
+        <div className="slds-grid slds-grid_vertical-align-center slds-gap_small">
+          <div className="slds-flex slds-items-center slds-justify-center slds-border-radius_large" style={{ width: '36px', height: '36px', background: 'var(--slds-g-color-brand-1)' }}>
+            <Database className="slds-square_x-small slds-text-white" />
           </div>
           <div>
-            <h1 className="text-base font-semibold text-slds-neutral-base">
+            <h1 className="slds-text-size_large slds-font-weight_semibold slds-text-neutral-base">
               Salesforce Help Documents
             </h1>
-            <p className="text-xs text-slds-neutral-7">
+            <p className="slds-text-size_small slds-text-neutral-7">
               Upload MHTML files to index and search Salesforce documentation
             </p>
           </div>
         </div>
-        <div className="flex items-center gap-2">
-          <span className="text-xs text-slds-neutral-7">
+        <div className="slds-grid slds-grid_vertical-align-center slds-gap_x-small">
+          <span className="slds-text-size_small slds-text-neutral-7">
             {docs.length} document{docs.length !== 1 ? 's' : ''}
           </span>
           <button
-            onClick={() => {
-              // Run diagnose without file to check env
-              runDiagnose(null);
-            }}
+            onClick={() => runDiagnose(null)}
             disabled={diagRunning}
-            className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-white bg-[#54698D] rounded hover:bg-[#4a5f7d] disabled:opacity-50 transition-colors"
+            className="sf-btn sf-btn-neutral"
             title="Run pipeline diagnostics"
           >
             {diagRunning ? (
-              <Loader2 className="w-3.5 h-3.5 animate-spin" />
+              <Loader2 className="slds-icon-size_x-small sf-spin" />
             ) : (
-              <Stethoscope className="w-3.5 h-3.5" />
+              <Stethoscope className="slds-icon-size_x-small" />
             )}
             Diagnose
           </button>
@@ -285,7 +282,7 @@ export default function HelpDocExplorer() {
             ref={diagFileRef}
             type="file"
             accept=".mhtml,.mht"
-            className="hidden"
+            className="sf-hidden"
             onChange={(e) => {
               runDiagnose(e.target.files);
               e.target.value = '';
@@ -294,13 +291,13 @@ export default function HelpDocExplorer() {
           <button
             onClick={() => diagFileRef.current?.click()}
             disabled={diagRunning}
-            className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-white bg-[#54698D] rounded hover:bg-[#4a5f7d] disabled:opacity-50 transition-colors"
+            className="sf-btn sf-btn-neutral"
             title="Diagnose with a file upload"
           >
             {diagRunning ? (
-              <Loader2 className="w-3.5 h-3.5 animate-spin" />
+              <Loader2 className="slds-icon-size_x-small sf-spin" />
             ) : (
-              <Stethoscope className="w-3.5 h-3.5" />
+              <Stethoscope className="slds-icon-size_x-small" />
             )}
             Diagnose with File
           </button>
@@ -309,45 +306,43 @@ export default function HelpDocExplorer() {
 
       {/* Diagnostic results */}
       {diagSteps && (
-        <div className="sf-card overflow-hidden">
-          <div className="sf-card-header flex items-center justify-between">
-            <h2 className="text-sm font-semibold text-slds-neutral-base flex items-center gap-1.5">
-              <Stethoscope className="w-4 h-4" />
+        <div className="sf-card slds-overflow-hidden">
+          <div className="sf-card-header">
+            <h2 className="slds-text-size_medium slds-font-weight_semibold slds-text-neutral-base slds-grid slds-grid_vertical-align-center slds-gap_xx-small">
+              <Stethoscope className="slds-icon-size_small" />
               Pipeline Diagnostics
             </h2>
             <button
               onClick={() => { setDiagSteps(null); setDiagContentPreview(null); }}
-              className="p-1 rounded hover:bg-slds-border-2 text-slds-neutral-7"
+              className="sf-action-btn"
             >
-              <X className="w-3.5 h-3.5" />
+              <X className="slds-icon-size_x-small" />
             </button>
           </div>
-          <div className="p-4 space-y-2">
+          <div className="slds-p-around_medium" style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
             {diagSteps.map((s, i) => (
               <div
                 key={i}
-                className={`flex items-start gap-2 p-2.5 rounded border text-xs ${
-                  s.status === 'ok'
-                    ? 'bg-green-50 border-green-200'
-                    : 'bg-red-50 border-red-200'
+                className={`slds-grid slds-grid_vertical-align-start slds-gap_x-small slds-p-around_x-small slds-border-radius_small slds-text-size_small ${
+                  s.status === 'ok' ? 'sf-status-ok' : 'sf-status-error'
                 }`}
               >
                 {s.status === 'ok' ? (
-                  <CheckCircle2 className="w-4 h-4 text-green-600 flex-shrink-0 mt-0.5" />
+                  <CheckCircle2 className="slds-icon-size_small sf-status-ok-icon slds-flex-shrink-0" style={{ marginTop: '2px' }} />
                 ) : (
-                  <XCircle className="w-4 h-4 text-red-600 flex-shrink-0 mt-0.5" />
+                  <XCircle className="slds-icon-size_small sf-status-error-icon slds-flex-shrink-0" style={{ marginTop: '2px' }} />
                 )}
                 <div>
-                  <span className="font-semibold">{s.step}:</span>{' '}
-                  <span className={s.status === 'ok' ? 'text-green-800' : 'text-red-800'}>
+                  <span className="slds-font-weight_semibold">{s.step}:</span>{' '}
+                  <span className={s.status === 'ok' ? 'sf-status-ok-text' : 'sf-status-error-text'}>
                     {s.detail}
                   </span>
                 </div>
               </div>
             ))}
             {diagContentPreview && (
-              <div className="mt-3 p-3 bg-[#FAFAF9] rounded border border-slds-border-2 text-xs text-slds-neutral-9 whitespace-pre-wrap max-h-[200px] overflow-y-auto">
-                <div className="text-xs font-semibold text-slds-neutral-7 uppercase tracking-wide mb-1">
+              <div className="slds-m-top_small slds-p-around_small slds-border-radius_small slds-text-size_small slds-text-neutral-9" style={{ background: '#FAFAF9', border: '1px solid var(--slds-g-color-border-2)', whiteSpace: 'pre-wrap', maxHeight: '200px', overflowY: 'auto' }}>
+                <div className="slds-text-size_small slds-font-weight_semibold slds-text-neutral-7 slds-text-uppercase slds-tracking-wide slds-m-bottom_xxx-small">
                   Parsed Content Preview
                 </div>
                 {diagContentPreview}
@@ -357,9 +352,9 @@ export default function HelpDocExplorer() {
         </div>
       )}
 
-      <div className="grid grid-cols-3 gap-6">
+      <div className="slds-css-grid slds-css-grid-cols-3 slds-gap_large">
         {/* ---- Left 2/3: Drop zone + Document table ---- */}
-        <div className="col-span-2 space-y-4">
+        <div style={{ gridColumn: 'span 2', display: 'flex', flexDirection: 'column', gap: '16px' }}>
           {/* Drop zone */}
           <div
             onDragOver={(e) => {
@@ -369,138 +364,115 @@ export default function HelpDocExplorer() {
             onDragLeave={() => setDragOver(false)}
             onDrop={onDrop}
             onClick={() => fileRef.current?.click()}
-            className={`sf-card flex flex-col items-center justify-center py-8 cursor-pointer transition-all border-2 border-dashed ${
-              dragOver
-                ? 'border-slds-brand bg-[#EEF4FF]'
-                : 'border-slds-border-1 hover:border-slds-brand-2 hover:bg-[#F9FAFF]'
-            }`}
+            className={`sf-card sf-dropzone ${dragOver ? 'drag-over' : ''}`}
           >
             <input
               ref={fileRef}
               type="file"
               accept=".mhtml,.mht"
               multiple
-              className="hidden"
+              className="sf-hidden"
               onChange={(e) => handleFiles(e.target.files)}
             />
             {uploading ? (
-              <Loader2 className="w-8 h-8 text-slds-brand animate-spin mb-2" />
+              <Upload className="slds-square_large slds-text-brand sf-spin slds-m-bottom_x-small" />
             ) : (
-              <Upload className="w-8 h-8 text-slds-neutral-7 mb-2" />
+              <Upload className="slds-square_large slds-text-neutral-7 slds-m-bottom_x-small" />
             )}
-            <span className="text-sm font-medium text-slds-neutral-base">
+            <span className="slds-text-size_medium slds-font-weight_medium slds-text-neutral-base">
               {uploading ? 'Processing...' : 'Drop MHTML files here or click to browse'}
             </span>
-            <span className="text-xs text-slds-neutral-7 mt-1">
+            <span className="slds-text-size_small slds-text-neutral-7 slds-m-top_xx-small">
               Accepts .mhtml and .mht files up to 20 MB
             </span>
           </div>
 
           {uploadError && (
-            <div className="text-xs text-red-600 bg-red-50 border border-red-200 rounded px-3 py-2">
-              {uploadError}
-            </div>
+            <div className="sf-alert-error">{uploadError}</div>
           )}
 
           {deleteError && (
-            <div className="text-xs text-red-600 bg-red-50 border border-red-200 rounded px-3 py-2">
-              Delete failed: {deleteError}
-            </div>
+            <div className="sf-alert-error">Delete failed: {deleteError}</div>
           )}
 
           {republishResult && (
-            <div className={`text-xs rounded px-3 py-2 border ${
-              republishResult.startsWith('Error')
-                ? 'text-red-600 bg-red-50 border-red-200'
-                : 'text-green-700 bg-green-50 border-green-200'
-            }`}>
+            <div className={republishResult.startsWith('Error') ? 'sf-alert-error' : 'sf-alert-success'}>
               {republishResult}
             </div>
           )}
 
           {/* Document table */}
-          <div className="sf-card overflow-hidden">
-            <div className="sf-card-header flex items-center justify-between">
-              <h2 className="text-sm font-semibold text-slds-neutral-base">
+          <div className="sf-card slds-overflow-hidden">
+            <div className="sf-card-header">
+              <h2 className="slds-text-size_medium slds-font-weight_semibold slds-text-neutral-base">
                 Indexed Documents
               </h2>
               {docsLoading && (
-                <Loader2 className="w-3.5 h-3.5 text-slds-neutral-7 animate-spin" />
+                <Loader2 className="slds-icon-size_x-small slds-text-neutral-7 sf-spin" />
               )}
             </div>
             {docs.length === 0 ? (
-              <div className="px-4 py-8 text-center text-sm text-slds-neutral-7">
+              <div className="slds-p-horizontal_medium slds-p-vertical_x-large slds-text-center slds-text-size_medium slds-text-neutral-7">
                 No documents uploaded yet
               </div>
             ) : (
-              <table className="w-full text-sm">
+              <table className="sf-table">
                 <thead>
-                  <tr className="border-b border-slds-border-2 bg-[#FAFAF9]">
-                    <th className="text-left px-4 py-2 text-xs font-semibold text-slds-neutral-7 uppercase tracking-wide">
-                      Id
-                    </th>
-                    <th className="text-left px-4 py-2 text-xs font-semibold text-slds-neutral-7 uppercase tracking-wide">
-                      File Name
-                    </th>
-                    <th className="text-left px-4 py-2 text-xs font-semibold text-slds-neutral-7 uppercase tracking-wide">
-                      Chunks
-                    </th>
-                    <th className="text-right px-4 py-2 text-xs font-semibold text-slds-neutral-7 uppercase tracking-wide">
-                      Actions
-                    </th>
+                  <tr>
+                    <th>Id</th>
+                    <th>File Name</th>
+                    <th>Chunks</th>
+                    <th style={{ textAlign: 'right' }}>Actions</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-slds-border-2">
+                <tbody>
                   {docs.map((doc) => (
-                    <tr
-                      key={doc.id}
-                      className="hover:bg-slds-neutral-2 transition-colors"
-                    >
-                      <td className="px-4 py-2.5 text-slds-neutral-7 tabular-nums">
+                    <tr key={doc.id}>
+                      <td className="sf-tabular-nums" style={{ color: 'var(--slds-g-color-neutral-7)' }}>
                         {doc.id}
                       </td>
-                      <td className="px-4 py-2.5">
-                        <div className="flex items-center gap-2">
-                          <FileText className="w-4 h-4 text-slds-brand flex-shrink-0" />
-                          <span className="text-slds-brand font-medium truncate max-w-[300px]">
+                      <td>
+                        <div className="slds-grid slds-grid_vertical-align-center slds-gap_x-small">
+                          <FileText className="slds-icon-size_small slds-text-brand slds-flex-shrink-0" />
+                          <span className="slds-text-brand slds-font-weight_medium slds-truncate" style={{ maxWidth: '300px' }}>
                             {doc.fileName}
                           </span>
                         </div>
                       </td>
-                      <td className="px-4 py-2.5">
-                        <span className={doc.chunkCount === 0 ? 'text-slds-warning-1 font-medium' : 'text-slds-neutral-7'}>
+                      <td>
+                        <span className={doc.chunkCount === 0 ? 'slds-text-warning slds-font-weight_medium' : 'slds-text-neutral-7'}>
                           {doc.chunkCount}
                         </span>
                       </td>
-                      <td className="px-4 py-2.5 text-right">
-                        <div className="flex items-center justify-end gap-1">
+                      <td style={{ textAlign: 'right' }}>
+                        <div className="slds-grid slds-grid_vertical-align-center slds-grid_align-end slds-gap_xx-small">
                           {doc.chunkCount === 0 && (
                             <button
                               onClick={() => republishDoc(doc.id)}
                               disabled={republishing === doc.id}
-                              className="p-1.5 rounded hover:bg-[#EEF4FF] text-slds-warning-1 hover:text-slds-brand transition-colors disabled:opacity-50"
+                              className="sf-action-btn sf-action-btn-warning"
                               title="Re-publish (re-chunk and re-embed)"
                             >
                               {republishing === doc.id ? (
-                                <Loader2 className="w-4 h-4 animate-spin" />
+                                <Loader2 className="slds-icon-size_small sf-spin" />
                               ) : (
-                                <RefreshCw className="w-4 h-4" />
+                                <RefreshCw className="slds-icon-size_small" style={{ color: 'var(--slds-g-color-warning-1)' }} />
                               )}
                             </button>
                           )}
                           <button
                             onClick={() => openPreview(doc.id)}
-                            className="p-1.5 rounded hover:bg-slds-border-2 text-slds-neutral-7 hover:text-slds-brand transition-colors"
+                            className="sf-action-btn"
                             title="Preview"
                           >
-                            <Eye className="w-4 h-4" />
+                            <Eye className="slds-icon-size_small" />
                           </button>
                           <button
                             onClick={() => deleteDoc(doc.id)}
-                            className="p-1.5 rounded hover:bg-red-50 text-slds-neutral-7 hover:text-red-600 transition-colors"
+                            className="sf-action-btn sf-action-btn-danger"
                             title="Delete"
                           >
-                            <Trash2 className="w-4 h-4" />
+                            <Trash2 className="slds-icon-size_small" />
                           </button>
                         </div>
                       </td>
@@ -513,54 +485,54 @@ export default function HelpDocExplorer() {
         </div>
 
         {/* ---- Right 1/3: Search + Preview ---- */}
-        <div className="space-y-4">
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
           {/* Search */}
           <div className="sf-card">
             <div className="sf-card-header">
-              <h2 className="text-sm font-semibold text-slds-neutral-base">
+              <h2 className="slds-text-size_medium slds-font-weight_semibold slds-text-neutral-base">
                 Semantic Search
               </h2>
             </div>
-            <div className="p-4 space-y-3">
-              <div className="flex gap-2">
+            <div className="slds-p-around_medium" style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+              <div className="slds-grid slds-gap_x-small">
                 <input
                   type="text"
                   placeholder="Search help documents..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   onKeyDown={(e) => e.key === 'Enter' && runSearch()}
-                  className="flex-1 px-3 py-1.5 text-sm border border-slds-border-1 rounded focus:border-slds-brand focus:ring-1 focus:ring-slds-brand outline-none"
+                  className="sf-input slds-col"
                 />
                 <button
                   onClick={runSearch}
                   disabled={searching || !searchQuery.trim()}
-                  className="px-3 py-1.5 text-sm font-medium text-white bg-slds-brand rounded hover:bg-slds-brand-contrast-1 disabled:opacity-50 flex items-center gap-1.5"
+                  className="sf-btn sf-btn-brand"
                 >
                   {searching ? (
-                    <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                    <Loader2 className="slds-icon-size_x-small sf-spin" />
                   ) : (
-                    <Search className="w-3.5 h-3.5" />
+                    <Search className="slds-icon-size_x-small" />
                   )}
                 </button>
               </div>
 
               {/* Search results */}
               {searchResults.length > 0 && (
-                <div className="space-y-2 max-h-[400px] overflow-y-auto">
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', maxHeight: '400px', overflowY: 'auto' }}>
                   {searchResults.map((r, i) => (
                     <div
                       key={r.id}
-                      className="p-3 rounded border border-slds-border-2 hover:border-slds-brand-2 transition-colors"
+                      className="slds-p-around_small slds-border-radius_small slds-border_all slds-border-color_border-2 slds-hover-border-brand-2 slds-transition-colors"
                     >
-                      <div className="flex items-center justify-between mb-1">
-                        <span className="text-xs font-medium text-slds-brand">
+                      <div className="slds-grid slds-grid_vertical-align-center slds-grid_align-spread slds-m-bottom_xxx-small">
+                        <span className="slds-text-size_small slds-font-weight_medium slds-text-brand">
                           {(r.metadata as any)?.file_name || `Result ${i + 1}`}
                         </span>
-                        <span className="text-xs text-slds-neutral-7">
+                        <span className="slds-text-size_small slds-text-neutral-7">
                           {(r.similarity * 100).toFixed(1)}%
                         </span>
                       </div>
-                      <p className="text-xs text-slds-neutral-9 line-clamp-4">
+                      <p className="slds-text-size_small slds-text-neutral-9 sf-line-clamp-4">
                         {r.content.slice(0, 300)}
                         {r.content.length > 300 ? '...' : ''}
                       </p>
@@ -574,38 +546,38 @@ export default function HelpDocExplorer() {
           {/* Preview panel */}
           {(preview || previewLoading) && (
             <div className="sf-card">
-              <div className="sf-card-header flex items-center justify-between">
-                <h2 className="text-sm font-semibold text-slds-neutral-base flex items-center gap-1.5">
-                  <Eye className="w-3.5 h-3.5" />
+              <div className="sf-card-header">
+                <h2 className="slds-text-size_medium slds-font-weight_semibold slds-text-neutral-base slds-grid slds-grid_vertical-align-center slds-gap_xx-small">
+                  <Eye className="slds-icon-size_x-small" />
                   Preview
                 </h2>
                 <button
                   onClick={() => setPreview(null)}
-                  className="p-1 rounded hover:bg-slds-border-2 text-slds-neutral-7"
+                  className="sf-action-btn"
                 >
-                  <X className="w-3.5 h-3.5" />
+                  <X className="slds-icon-size_x-small" />
                 </button>
               </div>
-              <div className="p-4">
+              <div className="slds-p-around_medium">
                 {previewLoading ? (
-                  <div className="flex items-center justify-center py-6">
-                    <Loader2 className="w-5 h-5 text-slds-brand animate-spin" />
+                  <div className="slds-grid slds-grid_vertical-align-center slds-grid_align-center slds-p-vertical_large">
+                    <Loader2 className="slds-square_x-small slds-text-brand sf-spin" />
                   </div>
                 ) : preview ? (
-                  <div className="space-y-3">
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
                     <div>
-                      <div className="text-xs font-medium text-slds-neutral-7 uppercase tracking-wide mb-1">
+                      <div className="slds-text-size_small slds-font-weight_medium slds-text-neutral-7 slds-text-uppercase slds-tracking-wide slds-m-bottom_xxx-small">
                         File Name
                       </div>
-                      <div className="text-sm text-slds-neutral-base font-medium">
+                      <div className="slds-text-size_medium slds-text-neutral-base slds-font-weight_medium">
                         {preview.fileName}
                       </div>
                     </div>
                     <div>
-                      <div className="text-xs font-medium text-slds-neutral-7 uppercase tracking-wide mb-1">
+                      <div className="slds-text-size_small slds-font-weight_medium slds-text-neutral-7 slds-text-uppercase slds-tracking-wide slds-m-bottom_xxx-small">
                         Content
                       </div>
-                      <div className="text-xs text-slds-neutral-9 max-h-[400px] overflow-y-auto whitespace-pre-wrap leading-relaxed bg-[#FAFAF9] rounded p-3 border border-slds-border-2">
+                      <div className="slds-text-size_small slds-text-neutral-9 slds-leading-relaxed slds-border-radius_small slds-p-around_small" style={{ maxHeight: '400px', overflowY: 'auto', whiteSpace: 'pre-wrap', background: '#FAFAF9', border: '1px solid var(--slds-g-color-border-2)' }}>
                         {preview.content.slice(0, 5000)}
                         {preview.content.length > 5000 ? '\n\n... (truncated)' : ''}
                       </div>
