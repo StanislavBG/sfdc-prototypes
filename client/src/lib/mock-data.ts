@@ -145,7 +145,7 @@ export const appNavItems: Record<string, NavTab[]> = Object.fromEntries(
 
 // Available Salesforce apps
 export const salesforceApps: SalesforceApp[] = [
-  { id: 'data-cloud', name: 'Data 360', description: 'Unified customer data platform', color: '#032D60', icon: 'Database' },
+  { id: 'data-cloud', name: 'Data 360', description: 'Unified customer data platform', color: 'var(--slds-g-color-brand-1)', icon: 'Database' },
   { id: 'sales', name: 'Sales', description: 'Manage your sales pipeline', color: '#7F8DE1', icon: 'TrendingUp' },
   { id: 'service', name: 'Service', description: 'Customer service console', color: '#F49756', icon: 'Headphones' },
   { id: 'marketing', name: 'Marketing', description: 'Campaign management', color: '#E8788A', icon: 'Megaphone' },

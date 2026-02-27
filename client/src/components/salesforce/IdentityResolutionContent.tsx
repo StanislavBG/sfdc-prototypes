@@ -736,33 +736,33 @@ export default function IdentityResolutionContent({ demoSession, onDemoSessionCh
     return (
       <div className="h-full flex flex-col">
         {/* Breadcrumb */}
-        <div className="bg-white border-b border-[var(--sf-border)] px-6 py-2 flex items-center gap-2">
-          <button onClick={() => setSelectedRuleset(null)} className="flex items-center gap-1 text-xs text-[var(--sf-link)] hover:underline">
+        <div className="bg-white border-b border-slds-border-1 px-6 py-2 flex items-center gap-2">
+          <button onClick={() => setSelectedRuleset(null)} className="flex items-center gap-1 text-xs text-slds-brand hover:underline">
             <ArrowLeft className="w-3.5 h-3.5" />
             Identity Resolutions
           </button>
-          <ChevronRight className="w-3 h-3 text-[var(--sf-text-tertiary)]" />
-          <span className="text-xs font-medium text-[var(--sf-text-primary)]">{selectedRuleset.rulesetName}</span>
+          <ChevronRight className="w-3 h-3 text-slds-neutral-7" />
+          <span className="text-xs font-medium text-slds-neutral-base">{selectedRuleset.rulesetName}</span>
         </div>
 
         {/* BYOM Header */}
-        <div className="bg-white border-b border-[var(--sf-border)] px-6 py-4">
+        <div className="bg-white border-b border-slds-border-1 px-6 py-4">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-xs text-[var(--sf-text-tertiary)]">Identity Resolution</p>
-              <h1 className="text-xl font-bold text-[var(--sf-text-primary)] flex items-center gap-3">
-                <div className="w-9 h-9 rounded-full bg-[#032D60] flex items-center justify-center flex-shrink-0">
+              <p className="text-xs text-slds-neutral-7">Identity Resolution</p>
+              <h1 className="text-xl font-bold text-slds-neutral-base flex items-center gap-3">
+                <div className="w-9 h-9 rounded-full bg-slds-brand-1 flex items-center justify-center flex-shrink-0">
                   <Fingerprint className="w-4.5 h-4.5 text-white" />
                 </div>
                 NTO Pro-North America
               </h1>
             </div>
             <div className="flex items-center gap-2">
-              <button className="px-3 py-1.5 text-xs font-medium border border-[var(--sf-border)] rounded hover:bg-[#F3F3F3] text-[var(--sf-text-secondary)]">Open Page</button>
-              <button className="px-3 py-1.5 text-xs font-medium border border-[var(--sf-border)] rounded hover:bg-[#F3F3F3] text-[var(--sf-text-secondary)]">Publish...</button>
-              <button className="px-3 py-1.5 text-xs font-medium border border-[var(--sf-border)] rounded hover:bg-[#F3F3F3] text-[var(--sf-text-secondary)]">Edit Properties</button>
-              <button className="px-3 py-1.5 text-xs font-medium border border-[var(--sf-border)] rounded hover:bg-[#F3F3F3] text-[var(--sf-text-secondary)]">Clone</button>
-              <button className="w-7 h-7 flex items-center justify-center border border-[var(--sf-border)] rounded hover:bg-[#F3F3F3] text-[var(--sf-text-tertiary)]">
+              <button className="px-3 py-1.5 text-xs font-medium border border-slds-border-1 rounded hover:bg-slds-neutral-2 text-slds-neutral-9">Open Page</button>
+              <button className="px-3 py-1.5 text-xs font-medium border border-slds-border-1 rounded hover:bg-slds-neutral-2 text-slds-neutral-9">Publish...</button>
+              <button className="px-3 py-1.5 text-xs font-medium border border-slds-border-1 rounded hover:bg-slds-neutral-2 text-slds-neutral-9">Edit Properties</button>
+              <button className="px-3 py-1.5 text-xs font-medium border border-slds-border-1 rounded hover:bg-slds-neutral-2 text-slds-neutral-9">Clone</button>
+              <button className="w-7 h-7 flex items-center justify-center border border-slds-border-1 rounded hover:bg-slds-neutral-2 text-slds-neutral-7">
                 <ChevronDown className="w-3.5 h-3.5" />
               </button>
             </div>
@@ -771,42 +771,42 @@ export default function IdentityResolutionContent({ demoSession, onDemoSessionCh
           {/* Info bar */}
           <div className="flex items-center gap-8 mt-4">
             <div>
-              <p className="text-[10px] uppercase tracking-wider text-[var(--sf-text-tertiary)]">Primary DMO</p>
-              <p className="text-sm font-medium text-[var(--sf-text-primary)]">{selectedRuleset.primaryDataModelObject}</p>
+              <p className="text-[10px] uppercase tracking-wider text-slds-neutral-7">Primary DMO</p>
+              <p className="text-sm font-medium text-slds-neutral-base">{selectedRuleset.primaryDataModelObject}</p>
             </div>
             <div>
-              <p className="text-[10px] uppercase tracking-wider text-[var(--sf-text-tertiary)]">Ruleset ID</p>
-              <p className="text-sm font-medium text-[var(--sf-text-primary)]">{selectedRuleset.rulesetId}</p>
+              <p className="text-[10px] uppercase tracking-wider text-slds-neutral-7">Ruleset ID</p>
+              <p className="text-sm font-medium text-slds-neutral-base">{selectedRuleset.rulesetId}</p>
             </div>
             <div>
-              <p className="text-[10px] uppercase tracking-wider text-[var(--sf-text-tertiary)]">Data Space</p>
-              <p className="text-sm font-medium text-[var(--sf-text-primary)] capitalize">{selectedRuleset.dataSpace}</p>
+              <p className="text-[10px] uppercase tracking-wider text-slds-neutral-7">Data Space</p>
+              <p className="text-sm font-medium text-slds-neutral-base capitalize">{selectedRuleset.dataSpace}</p>
             </div>
           </div>
         </div>
 
         {/* BYOM Content */}
-        <div className="flex-1 overflow-y-auto bg-[var(--sf-content-bg)]">
+        <div className="flex-1 overflow-y-auto bg-slds-neutral-2">
           <div className="flex gap-4 p-6">
             {/* Left column */}
             <div className="flex-1 space-y-4">
               {/* "Bring Your Own Identity" — Verification cards */}
               <div className="sf-card">
                 <div className="sf-card-header">
-                  <h2 className="text-base font-bold text-[var(--sf-text-primary)]">&ldquo;Bring Your Own Identity&rdquo;</h2>
+                  <h2 className="text-base font-bold text-slds-neutral-base">&ldquo;Bring Your Own Identity&rdquo;</h2>
                 </div>
                 <div className="sf-card-body space-y-4">
                   {/* Verify Unified Link DMO */}
-                  <div className="border border-[var(--sf-border)] rounded-lg p-4 flex items-start justify-between">
+                  <div className="border border-slds-border-1 rounded-lg p-4 flex items-start justify-between">
                     <div>
-                      <h3 className="text-sm font-bold text-[var(--sf-text-primary)] mb-1">Verify Unified Link DMO</h3>
-                      <p className="text-xs text-[var(--sf-text-tertiary)] leading-relaxed">
+                      <h3 className="text-sm font-bold text-slds-neutral-base mb-1">Verify Unified Link DMO</h3>
+                      <p className="text-xs text-slds-neutral-7 leading-relaxed">
                         Explore the Unified Link data model object to understand cross-source identity linkage and resolution quality.
                       </p>
                     </div>
                     <button
                       onClick={() => { setExploreDMO('link'); setExploreOpen(true); }}
-                      className="flex-shrink-0 ml-4 px-4 py-1.5 text-xs font-medium text-white bg-[var(--sf-blue)] rounded hover:bg-[var(--sf-blue-hover)] flex items-center gap-1.5"
+                      className="flex-shrink-0 ml-4 px-4 py-1.5 text-xs font-medium text-white bg-slds-brand rounded hover:bg-slds-brand-contrast-1 flex items-center gap-1.5"
                     >
                       <Search className="w-3.5 h-3.5" />
                       Explore
@@ -814,16 +814,16 @@ export default function IdentityResolutionContent({ demoSession, onDemoSessionCh
                   </div>
 
                   {/* Verify Primary Unified DMO */}
-                  <div className="border border-[var(--sf-border)] rounded-lg p-4 flex items-start justify-between">
+                  <div className="border border-slds-border-1 rounded-lg p-4 flex items-start justify-between">
                     <div>
-                      <h3 className="text-sm font-bold text-[var(--sf-text-primary)] mb-1">Verify Primary Unified DMO</h3>
-                      <p className="text-xs text-[var(--sf-text-tertiary)] leading-relaxed">
+                      <h3 className="text-sm font-bold text-slds-neutral-base mb-1">Verify Primary Unified DMO</h3>
+                      <p className="text-xs text-slds-neutral-7 leading-relaxed">
                         Explore the Primary Unified data model object to review merged profile quality and field completeness.
                       </p>
                     </div>
                     <button
                       onClick={() => { setExploreDMO('unified'); setExploreOpen(true); }}
-                      className="flex-shrink-0 ml-4 px-4 py-1.5 text-xs font-medium text-white bg-[var(--sf-blue)] rounded hover:bg-[var(--sf-blue-hover)] flex items-center gap-1.5"
+                      className="flex-shrink-0 ml-4 px-4 py-1.5 text-xs font-medium text-white bg-slds-brand rounded hover:bg-slds-brand-contrast-1 flex items-center gap-1.5"
                     >
                       <Search className="w-3.5 h-3.5" />
                       Explore
@@ -835,8 +835,8 @@ export default function IdentityResolutionContent({ demoSession, onDemoSessionCh
               {/* "Bring Your Own Identity" — Mapping status (toggles based on datakit install) */}
               <div className="sf-card">
                 <div className="sf-card-header flex items-center justify-between">
-                  <h2 className="text-base font-bold text-[var(--sf-text-primary)]">&ldquo;Bring Your Own Identity&rdquo;</h2>
-                  <span className={`text-xs font-medium ${byomMappingPopulated ? 'text-[var(--sf-success)]' : 'text-[var(--sf-text-tertiary)]'}`}>
+                  <h2 className="text-base font-bold text-slds-neutral-base">&ldquo;Bring Your Own Identity&rdquo;</h2>
+                  <span className={`text-xs font-medium ${byomMappingPopulated ? 'text-slds-success-1' : 'text-slds-neutral-7'}`}>
                     {byomMappingPopulated ? '87 / 87 Fields Mapped' : '0 / 87 Fields Mapped'}
                   </span>
                 </div>
@@ -846,25 +846,25 @@ export default function IdentityResolutionContent({ demoSession, onDemoSessionCh
                       {/* Populated mapping status */}
                       <div className="flex items-center justify-between mb-4">
                         <div className="flex items-center gap-2">
-                          <CheckCircle2 className="w-5 h-5 text-[var(--sf-success)]" />
-                          <p className="text-sm text-[var(--sf-text-secondary)]">
+                          <CheckCircle2 className="w-5 h-5 text-slds-success-1" />
+                          <p className="text-sm text-slds-neutral-9">
                             <span className="sf-link font-medium">Your Mapping</span> is complete. 3rd party rules active.
                           </p>
                         </div>
-                        <button className="px-4 py-1.5 text-xs font-medium border border-[var(--sf-border)] rounded hover:bg-[#F3F3F3] text-[var(--sf-text-secondary)]">
+                        <button className="px-4 py-1.5 text-xs font-medium border border-slds-border-1 rounded hover:bg-slds-neutral-2 text-slds-neutral-9">
                           Convert to Regular IR
                         </button>
                       </div>
 
                       {/* Populated mapping canvas — all connected */}
-                      <div className="border border-[var(--sf-border)] rounded-lg bg-[#FAFAF9] p-4">
+                      <div className="border border-slds-border-1 rounded-lg bg-[#FAFAF9] p-4">
                         <div className="flex items-start gap-0 relative">
                           {/* Source fields column */}
                           <div className="w-[200px] flex-shrink-0">
-                            <div className="text-[10px] uppercase tracking-wider text-[var(--sf-text-tertiary)] font-medium mb-2 px-2">Source Fields</div>
+                            <div className="text-[10px] uppercase tracking-wider text-slds-neutral-7 font-medium mb-2 px-2">Source Fields</div>
                             {['First Name', 'Last Name', 'Email', 'Phone', 'Address Line 1', 'City', 'State', 'Postal Code'].map((f) => (
-                              <div key={f} className="flex items-center gap-2 px-2 py-1.5 text-xs text-[var(--sf-text-primary)] border-b border-[var(--sf-border)] last:border-0">
-                                <div className="w-2 h-2 rounded-full bg-[var(--sf-success)]" />
+                              <div key={f} className="flex items-center gap-2 px-2 py-1.5 text-xs text-slds-neutral-base border-b border-slds-border-1 last:border-0">
+                                <div className="w-2 h-2 rounded-full bg-slds-success-1" />
                                 {f}
                               </div>
                             ))}
@@ -882,11 +882,11 @@ export default function IdentityResolutionContent({ demoSession, onDemoSessionCh
 
                           {/* Target DMO column */}
                           <div className="w-[200px] flex-shrink-0">
-                            <div className="text-[10px] uppercase tracking-wider text-[var(--sf-text-tertiary)] font-medium mb-2 px-2">Target DMO</div>
+                            <div className="text-[10px] uppercase tracking-wider text-slds-neutral-7 font-medium mb-2 px-2">Target DMO</div>
                             {['ssot__FirstName__c', 'ssot__LastName__c', 'ssot__Email__c', 'ssot__Phone__c', 'ssot__Street__c', 'ssot__City__c', 'ssot__State__c', 'ssot__PostalCode__c'].map((f) => (
-                              <div key={f} className="flex items-center justify-end gap-2 px-2 py-1.5 text-xs text-[var(--sf-text-primary)] border-b border-[var(--sf-border)] last:border-0">
+                              <div key={f} className="flex items-center justify-end gap-2 px-2 py-1.5 text-xs text-slds-neutral-base border-b border-slds-border-1 last:border-0">
                                 {f}
-                                <div className="w-2 h-2 rounded-full bg-[var(--sf-success)]" />
+                                <div className="w-2 h-2 rounded-full bg-slds-success-1" />
                               </div>
                             ))}
                           </div>
@@ -898,23 +898,23 @@ export default function IdentityResolutionContent({ demoSession, onDemoSessionCh
                       {/* Empty mapping status */}
                       <div className="flex items-center justify-between mb-4">
                         <div className="flex items-center gap-2">
-                          <AlertTriangle className="w-5 h-5 text-[var(--sf-warning)]" />
-                          <p className="text-sm text-[var(--sf-text-secondary)]">
+                          <AlertTriangle className="w-5 h-5 text-slds-warning-1" />
+                          <p className="text-sm text-slds-neutral-9">
                             <span className="font-medium">No mappings configured.</span> Map source fields to target DMOs to activate identity resolution.
                           </p>
                         </div>
-                        <button className="px-4 py-1.5 text-xs font-medium text-white bg-[var(--sf-blue)] rounded hover:bg-[var(--sf-blue-hover)]">
+                        <button className="px-4 py-1.5 text-xs font-medium text-white bg-slds-brand rounded hover:bg-slds-brand-contrast-1">
                           Start Mapping
                         </button>
                       </div>
 
                       {/* Empty mapping canvas */}
-                      <div className="border border-[var(--sf-border)] rounded-lg bg-[#FAFAF9] p-4">
+                      <div className="border border-slds-border-1 rounded-lg bg-[#FAFAF9] p-4">
                         <div className="flex items-start gap-0">
                           <div className="w-[200px] flex-shrink-0">
-                            <div className="text-[10px] uppercase tracking-wider text-[var(--sf-text-tertiary)] font-medium mb-2 px-2">Source Fields</div>
+                            <div className="text-[10px] uppercase tracking-wider text-slds-neutral-7 font-medium mb-2 px-2">Source Fields</div>
                             {['First Name', 'Last Name', 'Email', 'Phone', 'Address Line 1', 'City', 'State', 'Postal Code'].map((f) => (
-                              <div key={f} className="flex items-center gap-2 px-2 py-1.5 text-xs text-[var(--sf-text-secondary)] border-b border-[var(--sf-border)] last:border-0">
+                              <div key={f} className="flex items-center gap-2 px-2 py-1.5 text-xs text-slds-neutral-9 border-b border-slds-border-1 last:border-0">
                                 <div className="w-2 h-2 rounded-full bg-[#D8DDE6]" />
                                 {f}
                               </div>
@@ -922,17 +922,17 @@ export default function IdentityResolutionContent({ demoSession, onDemoSessionCh
                           </div>
                           <div className="flex-1 flex items-center justify-center min-h-[220px]">
                             <div className="text-center">
-                              <div className="w-12 h-12 mx-auto mb-2 rounded-full bg-[#E5E5E5] flex items-center justify-center">
+                              <div className="w-12 h-12 mx-auto mb-2 rounded-full bg-slds-border-2 flex items-center justify-center">
                                 <ArrowRight className="w-5 h-5 text-[#B0B0B0]" />
                               </div>
-                              <p className="text-xs text-[var(--sf-text-tertiary)]">No connections</p>
-                              <p className="text-[10px] text-[var(--sf-text-tertiary)] mt-0.5">Drag fields to create mappings</p>
+                              <p className="text-xs text-slds-neutral-7">No connections</p>
+                              <p className="text-[10px] text-slds-neutral-7 mt-0.5">Drag fields to create mappings</p>
                             </div>
                           </div>
                           <div className="w-[200px] flex-shrink-0">
-                            <div className="text-[10px] uppercase tracking-wider text-[var(--sf-text-tertiary)] font-medium mb-2 px-2">Target DMO</div>
+                            <div className="text-[10px] uppercase tracking-wider text-slds-neutral-7 font-medium mb-2 px-2">Target DMO</div>
                             {['ssot__FirstName__c', 'ssot__LastName__c', 'ssot__Email__c', 'ssot__Phone__c', 'ssot__Street__c', 'ssot__City__c', 'ssot__State__c', 'ssot__PostalCode__c'].map((f) => (
-                              <div key={f} className="flex items-center justify-end gap-2 px-2 py-1.5 text-xs text-[var(--sf-text-secondary)] border-b border-[var(--sf-border)] last:border-0">
+                              <div key={f} className="flex items-center justify-end gap-2 px-2 py-1.5 text-xs text-slds-neutral-9 border-b border-slds-border-1 last:border-0">
                                 {f}
                                 <div className="w-2 h-2 rounded-full bg-[#D8DDE6]" />
                               </div>
@@ -944,10 +944,10 @@ export default function IdentityResolutionContent({ demoSession, onDemoSessionCh
                   )}
 
                   {/* Collapsible Details */}
-                  <div className="border-t border-[var(--sf-border)] pt-3 mt-4">
+                  <div className="border-t border-slds-border-1 pt-3 mt-4">
                     <button
                       onClick={() => setByomDetailsOpen(!byomDetailsOpen)}
-                      className="flex items-center gap-1.5 text-sm font-medium text-[var(--sf-text-primary)] mb-3"
+                      className="flex items-center gap-1.5 text-sm font-medium text-slds-neutral-base mb-3"
                     >
                       {byomDetailsOpen ? <ChevronDown className="w-4 h-4" /> : <ChevronRight className="w-4 h-4" />}
                       Details
@@ -989,8 +989,8 @@ export default function IdentityResolutionContent({ demoSession, onDemoSessionCh
             <div className="w-[320px] flex-shrink-0 space-y-4">
               {/* Resolution Summary */}
               <div className="sf-card">
-                <div className="px-4 py-3 border-b-2 border-[var(--sf-blue)]">
-                  <h3 className="text-sm font-semibold text-[var(--sf-blue)]">Resolution Summary</h3>
+                <div className="px-4 py-3 border-b-2 border-slds-brand">
+                  <h3 className="text-sm font-semibold text-slds-brand">Resolution Summary</h3>
                 </div>
                 <div className="p-6 text-center">
                   {/* Desert/cactus illustration placeholder */}
@@ -1006,15 +1006,15 @@ export default function IdentityResolutionContent({ demoSession, onDemoSessionCh
                       <path d="M90 80 Q95 75 100 80" />
                     </svg>
                   </div>
-                  <p className="text-xs text-[var(--sf-text-tertiary)] leading-relaxed mb-4">
+                  <p className="text-xs text-slds-neutral-7 leading-relaxed mb-4">
                     Nothing here yet. If you enable, you can see summaries of your last run job to help you analyze further configurations etc.{' '}
                     <span className="sf-link">Learn More</span>
                   </p>
                   <div className="flex items-center justify-center gap-3">
-                    <button className="px-4 py-1.5 text-xs font-medium border border-[var(--sf-border)] rounded hover:bg-[#F3F3F3] text-[var(--sf-text-secondary)]">
+                    <button className="px-4 py-1.5 text-xs font-medium border border-slds-border-1 rounded hover:bg-slds-neutral-2 text-slds-neutral-9">
                       Enable
                     </button>
-                    <button className="w-7 h-7 flex items-center justify-center border border-[var(--sf-border)] rounded hover:bg-[#F3F3F3] text-[var(--sf-text-tertiary)]">
+                    <button className="w-7 h-7 flex items-center justify-center border border-slds-border-1 rounded hover:bg-slds-neutral-2 text-slds-neutral-7">
                       <Camera className="w-3.5 h-3.5" />
                     </button>
                   </div>
@@ -1023,14 +1023,14 @@ export default function IdentityResolutionContent({ demoSession, onDemoSessionCh
 
               {/* Post / Poll / Question activity card */}
               <div className="sf-card">
-                <div className="flex border-b border-[var(--sf-border)]">
+                <div className="flex border-b border-slds-border-1">
                   {['Post', 'Poll', 'Question'].map((tab) => (
                     <button
                       key={tab}
                       className={`px-4 py-2.5 text-xs font-medium border-b-2 transition-colors ${
                         tab === 'Post'
-                          ? 'border-[var(--sf-blue)] text-[var(--sf-blue)]'
-                          : 'border-transparent text-[var(--sf-text-tertiary)] hover:text-[var(--sf-text-secondary)]'
+                          ? 'border-slds-brand text-slds-brand'
+                          : 'border-transparent text-slds-neutral-7 hover:text-slds-neutral-9'
                       }`}
                     >
                       {tab}
@@ -1042,25 +1042,25 @@ export default function IdentityResolutionContent({ demoSession, onDemoSessionCh
                     <input
                       type="text"
                       placeholder="Share an update..."
-                      className="flex-1 px-3 py-1.5 text-xs border border-[var(--sf-border)] rounded focus:outline-none focus:border-[var(--sf-blue-light)]"
+                      className="flex-1 px-3 py-1.5 text-xs border border-slds-border-1 rounded focus:outline-none focus:border-slds-brand-2"
                     />
-                    <button className="px-3 py-1.5 text-xs font-medium text-white bg-[var(--sf-blue)] rounded hover:bg-[var(--sf-blue-hover)]">
+                    <button className="px-3 py-1.5 text-xs font-medium text-white bg-slds-brand rounded hover:bg-slds-brand-contrast-1">
                       Share
                     </button>
                   </div>
                 </div>
                 <div className="px-3 pb-3 flex items-center justify-between">
-                  <button className="flex items-center gap-1 text-xs text-[var(--sf-text-tertiary)] hover:text-[var(--sf-text-secondary)]">
+                  <button className="flex items-center gap-1 text-xs text-slds-neutral-7 hover:text-slds-neutral-9">
                     <RefreshCw className="w-3 h-3" />
                   </button>
                   <div className="flex items-center gap-1.5">
-                    <Search className="w-3.5 h-3.5 text-[var(--sf-text-tertiary)]" />
+                    <Search className="w-3.5 h-3.5 text-slds-neutral-7" />
                     <input
                       type="text"
                       placeholder="Search..."
-                      className="w-28 px-2 py-1 text-xs border border-[var(--sf-border)] rounded focus:outline-none"
+                      className="w-28 px-2 py-1 text-xs border border-slds-border-1 rounded focus:outline-none"
                     />
-                    <button className="w-6 h-6 flex items-center justify-center rounded hover:bg-[#F3F3F3] text-[var(--sf-text-tertiary)]">
+                    <button className="w-6 h-6 flex items-center justify-center rounded hover:bg-slds-neutral-2 text-slds-neutral-7">
                       <RefreshCw className="w-3 h-3" />
                     </button>
                   </div>
@@ -1076,16 +1076,16 @@ export default function IdentityResolutionContent({ demoSession, onDemoSessionCh
             <div className="absolute inset-0 bg-black/40" onClick={() => setExploreOpen(false)} />
             <div className="relative bg-white rounded-lg shadow-2xl w-[720px] max-h-[80vh] overflow-hidden">
               {/* Header */}
-              <div className="px-6 py-4 border-b border-[var(--sf-border)] flex items-center justify-between">
+              <div className="px-6 py-4 border-b border-slds-border-1 flex items-center justify-between">
                 <div>
-                  <h2 className="text-base font-bold text-[var(--sf-text-primary)]">
+                  <h2 className="text-base font-bold text-slds-neutral-base">
                     Data Explorer — {exploreDMO === 'link' ? 'Unified Link DMO' : 'Primary Unified DMO'}
                   </h2>
-                  <p className="text-xs text-[var(--sf-text-tertiary)] mt-0.5">
+                  <p className="text-xs text-slds-neutral-7 mt-0.5">
                     {exploreDMO === 'link' ? 'ssot__UnifiedLink__dlm' : `ssot__${selectedRuleset.primaryDataModelObject}__dlm`}
                   </p>
                 </div>
-                <button onClick={() => setExploreOpen(false)} className="w-7 h-7 flex items-center justify-center rounded hover:bg-[#F3F3F3] text-[var(--sf-text-tertiary)]">
+                <button onClick={() => setExploreOpen(false)} className="w-7 h-7 flex items-center justify-center rounded hover:bg-slds-neutral-2 text-slds-neutral-7">
                   <X className="w-4 h-4" />
                 </button>
               </div>
@@ -1094,29 +1094,29 @@ export default function IdentityResolutionContent({ demoSession, onDemoSessionCh
               <div className="p-6 overflow-y-auto max-h-[65vh] space-y-6">
                 {/* Row 1: Record counts + match rate */}
                 <div className="grid grid-cols-3 gap-4">
-                  <div className="border border-[var(--sf-border)] rounded-lg p-4 text-center">
-                    <p className="text-[10px] uppercase tracking-wider text-[var(--sf-text-tertiary)] mb-1">Total Records</p>
-                    <p className="text-2xl font-bold text-[var(--sf-blue)]">{exploreDMO === 'link' ? '45,892' : '38,241'}</p>
+                  <div className="border border-slds-border-1 rounded-lg p-4 text-center">
+                    <p className="text-[10px] uppercase tracking-wider text-slds-neutral-7 mb-1">Total Records</p>
+                    <p className="text-2xl font-bold text-slds-brand">{exploreDMO === 'link' ? '45,892' : '38,241'}</p>
                   </div>
-                  <div className="border border-[var(--sf-border)] rounded-lg p-4 text-center">
-                    <p className="text-[10px] uppercase tracking-wider text-[var(--sf-text-tertiary)] mb-1">{exploreDMO === 'link' ? 'Linked Pairs' : 'Unified Profiles'}</p>
-                    <p className="text-2xl font-bold text-[var(--sf-success)]">{exploreDMO === 'link' ? '12,547' : '10,594'}</p>
+                  <div className="border border-slds-border-1 rounded-lg p-4 text-center">
+                    <p className="text-[10px] uppercase tracking-wider text-slds-neutral-7 mb-1">{exploreDMO === 'link' ? 'Linked Pairs' : 'Unified Profiles'}</p>
+                    <p className="text-2xl font-bold text-slds-success-1">{exploreDMO === 'link' ? '12,547' : '10,594'}</p>
                   </div>
-                  <div className="border border-[var(--sf-border)] rounded-lg p-4 text-center">
-                    <p className="text-[10px] uppercase tracking-wider text-[var(--sf-text-tertiary)] mb-1">{exploreDMO === 'link' ? 'Link Rate' : 'Consolidation'}</p>
+                  <div className="border border-slds-border-1 rounded-lg p-4 text-center">
+                    <p className="text-[10px] uppercase tracking-wider text-slds-neutral-7 mb-1">{exploreDMO === 'link' ? 'Link Rate' : 'Consolidation'}</p>
                     <p className="text-2xl font-bold text-[#FF4A00]">{exploreDMO === 'link' ? '27.3%' : '72.3%'}</p>
                   </div>
                 </div>
 
                 {/* Chart: Source Distribution (bar chart via SVG) */}
-                <div className="border border-[var(--sf-border)] rounded-lg p-4">
-                  <h3 className="text-sm font-semibold text-[var(--sf-text-primary)] mb-3">
+                <div className="border border-slds-border-1 rounded-lg p-4">
+                  <h3 className="text-sm font-semibold text-slds-neutral-base mb-3">
                     {exploreDMO === 'link' ? 'Links by Source System' : 'Records by Data Source'}
                   </h3>
                   <svg viewBox="0 0 600 140" className="w-full">
                     {[
                       { label: 'Informatica MDM', value: 0.72, color: '#FF4A00' },
-                      { label: 'Salesforce CRM', value: 0.45, color: '#0070D2' },
+                      { label: 'Salesforce CRM', value: 0.45, color: 'var(--slds-g-color-brand)' },
                       { label: 'Marketing Cloud', value: 0.28, color: '#9C27B0' },
                       { label: 'External API', value: 0.15, color: '#4CAF50' },
                     ].map((bar, i) => (
@@ -1130,27 +1130,27 @@ export default function IdentityResolutionContent({ demoSession, onDemoSessionCh
                 </div>
 
                 {/* Chart: Field Completeness (horizontal segments) */}
-                <div className="border border-[var(--sf-border)] rounded-lg p-4">
-                  <h3 className="text-sm font-semibold text-[var(--sf-text-primary)] mb-3">Field Completeness</h3>
+                <div className="border border-slds-border-1 rounded-lg p-4">
+                  <h3 className="text-sm font-semibold text-slds-neutral-base mb-3">Field Completeness</h3>
                   <div className="space-y-2">
                     {(exploreDMO === 'link'
                       ? [{ f: 'Source Record ID', pct: 100 }, { f: 'Target Record ID', pct: 100 }, { f: 'Link Confidence', pct: 94 }, { f: 'Match Rule', pct: 91 }, { f: 'Created Date', pct: 100 }]
                       : [{ f: 'First Name', pct: 98 }, { f: 'Last Name', pct: 99 }, { f: 'Email', pct: 87 }, { f: 'Phone', pct: 72 }, { f: 'Address', pct: 64 }, { f: 'Date of Birth', pct: 41 }]
                     ).map((row) => (
                       <div key={row.f} className="flex items-center gap-3">
-                        <span className="text-xs text-[var(--sf-text-secondary)] w-32 flex-shrink-0">{row.f}</span>
-                        <div className="flex-1 h-3 bg-[#E5E5E5] rounded-full overflow-hidden">
+                        <span className="text-xs text-slds-neutral-9 w-32 flex-shrink-0">{row.f}</span>
+                        <div className="flex-1 h-3 bg-slds-border-2 rounded-full overflow-hidden">
                           <div className="h-full rounded-full" style={{ width: `${row.pct}%`, backgroundColor: row.pct > 90 ? '#4BC076' : row.pct > 70 ? '#FF9800' : '#E91E63' }} />
                         </div>
-                        <span className="text-xs font-medium text-[var(--sf-text-primary)] w-10 text-right">{row.pct}%</span>
+                        <span className="text-xs font-medium text-slds-neutral-base w-10 text-right">{row.pct}%</span>
                       </div>
                     ))}
                   </div>
                 </div>
 
                 {/* Chart: Match Quality Distribution (donut via SVG) */}
-                <div className="border border-[var(--sf-border)] rounded-lg p-4">
-                  <h3 className="text-sm font-semibold text-[var(--sf-text-primary)] mb-3">
+                <div className="border border-slds-border-1 rounded-lg p-4">
+                  <h3 className="text-sm font-semibold text-slds-neutral-base mb-3">
                     {exploreDMO === 'link' ? 'Link Confidence Distribution' : 'Match Quality Score'}
                   </h3>
                   <div className="flex items-center gap-8">
@@ -1163,9 +1163,9 @@ export default function IdentityResolutionContent({ demoSession, onDemoSessionCh
                       <text x="60" y="72" textAnchor="middle" fontSize="9" fill="#706E6B">High</text>
                     </svg>
                     <div className="space-y-2">
-                      <div className="flex items-center gap-2"><div className="w-3 h-3 rounded-full bg-[#4BC076]" /><span className="text-xs text-[var(--sf-text-secondary)]">High confidence (68%)</span></div>
-                      <div className="flex items-center gap-2"><div className="w-3 h-3 rounded-full bg-[#FF9800]" /><span className="text-xs text-[var(--sf-text-secondary)]">Medium confidence (22%)</span></div>
-                      <div className="flex items-center gap-2"><div className="w-3 h-3 rounded-full bg-[#E91E63]" /><span className="text-xs text-[var(--sf-text-secondary)]">Low confidence (10%)</span></div>
+                      <div className="flex items-center gap-2"><div className="w-3 h-3 rounded-full bg-[#4BC076]" /><span className="text-xs text-slds-neutral-9">High confidence (68%)</span></div>
+                      <div className="flex items-center gap-2"><div className="w-3 h-3 rounded-full bg-[#FF9800]" /><span className="text-xs text-slds-neutral-9">Medium confidence (22%)</span></div>
+                      <div className="flex items-center gap-2"><div className="w-3 h-3 rounded-full bg-[#E91E63]" /><span className="text-xs text-slds-neutral-9">Low confidence (10%)</span></div>
                     </div>
                   </div>
                 </div>
@@ -1184,52 +1184,52 @@ export default function IdentityResolutionContent({ demoSession, onDemoSessionCh
     return (
       <div className="h-full flex flex-col">
         {/* Breadcrumb */}
-        <div className="bg-white border-b border-[var(--sf-border)] px-6 py-2 flex items-center gap-2">
-          <button onClick={() => setSelectedRuleset(null)} className="flex items-center gap-1 text-xs text-[var(--sf-link)] hover:underline">
+        <div className="bg-white border-b border-slds-border-1 px-6 py-2 flex items-center gap-2">
+          <button onClick={() => setSelectedRuleset(null)} className="flex items-center gap-1 text-xs text-slds-brand hover:underline">
             <ArrowLeft className="w-3.5 h-3.5" />
             Identity Resolutions
           </button>
-          <ChevronRight className="w-3 h-3 text-[var(--sf-text-tertiary)]" />
-          <span className="text-xs font-medium text-[var(--sf-text-primary)]">{selectedRuleset.rulesetName}</span>
+          <ChevronRight className="w-3 h-3 text-slds-neutral-7" />
+          <span className="text-xs font-medium text-slds-neutral-base">{selectedRuleset.rulesetName}</span>
         </div>
 
         {/* Header */}
-        <div className="bg-white border-b border-[var(--sf-border)] px-6 py-4">
+        <div className="bg-white border-b border-slds-border-1 px-6 py-4">
           <div className="flex items-start gap-4">
-            <div className="w-10 h-10 rounded-lg bg-[#032D60] flex items-center justify-center flex-shrink-0">
+            <div className="w-10 h-10 rounded-lg bg-slds-brand-1 flex items-center justify-center flex-shrink-0">
               <Fingerprint className="w-5 h-5 text-white" />
             </div>
             <div className="flex-1">
-              <p className="text-xs text-[var(--sf-text-tertiary)]">Identity Resolution</p>
-              <h1 className="text-lg font-bold text-[var(--sf-text-primary)]">{selectedRuleset.rulesetName}</h1>
+              <p className="text-xs text-slds-neutral-7">Identity Resolution</p>
+              <h1 className="text-lg font-bold text-slds-neutral-base">{selectedRuleset.rulesetName}</h1>
             </div>
           </div>
 
           {/* Metadata bar */}
           <div className="flex flex-wrap items-center gap-x-8 gap-y-2 mt-4">
             <div>
-              <p className="text-[10px] uppercase tracking-wider text-[var(--sf-text-tertiary)]">Data Space</p>
-              <p className="text-sm font-medium text-[var(--sf-text-primary)] capitalize">{selectedRuleset.dataSpace}</p>
+              <p className="text-[10px] uppercase tracking-wider text-slds-neutral-7">Data Space</p>
+              <p className="text-sm font-medium text-slds-neutral-base capitalize">{selectedRuleset.dataSpace}</p>
             </div>
             <div>
-              <p className="text-[10px] uppercase tracking-wider text-[var(--sf-text-tertiary)]">Primary Data Model Object</p>
-              <p className="text-sm font-medium text-[var(--sf-text-primary)]">{selectedRuleset.primaryDataModelObject}</p>
+              <p className="text-[10px] uppercase tracking-wider text-slds-neutral-7">Primary Data Model Object</p>
+              <p className="text-sm font-medium text-slds-neutral-base">{selectedRuleset.primaryDataModelObject}</p>
             </div>
             <div>
-              <p className="text-[10px] uppercase tracking-wider text-[var(--sf-text-tertiary)]">Ruleset ID</p>
-              <p className="text-sm font-medium text-[var(--sf-text-primary)]">{selectedRuleset.rulesetId}</p>
+              <p className="text-[10px] uppercase tracking-wider text-slds-neutral-7">Ruleset ID</p>
+              <p className="text-sm font-medium text-slds-neutral-base">{selectedRuleset.rulesetId}</p>
             </div>
             <div>
-              <p className="text-[10px] uppercase tracking-wider text-[var(--sf-text-tertiary)]">Ruleset Status</p>
+              <p className="text-[10px] uppercase tracking-wider text-slds-neutral-7">Ruleset Status</p>
               <p className="text-sm">{statusBadge(selectedRuleset.rulesetStatus)}</p>
             </div>
             <div>
-              <p className="text-[10px] uppercase tracking-wider text-[var(--sf-text-tertiary)]">Last Job Status</p>
+              <p className="text-[10px] uppercase tracking-wider text-slds-neutral-7">Last Job Status</p>
               <p className="text-sm">{statusBadge(selectedRuleset.lastJobStatus === 'Completed' ? 'Succeeded' : selectedRuleset.lastJobStatus)}</p>
             </div>
             <div>
-              <p className="text-[10px] uppercase tracking-wider text-[var(--sf-text-tertiary)]">Last Job Completed</p>
-              <p className="text-sm font-medium text-[var(--sf-text-primary)]">{selectedRuleset.lastJobCompleted}</p>
+              <p className="text-[10px] uppercase tracking-wider text-slds-neutral-7">Last Job Completed</p>
+              <p className="text-sm font-medium text-slds-neutral-base">{selectedRuleset.lastJobCompleted}</p>
             </div>
           </div>
         </div>
@@ -1247,7 +1247,7 @@ export default function IdentityResolutionContent({ demoSession, onDemoSessionCh
         </div>
 
         {/* Tab Content */}
-        <div className="flex-1 overflow-y-auto bg-[var(--sf-content-bg)]">
+        <div className="flex-1 overflow-y-auto bg-slds-neutral-2">
 
           {/* ── DETAILS TAB ── */}
           {detailTab === 'details' && (
@@ -1257,29 +1257,29 @@ export default function IdentityResolutionContent({ demoSession, onDemoSessionCh
                 {/* Match Rules card */}
                 <div className="sf-card">
                   <div className="sf-card-header">
-                    <h2 className="text-sm font-semibold text-[var(--sf-text-primary)]">
-                      Match Rules <span className="text-xs font-normal text-[var(--sf-text-tertiary)]">({selectedRuleset.matchRules.length})</span>
+                    <h2 className="text-sm font-semibold text-slds-neutral-base">
+                      Match Rules <span className="text-xs font-normal text-slds-neutral-7">({selectedRuleset.matchRules.length})</span>
                     </h2>
-                    <button onClick={handleOpenEditMatchRules} className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-white bg-[var(--sf-blue)] rounded hover:bg-[var(--sf-blue-hover)] transition-colors">
+                    <button onClick={handleOpenEditMatchRules} className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-white bg-slds-brand rounded hover:bg-slds-brand-contrast-1 transition-colors">
                       <Edit3 className="w-3.5 h-3.5" />
                       Edit
                     </button>
                   </div>
                   {selectedRuleset.matchRules.length === 0 ? (
-                    <div className="sf-card-body text-center py-8 text-sm text-[var(--sf-text-tertiary)]">No match rules configured.</div>
+                    <div className="sf-card-body text-center py-8 text-sm text-slds-neutral-7">No match rules configured.</div>
                   ) : (
                     <div className="sf-card-body space-y-2">
                       {selectedRuleset.matchRules.map((rule, ri) => (
                         <div key={rule.id} className="flex items-start gap-3">
-                          {ri > 0 && <span className="text-xs font-bold text-[var(--sf-text-tertiary)] mt-1 w-6 text-center flex-shrink-0">OR</span>}
+                          {ri > 0 && <span className="text-xs font-bold text-slds-neutral-7 mt-1 w-6 text-center flex-shrink-0">OR</span>}
                           {ri === 0 && <span className="w-6 flex-shrink-0" />}
                           <div className={`flex-1 flex items-center gap-2 px-3 py-2.5 rounded-lg border ${
-                            rule.ruleName === 'Unique Identifier 01' ? 'border-[#FFB75D] bg-[#FFFBF5]' : 'border-[var(--sf-border)] bg-[#FAFAF9]'
+                            rule.ruleName === 'Unique Identifier 01' ? 'border-[#FFB75D] bg-[#FFFBF5]' : 'border-slds-border-1 bg-[#FAFAF9]'
                           }`}>
                             {rule.ruleName === 'Unique Identifier 01' && (
                               <AlertTriangle className="w-4 h-4 text-[#FFB75D] flex-shrink-0" />
                             )}
-                            <span className="text-sm text-[var(--sf-text-primary)]">{rule.ruleName}</span>
+                            <span className="text-sm text-slds-neutral-base">{rule.ruleName}</span>
                           </div>
                         </div>
                       ))}
@@ -1291,11 +1291,11 @@ export default function IdentityResolutionContent({ demoSession, onDemoSessionCh
                 <div className="sf-card">
                   <div className="sf-card-header">
                     <div>
-                      <h2 className="text-sm font-semibold text-[var(--sf-text-primary)]">Reconciliation Rules</h2>
-                      <p className="text-xs text-[var(--sf-text-tertiary)] mt-0.5">Reconciliation rules determine which field value to keep when source profiles are merged into a unified profile.</p>
+                      <h2 className="text-sm font-semibold text-slds-neutral-base">Reconciliation Rules</h2>
+                      <p className="text-xs text-slds-neutral-7 mt-0.5">Reconciliation rules determine which field value to keep when source profiles are merged into a unified profile.</p>
                     </div>
                     {selectedReconFields.size > 0 && (
-                      <button onClick={handleUpdateSelected} className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-white bg-[var(--sf-blue)] rounded hover:bg-[var(--sf-blue-hover)] transition-colors">
+                      <button onClick={handleUpdateSelected} className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-white bg-slds-brand rounded hover:bg-slds-brand-contrast-1 transition-colors">
                         Update Selected ({selectedReconFields.size})
                       </button>
                     )}
@@ -1304,18 +1304,18 @@ export default function IdentityResolutionContent({ demoSession, onDemoSessionCh
                     {selectedRuleset.reconciliationGroups.map((group) => {
                       const isOpen = reconGroupsOpen[group.dmoName] !== false;
                       return (
-                        <div key={group.dmoName} className="border-b border-[var(--sf-border-light)] last:border-b-0">
+                        <div key={group.dmoName} className="border-b border-slds-border-2 last:border-b-0">
                           <button onClick={() => toggleReconGroup(group.dmoName)} className="w-full flex items-center justify-between px-4 py-3 hover:bg-[#FAFAF9] transition-colors">
                             <div className="flex items-center gap-2">
-                              {isOpen ? <ChevronDown className="w-4 h-4 text-[var(--sf-text-tertiary)]" /> : <ChevronRight className="w-4 h-4 text-[var(--sf-text-tertiary)]" />}
-                              <span className="text-sm font-semibold text-[var(--sf-text-primary)]">{group.dmoName}</span>
+                              {isOpen ? <ChevronDown className="w-4 h-4 text-slds-neutral-7" /> : <ChevronRight className="w-4 h-4 text-slds-neutral-7" />}
+                              <span className="text-sm font-semibold text-slds-neutral-base">{group.dmoName}</span>
                             </div>
-                            <div className="flex items-center gap-2 text-xs text-[var(--sf-text-tertiary)]">
+                            <div className="flex items-center gap-2 text-xs text-slds-neutral-7">
                               <span>Default Reconciliation Rule:</span>
-                              <span className="font-medium text-[var(--sf-text-secondary)]">{group.defaultRule}</span>
+                              <span className="font-medium text-slds-neutral-9">{group.defaultRule}</span>
                               <button
                                 onClick={(e) => { e.stopPropagation(); }}
-                                className="w-6 h-6 flex items-center justify-center rounded hover:bg-[#E5E5E5] text-[var(--sf-text-tertiary)]"
+                                className="w-6 h-6 flex items-center justify-center rounded hover:bg-slds-border-2 text-slds-neutral-7"
                                 title="Edit Default Reconciliation Rule"
                               >
                                 <Pencil className="w-3 h-3" />
@@ -1340,7 +1340,7 @@ export default function IdentityResolutionContent({ demoSession, onDemoSessionCh
                                         type="checkbox"
                                         checked={selectedReconFields.has(field.id)}
                                         onChange={() => toggleReconFieldSelection(field.id)}
-                                        className="w-4 h-4 rounded border-[var(--sf-border)]"
+                                        className="w-4 h-4 rounded border-slds-border-1"
                                       />
                                     </td>
                                     <td>
@@ -1350,7 +1350,7 @@ export default function IdentityResolutionContent({ demoSession, onDemoSessionCh
                                     </td>
                                     <td>{field.reconciliationRule}</td>
                                     <td className="text-center">
-                                      {field.usingDefault && <Check className="w-4 h-4 text-[var(--sf-success)] mx-auto" />}
+                                      {field.usingDefault && <Check className="w-4 h-4 text-slds-success-1 mx-auto" />}
                                     </td>
                                   </tr>
                                 ))}
@@ -1368,44 +1368,44 @@ export default function IdentityResolutionContent({ demoSession, onDemoSessionCh
               <div className="w-[320px] flex-shrink-0 space-y-4">
                 {/* Resolution Summary */}
                 <div className="sf-card">
-                  <div className="px-4 py-3 border-b-2 border-[var(--sf-blue)]">
-                    <h3 className="text-sm font-semibold text-[var(--sf-blue)]">Resolution Summary</h3>
+                  <div className="px-4 py-3 border-b-2 border-slds-brand">
+                    <h3 className="text-sm font-semibold text-slds-brand">Resolution Summary</h3>
                   </div>
                   <div className="p-4 space-y-3">
                     <div className="flex items-center justify-between">
-                      <span className="text-xs text-[var(--sf-text-tertiary)]">Total Unified Profiles</span>
-                      <span className="text-sm font-bold text-[var(--sf-text-primary)]">{fmt(selectedRuleset.totalUnifiedProfiles)}</span>
+                      <span className="text-xs text-slds-neutral-7">Total Unified Profiles</span>
+                      <span className="text-sm font-bold text-slds-neutral-base">{fmt(selectedRuleset.totalUnifiedProfiles)}</span>
                     </div>
-                    <div className="text-xs text-[var(--sf-text-tertiary)]">/ {fmt(selectedRuleset.sourceProfiles)} Source Profiles</div>
+                    <div className="text-xs text-slds-neutral-7">/ {fmt(selectedRuleset.sourceProfiles)} Source Profiles</div>
                     <div className="flex items-center justify-between">
-                      <span className="text-xs text-[var(--sf-text-tertiary)]">Consolidation Rate</span>
-                      <span className="text-sm font-bold text-[var(--sf-text-primary)]">{selectedRuleset.consolidationRate}%</span>
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <span className="text-xs text-[var(--sf-text-tertiary)]">Known Unified Profiles</span>
-                      <span className="text-sm font-medium text-[var(--sf-text-primary)]">{fmt(selectedRuleset.totalUnifiedProfiles)}</span>
+                      <span className="text-xs text-slds-neutral-7">Consolidation Rate</span>
+                      <span className="text-sm font-bold text-slds-neutral-base">{selectedRuleset.consolidationRate}%</span>
                     </div>
                     <div className="flex items-center justify-between">
-                      <span className="text-xs text-[var(--sf-text-tertiary)]">Anonymous Unified Profiles</span>
-                      <span className="text-sm font-medium text-[var(--sf-text-primary)]">8</span>
+                      <span className="text-xs text-slds-neutral-7">Known Unified Profiles</span>
+                      <span className="text-sm font-medium text-slds-neutral-base">{fmt(selectedRuleset.totalUnifiedProfiles)}</span>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs text-slds-neutral-7">Anonymous Unified Profiles</span>
+                      <span className="text-sm font-medium text-slds-neutral-base">8</span>
                     </div>
                   </div>
                 </div>
 
                 {/* Warnings */}
                 <div className="sf-card">
-                  <div className="px-4 py-3 border-b border-[var(--sf-border)]">
+                  <div className="px-4 py-3 border-b border-slds-border-1">
                     <div className="flex items-center gap-2">
                       <AlertTriangle className="w-4 h-4 text-[#FFB75D]" />
-                      <h3 className="text-sm font-semibold text-[var(--sf-text-primary)]">Warnings (2)</h3>
+                      <h3 className="text-sm font-semibold text-slds-neutral-base">Warnings (2)</h3>
                     </div>
                   </div>
                   <div className="p-4 space-y-2">
-                    <div className="flex items-start gap-2 text-xs text-[var(--sf-text-secondary)]">
+                    <div className="flex items-start gap-2 text-xs text-slds-neutral-9">
                       <AlertTriangle className="w-3.5 h-3.5 text-[#FFB75D] flex-shrink-0 mt-0.5" />
                       <span>Match rule &ldquo;Unique Identifier 01&rdquo; may produce false positives with non-unique identifiers.</span>
                     </div>
-                    <div className="flex items-start gap-2 text-xs text-[var(--sf-text-secondary)]">
+                    <div className="flex items-start gap-2 text-xs text-slds-neutral-9">
                       <AlertTriangle className="w-3.5 h-3.5 text-[#FFB75D] flex-shrink-0 mt-0.5" />
                       <span>Consolidation rate below 15% — consider reviewing match rules for better coverage.</span>
                     </div>
@@ -1414,14 +1414,14 @@ export default function IdentityResolutionContent({ demoSession, onDemoSessionCh
 
                 {/* Post / Poll / Question feed */}
                 <div className="sf-card">
-                  <div className="flex border-b border-[var(--sf-border)]">
+                  <div className="flex border-b border-slds-border-1">
                     {['Post', 'Poll', 'Question'].map((tab) => (
                       <button
                         key={tab}
                         className={`px-4 py-2.5 text-xs font-medium border-b-2 transition-colors ${
                           tab === 'Post'
-                            ? 'border-[var(--sf-blue)] text-[var(--sf-blue)]'
-                            : 'border-transparent text-[var(--sf-text-tertiary)] hover:text-[var(--sf-text-secondary)]'
+                            ? 'border-slds-brand text-slds-brand'
+                            : 'border-transparent text-slds-neutral-7 hover:text-slds-neutral-9'
                         }`}
                       >
                         {tab}
@@ -1433,9 +1433,9 @@ export default function IdentityResolutionContent({ demoSession, onDemoSessionCh
                       <input
                         type="text"
                         placeholder="Share an update..."
-                        className="flex-1 px-3 py-1.5 text-xs border border-[var(--sf-border)] rounded focus:outline-none focus:border-[var(--sf-blue-light)]"
+                        className="flex-1 px-3 py-1.5 text-xs border border-slds-border-1 rounded focus:outline-none focus:border-slds-brand-2"
                       />
-                      <button className="px-3 py-1.5 text-xs font-medium text-white bg-[var(--sf-blue)] rounded hover:bg-[var(--sf-blue-hover)]">
+                      <button className="px-3 py-1.5 text-xs font-medium text-white bg-slds-brand rounded hover:bg-slds-brand-contrast-1">
                         Share
                       </button>
                     </div>
@@ -1449,7 +1449,7 @@ export default function IdentityResolutionContent({ demoSession, onDemoSessionCh
           {detailTab === 'properties' && (
             <div className="p-6">
               <div className="sf-card">
-                <div className="sf-card-header"><h2 className="text-sm font-semibold text-[var(--sf-text-primary)]">Ruleset Configuration</h2></div>
+                <div className="sf-card-header"><h2 className="text-sm font-semibold text-slds-neutral-base">Ruleset Configuration</h2></div>
                 <div className="sf-detail-grid">
                   {[
                     ['Ruleset Name', selectedRuleset.rulesetName],
@@ -1472,22 +1472,22 @@ export default function IdentityResolutionContent({ demoSession, onDemoSessionCh
           {/* ── PROCESSING HISTORY TAB ── */}
           {detailTab === 'history' && (
             <div className="p-6 space-y-4">
-              <p className="text-sm text-[var(--sf-text-secondary)]">
+              <p className="text-sm text-slds-neutral-9">
                 Daily summaries contain the aggregate results of all runs of this ruleset from a single date.
               </p>
-              <div className="flex items-center justify-end gap-2 text-xs text-[var(--sf-text-tertiary)]">
+              <div className="flex items-center justify-end gap-2 text-xs text-slds-neutral-7">
                 <Info className="w-3.5 h-3.5" />
                 <span>Automatic runs:</span>
-                <span className="font-medium text-[var(--sf-text-secondary)]">{selectedRuleset.isScheduled ? 'Enabled' : 'Disabled'}</span>
+                <span className="font-medium text-slds-neutral-9">{selectedRuleset.isScheduled ? 'Enabled' : 'Disabled'}</span>
               </div>
               <div className="sf-card">
                 <div className="sf-card-header">
-                  <h2 className="text-sm font-semibold text-[var(--sf-text-primary)]">Daily Processing Summary</h2>
+                  <h2 className="text-sm font-semibold text-slds-neutral-base">Daily Processing Summary</h2>
                 </div>
                 {selectedRuleset.processingHistory.length === 0 ? (
                   <div className="sf-card-body text-center py-12">
-                    <Clock className="w-8 h-8 text-[var(--sf-text-tertiary)] mx-auto mb-2" />
-                    <p className="text-sm text-[var(--sf-text-tertiary)]">No processing history available</p>
+                    <Clock className="w-8 h-8 text-slds-neutral-7 mx-auto mb-2" />
+                    <p className="text-sm text-slds-neutral-7">No processing history available</p>
                   </div>
                 ) : (
                   <div className="overflow-x-auto">
@@ -1508,7 +1508,7 @@ export default function IdentityResolutionContent({ demoSession, onDemoSessionCh
                       <tbody>
                         {selectedRuleset.processingHistory.map((entry) => (
                           <tr key={entry.id}>
-                            <td className="text-center text-[var(--sf-text-tertiary)]">{entry.rowNum}</td>
+                            <td className="text-center text-slds-neutral-7">{entry.rowNum}</td>
                             <td>{entry.date}</td>
                             <td>{fmt(entry.totalSourceProfiles)}</td>
                             <td>{fmt(entry.totalUnifiedProfiles)}</td>
@@ -1540,20 +1540,20 @@ export default function IdentityResolutionContent({ demoSession, onDemoSessionCh
           <div className="fixed inset-0 z-50 flex items-center justify-center">
             <div className="absolute inset-0 bg-black/40" onClick={() => setEditMatchRulesOpen(false)} />
             <div className="relative bg-white rounded-lg shadow-2xl w-[760px] max-h-[85vh] flex flex-col">
-              <div className="flex items-center justify-between px-6 py-4 border-b border-[var(--sf-border)]">
-                <h2 className="text-base font-semibold text-[var(--sf-text-primary)]">
+              <div className="flex items-center justify-between px-6 py-4 border-b border-slds-border-1">
+                <h2 className="text-base font-semibold text-slds-neutral-base">
                   {matchRulesStep === 'instructions' ? 'Match Rule Instructions' : 'Edit Match Rules'}
                 </h2>
-                <button onClick={() => setEditMatchRulesOpen(false)} className="w-7 h-7 flex items-center justify-center rounded hover:bg-[#F3F3F3] text-[var(--sf-text-tertiary)]">
+                <button onClick={() => setEditMatchRulesOpen(false)} className="w-7 h-7 flex items-center justify-center rounded hover:bg-slds-neutral-2 text-slds-neutral-7">
                   <X className="w-4 h-4" />
                 </button>
               </div>
               <div className="flex-1 overflow-y-auto px-6 py-5">
                 {matchRulesStep === 'instructions' ? (
                   <div className="flex items-start gap-3 p-4 bg-[#E1F5FE] rounded-lg">
-                    <Info className="w-5 h-5 text-[var(--sf-blue)] flex-shrink-0 mt-0.5" />
-                    <div className="text-sm text-[var(--sf-text-secondary)] leading-relaxed space-y-3">
-                      <p className="font-semibold text-[var(--sf-text-primary)]">How Match Rules Work</p>
+                    <Info className="w-5 h-5 text-slds-brand flex-shrink-0 mt-0.5" />
+                    <div className="text-sm text-slds-neutral-9 leading-relaxed space-y-3">
+                      <p className="font-semibold text-slds-neutral-base">How Match Rules Work</p>
                       <p>Match rules define how source profiles are compared and grouped into unified profiles. Rules are evaluated in priority order.</p>
                       <p>Each match rule specifies:</p>
                       <ul className="list-disc ml-4 space-y-1">
@@ -1561,9 +1561,9 @@ export default function IdentityResolutionContent({ demoSession, onDemoSessionCh
                         <li><strong>Match Type</strong> — Whether the comparison is Exact, Fuzzy, or Normalized.</li>
                         <li><strong>Priority</strong> — The order in which rules are evaluated.</li>
                       </ul>
-                      <div className="mt-2 p-3 bg-white rounded border border-[var(--sf-border-light)]">
-                        <p className="text-xs font-semibold text-[var(--sf-text-primary)] mb-1">Best Practices</p>
-                        <ul className="text-xs space-y-1 text-[var(--sf-text-secondary)]">
+                      <div className="mt-2 p-3 bg-white rounded border border-slds-border-2">
+                        <p className="text-xs font-semibold text-slds-neutral-base mb-1">Best Practices</p>
+                        <ul className="text-xs space-y-1 text-slds-neutral-9">
                           <li>Start with strict (Exact) rules at high priority and add fuzzy rules at lower priority.</li>
                           <li>Use multiple fields in a single rule for more precise matching.</li>
                           <li>Test your rules with a sample batch before running a full job.</li>
@@ -1574,20 +1574,20 @@ export default function IdentityResolutionContent({ demoSession, onDemoSessionCh
                 ) : (
                   <div className="space-y-4">
                     <div className="flex items-center justify-between">
-                      <p className="text-sm text-[var(--sf-text-secondary)]">{localMatchRules.length} match rule{localMatchRules.length !== 1 ? 's' : ''} configured.</p>
-                      <button onClick={handleAddNewMatchRule} className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-white bg-[var(--sf-blue)] rounded hover:bg-[var(--sf-blue-hover)] transition-colors">
+                      <p className="text-sm text-slds-neutral-9">{localMatchRules.length} match rule{localMatchRules.length !== 1 ? 's' : ''} configured.</p>
+                      <button onClick={handleAddNewMatchRule} className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-white bg-slds-brand rounded hover:bg-slds-brand-contrast-1 transition-colors">
                         <Plus className="w-3.5 h-3.5" /> Add Rule
                       </button>
                     </div>
                     {localMatchRules.length === 0 ? (
-                      <div className="text-center py-12 text-sm text-[var(--sf-text-tertiary)]">No match rules configured yet.</div>
+                      <div className="text-center py-12 text-sm text-slds-neutral-7">No match rules configured yet.</div>
                     ) : (
                       <table className="sf-table">
                         <thead><tr><th className="w-8"></th><th>Priority</th><th>Rule Name</th><th>Criteria</th><th className="w-28">Actions</th></tr></thead>
                         <tbody>
                           {localMatchRules.map((rule) => (
                             <tr key={rule.id}>
-                              <td><GripVertical className="w-4 h-4 text-[var(--sf-text-tertiary)] cursor-grab" /></td>
+                              <td><GripVertical className="w-4 h-4 text-slds-neutral-7 cursor-grab" /></td>
                               <td className="font-medium">{rule.priority}</td>
                               <td className="sf-link cursor-pointer" onClick={() => handleConfigureRule(rule)}>{rule.ruleName}</td>
                               <td>
@@ -1599,10 +1599,10 @@ export default function IdentityResolutionContent({ demoSession, onDemoSessionCh
                               </td>
                               <td>
                                 <div className="flex items-center gap-1">
-                                  <button onClick={() => handleConfigureRule(rule)} className="w-7 h-7 flex items-center justify-center rounded hover:bg-[#F3F3F3] text-[var(--sf-text-tertiary)] hover:text-[var(--sf-blue)]" title="Configure">
+                                  <button onClick={() => handleConfigureRule(rule)} className="w-7 h-7 flex items-center justify-center rounded hover:bg-slds-neutral-2 text-slds-neutral-7 hover:text-slds-brand" title="Configure">
                                     <Edit3 className="w-3.5 h-3.5" />
                                   </button>
-                                  <button onClick={() => handleDeleteMatchRule(rule.id)} className="w-7 h-7 flex items-center justify-center rounded hover:bg-[#FDE8E8] text-[var(--sf-text-tertiary)] hover:text-[var(--sf-error)]" title="Delete">
+                                  <button onClick={() => handleDeleteMatchRule(rule.id)} className="w-7 h-7 flex items-center justify-center rounded hover:bg-[#FDE8E8] text-slds-neutral-7 hover:text-slds-error-1" title="Delete">
                                     <Trash2 className="w-3.5 h-3.5" />
                                   </button>
                                 </div>
@@ -1615,16 +1615,16 @@ export default function IdentityResolutionContent({ demoSession, onDemoSessionCh
                   </div>
                 )}
               </div>
-              <div className="flex items-center justify-end gap-3 px-6 py-4 border-t border-[var(--sf-border)]">
+              <div className="flex items-center justify-end gap-3 px-6 py-4 border-t border-slds-border-1">
                 {matchRulesStep === 'instructions' ? (
                   <>
-                    <button onClick={() => setEditMatchRulesOpen(false)} className="px-4 py-2 text-sm font-medium text-[var(--sf-text-secondary)] border border-[var(--sf-border)] rounded hover:bg-[#F3F3F3]">Cancel</button>
-                    <button onClick={() => setMatchRulesStep('rules')} className="px-4 py-2 text-sm font-medium text-white bg-[var(--sf-blue)] rounded hover:bg-[var(--sf-blue-hover)]">Continue</button>
+                    <button onClick={() => setEditMatchRulesOpen(false)} className="px-4 py-2 text-sm font-medium text-slds-neutral-9 border border-slds-border-1 rounded hover:bg-slds-neutral-2">Cancel</button>
+                    <button onClick={() => setMatchRulesStep('rules')} className="px-4 py-2 text-sm font-medium text-white bg-slds-brand rounded hover:bg-slds-brand-contrast-1">Continue</button>
                   </>
                 ) : (
                   <>
-                    <button onClick={() => setMatchRulesStep('instructions')} className="px-4 py-2 text-sm font-medium text-[var(--sf-text-secondary)] border border-[var(--sf-border)] rounded hover:bg-[#F3F3F3]">Back</button>
-                    <button onClick={handleSaveMatchRules} className="px-4 py-2 text-sm font-medium text-white bg-[var(--sf-blue)] rounded hover:bg-[var(--sf-blue-hover)]">Save Match Rules</button>
+                    <button onClick={() => setMatchRulesStep('instructions')} className="px-4 py-2 text-sm font-medium text-slds-neutral-9 border border-slds-border-1 rounded hover:bg-slds-neutral-2">Back</button>
+                    <button onClick={handleSaveMatchRules} className="px-4 py-2 text-sm font-medium text-white bg-slds-brand rounded hover:bg-slds-brand-contrast-1">Save Match Rules</button>
                   </>
                 )}
               </div>
@@ -1639,31 +1639,31 @@ export default function IdentityResolutionContent({ demoSession, onDemoSessionCh
           <div className="fixed inset-0 z-[60] flex items-center justify-center">
             <div className="absolute inset-0 bg-black/40" onClick={() => setConfigureRuleOpen(false)} />
             <div className="relative bg-white rounded-lg shadow-2xl w-[820px] max-h-[85vh] flex flex-col">
-              <div className="flex items-center justify-between px-6 py-4 border-b border-[var(--sf-border)]">
-                <h2 className="text-base font-semibold text-[var(--sf-text-primary)]">Configure Match Criteria</h2>
-                <button onClick={() => setConfigureRuleOpen(false)} className="w-7 h-7 flex items-center justify-center rounded hover:bg-[#F3F3F3] text-[var(--sf-text-tertiary)]">
+              <div className="flex items-center justify-between px-6 py-4 border-b border-slds-border-1">
+                <h2 className="text-base font-semibold text-slds-neutral-base">Configure Match Criteria</h2>
+                <button onClick={() => setConfigureRuleOpen(false)} className="w-7 h-7 flex items-center justify-center rounded hover:bg-slds-neutral-2 text-slds-neutral-7">
                   <X className="w-4 h-4" />
                 </button>
               </div>
               <div className="flex-1 overflow-y-auto px-6 py-5 space-y-5">
-                <p className="text-sm text-[var(--sf-text-secondary)]">
+                <p className="text-sm text-slds-neutral-9">
                   Configure at least one match criterion. Values in the specified fields will be compared for matches.
                 </p>
                 {/* Rule Name */}
                 <div>
-                  <label className="block text-xs font-medium text-[var(--sf-text-tertiary)] uppercase tracking-wide mb-1">Match Rule Name</label>
+                  <label className="block text-xs font-medium text-slds-neutral-7 uppercase tracking-wide mb-1">Match Rule Name</label>
                   <input
                     type="text"
                     value={editingRule.ruleName}
                     onChange={(e) => setEditingRule({ ...editingRule, ruleName: e.target.value })}
                     placeholder="e.g., Fuzzy Name and Normalized Email"
-                    className="w-full px-3 py-2 text-sm border border-[var(--sf-border)] rounded focus:outline-none focus:border-[var(--sf-blue-light)] focus:ring-2 focus:ring-[rgba(27,150,255,0.2)]"
+                    className="w-full px-3 py-2 text-sm border border-slds-border-1 rounded focus:outline-none focus:border-slds-brand-2 focus:ring-2 focus:ring-[rgba(27,150,255,0.2)]"
                   />
                 </div>
                 {/* Match Criteria table */}
                 <div>
-                  <label className="block text-xs font-medium text-[var(--sf-text-tertiary)] uppercase tracking-wide mb-2">Match Criteria</label>
-                  <div className="border border-[var(--sf-border)] rounded overflow-hidden">
+                  <label className="block text-xs font-medium text-slds-neutral-7 uppercase tracking-wide mb-2">Match Criteria</label>
+                  <div className="border border-slds-border-1 rounded overflow-hidden">
                     <table className="sf-table">
                       <thead>
                         <tr>
@@ -1681,7 +1681,7 @@ export default function IdentityResolutionContent({ demoSession, onDemoSessionCh
                               <select
                                 value={criterion.dataModelObject}
                                 onChange={(e) => updateCriterion(criterion.id, { dataModelObject: e.target.value, field: '' })}
-                                className="w-full px-2 py-1.5 text-xs border border-[var(--sf-border)] rounded bg-white focus:outline-none focus:border-[var(--sf-blue-light)]"
+                                className="w-full px-2 py-1.5 text-xs border border-slds-border-1 rounded bg-white focus:outline-none focus:border-slds-brand-2"
                               >
                                 <option value="">Select...</option>
                                 {dataModelObjects.map((dmo) => (
@@ -1693,7 +1693,7 @@ export default function IdentityResolutionContent({ demoSession, onDemoSessionCh
                               <select
                                 value={criterion.field}
                                 onChange={(e) => updateCriterion(criterion.id, { field: e.target.value })}
-                                className="w-full px-2 py-1.5 text-xs border border-[var(--sf-border)] rounded bg-white focus:outline-none focus:border-[var(--sf-blue-light)]"
+                                className="w-full px-2 py-1.5 text-xs border border-slds-border-1 rounded bg-white focus:outline-none focus:border-slds-brand-2"
                                 disabled={!criterion.dataModelObject}
                               >
                                 <option value="">Select...</option>
@@ -1706,7 +1706,7 @@ export default function IdentityResolutionContent({ demoSession, onDemoSessionCh
                               <select
                                 value={criterion.matchMethod}
                                 onChange={(e) => updateCriterion(criterion.id, { matchMethod: e.target.value })}
-                                className="w-full px-2 py-1.5 text-xs border border-[var(--sf-border)] rounded bg-white focus:outline-none focus:border-[var(--sf-blue-light)]"
+                                className="w-full px-2 py-1.5 text-xs border border-slds-border-1 rounded bg-white focus:outline-none focus:border-slds-brand-2"
                               >
                                 <option value="">Select...</option>
                                 {matchMethods.map((m) => (
@@ -1717,14 +1717,14 @@ export default function IdentityResolutionContent({ demoSession, onDemoSessionCh
                             <td className="text-center">
                               <button
                                 onClick={() => handleOpenAdvanced(criterion.id)}
-                                className="text-xs text-[var(--sf-link)] hover:underline"
+                                className="text-xs text-slds-brand hover:underline"
                               >
                                 Configure
                               </button>
                             </td>
                             <td>
                               {editingRule.criteria.length > 1 && (
-                                <button onClick={() => handleDeleteCriterion(criterion.id)} className="w-7 h-7 flex items-center justify-center rounded hover:bg-[#FDE8E8] text-[var(--sf-text-tertiary)] hover:text-[var(--sf-error)]">
+                                <button onClick={() => handleDeleteCriterion(criterion.id)} className="w-7 h-7 flex items-center justify-center rounded hover:bg-[#FDE8E8] text-slds-neutral-7 hover:text-slds-error-1">
                                   <Trash2 className="w-3.5 h-3.5" />
                                 </button>
                               )}
@@ -1734,17 +1734,17 @@ export default function IdentityResolutionContent({ demoSession, onDemoSessionCh
                       </tbody>
                     </table>
                   </div>
-                  <button onClick={handleAddCriterion} className="flex items-center gap-1 mt-3 text-xs font-medium text-[var(--sf-link)] hover:underline">
+                  <button onClick={handleAddCriterion} className="flex items-center gap-1 mt-3 text-xs font-medium text-slds-brand hover:underline">
                     <Plus className="w-3.5 h-3.5" /> Add Criteria
                   </button>
                 </div>
               </div>
-              <div className="flex items-center justify-end gap-3 px-6 py-4 border-t border-[var(--sf-border)]">
-                <button onClick={() => setConfigureRuleOpen(false)} className="px-4 py-2 text-sm font-medium text-[var(--sf-text-secondary)] border border-[var(--sf-border)] rounded hover:bg-[#F3F3F3]">Cancel</button>
+              <div className="flex items-center justify-end gap-3 px-6 py-4 border-t border-slds-border-1">
+                <button onClick={() => setConfigureRuleOpen(false)} className="px-4 py-2 text-sm font-medium text-slds-neutral-9 border border-slds-border-1 rounded hover:bg-slds-neutral-2">Cancel</button>
                 <button
                   onClick={handleSaveConfiguredRule}
                   disabled={!editingRule.ruleName.trim() || editingRule.criteria.every((c) => !c.field)}
-                  className="px-4 py-2 text-sm font-medium text-white bg-[var(--sf-blue)] rounded hover:bg-[var(--sf-blue-hover)] disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="px-4 py-2 text-sm font-medium text-white bg-slds-brand rounded hover:bg-slds-brand-contrast-1 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   Next
                 </button>
@@ -1760,35 +1760,35 @@ export default function IdentityResolutionContent({ demoSession, onDemoSessionCh
           <div className="fixed inset-0 z-[70] flex items-center justify-center">
             <div className="absolute inset-0 bg-black/40" onClick={() => setAdvancedSettingsOpen(false)} />
             <div className="relative bg-white rounded-lg shadow-2xl w-[640px] max-h-[80vh] flex flex-col">
-              <div className="flex items-center justify-between px-6 py-4 border-b border-[var(--sf-border)]">
-                <h2 className="text-base font-semibold text-[var(--sf-text-primary)]">Advanced Match Criteria Settings</h2>
-                <button onClick={() => setAdvancedSettingsOpen(false)} className="w-7 h-7 flex items-center justify-center rounded hover:bg-[#F3F3F3] text-[var(--sf-text-tertiary)]">
+              <div className="flex items-center justify-between px-6 py-4 border-b border-slds-border-1">
+                <h2 className="text-base font-semibold text-slds-neutral-base">Advanced Match Criteria Settings</h2>
+                <button onClick={() => setAdvancedSettingsOpen(false)} className="w-7 h-7 flex items-center justify-center rounded hover:bg-slds-neutral-2 text-slds-neutral-7">
                   <X className="w-4 h-4" />
                 </button>
               </div>
               <div className="flex-1 overflow-y-auto px-6 py-5 space-y-6">
                 {/* Cross-Field Match Settings */}
                 <div>
-                  <h3 className="text-sm font-semibold text-[var(--sf-text-primary)] mb-3">Cross-Field Match Settings</h3>
-                  <div className="border border-[var(--sf-border)] rounded overflow-hidden">
+                  <h3 className="text-sm font-semibold text-slds-neutral-base mb-3">Cross-Field Match Settings</h3>
+                  <div className="border border-slds-border-1 rounded overflow-hidden">
                     <table className="sf-table">
                       <thead>
                         <tr><th></th><th>Data Model Object</th><th>Match Field</th><th>Scheduled Match Method</th></tr>
                       </thead>
                       <tbody>
                         <tr>
-                          <td className="text-xs font-medium text-[var(--sf-text-tertiary)]">Primary DMO</td>
-                          <td className="text-xs text-[var(--sf-text-secondary)]">{advancedCriterion.dataModelObject || '—'}</td>
-                          <td className="text-xs text-[var(--sf-text-secondary)]">{advancedCriterion.field || '—'}</td>
-                          <td className="text-xs text-[var(--sf-text-secondary)]">{advancedCriterion.matchMethod || '—'}</td>
+                          <td className="text-xs font-medium text-slds-neutral-7">Primary DMO</td>
+                          <td className="text-xs text-slds-neutral-9">{advancedCriterion.dataModelObject || '—'}</td>
+                          <td className="text-xs text-slds-neutral-9">{advancedCriterion.field || '—'}</td>
+                          <td className="text-xs text-slds-neutral-9">{advancedCriterion.matchMethod || '—'}</td>
                         </tr>
                         <tr>
-                          <td className="text-xs font-medium text-[var(--sf-text-tertiary)]">Match to Individual</td>
+                          <td className="text-xs font-medium text-slds-neutral-7">Match to Individual</td>
                           <td>
                             <select
                               value={advancedCriterion.crossFieldDMO}
                               onChange={(e) => updateCriterion(advancedCriterion.id, { crossFieldDMO: e.target.value, crossFieldMatchField: '' })}
-                              className="w-full px-2 py-1.5 text-xs border border-[var(--sf-border)] rounded bg-white"
+                              className="w-full px-2 py-1.5 text-xs border border-slds-border-1 rounded bg-white"
                             >
                               <option value="">Select...</option>
                               {dataModelObjects.map((dmo) => (
@@ -1800,7 +1800,7 @@ export default function IdentityResolutionContent({ demoSession, onDemoSessionCh
                             <select
                               value={advancedCriterion.crossFieldMatchField}
                               onChange={(e) => updateCriterion(advancedCriterion.id, { crossFieldMatchField: e.target.value })}
-                              className="w-full px-2 py-1.5 text-xs border border-[var(--sf-border)] rounded bg-white"
+                              className="w-full px-2 py-1.5 text-xs border border-slds-border-1 rounded bg-white"
                               disabled={!advancedCriterion.crossFieldDMO}
                             >
                               <option value="">Select...</option>
@@ -1817,34 +1817,34 @@ export default function IdentityResolutionContent({ demoSession, onDemoSessionCh
                 </div>
                 {/* Match Method Refinements */}
                 <div>
-                  <h3 className="text-sm font-semibold text-[var(--sf-text-primary)] mb-3">Match Method Refinements</h3>
+                  <h3 className="text-sm font-semibold text-slds-neutral-base mb-3">Match Method Refinements</h3>
                   <div className="space-y-3">
                     <label className="flex items-center gap-3 cursor-pointer">
                       <input
                         type="checkbox"
                         checked={advancedCriterion.matchOnBlank}
                         onChange={(e) => updateCriterion(advancedCriterion.id, { matchOnBlank: e.target.checked })}
-                        className="w-4 h-4 rounded border-[var(--sf-border)]"
+                        className="w-4 h-4 rounded border-slds-border-1"
                       />
-                      <span className="text-sm text-[var(--sf-text-primary)]">Match on Blank</span>
-                      <Info className="w-3.5 h-3.5 text-[var(--sf-text-tertiary)]" />
+                      <span className="text-sm text-slds-neutral-base">Match on Blank</span>
+                      <Info className="w-3.5 h-3.5 text-slds-neutral-7" />
                     </label>
                     <label className="flex items-center gap-3 cursor-pointer">
                       <input
                         type="checkbox"
                         checked={advancedCriterion.caseSensitive}
                         onChange={(e) => updateCriterion(advancedCriterion.id, { caseSensitive: e.target.checked })}
-                        className="w-4 h-4 rounded border-[var(--sf-border)]"
+                        className="w-4 h-4 rounded border-slds-border-1"
                       />
-                      <span className="text-sm text-[var(--sf-text-primary)]">Case Sensitive</span>
-                      <Info className="w-3.5 h-3.5 text-[var(--sf-text-tertiary)]" />
+                      <span className="text-sm text-slds-neutral-base">Case Sensitive</span>
+                      <Info className="w-3.5 h-3.5 text-slds-neutral-7" />
                     </label>
                   </div>
                 </div>
               </div>
-              <div className="flex items-center justify-end gap-3 px-6 py-4 border-t border-[var(--sf-border)]">
-                <button onClick={() => setAdvancedSettingsOpen(false)} className="px-4 py-2 text-sm font-medium text-[var(--sf-text-secondary)] border border-[var(--sf-border)] rounded hover:bg-[#F3F3F3]">Cancel</button>
-                <button onClick={handleSaveAdvanced} className="px-4 py-2 text-sm font-medium text-white bg-[var(--sf-blue)] rounded hover:bg-[var(--sf-blue-hover)]">Back To Basic Setting</button>
+              <div className="flex items-center justify-end gap-3 px-6 py-4 border-t border-slds-border-1">
+                <button onClick={() => setAdvancedSettingsOpen(false)} className="px-4 py-2 text-sm font-medium text-slds-neutral-9 border border-slds-border-1 rounded hover:bg-slds-neutral-2">Cancel</button>
+                <button onClick={handleSaveAdvanced} className="px-4 py-2 text-sm font-medium text-white bg-slds-brand rounded hover:bg-slds-brand-contrast-1">Back To Basic Setting</button>
               </div>
             </div>
           </div>
@@ -1857,46 +1857,46 @@ export default function IdentityResolutionContent({ demoSession, onDemoSessionCh
           <div className="fixed inset-0 z-50 flex items-center justify-center">
             <div className="absolute inset-0 bg-black/40" onClick={() => setEditReconRuleOpen(false)} />
             <div className="relative bg-white rounded-lg shadow-2xl w-[520px] flex flex-col">
-              <div className="flex items-center justify-between px-6 py-4 border-b border-[var(--sf-border)]">
-                <h2 className="text-base font-semibold text-[var(--sf-text-primary)]">
+              <div className="flex items-center justify-between px-6 py-4 border-b border-slds-border-1">
+                <h2 className="text-base font-semibold text-slds-neutral-base">
                   Edit Reconciliation Rule for {editingReconField.fieldName}
                 </h2>
-                <button onClick={() => setEditReconRuleOpen(false)} className="w-7 h-7 flex items-center justify-center rounded hover:bg-[#F3F3F3] text-[var(--sf-text-tertiary)]">
+                <button onClick={() => setEditReconRuleOpen(false)} className="w-7 h-7 flex items-center justify-center rounded hover:bg-slds-neutral-2 text-slds-neutral-7">
                   <X className="w-4 h-4" />
                 </button>
               </div>
               <div className="px-6 py-5 space-y-5">
-                <p className="text-sm text-[var(--sf-text-secondary)]">
+                <p className="text-sm text-slds-neutral-9">
                   When the default reconciliation rule is enabled, this field inherits the rule set at the DMO level.
                 </p>
                 {/* Default toggle */}
                 <div>
-                  <label className="block text-xs font-medium text-[var(--sf-text-tertiary)] uppercase tracking-wide mb-2">Default Reconciliation Rule</label>
+                  <label className="block text-xs font-medium text-slds-neutral-7 uppercase tracking-wide mb-2">Default Reconciliation Rule</label>
                   <div className="flex items-center gap-3">
                     <button
                       onClick={() => setEditReconUseDefault(!editReconUseDefault)}
-                      className={`relative w-10 h-5 rounded-full transition-colors ${editReconUseDefault ? 'bg-[var(--sf-blue)]' : 'bg-[#DDDBDA]'}`}
+                      className={`relative w-10 h-5 rounded-full transition-colors ${editReconUseDefault ? 'bg-slds-brand' : 'bg-slds-border-1'}`}
                     >
                       <span className={`absolute top-0.5 w-4 h-4 rounded-full bg-white shadow transition-transform ${editReconUseDefault ? 'left-[22px]' : 'left-0.5'}`} />
                     </button>
-                    <span className="text-sm text-[var(--sf-text-primary)]">{editReconUseDefault ? 'Enabled' : 'Disabled'}</span>
+                    <span className="text-sm text-slds-neutral-base">{editReconUseDefault ? 'Enabled' : 'Disabled'}</span>
                   </div>
                 </div>
                 {/* Field Reconciliation Rule dropdown */}
                 {!editReconUseDefault && (
                   <div>
-                    <label className="block text-xs font-medium text-[var(--sf-text-tertiary)] uppercase tracking-wide mb-1">Field Reconciliation Rule</label>
+                    <label className="block text-xs font-medium text-slds-neutral-7 uppercase tracking-wide mb-1">Field Reconciliation Rule</label>
                     <div className="relative">
                       <select
                         value={editReconRuleValue}
                         onChange={(e) => setEditReconRuleValue(e.target.value)}
-                        className="w-full px-3 py-2 text-sm border border-[var(--sf-border)] rounded appearance-none bg-white focus:outline-none focus:border-[var(--sf-blue-light)] focus:ring-2 focus:ring-[rgba(27,150,255,0.2)]"
+                        className="w-full px-3 py-2 text-sm border border-slds-border-1 rounded appearance-none bg-white focus:outline-none focus:border-slds-brand-2 focus:ring-2 focus:ring-[rgba(27,150,255,0.2)]"
                       >
                         <option value="Most Recent">Last Updated</option>
                         <option value="Most Frequent">Most Frequent</option>
                         <option value="Source Priority">Source Priority</option>
                       </select>
-                      <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--sf-text-tertiary)] pointer-events-none" />
+                      <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slds-neutral-7 pointer-events-none" />
                     </div>
                   </div>
                 )}
@@ -1906,14 +1906,14 @@ export default function IdentityResolutionContent({ demoSession, onDemoSessionCh
                     type="checkbox"
                     checked={editReconIgnoreEmpty}
                     onChange={(e) => setEditReconIgnoreEmpty(e.target.checked)}
-                    className="w-4 h-4 rounded border-[var(--sf-border)]"
+                    className="w-4 h-4 rounded border-slds-border-1"
                   />
-                  <span className="text-sm text-[var(--sf-text-primary)]">Ignore Empty Values</span>
+                  <span className="text-sm text-slds-neutral-base">Ignore Empty Values</span>
                 </label>
               </div>
-              <div className="flex items-center justify-end gap-3 px-6 py-4 border-t border-[var(--sf-border)]">
-                <button onClick={() => setEditReconRuleOpen(false)} className="px-4 py-2 text-sm font-medium text-[var(--sf-text-secondary)] border border-[var(--sf-border)] rounded hover:bg-[#F3F3F3]">Cancel</button>
-                <button onClick={handleSaveReconRule} className="px-4 py-2 text-sm font-medium text-white bg-[var(--sf-blue)] rounded hover:bg-[var(--sf-blue-hover)]">Save</button>
+              <div className="flex items-center justify-end gap-3 px-6 py-4 border-t border-slds-border-1">
+                <button onClick={() => setEditReconRuleOpen(false)} className="px-4 py-2 text-sm font-medium text-slds-neutral-9 border border-slds-border-1 rounded hover:bg-slds-neutral-2">Cancel</button>
+                <button onClick={handleSaveReconRule} className="px-4 py-2 text-sm font-medium text-white bg-slds-brand rounded hover:bg-slds-brand-contrast-1">Save</button>
               </div>
             </div>
           </div>
@@ -1933,8 +1933,8 @@ export default function IdentityResolutionContent({ demoSession, onDemoSessionCh
   if (isLoading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <Loader2 className="w-6 h-6 animate-spin text-[var(--sf-blue)]" />
-        <span className="ml-2 text-sm text-[var(--sf-text-secondary)]">Loading rulesets...</span>
+        <Loader2 className="w-6 h-6 animate-spin text-slds-brand" />
+        <span className="ml-2 text-sm text-slds-neutral-9">Loading rulesets...</span>
       </div>
     );
   }
@@ -1943,10 +1943,10 @@ export default function IdentityResolutionContent({ demoSession, onDemoSessionCh
     <div className="p-6">
       <div className="flex items-center justify-between mb-4">
         <div>
-          <h1 className="text-lg font-bold text-[var(--sf-text-primary)]">Identity Resolutions</h1>
-          <p className="text-xs text-[var(--sf-text-tertiary)] mt-0.5">Manage rulesets that match and unify source profiles into unified profiles.</p>
+          <h1 className="text-lg font-bold text-slds-neutral-base">Identity Resolutions</h1>
+          <p className="text-xs text-slds-neutral-7 mt-0.5">Manage rulesets that match and unify source profiles into unified profiles.</p>
         </div>
-        <button onClick={handleOpenNewRuleset} className="flex items-center gap-1.5 px-4 py-2 text-sm font-medium text-white bg-[var(--sf-blue)] rounded hover:bg-[var(--sf-blue-hover)] transition-colors">
+        <button onClick={handleOpenNewRuleset} className="flex items-center gap-1.5 px-4 py-2 text-sm font-medium text-white bg-slds-brand rounded hover:bg-slds-brand-contrast-1 transition-colors">
           <Plus className="w-4 h-4" /> New Ruleset
         </button>
       </div>
@@ -1972,8 +1972,8 @@ export default function IdentityResolutionContent({ demoSession, onDemoSessionCh
                       salesforce
                     </text>
                   </svg>
-                  <h2 className="text-base font-semibold text-[var(--sf-text-primary)] mb-2">No Identity Resolution Rulesets</h2>
-                  <p className="text-sm text-[var(--sf-text-tertiary)] max-w-md">
+                  <h2 className="text-base font-semibold text-slds-neutral-base mb-2">No Identity Resolution Rulesets</h2>
+                  <p className="text-sm text-slds-neutral-7 max-w-md">
                     Get started by creating a new ruleset. Use <span className="font-semibold text-[#FF5D2D]">Install from Datakits</span> to set up Informatica MDM identity resolution.
                   </p>
                 </div>
@@ -1983,8 +1983,8 @@ export default function IdentityResolutionContent({ demoSession, onDemoSessionCh
           return (
             <div className="sf-card">
               <div className="sf-card-header">
-                <h2 className="text-sm font-semibold text-[var(--sf-text-primary)]">
-                  Identity Resolution Rulesets <span className="text-xs font-normal text-[var(--sf-text-tertiary)]">({sessionRulesets.length})</span>
+                <h2 className="text-sm font-semibold text-slds-neutral-base">
+                  Identity Resolution Rulesets <span className="text-xs font-normal text-slds-neutral-7">({sessionRulesets.length})</span>
                 </h2>
               </div>
               <div className="overflow-x-auto">
@@ -2028,8 +2028,8 @@ export default function IdentityResolutionContent({ demoSession, onDemoSessionCh
         /* Today: full data table with all rulesets */
         <div className="sf-card">
           <div className="sf-card-header">
-            <h2 className="text-sm font-semibold text-[var(--sf-text-primary)]">
-              All Identity Resolution Rulesets <span className="text-xs font-normal text-[var(--sf-text-tertiary)]">({rulesets.length})</span>
+            <h2 className="text-sm font-semibold text-slds-neutral-base">
+              All Identity Resolution Rulesets <span className="text-xs font-normal text-slds-neutral-7">({rulesets.length})</span>
             </h2>
           </div>
           <div className="overflow-x-auto">
@@ -2077,14 +2077,14 @@ export default function IdentityResolutionContent({ demoSession, onDemoSessionCh
           <div className="absolute inset-0 bg-black/40" onClick={() => setNewRulesetOpen(false)} />
           <div className={`relative bg-white rounded-lg shadow-2xl max-h-[85vh] flex flex-col transition-all ${newRulesetStep === 2 && newRulesetOption === 'datakit' ? 'w-[860px]' : 'w-[640px]'}`}>
             {/* Header */}
-            <div className="flex items-center justify-between px-6 py-4 border-b border-[var(--sf-border)]">
+            <div className="flex items-center justify-between px-6 py-4 border-b border-slds-border-1">
               <div>
-                <h2 className="text-base font-semibold text-[var(--sf-text-primary)]">New Ruleset</h2>
-                <p className="text-xs text-[var(--sf-text-tertiary)] mt-0.5">
+                <h2 className="text-base font-semibold text-slds-neutral-base">New Ruleset</h2>
+                <p className="text-xs text-slds-neutral-7 mt-0.5">
                   {newRulesetStep === 1 ? 'Select an option to continue.' : newRulesetStep === 2 ? 'Configure your new ruleset.' : 'Review and confirm.'}
                 </p>
               </div>
-              <button onClick={() => setNewRulesetOpen(false)} className="w-7 h-7 flex items-center justify-center rounded hover:bg-[#F3F3F3] text-[var(--sf-text-tertiary)]">
+              <button onClick={() => setNewRulesetOpen(false)} className="w-7 h-7 flex items-center justify-center rounded hover:bg-slds-neutral-2 text-slds-neutral-7">
                 <X className="w-4 h-4" />
               </button>
             </div>
@@ -2104,20 +2104,20 @@ export default function IdentityResolutionContent({ demoSession, onDemoSessionCh
                         onClick={() => setNewRulesetOption(opt.key)}
                         className={`relative flex flex-col items-center justify-center h-40 rounded-lg border-2 transition-all text-center px-4 ${
                           selected
-                            ? 'border-[var(--sf-blue)] bg-white shadow-sm'
+                            ? 'border-slds-brand bg-white shadow-sm'
                             : 'border-[#D8DDE6] bg-white hover:border-[#B0B0B0]'
                         }`}
                       >
                         {selected && (
-                          <div className="absolute top-0 right-0 w-7 h-7 bg-[var(--sf-blue)] flex items-center justify-center" style={{ clipPath: 'polygon(0 0, 100% 0, 100% 100%)' }}>
+                          <div className="absolute top-0 right-0 w-7 h-7 bg-slds-brand flex items-center justify-center" style={{ clipPath: 'polygon(0 0, 100% 0, 100% 100%)' }}>
                             <Check className="w-3 h-3 text-white absolute top-0.5 right-0.5" />
                           </div>
                         )}
-                        <div className={`w-10 h-10 rounded-full flex items-center justify-center mb-3 ${selected ? 'bg-[#EEF4FF]' : 'bg-[#F3F3F3]'}`}>
-                          <opt.icon className={`w-5 h-5 ${selected ? 'text-[var(--sf-blue)]' : 'text-[var(--sf-text-tertiary)]'}`} />
+                        <div className={`w-10 h-10 rounded-full flex items-center justify-center mb-3 ${selected ? 'bg-[#EEF4FF]' : 'bg-slds-neutral-2'}`}>
+                          <opt.icon className={`w-5 h-5 ${selected ? 'text-slds-brand' : 'text-slds-neutral-7'}`} />
                         </div>
-                        <span className="text-sm font-medium text-[var(--sf-text-primary)]">{opt.label}</span>
-                        <span className="text-xs text-[var(--sf-text-tertiary)] mt-1">{opt.desc}</span>
+                        <span className="text-sm font-medium text-slds-neutral-base">{opt.label}</span>
+                        <span className="text-xs text-slds-neutral-7 mt-1">{opt.desc}</span>
                       </button>
                     );
                   })}
@@ -2127,25 +2127,25 @@ export default function IdentityResolutionContent({ demoSession, onDemoSessionCh
               {newRulesetStep === 2 && newRulesetOption === 'create' && (
                 <div className="space-y-5">
                   <div>
-                    <label className="block text-xs font-medium text-[var(--sf-text-tertiary)] uppercase tracking-wide mb-1">
-                      <span className="text-[var(--sf-error)]">*</span> Ruleset Name
+                    <label className="block text-xs font-medium text-slds-neutral-7 uppercase tracking-wide mb-1">
+                      <span className="text-slds-error-1">*</span> Ruleset Name
                     </label>
                     <input
                       type="text"
                       value={newRulesetName}
                       onChange={(e) => setNewRulesetName(e.target.value)}
                       placeholder="e.g., Individual (Main)"
-                      className="w-full px-3 py-2 text-sm border border-[var(--sf-border)] rounded focus:outline-none focus:border-[var(--sf-blue-light)] focus:ring-2 focus:ring-[rgba(27,150,255,0.2)]"
+                      className="w-full px-3 py-2 text-sm border border-slds-border-1 rounded focus:outline-none focus:border-slds-brand-2 focus:ring-2 focus:ring-[rgba(27,150,255,0.2)]"
                     />
                   </div>
                   <div>
-                    <label className="block text-xs font-medium text-[var(--sf-text-tertiary)] uppercase tracking-wide mb-1">
-                      <span className="text-[var(--sf-error)]">*</span> Primary Data Model Object
+                    <label className="block text-xs font-medium text-slds-neutral-7 uppercase tracking-wide mb-1">
+                      <span className="text-slds-error-1">*</span> Primary Data Model Object
                     </label>
                     <select
                       value={newRulesetPrimaryDMO}
                       onChange={(e) => setNewRulesetPrimaryDMO(e.target.value)}
-                      className="w-full px-3 py-2 text-sm border border-[var(--sf-border)] rounded bg-white focus:outline-none focus:border-[var(--sf-blue-light)] focus:ring-2 focus:ring-[rgba(27,150,255,0.2)]"
+                      className="w-full px-3 py-2 text-sm border border-slds-border-1 rounded bg-white focus:outline-none focus:border-slds-brand-2 focus:ring-2 focus:ring-[rgba(27,150,255,0.2)]"
                     >
                       {dataModelObjects.map((dmo) => (
                         <option key={dmo} value={dmo}>{dmo}</option>
@@ -2153,11 +2153,11 @@ export default function IdentityResolutionContent({ demoSession, onDemoSessionCh
                     </select>
                   </div>
                   <div>
-                    <label className="block text-xs font-medium text-[var(--sf-text-tertiary)] uppercase tracking-wide mb-1">Data Space</label>
+                    <label className="block text-xs font-medium text-slds-neutral-7 uppercase tracking-wide mb-1">Data Space</label>
                     <select
                       value={newRulesetDataSpace}
                       onChange={(e) => setNewRulesetDataSpace(e.target.value)}
-                      className="w-full px-3 py-2 text-sm border border-[var(--sf-border)] rounded bg-white focus:outline-none focus:border-[var(--sf-blue-light)] focus:ring-2 focus:ring-[rgba(27,150,255,0.2)]"
+                      className="w-full px-3 py-2 text-sm border border-slds-border-1 rounded bg-white focus:outline-none focus:border-slds-brand-2 focus:ring-2 focus:ring-[rgba(27,150,255,0.2)]"
                     >
                       <option value="default">default</option>
                     </select>
@@ -2168,14 +2168,14 @@ export default function IdentityResolutionContent({ demoSession, onDemoSessionCh
               {newRulesetStep === 2 && newRulesetOption === 'datakit' && (
                 <div className="flex gap-0 -mx-6 -my-6 h-[420px]">
                   {/* Left sidebar: datakit categories */}
-                  <div className="w-[220px] flex-shrink-0 border-r border-[var(--sf-border)] bg-[#FAFAF9] overflow-y-auto">
+                  <div className="w-[220px] flex-shrink-0 border-r border-slds-border-1 bg-[#FAFAF9] overflow-y-auto">
                     <div className="px-3 py-3">
                       <input
                         type="text"
                         value={datakitSearch}
                         onChange={(e) => setDatakitSearch(e.target.value)}
                         placeholder="Search datakits..."
-                        className="w-full px-2.5 py-1.5 text-xs border border-[var(--sf-border)] rounded focus:outline-none focus:border-[var(--sf-blue-light)]"
+                        className="w-full px-2.5 py-1.5 text-xs border border-slds-border-1 rounded focus:outline-none focus:border-slds-brand-2"
                       />
                     </div>
                     <nav className="px-1 pb-3">
@@ -2192,10 +2192,10 @@ export default function IdentityResolutionContent({ demoSession, onDemoSessionCh
                                 isActive && isInformatica
                                   ? 'bg-[#FFF3ED] text-[#FF4A00] font-semibold'
                                   : isActive
-                                    ? 'bg-[#EEF4FF] text-[var(--sf-blue)] font-semibold'
+                                    ? 'bg-[#EEF4FF] text-slds-brand font-semibold'
                                     : isInformatica
                                       ? 'text-[#FF4A00] font-medium hover:bg-[#FFF8F5]'
-                                      : 'text-[var(--sf-text-secondary)] hover:bg-white'
+                                      : 'text-slds-neutral-9 hover:bg-white'
                               }`}
                             >
                               {cat}
@@ -2210,9 +2210,9 @@ export default function IdentityResolutionContent({ demoSession, onDemoSessionCh
 
                   {/* Right side: rulesets table */}
                   <div className="flex-1 overflow-y-auto">
-                    <div className="px-4 py-3 border-b border-[var(--sf-border)]">
-                      <h3 className="text-sm font-semibold text-[var(--sf-text-primary)]">Datakit Selection</h3>
-                      <p className="text-xs text-[var(--sf-text-tertiary)] mt-0.5">{selectedDatakit} — select a ruleset to install</p>
+                    <div className="px-4 py-3 border-b border-slds-border-1">
+                      <h3 className="text-sm font-semibold text-slds-neutral-base">Datakit Selection</h3>
+                      <p className="text-xs text-slds-neutral-7 mt-0.5">{selectedDatakit} — select a ruleset to install</p>
                       {/* Session context: show remembered connections + bundles */}
                       {demoSession && demoSession.informaticaConnections.length > 0 && selectedDatakit === 'Informatica MDM' && (
                         <div className="mt-2 px-3 py-2 bg-[#FFF3ED] rounded-md border border-[#FFD6C0]">
@@ -2228,7 +2228,7 @@ export default function IdentityResolutionContent({ demoSession, onDemoSessionCh
                       )}
                     </div>
                     {(datakitRulesets[selectedDatakit] || []).length === 0 ? (
-                      <div className="flex items-center justify-center h-48 text-sm text-[var(--sf-text-tertiary)]">
+                      <div className="flex items-center justify-center h-48 text-sm text-slds-neutral-7">
                         No rulesets available for {selectedDatakit}.
                       </div>
                     ) : (
@@ -2256,18 +2256,18 @@ export default function IdentityResolutionContent({ demoSession, onDemoSessionCh
                                   checked={selectedDatakitRuleset === rs.id}
                                   onChange={() => { if (!isPhase2) setSelectedDatakitRuleset(rs.id); }}
                                   disabled={isPhase2}
-                                  className="w-4 h-4 accent-[var(--sf-blue)]"
+                                  className="w-4 h-4 accent-slds-brand"
                                 />
                               </td>
                               <td>
                                 <div className="flex items-center gap-2">
-                                  <span className={`text-sm font-medium ${isPhase2 ? 'text-[var(--sf-text-tertiary)]' : 'text-[var(--sf-text-primary)]'}`}>{rs.name}</span>
+                                  <span className={`text-sm font-medium ${isPhase2 ? 'text-slds-neutral-7' : 'text-slds-neutral-base'}`}>{rs.name}</span>
                                   {isPhase2 && (
                                     <span className="sf-badge sf-badge-neutral" style={{ opacity: 0.6 }}>Phase-2</span>
                                   )}
                                 </div>
                               </td>
-                              <td className="text-sm text-[var(--sf-text-tertiary)]">
+                              <td className="text-sm text-slds-neutral-7">
                                 {rs.primaryDMO} resolution — {rs.dataSpace} data space
                               </td>
                             </tr>
@@ -2283,8 +2283,8 @@ export default function IdentityResolutionContent({ demoSession, onDemoSessionCh
               {newRulesetStep === 3 && (
                 <div className="space-y-4">
                   <div className="flex items-start gap-3 p-4 bg-[#E1F5FE] rounded-lg">
-                    <Info className="w-5 h-5 text-[var(--sf-blue)] flex-shrink-0 mt-0.5" />
-                    <div className="text-sm text-[var(--sf-text-secondary)]">
+                    <Info className="w-5 h-5 text-slds-brand flex-shrink-0 mt-0.5" />
+                    <div className="text-sm text-slds-neutral-9">
                       {newRulesetOption === 'datakit'
                         ? <>Your ruleset will be created with defaults from <strong>{selectedDatakit}</strong>. Review and click <strong>Save</strong>.</>
                         : <>Review the details below and click <strong>Save</strong> to create your new ruleset.</>
@@ -2327,50 +2327,50 @@ export default function IdentityResolutionContent({ demoSession, onDemoSessionCh
             </div>
 
             {/* Footer with step indicator */}
-            <div className="flex items-center justify-between px-6 py-4 border-t border-[var(--sf-border)] bg-[#FAFAF9]">
+            <div className="flex items-center justify-between px-6 py-4 border-t border-slds-border-1 bg-[#FAFAF9]">
               <div className="flex items-center gap-2">
                 {[1, 2, 3].map((s) => (
                   <div key={s} className="flex items-center gap-1.5">
                     <div className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-medium ${
-                      s < newRulesetStep ? 'bg-[var(--sf-success)] text-white' :
-                      s === newRulesetStep ? 'bg-[var(--sf-blue)] text-white' :
-                      'bg-[#E5E5E5] text-[var(--sf-text-tertiary)]'
+                      s < newRulesetStep ? 'bg-slds-success-1 text-white' :
+                      s === newRulesetStep ? 'bg-slds-brand text-white' :
+                      'bg-slds-border-2 text-slds-neutral-7'
                     }`}>
                       {s < newRulesetStep ? <Check className="w-3 h-3" /> : s}
                     </div>
-                    {s < 3 && <div className={`w-6 h-0.5 ${s < newRulesetStep ? 'bg-[var(--sf-success)]' : 'bg-[#E5E5E5]'}`} />}
+                    {s < 3 && <div className={`w-6 h-0.5 ${s < newRulesetStep ? 'bg-slds-success-1' : 'bg-slds-border-2'}`} />}
                   </div>
                 ))}
               </div>
               <div className="flex items-center gap-3">
                 {newRulesetStep === 1 ? (
                   <>
-                    <button onClick={() => setNewRulesetOpen(false)} className="px-4 py-2 text-sm font-medium text-[var(--sf-text-secondary)] border border-[var(--sf-border)] rounded hover:bg-[#F3F3F3]">Cancel</button>
+                    <button onClick={() => setNewRulesetOpen(false)} className="px-4 py-2 text-sm font-medium text-slds-neutral-9 border border-slds-border-1 rounded hover:bg-slds-neutral-2">Cancel</button>
                     <button
                       onClick={handleNewRulesetNext}
                       disabled={!newRulesetOption}
-                      className="px-5 py-2 text-sm font-medium text-white bg-[var(--sf-blue)] rounded hover:bg-[var(--sf-blue-hover)] disabled:opacity-50 disabled:cursor-not-allowed"
+                      className="px-5 py-2 text-sm font-medium text-white bg-slds-brand rounded hover:bg-slds-brand-contrast-1 disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                       Next
                     </button>
                   </>
                 ) : newRulesetStep === 2 ? (
                   <>
-                    <button onClick={handleNewRulesetBack} className="px-4 py-2 text-sm font-medium text-[var(--sf-text-secondary)] border border-[var(--sf-border)] rounded hover:bg-[#F3F3F3]">Back</button>
+                    <button onClick={handleNewRulesetBack} className="px-4 py-2 text-sm font-medium text-slds-neutral-9 border border-slds-border-1 rounded hover:bg-slds-neutral-2">Back</button>
                     <button
                       onClick={handleNewRulesetNext}
                       disabled={newRulesetOption === 'create' ? !newRulesetName.trim() : !selectedDatakitRuleset}
-                      className="px-5 py-2 text-sm font-medium text-white bg-[var(--sf-blue)] rounded hover:bg-[var(--sf-blue-hover)] disabled:opacity-50 disabled:cursor-not-allowed"
+                      className="px-5 py-2 text-sm font-medium text-white bg-slds-brand rounded hover:bg-slds-brand-contrast-1 disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                       Next
                     </button>
                   </>
                 ) : (
                   <>
-                    <button onClick={handleNewRulesetBack} className="px-4 py-2 text-sm font-medium text-[var(--sf-text-secondary)] border border-[var(--sf-border)] rounded hover:bg-[#F3F3F3]">Back</button>
+                    <button onClick={handleNewRulesetBack} className="px-4 py-2 text-sm font-medium text-slds-neutral-9 border border-slds-border-1 rounded hover:bg-slds-neutral-2">Back</button>
                     <button
                       onClick={handleNewRulesetSave}
-                      className="px-5 py-2 text-sm font-medium text-white bg-[var(--sf-blue)] rounded hover:bg-[var(--sf-blue-hover)]"
+                      className="px-5 py-2 text-sm font-medium text-white bg-slds-brand rounded hover:bg-slds-brand-contrast-1"
                     >
                       Save
                     </button>

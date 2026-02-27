@@ -10,8 +10,8 @@ import {
 } from 'lucide-react';
 
 const shortcuts = [
-  { icon: Database, label: 'Data Streams', color: '#032D60', description: 'Manage your data sources' },
-  { icon: Users, label: 'Segments', color: '#0176D3', description: 'Audience segmentation' },
+  { icon: Database, label: 'Data Streams', color: 'var(--slds-g-color-brand-1)', description: 'Manage your data sources' },
+  { icon: Users, label: 'Segments', color: 'var(--slds-g-color-brand)', description: 'Audience segmentation' },
   { icon: BarChart3, label: 'Reports', color: '#2E844A', description: 'View analytics & reports' },
   { icon: Globe, label: 'Activations', color: '#DD7A01', description: 'Manage activations' },
 ];
@@ -40,13 +40,13 @@ export default function HomeContent() {
           return (
             <div key={m.label} className="sf-card p-4">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-xs font-medium text-[var(--sf-text-tertiary)] uppercase tracking-wide">
+                <span className="text-xs font-medium text-slds-neutral-7 uppercase tracking-wide">
                   {m.label}
                 </span>
-                <Icon className="w-4 h-4 text-[var(--sf-text-tertiary)]" />
+                <Icon className="w-4 h-4 text-slds-neutral-7" />
               </div>
-              <div className="text-xl font-bold text-[var(--sf-text-primary)]">{m.value}</div>
-              <div className="text-xs text-[var(--sf-success)] font-medium mt-1">{m.change}</div>
+              <div className="text-xl font-bold text-slds-neutral-base">{m.value}</div>
+              <div className="text-xs text-slds-success-1 font-medium mt-1">{m.change}</div>
             </div>
           );
         })}
@@ -61,15 +61,15 @@ export default function HomeContent() {
               <Sparkles className="w-5 h-5 text-white" />
             </div>
             <div className="flex-1 min-w-0">
-              <h3 className="text-sm font-semibold text-[var(--sf-text-primary)] mb-1">
+              <h3 className="text-sm font-semibold text-slds-neutral-base mb-1">
                 Agentforce Assistant
               </h3>
-              <p className="text-xs text-[var(--sf-text-tertiary)] leading-relaxed">
+              <p className="text-xs text-slds-neutral-7 leading-relaxed">
                 Ask questions about your data, create segments, or get insights. Use the agent panel
                 on the right to start a conversation.
               </p>
             </div>
-            <button className="flex items-center gap-1 text-xs font-medium text-[var(--sf-blue)] hover:text-[var(--sf-blue-hover)] whitespace-nowrap">
+            <button className="flex items-center gap-1 text-xs font-medium text-slds-brand hover:text-slds-brand-contrast-1 whitespace-nowrap">
               Open Agent
               <ArrowRight className="w-3.5 h-3.5" />
             </button>
@@ -77,7 +77,7 @@ export default function HomeContent() {
 
           {/* Quick access shortcuts */}
           <div>
-            <h2 className="text-sm font-semibold text-[var(--sf-text-primary)] mb-3">
+            <h2 className="text-sm font-semibold text-slds-neutral-base mb-3">
               Quick Access
             </h2>
             <div className="grid grid-cols-4 gap-3">
@@ -91,10 +91,10 @@ export default function HomeContent() {
                     >
                       <Icon className="w-5 h-5 text-white" />
                     </div>
-                    <div className="text-sm font-medium text-[var(--sf-text-primary)]">
+                    <div className="text-sm font-medium text-slds-neutral-base">
                       {s.label}
                     </div>
-                    <div className="text-xs text-[var(--sf-text-tertiary)] mt-0.5">
+                    <div className="text-xs text-slds-neutral-7 mt-0.5">
                       {s.description}
                     </div>
                   </div>
@@ -107,20 +107,20 @@ export default function HomeContent() {
         {/* Right 1/3 – Recent items */}
         <div className="sf-card">
           <div className="sf-card-header">
-            <h2 className="text-sm font-semibold text-[var(--sf-text-primary)]">
+            <h2 className="text-sm font-semibold text-slds-neutral-base">
               Recent Items
             </h2>
           </div>
-          <div className="divide-y divide-[var(--sf-border-light)]">
+          <div className="divide-y divide-slds-border-2">
             {recentItems.map((item) => (
               <div
                 key={item.name}
-                className="px-4 py-3 hover:bg-[#F3F3F3] cursor-pointer transition-colors"
+                className="px-4 py-3 hover:bg-slds-neutral-2 cursor-pointer transition-colors"
               >
-                <div className="text-sm text-[var(--sf-link)] font-medium hover:underline">
+                <div className="text-sm text-slds-brand font-medium hover:underline">
                   {item.name}
                 </div>
-                <div className="text-xs text-[var(--sf-text-tertiary)] mt-0.5">
+                <div className="text-xs text-slds-neutral-7 mt-0.5">
                   {item.type} &middot; {item.time}
                 </div>
               </div>
