@@ -16,6 +16,12 @@ import {
   X,
   Copy,
   Pencil,
+  Mic,
+  MicOff,
+  ChevronRight,
+  Check,
+  AlertCircle,
+  Volume2,
 } from 'lucide-react';
 import {
   useBSCharts,
@@ -28,6 +34,7 @@ import {
   type ChartData,
   type BSChartSummary,
 } from '@/hooks/use-bs-charts';
+import { useVoiceCommands, type VoiceCommand, type VoiceLogEntry } from '@/hooks/use-voice-commands';
 
 // ─── Constants ────────────────────────────────────────────────────────
 const GRID_SIZE = 20;
@@ -47,6 +54,8 @@ const DEFAULT_NODE_SIZES: Record<ChartNode['type'], { w: number; h: number }> = 
   process: { w: 200, h: 80 },
   'text-label': { w: 160, h: 40 },
 };
+
+const MOVE_STEP = 60;
 
 // ─── Helpers ──────────────────────────────────────────────────────────
 let idCounter = 0;
@@ -92,6 +101,37 @@ function buildEdgePath(
   const c1 = controlOffset(srcAnchor, offset);
   const c2 = controlOffset(tgtAnchor, offset);
   return `M${src.x},${src.y} C${src.x + c1.x},${src.y + c1.y} ${tgt.x + c2.x},${tgt.y + c2.y} ${tgt.x},${tgt.y}`;
+}
+
+/** Fuzzy-match a node by label (case-insensitive, includes-based) */
+function findNodeByLabel(nodes: ChartNode[], label: string): ChartNode | undefined {
+  const lower = label.toLowerCase().trim();
+  // Exact match first
+  const exact = nodes.find((n) => n.label.toLowerCase() === lower);
+  if (exact) return exact;
+  // Starts-with match
+  const startsWith = nodes.find((n) => n.label.toLowerCase().startsWith(lower));
+  if (startsWith) return startsWith;
+  // Includes match
+  return nodes.find((n) => n.label.toLowerCase().includes(lower));
+}
+
+/** Smart auto-anchor: picks the best anchor pair based on relative position */
+function pickAnchors(src: ChartNode, tgt: ChartNode): { srcAnchor: 'top' | 'right' | 'bottom' | 'left'; tgtAnchor: 'top' | 'right' | 'bottom' | 'left' } {
+  const srcCx = src.x + src.width / 2;
+  const srcCy = src.y + src.height / 2;
+  const tgtCx = tgt.x + tgt.width / 2;
+  const tgtCy = tgt.y + tgt.height / 2;
+  const dx = tgtCx - srcCx;
+  const dy = tgtCy - srcCy;
+  if (Math.abs(dx) > Math.abs(dy)) {
+    return dx > 0
+      ? { srcAnchor: 'right', tgtAnchor: 'left' }
+      : { srcAnchor: 'left', tgtAnchor: 'right' };
+  }
+  return dy > 0
+    ? { srcAnchor: 'bottom', tgtAnchor: 'top' }
+    : { srcAnchor: 'top', tgtAnchor: 'bottom' };
 }
 
 // ─── Chart List View ──────────────────────────────────────────────────
@@ -447,6 +487,168 @@ const TOOLBAR_ITEMS: { type: ChartNode['type']; label: string; icon: typeof Tabl
   { type: 'text-label', label: 'Text Label', icon: Type },
 ];
 
+// ─── Voice Panel ──────────────────────────────────────────────────────
+function VoicePanel({
+  isListening,
+  isSupported,
+  interimTranscript,
+  error,
+  log,
+  onStart,
+  onStop,
+  onClear,
+}: {
+  isListening: boolean;
+  isSupported: boolean;
+  interimTranscript: string;
+  error: string | null;
+  log: VoiceLogEntry[];
+  onStart: () => void;
+  onStop: () => void;
+  onClear: () => void;
+}) {
+  const logEndRef = useRef<HTMLDivElement>(null);
+
+  const commandLabel = (cmd: VoiceCommand) => {
+    switch (cmd.action) {
+      case 'add': return `Add ${cmd.elementType}${cmd.label ? ` "${cmd.label}"` : ''}`;
+      case 'label': return `Label → "${cmd.name}"`;
+      case 'move-direction': return `Move "${cmd.target}" ${cmd.direction}`;
+      case 'move-relative': return `Move "${cmd.target}" ${cmd.position} "${cmd.relativeTo}"`;
+      case 'connect': return `Connect "${cmd.from}" → "${cmd.to}"`;
+      case 'delete': return `Delete "${cmd.target}"`;
+      case 'select': return `Select "${cmd.target}"`;
+      case 'set-color': return `Color ${cmd.target ? `"${cmd.target}"` : 'selected'} → ${cmd.color}`;
+      case 'add-row': return `Add row "${cmd.text}"`;
+      case 'duplicate': return `Duplicate "${cmd.target}"`;
+      case 'set-property': return `Set ${cmd.property} → "${cmd.value}"`;
+      case 'unknown': return `Unknown: "${cmd.raw}"`;
+    }
+  };
+
+  if (!isSupported) {
+    return (
+      <div className="w-72 bg-white border-l flex flex-col shrink-0">
+        <div className="p-4 border-b">
+          <div className="flex items-center gap-2 text-amber-600">
+            <AlertCircle size={16} />
+            <span className="text-sm font-medium">Voice Not Supported</span>
+          </div>
+          <p className="text-xs text-gray-500 mt-2">
+            Speech recognition requires Chrome, Edge, or Safari. Please use a supported browser.
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="w-72 bg-white border-l flex flex-col shrink-0">
+      {/* Voice header */}
+      <div className="p-3 border-b">
+        <div className="flex items-center justify-between mb-2">
+          <div className="flex items-center gap-2">
+            <Volume2 size={16} className="text-gray-500" />
+            <span className="text-sm font-semibold text-gray-900">Design with Voice</span>
+          </div>
+          <button
+            onClick={isListening ? onStop : onStart}
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium transition-all"
+            style={{
+              background: isListening ? '#E11D48' : '#1B96FF',
+              color: 'white',
+            }}
+          >
+            {isListening ? <MicOff size={12} /> : <Mic size={12} />}
+            {isListening ? 'Stop' : 'Start'}
+          </button>
+        </div>
+
+        {/* Listening indicator */}
+        {isListening && (
+          <div className="flex items-center gap-2 px-3 py-2 rounded-lg" style={{ background: '#FEF2F2' }}>
+            <div className="relative flex items-center justify-center">
+              <div className="w-3 h-3 rounded-full bg-red-500 animate-pulse" />
+              <div className="absolute w-5 h-5 rounded-full border-2 border-red-300 animate-ping" />
+            </div>
+            <span className="text-xs text-red-700 font-medium">Listening...</span>
+          </div>
+        )}
+
+        {/* Interim transcript (what's being heard right now) */}
+        {interimTranscript && (
+          <div className="mt-2 px-3 py-2 bg-blue-50 rounded-lg">
+            <span className="text-xs text-blue-600 italic">"{interimTranscript}"</span>
+          </div>
+        )}
+
+        {error && (
+          <div className="mt-2 px-3 py-2 bg-amber-50 rounded-lg flex items-center gap-2">
+            <AlertCircle size={12} className="text-amber-500 shrink-0" />
+            <span className="text-xs text-amber-700">{error}</span>
+          </div>
+        )}
+      </div>
+
+      {/* Quick reference */}
+      <div className="p-3 border-b bg-gray-50">
+        <div className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5">Voice Commands</div>
+        <div className="text-xs text-gray-600 space-y-1">
+          <p><strong>"Add data table"</strong> — add element</p>
+          <p><strong>"Label it Account"</strong> — name it</p>
+          <p><strong>"Add row Email"</strong> — add table field</p>
+          <p><strong>"Move Account right"</strong> — reposition</p>
+          <p><strong>"Move A above B"</strong> — relative move</p>
+          <p><strong>"Connect A to B"</strong> — draw arrow</p>
+          <p><strong>"Color it blue"</strong> — change color</p>
+          <p><strong>"Select Account"</strong> — focus element</p>
+          <p><strong>"Delete Account"</strong> — remove</p>
+          <p><strong>"Duplicate Account"</strong> — copy</p>
+        </div>
+      </div>
+
+      {/* Command log */}
+      <div className="flex-1 overflow-y-auto">
+        <div className="flex items-center justify-between px-3 py-2 border-b">
+          <span className="text-xs font-semibold text-gray-500 uppercase tracking-wide">History</span>
+          {log.length > 0 && (
+            <button onClick={onClear} className="text-xs text-gray-400 hover:text-gray-600">Clear</button>
+          )}
+        </div>
+        {log.length === 0 ? (
+          <div className="p-4 text-center">
+            <Mic size={24} className="text-gray-200 mx-auto mb-2" />
+            <p className="text-xs text-gray-400">
+              {isListening ? 'Speak a command...' : 'Start voice mode to begin'}
+            </p>
+          </div>
+        ) : (
+          <div className="divide-y">
+            {log.map((entry) => (
+              <div key={entry.id} className="px-3 py-2">
+                <div className="flex items-start gap-1.5">
+                  {entry.success ? (
+                    <Check size={12} className="text-green-500 mt-0.5 shrink-0" />
+                  ) : (
+                    <AlertCircle size={12} className="text-amber-500 mt-0.5 shrink-0" />
+                  )}
+                  <div className="min-w-0">
+                    <p className="text-xs text-gray-500 truncate">"{entry.transcript}"</p>
+                    <p className={`text-xs font-medium ${entry.success ? 'text-gray-800' : 'text-amber-600'}`}>
+                      {commandLabel(entry.command)}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            ))}
+            <div ref={logEndRef} />
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
 // ─── Chart Editor ─────────────────────────────────────────────────────
 function ChartEditor({
   chartId,
@@ -467,6 +669,21 @@ function ChartEditor({
   const [editingName, setEditingName] = useState(false);
   const [isDirty, setIsDirty] = useState(false);
   const [saveStatus, setSaveStatus] = useState<'saved' | 'saving' | 'unsaved'>('saved');
+  const [voiceModeOpen, setVoiceModeOpen] = useState(false);
+
+  // Voice commands
+  const voice = useVoiceCommands();
+
+  // Track the last created node for "label it" / "it" references
+  const lastCreatedNodeIdRef = useRef<string | null>(null);
+
+  // Keep a ref to the latest nodes for voice callbacks
+  const nodesRef = useRef(nodes);
+  nodesRef.current = nodes;
+  const edgesRef = useRef(edges);
+  edgesRef.current = edges;
+  const selectedNodeIdRef = useRef(selectedNodeId);
+  selectedNodeIdRef.current = selectedNodeId;
 
   // Dragging state
   const [dragState, setDragState] = useState<{
@@ -524,6 +741,233 @@ function ChartEditor({
     );
   }, [chartId, chartName, nodes, edges]);
 
+  // ─── Voice command dispatcher ──────────────────────────────────────
+  const resolveTarget = useCallback((target: string): ChartNode | undefined => {
+    const currentNodes = nodesRef.current;
+    const lower = target.toLowerCase().trim();
+    // "it", "this", "that", "selected" → selected or last created
+    if (['it', 'this', 'that', 'selected'].includes(lower)) {
+      const selId = selectedNodeIdRef.current || lastCreatedNodeIdRef.current;
+      return selId ? currentNodes.find((n) => n.id === selId) : currentNodes[currentNodes.length - 1];
+    }
+    return findNodeByLabel(currentNodes, target);
+  }, []);
+
+  const handleVoiceCommand = useCallback((cmd: VoiceCommand, _raw: string): boolean => {
+    const currentNodes = nodesRef.current;
+
+    switch (cmd.action) {
+      case 'add': {
+        const size = DEFAULT_NODE_SIZES[cmd.elementType];
+        // Place near the last node, or center of viewport
+        let x = 200, y = 200;
+        if (currentNodes.length > 0) {
+          const last = currentNodes[currentNodes.length - 1];
+          x = last.x + last.width + 40;
+          y = last.y;
+        }
+        const newNode: ChartNode = {
+          id: genId(),
+          type: cmd.elementType,
+          x: snapToGrid(x),
+          y: snapToGrid(y),
+          width: size.w,
+          height: size.h,
+          label: cmd.label || (cmd.elementType === 'data-table' ? 'Data Table' : cmd.elementType === 'diamond' ? 'Decision' : cmd.elementType === 'process' ? 'Process' : 'Label'),
+          headerColor: DEFAULT_NODE_COLORS[cmd.elementType],
+          rows: cmd.elementType === 'data-table' ? ['Field 1', 'Field 2', 'Field 3'] : undefined,
+          textColor: cmd.elementType === 'text-label' ? '#1e293b' : undefined,
+          fontSize: cmd.elementType === 'text-label' ? 14 : undefined,
+          fontWeight: cmd.elementType === 'text-label' ? '600' : undefined,
+        };
+        setNodes((prev) => [...prev, newNode]);
+        setSelectedNodeId(newNode.id);
+        lastCreatedNodeIdRef.current = newNode.id;
+        markDirty();
+        return true;
+      }
+
+      case 'label': {
+        const target = selectedNodeIdRef.current || lastCreatedNodeIdRef.current;
+        if (!target) return false;
+        setNodes((prev) => prev.map((n) => (n.id === target ? { ...n, label: cmd.name } : n)));
+        markDirty();
+        return true;
+      }
+
+      case 'move-direction': {
+        const node = resolveTarget(cmd.target);
+        if (!node) return false;
+        const amount = cmd.amount || MOVE_STEP;
+        const delta = {
+          up: { x: 0, y: -amount },
+          down: { x: 0, y: amount },
+          left: { x: -amount, y: 0 },
+          right: { x: amount, y: 0 },
+        }[cmd.direction];
+        setNodes((prev) =>
+          prev.map((n) =>
+            n.id === node.id
+              ? { ...n, x: snapToGrid(n.x + delta.x), y: snapToGrid(n.y + delta.y) }
+              : n
+          )
+        );
+        setSelectedNodeId(node.id);
+        markDirty();
+        return true;
+      }
+
+      case 'move-relative': {
+        const node = resolveTarget(cmd.target);
+        const anchor = resolveTarget(cmd.relativeTo);
+        if (!node || !anchor) return false;
+        const gap = 40;
+        let newX = node.x, newY = node.y;
+        switch (cmd.position) {
+          case 'above':
+            newX = anchor.x + (anchor.width - node.width) / 2;
+            newY = anchor.y - node.height - gap;
+            break;
+          case 'below':
+            newX = anchor.x + (anchor.width - node.width) / 2;
+            newY = anchor.y + anchor.height + gap;
+            break;
+          case 'left-of':
+            newX = anchor.x - node.width - gap;
+            newY = anchor.y + (anchor.height - node.height) / 2;
+            break;
+          case 'right-of':
+            newX = anchor.x + anchor.width + gap;
+            newY = anchor.y + (anchor.height - node.height) / 2;
+            break;
+        }
+        setNodes((prev) =>
+          prev.map((n) =>
+            n.id === node.id ? { ...n, x: snapToGrid(newX), y: snapToGrid(newY) } : n
+          )
+        );
+        setSelectedNodeId(node.id);
+        markDirty();
+        return true;
+      }
+
+      case 'connect': {
+        const src = resolveTarget(cmd.from);
+        const tgt = resolveTarget(cmd.to);
+        if (!src || !tgt || src.id === tgt.id) return false;
+        const exists = edgesRef.current.some(
+          (e) => e.sourceId === src.id && e.targetId === tgt.id
+        );
+        if (exists) return false;
+        const { srcAnchor, tgtAnchor } = pickAnchors(src, tgt);
+        const newEdge: ChartEdge = {
+          id: genId(),
+          sourceId: src.id,
+          targetId: tgt.id,
+          sourceAnchor: srcAnchor,
+          targetAnchor: tgtAnchor,
+        };
+        setEdges((prev) => [...prev, newEdge]);
+        markDirty();
+        return true;
+      }
+
+      case 'delete': {
+        const node = resolveTarget(cmd.target);
+        if (!node) return false;
+        setNodes((prev) => prev.filter((n) => n.id !== node.id));
+        setEdges((prev) => prev.filter((e) => e.sourceId !== node.id && e.targetId !== node.id));
+        if (selectedNodeIdRef.current === node.id) setSelectedNodeId(null);
+        markDirty();
+        return true;
+      }
+
+      case 'select': {
+        const node = resolveTarget(cmd.target);
+        if (!node) return false;
+        setSelectedNodeId(node.id);
+        return true;
+      }
+
+      case 'set-color': {
+        const node = cmd.target ? resolveTarget(cmd.target) : (
+          selectedNodeIdRef.current ? currentNodes.find((n) => n.id === selectedNodeIdRef.current) :
+          lastCreatedNodeIdRef.current ? currentNodes.find((n) => n.id === lastCreatedNodeIdRef.current) :
+          undefined
+        );
+        if (!node) return false;
+        if (node.type === 'text-label') {
+          setNodes((prev) => prev.map((n) => (n.id === node.id ? { ...n, textColor: cmd.color } : n)));
+        } else {
+          setNodes((prev) => prev.map((n) => (n.id === node.id ? { ...n, headerColor: cmd.color } : n)));
+        }
+        markDirty();
+        return true;
+      }
+
+      case 'add-row': {
+        const selId = selectedNodeIdRef.current || lastCreatedNodeIdRef.current;
+        const node = selId ? currentNodes.find((n) => n.id === selId) : undefined;
+        if (!node || node.type !== 'data-table') return false;
+        setNodes((prev) =>
+          prev.map((n) =>
+            n.id === node.id ? { ...n, rows: [...(n.rows || []), cmd.text] } : n
+          )
+        );
+        markDirty();
+        return true;
+      }
+
+      case 'duplicate': {
+        const node = resolveTarget(cmd.target);
+        if (!node) return false;
+        const dup: ChartNode = {
+          ...node,
+          id: genId(),
+          x: node.x + 40,
+          y: node.y + 40,
+          label: node.label + ' Copy',
+        };
+        setNodes((prev) => [...prev, dup]);
+        setSelectedNodeId(dup.id);
+        lastCreatedNodeIdRef.current = dup.id;
+        markDirty();
+        return true;
+      }
+
+      case 'set-property': {
+        const node = cmd.target ? resolveTarget(cmd.target) : (
+          selectedNodeIdRef.current ? currentNodes.find((n) => n.id === selectedNodeIdRef.current) : undefined
+        );
+        if (!node) return false;
+        const prop = cmd.property.toLowerCase();
+        if (prop === 'label' || prop === 'name' || prop === 'title') {
+          setNodes((prev) => prev.map((n) => (n.id === node.id ? { ...n, label: cmd.value } : n)));
+        } else if (prop === 'font size' || prop === 'fontsize' || prop === 'size') {
+          const size = parseInt(cmd.value);
+          if (!isNaN(size)) {
+            setNodes((prev) => prev.map((n) => (n.id === node.id ? { ...n, fontSize: size } : n)));
+          }
+        }
+        markDirty();
+        return true;
+      }
+
+      default:
+        return false;
+    }
+  }, [markDirty, resolveTarget]);
+
+  // Register voice command handler
+  useEffect(() => {
+    voice.setOnCommand(handleVoiceCommand);
+  }, [handleVoiceCommand, voice.setOnCommand]);
+
+  // Stop voice when leaving editor
+  useEffect(() => {
+    return () => { voice.stop(); };
+  }, []);
+
   // ─── Canvas mouse handlers ─────────────────────────────────────────
   const screenToCanvas = useCallback((clientX: number, clientY: number) => {
     const rect = canvasRef.current?.getBoundingClientRect();
@@ -539,7 +983,6 @@ function ChartEditor({
     if ((e.target as HTMLElement).closest('[data-node]')) return;
     setSelectedNodeId(null);
     setEditingNodeId(null);
-    const rect = canvasRef.current!.getBoundingClientRect();
     setDragState({
       type: 'pan',
       startX: e.clientX,
@@ -609,7 +1052,6 @@ function ChartEditor({
 
     const handleMouseUp = (e: MouseEvent) => {
       if (dragState.type === 'connect') {
-        // Find target node/anchor under cursor
         const rect = canvasRef.current!.getBoundingClientRect();
         const canvasPos = {
           x: (e.clientX - rect.left - viewport.x) / viewport.zoom,
@@ -624,7 +1066,6 @@ function ChartEditor({
             const dx = canvasPos.x - pos.x;
             const dy = canvasPos.y - pos.y;
             if (Math.sqrt(dx * dx + dy * dy) < 20) {
-              // Check for duplicate edge
               const exists = edges.some(
                 (e) => e.sourceId === dragState.sourceId && e.targetId === node.id &&
                   e.sourceAnchor === dragState.sourceAnchor && e.targetAnchor === anchor
@@ -696,6 +1137,8 @@ function ChartEditor({
       fontWeight: type === 'text-label' ? '600' : undefined,
     };
     setNodes((prev) => [...prev, newNode]);
+    setSelectedNodeId(newNode.id);
+    lastCreatedNodeIdRef.current = newNode.id;
     markDirty();
   }, [screenToCanvas, markDirty]);
 
@@ -717,7 +1160,6 @@ function ChartEditor({
         e.preventDefault();
         handleSave();
       }
-      // Duplicate
       if ((e.metaKey || e.ctrlKey) && e.key === 'd' && selectedNodeId) {
         e.preventDefault();
         const node = nodes.find((n) => n.id === selectedNodeId);
@@ -725,6 +1167,7 @@ function ChartEditor({
           const dup: ChartNode = { ...node, id: genId(), x: node.x + 40, y: node.y + 40 };
           setNodes((prev) => [...prev, dup]);
           setSelectedNodeId(dup.id);
+          lastCreatedNodeIdRef.current = dup.id;
           markDirty();
         }
       }
@@ -784,7 +1227,6 @@ function ChartEditor({
   // ─── Render ────────────────────────────────────────────────────────
   const editingNode = editingNodeId ? nodes.find((n) => n.id === editingNodeId) : null;
 
-  // Connection line being drawn
   const connectLine = useMemo(() => {
     if (dragState.type !== 'connect' || !dragState.sourceId || !dragState.currentX) return null;
     const sourceNode = nodes.find((n) => n.id === dragState.sourceId);
@@ -840,6 +1282,33 @@ function ChartEditor({
         >
           <Save size={14} />
           Save
+        </button>
+
+        {/* Voice mode toggle */}
+        <button
+          onClick={() => {
+            const opening = !voiceModeOpen;
+            setVoiceModeOpen(opening);
+            if (!opening && voice.isListening) voice.stop();
+          }}
+          className="flex items-center gap-1.5 px-3 py-1.5 rounded text-xs font-medium transition-all"
+          style={{
+            background: voice.isListening ? '#E11D48' : voiceModeOpen ? 'rgba(255,255,255,0.2)' : 'rgba(255,255,255,0.1)',
+            color: 'white',
+          }}
+          title="Design with Voice"
+        >
+          {voice.isListening ? (
+            <>
+              <div className="w-2 h-2 rounded-full bg-white animate-pulse" />
+              Voice Active
+            </>
+          ) : (
+            <>
+              <Mic size={14} />
+              Voice
+            </>
+          )}
         </button>
 
         {/* Zoom controls */}
@@ -927,7 +1396,6 @@ function ChartEditor({
                 const isSelected = selectedEdgeId === edge.id;
                 return (
                   <g key={edge.id}>
-                    {/* Invisible wider path for easier click targeting */}
                     <path
                       d={path}
                       fill="none"
@@ -988,6 +1456,20 @@ function ChartEditor({
             </svg>
           )}
         </div>
+
+        {/* Voice panel (right sidebar) */}
+        {voiceModeOpen && (
+          <VoicePanel
+            isListening={voice.isListening}
+            isSupported={voice.isSupported}
+            interimTranscript={voice.interimTranscript}
+            error={voice.error}
+            log={voice.log}
+            onStart={voice.start}
+            onStop={voice.stop}
+            onClear={voice.clearLog}
+          />
+        )}
       </div>
 
       {/* Inline editor */}
