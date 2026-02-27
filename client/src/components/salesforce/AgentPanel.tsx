@@ -31,7 +31,7 @@ export default function AgentPanel({ isMinimized, onToggleMinimize }: AgentPanel
         className="sf-agent-collapsed"
         title="Expand Agentforce"
       >
-        <ChevronLeft className="w-4 h-4 text-slds-neutral-7" />
+        <ChevronLeft className="slds-icon-size_small slds-text-neutral-7" />
       </button>
     );
   }
@@ -44,27 +44,27 @@ export default function AgentPanel({ isMinimized, onToggleMinimize }: AgentPanel
         className="sf-agent-collapse-btn"
         title="Collapse panel"
       >
-        <ChevronRight className="w-3.5 h-3.5" />
+        <ChevronRight className="slds-icon-size_x-small" />
       </button>
 
       {/* Header */}
       <div className="sf-agent-header">
-        <div className="flex items-center gap-2">
-          <Sparkles className="w-4 h-4 text-slds-brand" />
-          <button className="flex items-center gap-1 text-sm font-semibold text-slds-neutral-base hover:text-slds-brand">
+        <div className="slds-grid slds-grid_vertical-align-center slds-gap_x-small">
+          <Sparkles className="slds-icon-size_small slds-text-brand" />
+          <button className="slds-grid slds-grid_vertical-align-center slds-gap_xx-small slds-text-size_medium slds-font-weight_semibold slds-text-neutral-base slds-hover-text-brand">
             Data 360 Agent
-            <ChevronDown className="w-3 h-3" />
+            <ChevronDown className="slds-icon-size_xx-small" />
           </button>
         </div>
-        <div className="flex items-center gap-1">
+        <div className="slds-grid slds-grid_vertical-align-center slds-gap_xx-small">
           <button className="sf-agent-icon-btn" title="Info">
-            <Info className="w-4 h-4" />
+            <Info className="slds-icon-size_small" />
           </button>
           <button className="sf-agent-icon-btn" title="New conversation">
-            <MessageSquare className="w-4 h-4" />
+            <MessageSquare className="slds-icon-size_small" />
           </button>
           <button className="sf-agent-icon-btn" title="Pin panel">
-            <Pin className="w-4 h-4" />
+            <Pin className="slds-icon-size_small" />
           </button>
         </div>
       </div>
@@ -72,10 +72,10 @@ export default function AgentPanel({ isMinimized, onToggleMinimize }: AgentPanel
       {/* Body — scrollable middle area */}
       <div className="sf-agent-body">
         {/* Astro illustration */}
-        <div className="flex justify-center pt-6 pb-4">
+        <div className="slds-grid slds-grid_align-center slds-p-top_large slds-p-bottom_small">
           <div className="sf-agent-astro">
             {/* Stylised Astro mascot placeholder */}
-            <svg viewBox="0 0 120 120" className="w-[100px] h-[100px]">
+            <svg viewBox="0 0 120 120" style={{ width: '100px', height: '100px' }}>
               {/* Background circle with mountains */}
               <circle cx="60" cy="60" r="58" fill="url(#astroGrad)" />
               {/* Mountains */}
@@ -110,28 +110,28 @@ export default function AgentPanel({ isMinimized, onToggleMinimize }: AgentPanel
         </div>
 
         {/* Welcome text */}
-        <div className="text-center px-4 pb-5">
-          <h3 className="text-base font-semibold text-slds-neutral-base mb-1">
+        <div className="slds-text-center slds-p-horizontal_medium slds-p-bottom_medium">
+          <h3 className="slds-text-size_large slds-font-weight_semibold slds-text-neutral-base slds-m-bottom_xxx-small">
             Let's chat!
           </h3>
-          <p className="text-xs text-slds-neutral-7 leading-relaxed">
+          <p className="slds-text-size_small slds-text-neutral-7 slds-leading-relaxed">
             I'm your Agentforce AI assistant. I can help you search records, create segments,
             analyze data, and more.
           </p>
         </div>
 
         {/* Suggested prompts */}
-        <div className="px-4 pb-4 space-y-2">
+        <div className="slds-p-horizontal_medium slds-p-bottom_medium" style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
           {suggestedPrompts.map((prompt) => (
             <button
               key={prompt}
               className="sf-agent-prompt-card"
               onClick={() => setInputValue(prompt)}
             >
-              <span className="text-xs text-slds-neutral-9 leading-snug flex-1 text-left">
+              <span className="slds-text-size_small slds-text-neutral-9 slds-col slds-text-left" style={{ lineHeight: '1.375' }}>
                 {prompt}
               </span>
-              <Send className="w-3.5 h-3.5 text-slds-brand flex-shrink-0" />
+              <Send className="slds-icon-size_x-small slds-text-brand slds-flex-shrink-0" />
             </button>
           ))}
         </div>
@@ -139,7 +139,7 @@ export default function AgentPanel({ isMinimized, onToggleMinimize }: AgentPanel
 
       {/* Footer — input area */}
       <div className="sf-agent-footer">
-        <div className="relative">
+        <div className="slds-pos-relative">
           <input
             type="text"
             placeholder="Describe your task or ask a question..."
@@ -148,13 +148,9 @@ export default function AgentPanel({ isMinimized, onToggleMinimize }: AgentPanel
             className="sf-agent-input"
           />
           <button
-            className={`absolute right-2 top-1/2 -translate-y-1/2 w-7 h-7 rounded flex items-center justify-center transition-colors ${
-              inputValue
-                ? 'bg-slds-brand text-white'
-                : 'text-slds-neutral-7'
-            }`}
+            className={`sf-agent-send-btn ${inputValue ? 'has-input' : ''}`}
           >
-            <Send className="w-3.5 h-3.5" />
+            <Send className="slds-icon-size_x-small" />
           </button>
         </div>
       </div>

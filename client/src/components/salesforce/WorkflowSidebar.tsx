@@ -52,9 +52,9 @@ export default function WorkflowSidebar({
       <div className="sf-workflow-sidebar-body">
         {/* Question + Input group */}
         <div className="sf-workflow-input-group">
-          <div className="flex items-center gap-2 mb-2">
-            <Sparkles className="w-4 h-4 text-[#9B8BF4]" />
-            <span className="text-xs font-semibold text-slds-neutral-base">
+          <div className="slds-grid slds-grid_vertical-align-center slds-gap_x-small slds-m-bottom_x-small">
+            <Sparkles className="slds-icon-size_small" style={{ color: '#9B8BF4' }} />
+            <span className="slds-text-size_small slds-font-weight_semibold slds-text-neutral-base">
               What are you working on today?
             </span>
           </div>
@@ -72,13 +72,13 @@ export default function WorkflowSidebar({
                 className="sf-workflow-input-icon"
                 title="Voice input"
               >
-                <Mic className="w-3.5 h-3.5" />
+                <Mic className="slds-icon-size_x-small" />
               </button>
               <button
                 className="sf-workflow-input-icon"
                 title="Edit"
               >
-                <Edit3 className="w-3.5 h-3.5" />
+                <Edit3 className="slds-icon-size_x-small" />
               </button>
             </div>
           </div>
@@ -102,13 +102,13 @@ export default function WorkflowSidebar({
                 onClick={() => onSelectWorkflow(wf)}
               >
                 <div className="sf-workflow-item-icon">
-                  <Icon className="w-4 h-4" />
+                  <Icon className="slds-icon-size_small" />
                 </div>
                 <div className="sf-workflow-item-text">
                   <span className="sf-workflow-item-label">{wf.title}</span>
                   <span className="sf-workflow-item-desc">{wf.description}</span>
                 </div>
-                <ChevronRight className="w-3.5 h-3.5 text-slds-neutral-7 flex-shrink-0 opacity-0 group-hover:opacity-100" />
+                <ChevronRight className="slds-icon-size_x-small slds-text-neutral-7 slds-flex-shrink-0 sf-chevron-reveal" />
               </button>
             );
           })}
@@ -129,13 +129,13 @@ export default function WorkflowSidebar({
                 onClick={() => onSelectWorkflow(wf)}
               >
                 <div className="sf-workflow-item-icon">
-                  <Icon className="w-4 h-4" />
+                  <Icon className="slds-icon-size_small" />
                 </div>
                 <div className="sf-workflow-item-text">
                   <span className="sf-workflow-item-label">{wf.title}</span>
                   <span className="sf-workflow-item-desc">{wf.description}</span>
                 </div>
-                <ChevronRight className="w-3.5 h-3.5 text-slds-neutral-7 flex-shrink-0 opacity-0 group-hover:opacity-100" />
+                <ChevronRight className="slds-icon-size_x-small slds-text-neutral-7 slds-flex-shrink-0 sf-chevron-reveal" />
               </button>
             );
           })}

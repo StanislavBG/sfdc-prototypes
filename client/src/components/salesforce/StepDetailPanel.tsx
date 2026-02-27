@@ -34,27 +34,27 @@ export default function StepDetailPanel({ step }: StepDetailPanelProps) {
     <div className="sf-step-detail">
       {/* Detail header */}
       <div className="sf-step-detail-header">
-        <div className="flex items-center gap-2">
+        <div className="slds-grid slds-grid_vertical-align-center slds-gap_x-small">
           <div className="sf-step-detail-icon">
-            <Icon className="w-4 h-4" />
+            <Icon className="slds-icon-size_small" />
           </div>
           <div>
-            <h3 className="text-sm font-semibold text-slds-neutral-base">
+            <h3 className="slds-text-size_medium slds-font-weight_semibold slds-text-neutral-base">
               {detailContent.heading}
             </h3>
-            <span className="text-xs text-slds-neutral-7">
+            <span className="slds-text-size_small slds-text-neutral-7">
               {typeLabels[step.detailType]}
             </span>
           </div>
         </div>
-        <div className="flex items-center gap-1.5">
-          <Sparkles className="w-3.5 h-3.5 text-[#9B8BF4]" />
-          <span className="text-xs text-[#9B8BF4] font-medium">Agent-assisted</span>
+        <div className="slds-grid slds-grid_vertical-align-center slds-gap_xx-small">
+          <Sparkles className="slds-icon-size_x-small" style={{ color: '#9B8BF4' }} />
+          <span className="slds-text-size_small slds-font-weight_medium" style={{ color: '#9B8BF4' }}>Agent-assisted</span>
         </div>
       </div>
 
       {/* Description */}
-      <p className="text-xs text-slds-neutral-7 px-4 pb-3 leading-relaxed">
+      <p className="slds-text-size_small slds-text-neutral-7 slds-p-horizontal_medium slds-p-bottom_small slds-leading-relaxed">
         {detailContent.description}
       </p>
 
@@ -65,15 +65,15 @@ export default function StepDetailPanel({ step }: StepDetailPanelProps) {
           <div className="sf-step-options">
             {detailContent.options.map((opt) => (
               <button key={opt.label} className="sf-step-option-card">
-                <div className="flex items-start justify-between">
-                  <span className="text-sm font-medium text-slds-neutral-base">
+                <div className="slds-grid slds-grid_vertical-align-start slds-grid_align-spread">
+                  <span className="slds-text-size_medium slds-font-weight_medium slds-text-neutral-base">
                     {opt.label}
                   </span>
                   {opt.recommended && (
                     <span className="sf-badge sf-badge-info">Recommended</span>
                   )}
                 </div>
-                <span className="text-xs text-slds-neutral-7 mt-1">
+                <span className="slds-text-size_small slds-text-neutral-7 slds-m-top_xx-small">
                   {opt.description}
                 </span>
               </button>
@@ -107,8 +107,8 @@ export default function StepDetailPanel({ step }: StepDetailPanelProps) {
           <div className="sf-step-tips">
             {detailContent.tips.map((tip, i) => (
               <div key={i} className="sf-step-tip">
-                <Lightbulb className="w-3.5 h-3.5 text-slds-warning-1 flex-shrink-0 mt-0.5" />
-                <span className="text-xs text-slds-neutral-9 leading-relaxed">
+                <Lightbulb className="slds-icon-size_x-small slds-text-warning slds-flex-shrink-0" style={{ marginTop: '2px' }} />
+                <span className="slds-text-size_small slds-text-neutral-9 slds-leading-relaxed">
                   {tip}
                 </span>
               </div>

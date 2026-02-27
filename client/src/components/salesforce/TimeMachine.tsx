@@ -55,59 +55,55 @@ export default function TimeMachine({ isOpen, onClose, onSelectTimeline, current
   return (
     <div
       ref={overlayRef}
-      className="fixed inset-0 z-50"
+      className="sf-overlay"
       onClick={(e) => {
         if (e.target === overlayRef.current) onClose();
       }}
     >
-      <div className="absolute left-0 top-[44px] w-[320px] bg-white rounded-b-lg shadow-xl border border-slds-border-1">
+      <div className="sf-panel" style={{ width: '320px' }}>
         {/* Header */}
-        <div className="px-4 pt-4 pb-3 border-b border-slds-border-1">
-          <div className="flex items-center gap-2 mb-1">
-            <Sparkles className="w-4 h-4 text-[#9B8BF4]" />
-            <span className="text-sm font-semibold text-slds-neutral-base">
+        <div className="slds-p-horizontal_medium slds-p-top_medium slds-p-bottom_small slds-border_bottom" style={{ borderColor: 'var(--slds-g-color-border-1)' }}>
+          <div className="slds-grid slds-grid_vertical-align-center slds-gap_x-small slds-m-bottom_xxx-small">
+            <Sparkles className="slds-icon-size_small" style={{ color: '#9B8BF4' }} />
+            <span className="slds-text-size_medium slds-font-weight_semibold slds-text-neutral-base">
               Time Machine
             </span>
           </div>
-          <p className="text-xs text-slds-neutral-7">
+          <p className="slds-text-size_small slds-text-neutral-7">
             Switch your Data 360 view between timelines
           </p>
         </div>
 
         {/* Timeline options */}
-        <div className="p-3 space-y-2">
+        <div className="slds-p-around_small" style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
           {timelines.map((t) => {
             const Icon = t.icon;
             const isActive = currentTimeline === t.id;
             return (
               <button
                 key={t.id}
-                className={`w-full flex items-center gap-3 p-3 rounded-lg border transition-all ${
-                  isActive
-                    ? 'border-slds-brand bg-[#EEF4FF]'
-                    : 'border-slds-border-1 hover:border-slds-brand-2 hover:bg-[#F9FAFF]'
-                }`}
+                className={`sf-timeline-option ${isActive ? 'active' : ''}`}
                 onClick={() => {
                   onSelectTimeline(t.id);
                   onClose();
                 }}
               >
                 <div
-                  className="w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0"
+                  className="sf-timeline-option-icon"
                   style={{ backgroundColor: t.color }}
                 >
-                  <Icon className="w-5 h-5 text-white" />
+                  <Icon className="slds-square_x-small slds-text-white" />
                 </div>
-                <div className="flex-1 text-left">
-                  <div className="text-sm font-medium text-slds-neutral-base">
+                <div className="slds-col slds-text-left">
+                  <div className="slds-text-size_medium slds-font-weight_medium slds-text-neutral-base">
                     {t.label}
                   </div>
-                  <div className="text-xs text-slds-neutral-7">
+                  <div className="slds-text-size_small slds-text-neutral-7">
                     {t.description}
                   </div>
                 </div>
                 {isActive && (
-                  <Check className="w-4 h-4 text-slds-brand flex-shrink-0" />
+                  <Check className="slds-icon-size_small slds-text-brand slds-flex-shrink-0" />
                 )}
               </button>
             );

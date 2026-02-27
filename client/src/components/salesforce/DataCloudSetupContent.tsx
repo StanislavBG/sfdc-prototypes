@@ -134,9 +134,9 @@ const informaticaBundles: DataBundle[] = [
 ];
 
 // ── Informatica Logo SVG ─────────────────────────────────────────────
-function InformaticaLogo({ className }: { className?: string }) {
+function InformaticaLogo({ className, style }: { className?: string; style?: React.CSSProperties }) {
   return (
-    <svg viewBox="0 0 200 50" className={className} fill="none">
+    <svg viewBox="0 0 200 50" className={className} style={style} fill="none">
       <rect width="200" height="50" rx="4" fill="#FF4A00" />
       <text x="100" y="33" textAnchor="middle" fill="white" fontFamily="Arial, sans-serif" fontSize="20" fontWeight="bold">
         informatica
@@ -695,43 +695,44 @@ export default function DataCloudSetupContent({ onBack, demoSession, onDemoSessi
   const detailPackage = packageDetailName ? installedPackages.find((p) => p.name === packageDetailName) : null;
 
   return (
-    <div className="h-full flex flex-col">
+    <div className="slds-h-full slds-flex slds-flex-col">
       {/* Setup Header Bar */}
-      <div className="bg-white border-b border-slds-border-1 px-4 py-2 flex items-center gap-3">
-        <button onClick={onBack} className="flex items-center gap-1 text-xs text-slds-brand hover:underline">
-          <ArrowLeft className="w-3.5 h-3.5" />
+      <div className="slds-bg-white slds-border_bottom slds-border-color_border-1 slds-p-horizontal_medium slds-p-vertical_x-small slds-flex slds-items-center slds-gap_small">
+        <button onClick={onBack} className="slds-flex slds-items-center slds-gap_xx-small slds-text-size_small slds-text-brand sf-hover-underline">
+          <ArrowLeft className="slds-icon-size_x-small" />
           Back to Data 360
         </button>
-        <div className="w-px h-4 bg-slds-border-1" />
-        <span className="text-sm font-semibold text-slds-neutral-base">Data Cloud Setup</span>
-        <div className="flex-1" />
-        <span className="text-xs text-slds-neutral-7">Home</span>
-        <span className="text-xs text-slds-neutral-7">Object Manager</span>
+        <div style={{ width: '1px', height: '16px', background: 'var(--slds-g-color-border-1)' }} />
+        <span className="slds-text-size_medium slds-font-weight_semibold slds-text-neutral-base">Data Cloud Setup</span>
+        <div className="slds-flex-1" />
+        <span className="slds-text-size_small slds-text-neutral-7">Home</span>
+        <span className="slds-text-size_small slds-text-neutral-7">Object Manager</span>
       </div>
 
-      <div className="flex flex-1 overflow-hidden">
+      <div className="slds-flex slds-flex-1 slds-overflow-hidden">
         {/* ── Left Nav ── */}
-        <nav className="w-[220px] min-w-[220px] bg-white border-r border-slds-border-1 flex flex-col h-full overflow-y-auto">
+        <nav style={{ width: '220px', minWidth: '220px' }} className="slds-bg-white slds-border_right slds-border-color_border-1 slds-flex slds-flex-col slds-h-full slds-overflow-y-auto">
           {/* Quick Find */}
-          <div className="p-3">
-            <div className="relative">
-              <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slds-neutral-7" />
+          <div className="slds-p-around_small">
+            <div className="slds-pos-relative">
+              <Search className="slds-pos-absolute slds-icon-size_x-small slds-text-neutral-7" style={{ left: '10px', top: '50%', transform: 'translateY(-50%)' }} />
               <input
                 type="text"
                 placeholder="Quick Find"
                 value={quickFindQuery}
                 onChange={(e) => setQuickFindQuery(e.target.value)}
-                className="w-full pl-8 pr-3 py-1.5 text-xs border border-slds-border-1 rounded focus:outline-none focus:border-slds-brand-2 focus:ring-1 focus:ring-[rgba(27,150,255,0.2)]"
+                className="slds-w-full slds-text-size_small slds-border_all slds-border-color_border-1 slds-border-radius_small"
+                style={{ paddingLeft: '32px', paddingRight: '12px', paddingTop: '6px', paddingBottom: '6px' }}
               />
             </div>
           </div>
 
           {/* Nav sections */}
-          <div className="flex-1 overflow-y-auto pb-4">
+          <div className="slds-flex-1 slds-overflow-y-auto slds-p-bottom_medium">
             {filteredSections.map((section, si) => (
               <div key={si}>
                 {section.title && (
-                  <div className="px-4 pt-4 pb-1 text-[10px] font-bold uppercase tracking-wider text-slds-neutral-7">
+                  <div className="slds-p-horizontal_medium slds-p-top_medium slds-font-weight_bold slds-text-uppercase slds-tracking-wide slds-text-neutral-7" style={{ paddingBottom: '4px', fontSize: '10px', letterSpacing: '0.05em' }}>
                     {section.title}
                   </div>
                 )}
@@ -742,40 +743,52 @@ export default function DataCloudSetupContent({ onBack, demoSession, onDemoSessi
                         if (item.hasChildren) toggleNavExpand(item.id);
                         else triggerDelay(() => setActiveNavItem(item.id));
                       }}
-                      className={`w-full flex items-center gap-1.5 px-4 py-1.5 text-xs text-left transition-colors ${
+                      className={`slds-w-full slds-flex slds-items-center slds-gap_xx-small slds-p-horizontal_medium slds-text-size_small slds-text-left slds-transition-colors ${
                         activeNavItem === item.id
                           ? (item.id === 'informatica-mdm-sf' || item.id === 'informatica-mdm'
-                              ? 'bg-[#FFF3ED] text-[#FF4A00] font-semibold'
+                              ? 'slds-font-weight_semibold'
                               : item.id === 'solution-manager'
-                                ? 'bg-[#EEF4FF] text-slds-brand font-bold'
-                                : 'bg-[#EEF4FF] text-slds-brand font-semibold')
+                                ? 'slds-text-brand slds-font-weight_bold'
+                                : 'slds-text-brand slds-font-weight_semibold')
                           : (item.id === 'informatica-mdm-sf'
-                              ? 'text-[#FF4A00] font-medium hover:bg-[#FFF3ED]'
+                              ? 'slds-font-weight_medium'
                               : item.id === 'solution-manager'
-                                ? 'text-slds-brand font-semibold hover:bg-[#EEF4FF]'
-                                : 'text-slds-neutral-9 hover:bg-slds-neutral-2')
+                                ? 'slds-text-brand slds-font-weight_semibold'
+                                : 'slds-text-neutral-9 sf-hover-bg-neutral')
                       }`}
+                      style={{
+                        paddingTop: '6px',
+                        paddingBottom: '6px',
+                        ...(activeNavItem === item.id
+                          ? (item.id === 'informatica-mdm-sf' || item.id === 'informatica-mdm'
+                              ? { background: '#FFF3ED', color: '#FF4A00' }
+                              : { background: '#EEF4FF' })
+                          : (item.id === 'informatica-mdm-sf'
+                              ? { color: '#FF4A00' }
+                              : {})),
+                      }}
                     >
                       {item.hasChildren && (
                         expandedNavItems.has(item.id)
-                          ? <ChevronDown className="w-3 h-3 flex-shrink-0" />
-                          : <ChevronRight className="w-3 h-3 flex-shrink-0" />
+                          ? <ChevronDown className="slds-icon-size_xx-small slds-flex-shrink-0" />
+                          : <ChevronRight className="slds-icon-size_xx-small slds-flex-shrink-0" />
                       )}
-                      <span className={activeNavItem === item.id ? (item.id === 'informatica-mdm-sf' || item.id === 'informatica-mdm' ? 'text-[#FF4A00]' : item.id === 'solution-manager' ? 'text-slds-brand' : 'sf-link') : item.id === 'solution-manager' ? 'text-slds-brand' : ''}>{item.label}</span>
+                      <span className={activeNavItem === item.id ? (item.id === 'informatica-mdm-sf' || item.id === 'informatica-mdm' ? '' : item.id === 'solution-manager' ? 'slds-text-brand' : 'sf-link') : item.id === 'solution-manager' ? 'slds-text-brand' : ''} style={activeNavItem === item.id && (item.id === 'informatica-mdm-sf' || item.id === 'informatica-mdm') ? { color: '#FF4A00' } : undefined}>{item.label}</span>
                       {item.id === 'informatica-mdm-sf' && (
-                        <span className="ml-auto px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wider bg-[#FF4A00] text-white rounded">New</span>
+                        <span className="slds-font-weight_bold slds-text-uppercase slds-tracking-wide slds-text-white slds-border-radius_small" style={{ marginLeft: 'auto', padding: '2px 6px', fontSize: '9px', background: '#FF4A00' }}>New</span>
                       )}
                       {item.id === 'solution-manager' && (
-                        <span className="ml-auto px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wider bg-slds-brand text-white rounded">New</span>
+                        <span className="slds-font-weight_bold slds-text-uppercase slds-tracking-wide slds-text-white slds-bg-brand slds-border-radius_small" style={{ marginLeft: 'auto', padding: '2px 6px', fontSize: '9px' }}>New</span>
                       )}
                     </button>
                     {item.hasChildren && expandedNavItems.has(item.id) && item.children?.map((child) => (
                       <button
                         key={child.id}
                         onClick={() => setActiveNavItem(child.id)}
-                        className={`w-full flex items-center pl-10 pr-4 py-1.5 text-xs text-left transition-colors ${
-                          activeNavItem === child.id ? 'bg-[#EEF4FF] text-slds-brand font-semibold' : 'text-slds-neutral-9 hover:bg-slds-neutral-2'
+                        className={`slds-w-full slds-flex slds-items-center slds-p-right_medium slds-text-size_small slds-text-left slds-transition-colors ${
+                          activeNavItem === child.id ? 'slds-text-brand slds-font-weight_semibold' : 'slds-text-neutral-9 sf-hover-bg-neutral'
                         }`}
+                        style={{ paddingLeft: '40px', paddingTop: '6px', paddingBottom: '6px', ...(activeNavItem === child.id ? { background: '#EEF4FF' } : {}) }}
                       >
                         {child.label}
                       </button>
@@ -788,50 +801,50 @@ export default function DataCloudSetupContent({ onBack, demoSession, onDemoSessi
         </nav>
 
         {/* ── Main Content ── */}
-        <main className="flex-1 overflow-y-auto bg-slds-neutral-2">
+        <main className="slds-flex-1 slds-overflow-y-auto slds-bg-neutral-2">
           {activeNavItem === 'setup-home' ? (
             /* ═══════════════════════════════════════════════════════════
                DATA CLOUD SETUP HOME — Matches Salesforce reference layout
                ═══════════════════════════════════════════════════════════ */
             <div>
               {/* Page header — SETUP / Data Cloud Setup */}
-              <div className="bg-white border-b border-slds-border-1 px-6 py-4 flex items-center justify-between">
-                <div className="flex items-center gap-4">
-                  <div className="w-10 h-10 rounded bg-[#F49756] flex items-center justify-center flex-shrink-0">
-                    <svg viewBox="0 0 24 24" className="w-5 h-5 text-white" fill="currentColor"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
+              <div className="slds-bg-white slds-border_bottom slds-border-color_border-1 slds-p-horizontal_large slds-p-vertical_medium slds-flex slds-items-center slds-justify-between">
+                <div className="slds-flex slds-items-center slds-gap_medium">
+                  <div className="slds-flex slds-items-center slds-justify-center slds-flex-shrink-0 slds-border-radius_small" style={{ width: '40px', height: '40px', background: '#F49756' }}>
+                    <svg viewBox="0 0 24 24" className="slds-icon-size_default slds-text-white" fill="currentColor"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
                   </div>
                   <div>
-                    <div className="text-xs font-medium text-slds-brand uppercase tracking-wide">SETUP</div>
-                    <h1 className="text-lg font-bold text-slds-neutral-base">Data Cloud Setup</h1>
+                    <div className="slds-text-size_small slds-font-weight_medium slds-text-brand slds-text-uppercase slds-tracking-wide">SETUP</div>
+                    <h1 className="slds-font-weight_bold slds-text-neutral-base" style={{ fontSize: '18px' }}>Data Cloud Setup</h1>
                   </div>
                 </div>
-                <button className="px-4 py-1.5 text-sm font-medium text-white bg-slds-brand rounded hover:bg-slds-brand-contrast-1 flex items-center gap-1">
-                  Create <ChevronDown className="w-3.5 h-3.5" />
+                <button className="slds-p-horizontal_medium slds-text-size_medium slds-font-weight_medium slds-text-white slds-bg-brand slds-border-radius_small slds-flex slds-items-center slds-gap_xx-small" style={{ paddingTop: '6px', paddingBottom: '6px' }}>
+                  Create <ChevronDown className="slds-icon-size_x-small" />
                 </button>
               </div>
 
               {/* Alert banner */}
-              <div className="bg-[#FFF3CD] border-b border-[#FFE69C] px-6 py-3 flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <Info className="w-4 h-4 text-[#856404] flex-shrink-0" />
-                  <p className="text-sm text-[#856404]">
+              <div className="slds-border_bottom slds-p-horizontal_large slds-p-vertical_small slds-flex slds-items-center slds-justify-between" style={{ background: '#FFF3CD', borderBottomColor: '#FFE69C' }}>
+                <div className="slds-flex slds-items-center slds-gap_x-small">
+                  <Info className="slds-icon-size_small slds-flex-shrink-0" style={{ color: '#856404' }} />
+                  <p className="slds-text-size_medium" style={{ color: '#856404' }}>
                     Data Cloud standard permission sets have changed. Some users must be assigned to new permission sets. Find out what's changed and what you should do next.
                   </p>
                 </div>
-                <button className="text-sm font-medium text-slds-brand hover:underline flex-shrink-0 ml-4">Learn More</button>
+                <button className="slds-text-size_medium slds-font-weight_medium slds-text-brand sf-hover-underline slds-flex-shrink-0 slds-m-left_medium">Learn More</button>
               </div>
 
               {/* Welcome to Data Cloud hero */}
-              <div className="relative bg-white border-b border-slds-border-1 overflow-hidden">
-                <div className="px-6 py-8 max-w-3xl">
-                  <h2 className="text-3xl font-bold text-slds-neutral-base mb-4">Welcome to Data Cloud</h2>
-                  <p className="text-sm text-slds-neutral-9 leading-relaxed">
+              <div className="slds-pos-relative slds-bg-white slds-border_bottom slds-border-color_border-1 slds-overflow-hidden">
+                <div className="slds-p-horizontal_large slds-p-vertical_x-large" style={{ maxWidth: '48rem' }}>
+                  <h2 className="slds-font-weight_bold slds-text-neutral-base slds-m-bottom_medium" style={{ fontSize: '30px' }}>Welcome to Data Cloud</h2>
+                  <p className="slds-text-size_medium slds-text-neutral-9 slds-leading-relaxed">
                     Harness the power of Data Cloud to unify all your company's data into a holistic view of each customer. Data Cloud consolidates data from all your source systems into Customer 360 profiles to help you understand your customers, empower your teams, and drive business decisions. Use Data Cloud's unified profile data to drive automation and analytics, personalize engagements, and power trusted AI.
                   </p>
                 </div>
                 {/* Mountain / sunset illustration */}
-                <div className="absolute right-0 top-0 bottom-0 w-[400px] pointer-events-none">
-                  <svg viewBox="0 0 400 180" className="w-full h-full" preserveAspectRatio="xMaxYMax slice">
+                <div className="slds-pos-absolute" style={{ right: 0, top: 0, bottom: 0, width: '400px', pointerEvents: 'none' }}>
+                  <svg viewBox="0 0 400 180" className="slds-w-full slds-h-full" preserveAspectRatio="xMaxYMax slice">
                     <defs>
                       <linearGradient id="skyGrad" x1="0" y1="0" x2="0" y2="1">
                         <stop offset="0%" stopColor="#87CEEB" />
@@ -852,32 +865,37 @@ export default function DataCloudSetupContent({ onBack, demoSession, onDemoSessi
               </div>
 
               {/* Learn About Data Cloud — collapsible */}
-              <div className="px-6 py-6">
+              <div className="slds-p-around_large">
                 <button
                   onClick={() => setSetupHomeLearnOpen(!setupHomeLearnOpen)}
-                  className="flex items-center gap-2 mb-4"
+                  className="slds-flex slds-items-center slds-gap_x-small slds-m-bottom_medium"
                 >
-                  {setupHomeLearnOpen ? <ChevronDown className="w-5 h-5 text-slds-neutral-7" /> : <ChevronRight className="w-5 h-5 text-slds-neutral-7" />}
-                  <h3 className="text-base font-semibold text-slds-neutral-base">Learn About Data Cloud</h3>
+                  {setupHomeLearnOpen ? <ChevronDown className="slds-icon-size_default slds-text-neutral-7" /> : <ChevronRight className="slds-icon-size_default slds-text-neutral-7" />}
+                  <h3 className="slds-text-size_large slds-font-weight_semibold slds-text-neutral-base">Learn About Data Cloud</h3>
                 </button>
 
                 {setupHomeLearnOpen && (
-                  <div className="flex gap-6">
+                  <div className="slds-flex slds-gap_large">
                     {/* Left — tabs + content */}
-                    <div className="flex-1 min-w-0">
+                    <div className="slds-flex-1 slds-min-w-0">
                       {/* Tab bar */}
-                      <div className="flex border-b border-slds-border-1 mb-5">
+                      <div className="slds-flex slds-border_bottom slds-border-color_border-1 slds-m-bottom_medium" style={{ marginBottom: '20px' }}>
                         {(['get-started', 'plan-data', 'monitor'] as const).map((tab) => {
                           const labels = { 'get-started': 'Get Started', 'plan-data': 'Plan Data Strategy', monitor: 'Monitor Data Cloud' };
                           return (
                             <button
                               key={tab}
                               onClick={() => setSetupHomeTab(tab)}
-                              className={`px-4 py-2.5 text-sm font-medium border-b-2 transition-colors ${
+                              className={`slds-p-horizontal_medium slds-text-size_medium slds-font-weight_medium slds-transition-colors ${
                                 setupHomeTab === tab
-                                  ? 'border-slds-brand text-slds-brand'
-                                  : 'border-transparent text-slds-neutral-7 hover:text-slds-neutral-9'
+                                  ? 'slds-text-brand slds-border-color_brand'
+                                  : 'slds-text-neutral-7'
                               }`}
+                              style={{
+                                paddingTop: '10px',
+                                paddingBottom: '10px',
+                                borderBottom: setupHomeTab === tab ? '2px solid var(--slds-g-color-brand)' : '2px solid transparent',
+                              }}
                             >
                               {labels[tab]}
                             </button>
@@ -888,26 +906,26 @@ export default function DataCloudSetupContent({ onBack, demoSession, onDemoSessi
                       {/* Tab content */}
                       {setupHomeTab === 'get-started' && (
                         <div>
-                          <p className="text-sm text-slds-neutral-9 leading-relaxed mb-2">
+                          <p className="slds-text-size_medium slds-text-neutral-9 slds-leading-relaxed slds-m-bottom_x-small">
                             Ensure that your org has all the necessary licenses to enable access to the features you need to use. Set up data spaces to organize and secure your data. Use permission sets to grant your users access to Data Cloud data and features.
                           </p>
-                          <p className="text-sm text-slds-neutral-9 leading-relaxed mb-6">
+                          <p className="slds-text-size_medium slds-text-neutral-9 slds-leading-relaxed slds-m-bottom_large">
                             Credits are consumed by usage of features and services. Use Digital Wallet to check your recent consumption and consumption trends.
                           </p>
 
-                          <h4 className="text-sm font-bold text-slds-neutral-base mb-3">Get Started</h4>
-                          <div className="border border-slds-border-1 rounded-lg divide-y divide-slds-border-1">
+                          <h4 className="slds-text-size_medium slds-font-weight_bold slds-text-neutral-base slds-m-bottom_small">Get Started</h4>
+                          <div className="slds-border_all slds-border-color_border-1 slds-border-radius_large sf-divide-y">
                             {[
                               { label: 'Review or add licenses', action: 'Check Your Account', navId: '' },
                               { label: 'Partition data with data spaces', action: 'Open Data Spaces Setup', navId: 'data-spaces' },
                               { label: 'Set up Data Cloud users', action: 'Manage Your Users', navId: 'users' },
                               { label: 'Check credit consumption', action: 'Open Digital Wallet', navId: '' },
                             ].map((item, i) => (
-                              <div key={i} className="flex items-center justify-between px-4 py-3">
-                                <span className="text-sm text-slds-neutral-9">{item.label}</span>
+                              <div key={i} className="slds-flex slds-items-center slds-justify-between slds-p-horizontal_medium slds-p-vertical_small">
+                                <span className="slds-text-size_medium slds-text-neutral-9">{item.label}</span>
                                 <button
                                   onClick={() => item.navId && setActiveNavItem(item.navId)}
-                                  className="text-sm font-medium text-slds-brand hover:underline"
+                                  className="slds-text-size_medium slds-font-weight_medium slds-text-brand sf-hover-underline"
                                 >
                                   {item.action}
                                 </button>
@@ -919,18 +937,18 @@ export default function DataCloudSetupContent({ onBack, demoSession, onDemoSessi
 
                       {setupHomeTab === 'plan-data' && (
                         <div>
-                          <p className="text-sm text-slds-neutral-9 leading-relaxed mb-4">
+                          <p className="slds-text-size_medium slds-text-neutral-9 slds-leading-relaxed slds-m-bottom_medium">
                             Plan your data strategy by mapping your source systems, defining data models, and establishing data quality rules before connecting your data to Data Cloud.
                           </p>
-                          <div className="border border-slds-border-1 rounded-lg divide-y divide-slds-border-1">
+                          <div className="slds-border_all slds-border-color_border-1 slds-border-radius_large sf-divide-y">
                             {[
                               { label: 'Map source systems and data objects', action: 'View Data Model' },
                               { label: 'Define identity resolution strategy', action: 'Identity Resolution' },
                               { label: 'Set up calculated insights', action: 'Create Insights' },
                             ].map((item, i) => (
-                              <div key={i} className="flex items-center justify-between px-4 py-3">
-                                <span className="text-sm text-slds-neutral-9">{item.label}</span>
-                                <button className="text-sm font-medium text-slds-brand hover:underline">{item.action}</button>
+                              <div key={i} className="slds-flex slds-items-center slds-justify-between slds-p-horizontal_medium slds-p-vertical_small">
+                                <span className="slds-text-size_medium slds-text-neutral-9">{item.label}</span>
+                                <button className="slds-text-size_medium slds-font-weight_medium slds-text-brand sf-hover-underline">{item.action}</button>
                               </div>
                             ))}
                           </div>
@@ -939,18 +957,18 @@ export default function DataCloudSetupContent({ onBack, demoSession, onDemoSessi
 
                       {setupHomeTab === 'monitor' && (
                         <div>
-                          <p className="text-sm text-slds-neutral-9 leading-relaxed mb-4">
+                          <p className="slds-text-size_medium slds-text-neutral-9 slds-leading-relaxed slds-m-bottom_medium">
                             Monitor your Data Cloud usage, job statuses, and system health to ensure your data pipelines are running smoothly.
                           </p>
-                          <div className="border border-slds-border-1 rounded-lg divide-y divide-slds-border-1">
+                          <div className="slds-border_all slds-border-color_border-1 slds-border-radius_large sf-divide-y">
                             {[
                               { label: 'Check data stream health', action: 'View Data Streams' },
                               { label: 'Monitor identity resolution jobs', action: 'View Jobs' },
                               { label: 'Review error logs', action: 'View Logs' },
                             ].map((item, i) => (
-                              <div key={i} className="flex items-center justify-between px-4 py-3">
-                                <span className="text-sm text-slds-neutral-9">{item.label}</span>
-                                <button className="text-sm font-medium text-slds-brand hover:underline">{item.action}</button>
+                              <div key={i} className="slds-flex slds-items-center slds-justify-between slds-p-horizontal_medium slds-p-vertical_small">
+                                <span className="slds-text-size_medium slds-text-neutral-9">{item.label}</span>
+                                <button className="slds-text-size_medium slds-font-weight_medium slds-text-brand sf-hover-underline">{item.action}</button>
                               </div>
                             ))}
                           </div>
@@ -959,10 +977,10 @@ export default function DataCloudSetupContent({ onBack, demoSession, onDemoSessi
                     </div>
 
                     {/* Right sidebar — Resources */}
-                    <div className="w-[260px] flex-shrink-0">
-                      <div className="border-l-2 border-slds-border-1 pl-5">
-                        <h4 className="text-base font-semibold text-slds-neutral-base mb-4">Resources</h4>
-                        <div className="space-y-3">
+                    <div className="slds-flex-shrink-0" style={{ width: '260px' }}>
+                      <div className="slds-p-left_medium slds-border-color_border-1" style={{ borderLeft: '2px solid var(--slds-g-color-border-1)' }}>
+                        <h4 className="slds-text-size_large slds-font-weight_semibold slds-text-neutral-base slds-m-bottom_medium">Resources</h4>
+                        <div className="slds-gap_small" style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
                           {[
                             { label: 'About Salesforce Data Cloud', icon: '📘' },
                             { label: 'Unlock Your Data with Data Cloud', icon: '🔑' },
@@ -970,8 +988,8 @@ export default function DataCloudSetupContent({ onBack, demoSession, onDemoSessi
                             { label: 'Data Cloud Features and Learning Path', icon: '📚' },
                             { label: 'Get Started Using Data Cloud', icon: '🚀' },
                           ].map((res, i) => (
-                            <button key={i} className="flex items-center gap-2 text-sm text-slds-brand hover:underline w-full text-left">
-                              <span className="text-base flex-shrink-0">{res.icon}</span>
+                            <button key={i} className="slds-flex slds-items-center slds-gap_x-small slds-text-size_medium slds-text-brand sf-hover-underline slds-w-full slds-text-left">
+                              <span className="slds-text-size_large slds-flex-shrink-0">{res.icon}</span>
                               {res.label}
                             </button>
                           ))}
@@ -988,19 +1006,19 @@ export default function DataCloudSetupContent({ onBack, demoSession, onDemoSessi
                ═══════════════════════════════════════════════════════════ */
             <div>
               {/* Page header */}
-              <div className="bg-white border-b border-slds-border-1 px-6 py-4">
-                <div className="text-xs font-medium text-slds-brand uppercase tracking-wide">SETUP</div>
-                <h1 className="text-lg font-bold text-slds-neutral-base">Data 360 Org Allowlist</h1>
+              <div className="slds-bg-white slds-border_bottom slds-border-color_border-1 slds-p-horizontal_large slds-p-vertical_medium">
+                <div className="slds-text-size_small slds-font-weight_medium slds-text-brand slds-text-uppercase slds-tracking-wide">SETUP</div>
+                <h1 className="slds-font-weight_bold slds-text-neutral-base" style={{ fontSize: '18px' }}>Data 360 Org Allowlist</h1>
               </div>
 
-              <div className="px-6 py-6 space-y-4">
+              <div className="slds-p-around_large" style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
                 {/* Allowlist table placeholder */}
                 <div className="sf-card">
                   <div className="sf-card-header">
-                    <h2 className="text-base font-bold text-slds-neutral-base">Allowed Organizations</h2>
+                    <h2 className="slds-text-size_large slds-font-weight_bold slds-text-neutral-base">Allowed Organizations</h2>
                   </div>
                   <div className="sf-card-body">
-                    <table className="sf-table w-full text-xs">
+                    <table className="sf-table slds-w-full slds-text-size_small">
                       <thead>
                         <tr>
                           <th>Organization ID</th>
@@ -1010,9 +1028,9 @@ export default function DataCloudSetupContent({ onBack, demoSession, onDemoSessi
                       </thead>
                       <tbody>
                         <tr>
-                          <td className="sf-link font-medium">00Dfo000001QldR</td>
+                          <td className="sf-link slds-font-weight_medium">00Dfo000001QldR</td>
                           <td>Data Cloud SG</td>
-                          <td><span className="inline-flex items-center gap-1 text-xs font-medium text-slds-success-1"><CheckCircle2 className="w-3.5 h-3.5" /> Active</span></td>
+                          <td><span className="slds-inline-flex slds-items-center slds-gap_xx-small slds-text-size_small slds-font-weight_medium slds-text-success"><CheckCircle2 className="slds-icon-size_x-small" /> Active</span></td>
                         </tr>
                       </tbody>
                     </table>
@@ -1020,58 +1038,59 @@ export default function DataCloudSetupContent({ onBack, demoSession, onDemoSessi
                 </div>
 
                 {/* ── Prototype Controls (moved from Setup Home) ── */}
-                <div className="border border-slds-border-1 rounded-lg bg-white overflow-hidden">
-                  <div className="flex items-center justify-between px-5 py-3">
-                    <div className="flex items-center gap-3">
-                      <span className="text-2xl">😊</span>
+                <div className="slds-border_all slds-border-color_border-1 slds-border-radius_large slds-bg-white slds-overflow-hidden">
+                  <div className="slds-flex slds-items-center slds-justify-between slds-p-horizontal_medium slds-p-vertical_small" style={{ padding: '12px 20px' }}>
+                    <div className="slds-flex slds-items-center slds-gap_small">
+                      <span style={{ fontSize: '24px' }}>😊</span>
                       <div>
-                        <h4 className="text-sm font-semibold text-slds-neutral-base">Prototype Controls</h4>
-                        <p className="text-[10px] text-slds-neutral-7">Toggle visibility of simulator branding elements</p>
+                        <h4 className="slds-text-size_medium slds-font-weight_semibold slds-text-neutral-base">Prototype Controls</h4>
+                        <p className="slds-text-neutral-7" style={{ fontSize: '10px' }}>Toggle visibility of simulator branding elements</p>
                       </div>
                     </div>
-                    <div className="flex items-center gap-4">
-                      <div className="flex items-center gap-2">
-                        <span className="text-lg">😄</span>
-                        <label className="text-xs font-medium text-slds-neutral-9">MDS Simulator</label>
+                    <div className="slds-flex slds-items-center slds-gap_medium">
+                      <div className="slds-flex slds-items-center slds-gap_x-small">
+                        <span style={{ fontSize: '18px' }}>😄</span>
+                        <label className="slds-text-size_small slds-font-weight_medium slds-text-neutral-9">MDS Simulator</label>
                         <button
                           onClick={() => setMdsSimulatorVisible(!mdsSimulatorVisible)}
-                          className={`relative w-10 h-5 rounded-full transition-colors ${mdsSimulatorVisible ? 'bg-slds-brand' : 'bg-[#D8DDE6]'}`}
+                          className={`slds-pos-relative slds-border-radius_pill slds-transition-colors ${mdsSimulatorVisible ? 'slds-bg-brand' : ''}`}
+                          style={{ width: '40px', height: '20px', ...(!mdsSimulatorVisible ? { background: '#D8DDE6' } : {}) }}
                         >
-                          <div className={`absolute top-0.5 w-4 h-4 rounded-full bg-white shadow transition-transform ${mdsSimulatorVisible ? 'translate-x-5' : 'translate-x-0.5'}`} />
+                          <div className="slds-pos-absolute slds-border-radius_pill slds-bg-white slds-shadow_small slds-transition-all" style={{ top: '2px', width: '16px', height: '16px', transform: mdsSimulatorVisible ? 'translateX(20px)' : 'translateX(2px)' }} />
                         </button>
                       </div>
-                      <span className="text-2xl">😎</span>
+                      <span style={{ fontSize: '24px' }}>😎</span>
                     </div>
                   </div>
                 </div>
 
                 {/* MDS Simulator thinking indicator */}
                 {mdsSimulatorVisible && (
-                  <div className="border-2 border-dashed border-slds-brand/30 rounded-lg bg-[#EEF4FF] p-4 flex items-center gap-4">
-                    <div className="relative w-12 h-12 flex items-center justify-center flex-shrink-0">
-                      <div className="absolute inset-0 rounded-full border-2 border-slds-brand/20 border-t-slds-brand animate-spin" />
-                      <div className="absolute inset-1.5 rounded-full border-2 border-[#FF4A00]/20 border-b-[#FF4A00] animate-spin" style={{ animationDirection: 'reverse', animationDuration: '1.5s' }} />
-                      <span className="text-lg">🧠</span>
+                  <div className="slds-border-radius_large slds-p-around_medium slds-flex slds-items-center slds-gap_medium" style={{ border: '2px dashed rgba(0,112,210,0.3)', background: '#EEF4FF' }}>
+                    <div className="slds-pos-relative slds-flex slds-items-center slds-justify-center slds-flex-shrink-0" style={{ width: '48px', height: '48px' }}>
+                      <div className="slds-pos-absolute slds-inset-0 slds-border-radius_pill sf-spin" style={{ border: '2px solid rgba(0,112,210,0.2)', borderTopColor: 'var(--slds-g-color-brand)' }} />
+                      <div className="slds-pos-absolute slds-border-radius_pill sf-spin" style={{ inset: '6px', border: '2px solid rgba(255,74,0,0.2)', borderBottomColor: '#FF4A00', animationDirection: 'reverse', animationDuration: '1.5s' }} />
+                      <span style={{ fontSize: '18px' }}>🧠</span>
                     </div>
-                    <div className="flex-1">
-                      <div className="flex items-center gap-2 mb-1">
-                        <div className="flex gap-0.5">
-                          <div className="w-1.5 h-1.5 rounded-full bg-slds-brand animate-bounce" style={{ animationDelay: '0ms' }} />
-                          <div className="w-1.5 h-1.5 rounded-full bg-slds-brand animate-bounce" style={{ animationDelay: '150ms' }} />
-                          <div className="w-1.5 h-1.5 rounded-full bg-slds-brand animate-bounce" style={{ animationDelay: '300ms' }} />
+                    <div className="slds-flex-1">
+                      <div className="slds-flex slds-items-center slds-gap_x-small slds-m-bottom_xx-small">
+                        <div className="slds-flex slds-gap_xxx-small" style={{ gap: '2px' }}>
+                          <div className="slds-border-radius_pill slds-bg-brand" style={{ width: '6px', height: '6px', animation: 'bounce 1s infinite', animationDelay: '0ms' }} />
+                          <div className="slds-border-radius_pill slds-bg-brand" style={{ width: '6px', height: '6px', animation: 'bounce 1s infinite', animationDelay: '150ms' }} />
+                          <div className="slds-border-radius_pill slds-bg-brand" style={{ width: '6px', height: '6px', animation: 'bounce 1s infinite', animationDelay: '300ms' }} />
                         </div>
-                        <span className="text-xs font-medium text-slds-brand">Thinking...</span>
+                        <span className="slds-text-size_small slds-font-weight_medium slds-text-brand">Thinking...</span>
                       </div>
-                      <div className="text-base font-bold text-slds-neutral-base tracking-wide">
+                      <div className="slds-text-size_large slds-font-weight_bold slds-text-neutral-base slds-tracking-wide">
                         MDS Simulator
                       </div>
-                      <p className="text-[10px] text-slds-neutral-7 mt-0.5">
+                      <p className="slds-text-neutral-7 slds-m-top_xxx-small" style={{ fontSize: '10px' }}>
                         Multi-Domain Simulator — Informatica MDM + Salesforce Data Cloud prototype environment
                       </p>
                     </div>
-                    <div className="flex flex-col items-center gap-1 flex-shrink-0">
-                      <span className="text-3xl">😃</span>
-                      <span className="text-[9px] text-slds-neutral-7 font-medium">Active</span>
+                    <div className="slds-flex slds-flex-col slds-items-center slds-gap_xx-small slds-flex-shrink-0">
+                      <span style={{ fontSize: '30px' }}>😃</span>
+                      <span className="slds-text-neutral-7 slds-font-weight_medium" style={{ fontSize: '9px' }}>Active</span>
                     </div>
                   </div>
                 )}
@@ -1088,36 +1107,36 @@ export default function DataCloudSetupContent({ onBack, demoSession, onDemoSessi
                 const progress = smGetProgress(smActiveSolution);
                 const prog = smStepProgress[smActiveSolution] || {};
                 return (
-                  <div className="h-full flex flex-col">
+                  <div className="slds-h-full slds-flex slds-flex-col">
                     {/* Breadcrumb */}
-                    <div className="bg-white border-b border-slds-border-1 px-6 py-2.5 flex items-center gap-2">
-                      <button onClick={() => setSmActiveSolution(null)} className="text-xs text-slds-brand hover:underline">Solution Manager</button>
-                      <ChevronRight className="w-3 h-3 text-slds-neutral-7" />
-                      <span className="text-xs font-medium text-slds-neutral-base">{sol.title}</span>
+                    <div className="slds-bg-white slds-border_bottom slds-border-color_border-1 slds-p-horizontal_large slds-flex slds-items-center slds-gap_x-small" style={{ paddingTop: '10px', paddingBottom: '10px' }}>
+                      <button onClick={() => setSmActiveSolution(null)} className="slds-text-size_small slds-text-brand sf-hover-underline">Solution Manager</button>
+                      <ChevronRight className="slds-icon-size_xx-small slds-text-neutral-7" />
+                      <span className="slds-text-size_small slds-font-weight_medium slds-text-neutral-base">{sol.title}</span>
                     </div>
 
                     {/* Progress bar */}
-                    <div className="bg-white border-b border-slds-border-1 px-6 py-3">
-                      <div className="flex items-center justify-between mb-1.5">
-                        <span className="text-xs font-medium text-slds-neutral-9">Overall Progress</span>
-                        <span className="text-xs font-bold text-slds-brand">{progress}%</span>
+                    <div className="slds-bg-white slds-border_bottom slds-border-color_border-1 slds-p-horizontal_large slds-p-vertical_small">
+                      <div className="slds-flex slds-items-center slds-justify-between" style={{ marginBottom: '6px' }}>
+                        <span className="slds-text-size_small slds-font-weight_medium slds-text-neutral-9">Overall Progress</span>
+                        <span className="slds-text-size_small slds-font-weight_bold slds-text-brand">{progress}%</span>
                       </div>
-                      <div className="w-full h-2 bg-slds-border-1 rounded-full overflow-hidden">
+                      <div className="slds-w-full slds-border-radius_pill slds-overflow-hidden" style={{ height: '8px', background: 'var(--slds-g-color-border-1)' }}>
                         <div
-                          className="h-full rounded-full transition-all duration-500"
-                          style={{ width: `${progress}%`, background: 'linear-gradient(90deg, #0070D2, #00A1E0)' }}
+                          className="slds-h-full slds-border-radius_pill slds-transition-all"
+                          style={{ width: `${progress}%`, background: 'linear-gradient(90deg, #0070D2, #00A1E0)', transitionDuration: '500ms' }}
                         />
                       </div>
                     </div>
 
                     {/* Content: sidebar + steps */}
-                    <div className="flex flex-1 overflow-hidden">
+                    <div className="slds-flex slds-flex-1 slds-overflow-hidden">
                       {/* Step sidebar */}
-                      <div className="w-[200px] min-w-[200px] bg-white border-r border-slds-border-1 overflow-y-auto">
-                        <div className="px-4 py-3 border-b border-slds-border-1">
-                          <span className="text-[10px] font-bold uppercase tracking-wider text-slds-neutral-7">Steps</span>
+                      <div className="slds-bg-white slds-border_right slds-border-color_border-1 slds-overflow-y-auto" style={{ width: '200px', minWidth: '200px' }}>
+                        <div className="slds-p-horizontal_medium slds-p-vertical_small slds-border_bottom slds-border-color_border-1">
+                          <span className="slds-font-weight_bold slds-text-uppercase slds-tracking-wide slds-text-neutral-7" style={{ fontSize: '10px' }}>Steps</span>
                         </div>
-                        <nav className="py-2">
+                        <nav className="slds-p-vertical_x-small">
                           {sol.steps.map((step, idx) => {
                             const status = prog[idx] || 'not-started';
                             const isActive = smActiveStep === idx;
@@ -1125,22 +1144,23 @@ export default function DataCloudSetupContent({ onBack, demoSession, onDemoSessi
                               <button
                                 key={idx}
                                 onClick={() => smHandleStepClick(idx)}
-                                className={`w-full flex items-center gap-2.5 px-4 py-2.5 text-left transition-colors ${
-                                  isActive ? 'bg-[#EEF4FF]' : 'hover:bg-slds-neutral-2'
+                                className={`slds-w-full slds-flex slds-items-center slds-p-horizontal_medium slds-text-left slds-transition-colors ${
+                                  isActive ? '' : 'sf-hover-bg-neutral'
                                 }`}
+                                style={{ gap: '10px', paddingTop: '10px', paddingBottom: '10px', ...(isActive ? { background: '#EEF4FF' } : {}) }}
                               >
-                                <div className={`w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0 text-xs font-medium ${
-                                  status === 'completed' ? 'bg-slds-success-1 text-white' :
-                                  status === 'in-progress' ? 'bg-slds-brand text-white' :
-                                  'border-2 border-slds-border-1 text-slds-neutral-7'
-                                }`}>
-                                  {status === 'completed' ? <Check className="w-3 h-3" /> : idx + 1}
+                                <div className={`slds-border-radius_pill slds-flex slds-items-center slds-justify-center slds-flex-shrink-0 slds-text-size_small slds-font-weight_medium ${
+                                  status === 'completed' ? 'slds-bg-success slds-text-white' :
+                                  status === 'in-progress' ? 'slds-bg-brand slds-text-white' :
+                                  'slds-text-neutral-7'
+                                }`} style={{ width: '24px', height: '24px', ...(status === 'not-started' ? { border: '2px solid var(--slds-g-color-border-1)' } : {}) }}>
+                                  {status === 'completed' ? <Check className="slds-icon-size_xx-small" /> : idx + 1}
                                 </div>
-                                <span className={`text-xs leading-tight ${
-                                  status === 'completed' ? 'text-slds-success-1 font-medium' :
-                                  status === 'in-progress' ? 'text-slds-brand font-semibold' :
-                                  'text-slds-neutral-9'
-                                }`}>
+                                <span className={`slds-text-size_small ${
+                                  status === 'completed' ? 'slds-text-success slds-font-weight_medium' :
+                                  status === 'in-progress' ? 'slds-text-brand slds-font-weight_semibold' :
+                                  'slds-text-neutral-9'
+                                }`} style={{ lineHeight: '1.25' }}>
                                   {step.title}
                                 </span>
                               </button>
@@ -1148,19 +1168,19 @@ export default function DataCloudSetupContent({ onBack, demoSession, onDemoSessi
                           })}
                         </nav>
                         {/* Tutorial video placeholder */}
-                        <div className="mx-4 mb-4 mt-2 rounded-lg border border-slds-border-1 bg-slds-neutral-2 p-4 text-center">
-                          <Play className="w-8 h-8 mx-auto text-slds-neutral-7 mb-2" />
-                          <span className="text-xs text-slds-neutral-7">Tutorial Video</span>
+                        <div className="slds-m-horizontal_medium slds-m-bottom_medium slds-m-top_x-small slds-border-radius_large slds-border_all slds-border-color_border-1 slds-bg-neutral-2 slds-p-around_medium slds-text-center">
+                          <Play className="slds-text-neutral-7 slds-m-bottom_x-small" style={{ width: '32px', height: '32px', margin: '0 auto 8px auto' }} />
+                          <span className="slds-text-size_small slds-text-neutral-7">Tutorial Video</span>
                         </div>
                       </div>
 
                       {/* Step content */}
-                      <div className="flex-1 overflow-y-auto p-6">
-                        <div className="max-w-3xl">
+                      <div className="slds-flex-1 slds-overflow-y-auto slds-p-around_large">
+                        <div style={{ maxWidth: '48rem' }}>
                           {/* Solution header */}
-                          <div className="mb-6">
-                            <h2 className="text-xl font-light text-slds-neutral-base mb-1">Integrate Business Entities from Informatica</h2>
-                            <p className="text-sm text-slds-neutral-7">{sol.headline}</p>
+                          <div className="slds-m-bottom_large">
+                            <h2 className="slds-text-size_x-large slds-font-weight_regular slds-text-neutral-base slds-m-bottom_xx-small">Integrate Business Entities from Informatica</h2>
+                            <p className="slds-text-size_medium slds-text-neutral-7">{sol.headline}</p>
                           </div>
 
                           {/* Active step card */}
@@ -1175,9 +1195,9 @@ export default function DataCloudSetupContent({ onBack, demoSession, onDemoSessi
                                 case 'action':
                                   return (
                                     <>
-                                      <p className="text-sm text-slds-neutral-9 mb-5 leading-relaxed">{step.description}</p>
+                                      <p className="slds-text-size_medium slds-text-neutral-9 slds-leading-relaxed" style={{ marginBottom: '20px' }}>{step.description}</p>
                                       {status !== 'completed' && (
-                                        <button onClick={smHandleCompleteStep} className="px-4 py-2 text-sm font-medium text-white bg-slds-brand rounded hover:bg-[#005FB2] transition-colors">
+                                        <button onClick={smHandleCompleteStep} className="slds-p-horizontal_medium slds-p-vertical_x-small slds-text-size_medium slds-font-weight_medium slds-text-white slds-bg-brand slds-border-radius_small slds-transition-colors">
                                           {step.actionLabel}
                                         </button>
                                       )}
@@ -1186,32 +1206,33 @@ export default function DataCloudSetupContent({ onBack, demoSession, onDemoSessi
 
                                 case 'form':
                                   return (
-                                    <div className="space-y-4">
+                                    <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
                                       {step.fields.map((field, fi) => (
                                         <div key={fi}>
-                                          <label className="block text-sm font-medium text-slds-neutral-base mb-1">
-                                            {field.name} {field.required && <span className="text-slds-error-1">*</span>}
+                                          <label className="slds-text-size_medium slds-font-weight_medium slds-text-neutral-base slds-m-bottom_xx-small" style={{ display: 'block', marginBottom: '4px' }}>
+                                            {field.name} {field.required && <span className="slds-text-error">*</span>}
                                           </label>
-                                          <div className="relative">
+                                          <div className="slds-pos-relative">
                                             <input
                                               type={field.inputType === 'password' ? (smFormPasswordVisible[`${smActiveSolution}-${smActiveStep}-${fi}`] ? 'text' : 'password') : field.inputType}
                                               placeholder={field.placeholder}
-                                              className="w-full px-3 py-2 text-sm border border-slds-border-1 rounded focus:outline-none focus:border-slds-brand-2 focus:ring-1 focus:ring-[rgba(27,150,255,0.2)]"
+                                              className="slds-w-full slds-p-horizontal_small slds-p-vertical_x-small slds-text-size_medium slds-border_all slds-border-color_border-1 slds-border-radius_small"
                                             />
                                             {field.inputType === 'password' && (
                                               <button
                                                 type="button"
                                                 onClick={() => setSmFormPasswordVisible(prev => ({ ...prev, [`${smActiveSolution}-${smActiveStep}-${fi}`]: !prev[`${smActiveSolution}-${smActiveStep}-${fi}`] }))}
-                                                className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slds-neutral-7 hover:text-slds-neutral-base"
+                                                className="slds-pos-absolute slds-text-neutral-7"
+                                                style={{ right: '10px', top: '50%', transform: 'translateY(-50%)' }}
                                               >
-                                                {smFormPasswordVisible[`${smActiveSolution}-${smActiveStep}-${fi}`] ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                                                {smFormPasswordVisible[`${smActiveSolution}-${smActiveStep}-${fi}`] ? <EyeOff className="slds-icon-size_small" /> : <Eye className="slds-icon-size_small" />}
                                               </button>
                                             )}
                                           </div>
                                         </div>
                                       ))}
                                       {status !== 'completed' && (
-                                        <button onClick={smHandleCompleteStep} className="px-4 py-2 text-sm font-medium text-white bg-slds-brand rounded hover:bg-[#005FB2] transition-colors mt-2">
+                                        <button onClick={smHandleCompleteStep} className="slds-p-horizontal_medium slds-p-vertical_x-small slds-text-size_medium slds-font-weight_medium slds-text-white slds-bg-brand slds-border-radius_small slds-transition-colors slds-m-top_x-small">
                                           Validate Connection
                                         </button>
                                       )}
@@ -1220,11 +1241,11 @@ export default function DataCloudSetupContent({ onBack, demoSession, onDemoSessi
 
                                 case 'multiselect':
                                   return (
-                                    <div className="space-y-5">
+                                    <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
                                       {step.groups.map((group, gi) => (
                                         <div key={gi}>
-                                          <div className="text-sm font-semibold text-slds-neutral-base mb-2">{group.name}</div>
-                                          <div className="flex flex-wrap gap-2">
+                                          <div className="slds-text-size_medium slds-font-weight_semibold slds-text-neutral-base slds-m-bottom_x-small">{group.name}</div>
+                                          <div className="slds-flex slds-flex-wrap slds-gap_x-small">
                                             {group.options.map((option, oi) => {
                                               const key = `${smActiveSolution}-${smActiveStep}-${gi}-${oi}`;
                                               const selected = smMultiselectState[key] || false;
@@ -1232,13 +1253,14 @@ export default function DataCloudSetupContent({ onBack, demoSession, onDemoSessi
                                                 <button
                                                   key={oi}
                                                   onClick={() => setSmMultiselectState(prev => ({ ...prev, [key]: !prev[key] }))}
-                                                  className={`px-3 py-2 text-sm rounded border transition-colors ${
+                                                  className={`slds-p-horizontal_small slds-p-vertical_x-small slds-text-size_medium slds-border-radius_small slds-border_all slds-transition-colors ${
                                                     selected
-                                                      ? 'bg-[#EEF4FF] border-slds-brand text-slds-brand font-medium'
-                                                      : 'bg-white border-slds-border-1 text-slds-neutral-9 hover:border-slds-brand'
+                                                      ? 'slds-border-color_brand slds-text-brand slds-font-weight_medium'
+                                                      : 'slds-bg-white slds-border-color_border-1 slds-text-neutral-9'
                                                   }`}
+                                                  style={selected ? { background: '#EEF4FF' } : undefined}
                                                 >
-                                                  {selected && <Check className="w-3 h-3 inline mr-1.5" />}
+                                                  {selected && <Check className="slds-icon-size_xx-small" style={{ display: 'inline', marginRight: '6px' }} />}
                                                   {option}
                                                 </button>
                                               );
@@ -1251,7 +1273,7 @@ export default function DataCloudSetupContent({ onBack, demoSession, onDemoSessi
 
                                 case 'radio':
                                   return (
-                                    <div className="space-y-3">
+                                    <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
                                       {step.options.map((option, oi) => {
                                         const key = `${smActiveSolution}-${smActiveStep}`;
                                         const selected = (smRadioState[key] ?? 0) === oi;
@@ -1259,21 +1281,22 @@ export default function DataCloudSetupContent({ onBack, demoSession, onDemoSessi
                                           <button
                                             key={oi}
                                             onClick={() => setSmRadioState(prev => ({ ...prev, [key]: oi }))}
-                                            className={`w-full text-left p-4 rounded-lg border-2 transition-all ${
+                                            className={`slds-w-full slds-text-left slds-p-around_medium slds-border-radius_large slds-transition-all ${
                                               selected
-                                                ? 'border-slds-brand bg-[#EEF4FF]'
-                                                : 'border-slds-border-1 bg-white hover:border-[#B0B0B0]'
+                                                ? 'slds-border-color_brand'
+                                                : 'slds-bg-white'
                                             }`}
+                                            style={{ border: `2px solid ${selected ? 'var(--slds-g-color-brand)' : 'var(--slds-g-color-border-1)'}`, ...(selected ? { background: '#EEF4FF' } : {}) }}
                                           >
-                                            <div className="flex items-start gap-3">
-                                              <div className={`w-4 h-4 rounded-full border-2 flex-shrink-0 mt-0.5 flex items-center justify-center ${
-                                                selected ? 'border-slds-brand' : 'border-slds-border-1'
-                                              }`}>
-                                                {selected && <div className="w-2 h-2 rounded-full bg-slds-brand" />}
+                                            <div className="slds-flex slds-items-start slds-gap_small">
+                                              <div className={`slds-border-radius_pill slds-flex-shrink-0 slds-flex slds-items-center slds-justify-center ${
+                                                selected ? 'slds-border-color_brand' : 'slds-border-color_border-1'
+                                              }`} style={{ width: '16px', height: '16px', marginTop: '2px', border: `2px solid ${selected ? 'var(--slds-g-color-brand)' : 'var(--slds-g-color-border-1)'}` }}>
+                                                {selected && <div className="slds-border-radius_pill slds-bg-brand" style={{ width: '8px', height: '8px' }} />}
                                               </div>
                                               <div>
-                                                <div className="text-sm font-semibold text-slds-neutral-base">{option.label}</div>
-                                                <p className="text-xs text-slds-neutral-9 mt-1 leading-relaxed">{option.description}</p>
+                                                <div className="slds-text-size_medium slds-font-weight_semibold slds-text-neutral-base">{option.label}</div>
+                                                <p className="slds-text-size_small slds-text-neutral-9 slds-m-top_xx-small slds-leading-relaxed">{option.description}</p>
                                               </div>
                                             </div>
                                           </button>
@@ -1284,11 +1307,11 @@ export default function DataCloudSetupContent({ onBack, demoSession, onDemoSessi
 
                                 case 'table-list':
                                   return (
-                                    <div className="space-y-2">
+                                    <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                                       {step.tables.map((table, ti) => (
-                                        <div key={ti} className="flex items-center justify-between p-3 bg-[#FAFAF9] border border-slds-border-1 rounded">
-                                          <span className="text-sm font-mono text-slds-neutral-base">{table}</span>
-                                          <button className="px-3 py-1.5 text-xs font-medium text-slds-brand border border-slds-border-1 rounded hover:bg-white transition-colors">
+                                        <div key={ti} className="slds-flex slds-items-center slds-justify-between slds-p-around_small slds-border_all slds-border-color_border-1 slds-border-radius_small" style={{ background: '#FAFAF9' }}>
+                                          <span className="slds-text-size_medium slds-text-neutral-base" style={{ fontFamily: 'monospace' }}>{table}</span>
+                                          <button className="slds-p-horizontal_small slds-text-size_small slds-font-weight_medium slds-text-brand slds-border_all slds-border-color_border-1 slds-border-radius_small slds-transition-colors" style={{ paddingTop: '6px', paddingBottom: '6px' }}>
                                             Review Mappings & Create Fields
                                           </button>
                                         </div>
@@ -1298,11 +1321,11 @@ export default function DataCloudSetupContent({ onBack, demoSession, onDemoSessi
 
                                 case 'preview':
                                   return (
-                                    <div className="space-y-4">
+                                    <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
                                       {step.items.map((item, pi) => (
                                         <div key={pi}>
-                                          <p className="text-sm text-slds-neutral-9 mb-2">{item.description}</p>
-                                          <button className="px-3 py-1.5 text-xs font-medium text-slds-brand border border-slds-border-1 rounded hover:bg-slds-neutral-2 transition-colors">
+                                          <p className="slds-text-size_medium slds-text-neutral-9 slds-m-bottom_x-small">{item.description}</p>
+                                          <button className="slds-p-horizontal_small slds-text-size_small slds-font-weight_medium slds-text-brand slds-border_all slds-border-color_border-1 slds-border-radius_small sf-hover-bg-neutral slds-transition-colors" style={{ paddingTop: '6px', paddingBottom: '6px' }}>
                                             {item.name} &rarr;
                                           </button>
                                         </div>
@@ -1312,14 +1335,14 @@ export default function DataCloudSetupContent({ onBack, demoSession, onDemoSessi
 
                                 case 'rules-list':
                                   return (
-                                    <div className="space-y-2">
+                                    <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                                       {step.rules.map((rule, ri) => (
-                                        <div key={ri} className="flex items-center justify-between p-3 bg-[#FAFAF9] border border-slds-border-1 rounded">
+                                        <div key={ri} className="slds-flex slds-items-center slds-justify-between slds-p-around_small slds-border_all slds-border-color_border-1 slds-border-radius_small" style={{ background: '#FAFAF9' }}>
                                           <div>
-                                            <div className="text-sm font-medium text-slds-neutral-base">{rule.name}</div>
-                                            <p className="text-xs text-slds-neutral-7 mt-0.5">{rule.description}</p>
+                                            <div className="slds-text-size_medium slds-font-weight_medium slds-text-neutral-base">{rule.name}</div>
+                                            <p className="slds-text-size_small slds-text-neutral-7 slds-m-top_xxx-small">{rule.description}</p>
                                           </div>
-                                          <button className="px-3 py-1.5 text-xs font-medium text-slds-brand border border-slds-border-1 rounded hover:bg-white transition-colors flex-shrink-0 ml-4">
+                                          <button className="slds-p-horizontal_small slds-text-size_small slds-font-weight_medium slds-text-brand slds-border_all slds-border-color_border-1 slds-border-radius_small slds-transition-colors slds-flex-shrink-0 slds-m-left_medium" style={{ paddingTop: '6px', paddingBottom: '6px' }}>
                                             Configure
                                           </button>
                                         </div>
@@ -1332,15 +1355,16 @@ export default function DataCloudSetupContent({ onBack, demoSession, onDemoSessi
                                   const isOn = smToggleState[toggleKey] || false;
                                   return (
                                     <>
-                                      <p className="text-sm text-slds-neutral-9 mb-5 leading-relaxed">{step.description}</p>
-                                      <div className="flex items-center gap-3 mb-4">
+                                      <p className="slds-text-size_medium slds-text-neutral-9 slds-leading-relaxed" style={{ marginBottom: '20px' }}>{step.description}</p>
+                                      <div className="slds-flex slds-items-center slds-gap_small slds-m-bottom_medium">
                                         <button
                                           onClick={() => setSmToggleState(prev => ({ ...prev, [toggleKey]: !prev[toggleKey] }))}
-                                          className={`relative w-12 h-6 rounded-full transition-colors ${isOn ? 'bg-slds-brand' : 'bg-slds-border-1'}`}
+                                          className={`slds-pos-relative slds-border-radius_pill slds-transition-colors ${isOn ? 'slds-bg-brand' : ''}`}
+                                          style={{ width: '48px', height: '24px', ...(!isOn ? { background: 'var(--slds-g-color-border-1)' } : {}) }}
                                         >
-                                          <div className={`absolute top-0.5 w-5 h-5 rounded-full bg-white shadow transition-transform ${isOn ? 'left-[26px]' : 'left-0.5'}`} />
+                                          <div className="slds-pos-absolute slds-border-radius_pill slds-bg-white slds-shadow_small slds-transition-all" style={{ top: '2px', width: '20px', height: '20px', left: isOn ? '26px' : '2px' }} />
                                         </button>
-                                        <span className="text-sm font-medium text-slds-neutral-base">
+                                        <span className="slds-text-size_medium slds-font-weight_medium slds-text-neutral-base">
                                           {isOn ? 'Sync Enabled' : 'Sync Disabled'}
                                         </span>
                                       </div>
@@ -1350,15 +1374,15 @@ export default function DataCloudSetupContent({ onBack, demoSession, onDemoSessi
 
                                 case 'substeps':
                                   return (
-                                    <div className="space-y-2">
+                                    <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                                       {step.substeps.map((substep, si) => (
-                                        <div key={si} className="flex items-center justify-between p-3 bg-[#FAFAF9] border border-slds-border-1 rounded">
+                                        <div key={si} className="slds-flex slds-items-center slds-justify-between slds-p-around_small slds-border_all slds-border-color_border-1 slds-border-radius_small" style={{ background: '#FAFAF9' }}>
                                           <div>
-                                            <div className="text-sm font-medium text-slds-neutral-base">{substep.name}</div>
-                                            <p className="text-xs text-slds-neutral-7 mt-0.5">{substep.description}</p>
+                                            <div className="slds-text-size_medium slds-font-weight_medium slds-text-neutral-base">{substep.name}</div>
+                                            <p className="slds-text-size_small slds-text-neutral-7 slds-m-top_xxx-small">{substep.description}</p>
                                           </div>
-                                          <a href={substep.link} target="_blank" rel="noopener noreferrer" className="text-xs font-medium text-slds-brand hover:underline flex-shrink-0 ml-4 flex items-center gap-1">
-                                            View Trailhead <ExternalLink className="w-3 h-3" />
+                                          <a href={substep.link} target="_blank" rel="noopener noreferrer" className="slds-text-size_small slds-font-weight_medium slds-text-brand sf-hover-underline slds-flex-shrink-0 slds-m-left_medium slds-flex slds-items-center slds-gap_xx-small">
+                                            View Trailhead <ExternalLink className="slds-icon-size_xx-small" />
                                           </a>
                                         </div>
                                       ))}
@@ -1368,12 +1392,12 @@ export default function DataCloudSetupContent({ onBack, demoSession, onDemoSessi
                                 case 'text-links':
                                   return (
                                     <>
-                                      <div className="text-sm text-slds-neutral-9 leading-relaxed mb-5" dangerouslySetInnerHTML={{ __html: step.description }} />
+                                      <div className="slds-text-size_medium slds-text-neutral-9 slds-leading-relaxed" style={{ marginBottom: '20px' }} dangerouslySetInnerHTML={{ __html: step.description }} />
                                       {step.links.length > 0 && (
-                                        <div className="space-y-2">
+                                        <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                                           {step.links.map((link, li) => (
-                                            <a key={li} href={link.url} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-sm text-slds-brand hover:underline">
-                                              <ExternalLink className="w-3.5 h-3.5 flex-shrink-0" />
+                                            <a key={li} href={link.url} target="_blank" rel="noopener noreferrer" className="slds-flex slds-items-center slds-gap_x-small slds-text-size_medium slds-text-brand sf-hover-underline">
+                                              <ExternalLink className="slds-icon-size_x-small slds-flex-shrink-0" />
                                               {link.label}
                                             </a>
                                           ))}
@@ -1388,25 +1412,25 @@ export default function DataCloudSetupContent({ onBack, demoSession, onDemoSessi
                             };
 
                             return (
-                              <div className={`sf-card mb-4 ${status === 'completed' ? 'ring-2 ring-slds-success-1/30' : ''}`}>
+                              <div className={`sf-card slds-m-bottom_medium`} style={status === 'completed' ? { boxShadow: '0 0 0 2px rgba(46,132,74,0.3)' } : undefined}>
                                 <div className="sf-card-header">
-                                  <div className="flex items-center gap-3">
-                                    <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold ${
-                                      status === 'completed' ? 'bg-slds-success-1 text-white' :
-                                      'bg-slds-brand text-white'
-                                    }`}>
-                                      {status === 'completed' ? <Check className="w-4 h-4" /> : smActiveStep + 1}
+                                  <div className="slds-flex slds-items-center slds-gap_small">
+                                    <div className={`slds-border-radius_pill slds-flex slds-items-center slds-justify-center slds-text-size_medium slds-font-weight_bold ${
+                                      status === 'completed' ? 'slds-bg-success slds-text-white' :
+                                      'slds-bg-brand slds-text-white'
+                                    }`} style={{ width: '32px', height: '32px' }}>
+                                      {status === 'completed' ? <Check className="slds-icon-size_small" /> : smActiveStep + 1}
                                     </div>
                                     <div>
-                                      <h3 className="text-sm font-semibold text-slds-neutral-base">{step.title}</h3>
-                                      <p className="text-xs text-slds-neutral-7">{step.headline}</p>
+                                      <h3 className="slds-text-size_medium slds-font-weight_semibold slds-text-neutral-base">{step.title}</h3>
+                                      <p className="slds-text-size_small slds-text-neutral-7">{step.headline}</p>
                                     </div>
                                     {step.type === 'action' && step.system && (
-                                      <span className={`ml-auto px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider rounded ${
+                                      <span className={`slds-font-weight_bold slds-text-uppercase slds-tracking-wide slds-border-radius_small ${
                                         step.system === 'D360'
-                                          ? 'bg-[#EEF4FF] text-slds-brand'
-                                          : 'bg-[#FFF3ED] text-[#D95800]'
-                                      }`}>
+                                          ? 'slds-text-brand'
+                                          : ''
+                                      }`} style={{ marginLeft: 'auto', padding: '4px 10px', fontSize: '10px', background: step.system === 'D360' ? '#EEF4FF' : '#FFF3ED', color: step.system === 'D360' ? undefined : '#D95800' }}>
                                         {step.system === 'D360' ? '\u2601 ' : '\u2699 '}{step.system}
                                       </span>
                                     )}
@@ -1415,27 +1439,28 @@ export default function DataCloudSetupContent({ onBack, demoSession, onDemoSessi
                                 <div className="sf-card-body">
                                   {renderStepBody()}
                                   {status === 'completed' && (
-                                    <div className="flex items-center gap-2 text-sm text-slds-success-1 font-medium mt-4">
-                                      <CheckCircle2 className="w-4 h-4" />
+                                    <div className="slds-flex slds-items-center slds-gap_x-small slds-text-size_medium slds-text-success slds-font-weight_medium slds-m-top_medium">
+                                      <CheckCircle2 className="slds-icon-size_small" />
                                       Step completed
                                     </div>
                                   )}
                                 </div>
                                 {/* Step footer */}
-                                <div className="flex items-center justify-between px-5 py-3 border-t border-slds-border-1 bg-[#FAFAF9]">
-                                  <div className="flex items-center gap-3">
-                                    <button className="text-xs text-slds-brand hover:underline flex items-center gap-1">
-                                      <FileText className="w-3 h-3" /> Documentation
+                                <div className="slds-flex slds-items-center slds-justify-between slds-p-horizontal_medium slds-p-vertical_small slds-border_top slds-border-color_border-1" style={{ padding: '12px 20px', background: '#FAFAF9' }}>
+                                  <div className="slds-flex slds-items-center slds-gap_small">
+                                    <button className="slds-text-size_small slds-text-brand sf-hover-underline slds-flex slds-items-center slds-gap_xx-small">
+                                      <FileText className="slds-icon-size_xx-small" /> Documentation
                                     </button>
-                                    <button className="text-xs text-slds-brand hover:underline flex items-center gap-1">
-                                      <BookOpen className="w-3 h-3" /> Tutorial
+                                    <button className="slds-text-size_small slds-text-brand sf-hover-underline slds-flex slds-items-center slds-gap_xx-small">
+                                      <BookOpen className="slds-icon-size_xx-small" /> Tutorial
                                     </button>
                                   </div>
-                                  <div className="flex items-center gap-2">
+                                  <div className="slds-flex slds-items-center slds-gap_x-small">
                                     {smActiveStep > 0 && (
                                       <button
                                         onClick={() => smHandleStepClick(smActiveStep - 1)}
-                                        className="px-3 py-1.5 text-xs font-medium text-slds-neutral-9 border border-slds-border-1 rounded hover:bg-slds-neutral-2"
+                                        className="slds-p-horizontal_small slds-text-size_small slds-font-weight_medium slds-text-neutral-9 slds-border_all slds-border-color_border-1 slds-border-radius_small sf-hover-bg-neutral"
+                                        style={{ paddingTop: '6px', paddingBottom: '6px' }}
                                       >
                                         &larr; Previous
                                       </button>
@@ -1443,14 +1468,16 @@ export default function DataCloudSetupContent({ onBack, demoSession, onDemoSessi
                                     {smActiveStep < sol.steps.length - 1 ? (
                                       <button
                                         onClick={smHandleCompleteStep}
-                                        className="px-3 py-1.5 text-xs font-medium text-white bg-slds-brand rounded hover:bg-[#005FB2]"
+                                        className="slds-p-horizontal_small slds-text-size_small slds-font-weight_medium slds-text-white slds-bg-brand slds-border-radius_small"
+                                        style={{ paddingTop: '6px', paddingBottom: '6px' }}
                                       >
                                         Next Step &rarr;
                                       </button>
                                     ) : (
                                       <button
                                         onClick={smHandleCompleteStep}
-                                        className="px-3 py-1.5 text-xs font-medium text-white bg-slds-success-1 rounded hover:bg-[#256B3B]"
+                                        className="slds-p-horizontal_small slds-text-size_small slds-font-weight_medium slds-text-white slds-bg-success slds-border-radius_small"
+                                        style={{ paddingTop: '6px', paddingBottom: '6px' }}
                                       >
                                         Complete &#10003;
                                       </button>
@@ -1468,35 +1495,35 @@ export default function DataCloudSetupContent({ onBack, demoSession, onDemoSessi
               })()
             ) : (
               /* ── Solution Manager Tiles ── */
-              <div className="p-6">
-                <div className="mb-6">
-                  <h1 className="text-2xl font-light text-slds-neutral-base mb-1">Solution Manager</h1>
-                  <p className="text-sm text-slds-neutral-7">Explore and implement data management solutions</p>
+              <div className="slds-p-around_large">
+                <div className="slds-m-bottom_large">
+                  <h1 className="slds-text-size_xx-large slds-font-weight_regular slds-text-neutral-base slds-m-bottom_xx-small">Solution Manager</h1>
+                  <p className="slds-text-size_medium slds-text-neutral-7">Explore and implement data management solutions</p>
                 </div>
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
+                <div className="slds-css-grid slds-css-grid-cols-2" style={{ gap: '20px' }}>
                   {smTiles.map((tile) => {
                     const progress = smGetProgress(tile.id);
                     return (
                       <button
                         key={tile.id}
                         onClick={() => { setSmActiveSolution(tile.id); setSmActiveStep(0); }}
-                        className="text-left bg-white border border-slds-border-1 rounded-lg p-6 hover:shadow-lg hover:border-slds-brand hover:-translate-y-0.5 transition-all group"
+                        className="slds-text-left slds-bg-white slds-border_all slds-border-color_border-1 slds-border-radius_large slds-p-around_large slds-transition-all"
                       >
-                        <span className="inline-block px-2 py-1 text-[11px] font-bold text-slds-brand bg-[#EEF4FF] rounded mb-3">
+                        <span className="slds-font-weight_bold slds-text-brand slds-border-radius_small slds-m-bottom_small" style={{ display: 'inline-block', padding: '4px 8px', fontSize: '11px', background: '#EEF4FF' }}>
                           {tile.badge}
                         </span>
-                        <h3 className="text-base font-semibold text-slds-brand mb-2 leading-snug group-hover:underline">{tile.title}</h3>
-                        <p className="text-sm text-slds-neutral-9 leading-relaxed mb-3">{tile.description}</p>
+                        <h3 className="slds-text-size_large slds-font-weight_semibold slds-text-brand slds-m-bottom_x-small" style={{ lineHeight: '1.3' }}>{tile.title}</h3>
+                        <p className="slds-text-size_medium slds-text-neutral-9 slds-leading-relaxed slds-m-bottom_small">{tile.description}</p>
                         {smSolutions[tile.id] && (
-                          <div className="flex items-center gap-2">
-                            <div className="flex-1 h-1.5 bg-slds-border-1 rounded-full overflow-hidden">
-                              <div className="h-full rounded-full" style={{ width: `${progress}%`, background: 'linear-gradient(90deg, #0070D2, #00A1E0)' }} />
+                          <div className="slds-flex slds-items-center slds-gap_x-small">
+                            <div className="slds-flex-1 slds-border-radius_pill slds-overflow-hidden" style={{ height: '6px', background: 'var(--slds-g-color-border-1)' }}>
+                              <div className="slds-h-full slds-border-radius_pill" style={{ width: `${progress}%`, background: 'linear-gradient(90deg, #0070D2, #00A1E0)' }} />
                             </div>
-                            <span className="text-[10px] font-bold text-slds-brand">{progress}%</span>
+                            <span className="slds-font-weight_bold slds-text-brand" style={{ fontSize: '10px' }}>{progress}%</span>
                           </div>
                         )}
                         {tile.id === 'CH' && (
-                          <div className="mt-2 text-xs text-slds-neutral-7 italic">Work in progress</div>
+                          <div className="slds-m-top_x-small slds-text-size_small slds-text-neutral-7" style={{ fontStyle: 'italic' }}>Work in progress</div>
                         )}
                       </button>
                     );
@@ -1505,27 +1532,26 @@ export default function DataCloudSetupContent({ onBack, demoSession, onDemoSessi
               </div>
             )
           ) : (activeNavItem === 'salesforce-crm' || activeNavItem === 'informatica-mdm' || activeNavItem === 'informatica-mdm-sf') ? (
-            <div className="p-6">
+            <div className="slds-p-around_large">
               {/* Page header */}
-              <div className="sf-card mb-6 relative">
+              <div className="sf-card slds-m-bottom_large slds-pos-relative">
                 {isInformatica && (
-                  <div className="absolute top-0 right-0 px-2.5 py-0.5 bg-[#FF4A00] text-white text-[10px] font-bold uppercase tracking-wider rounded-bl-lg rounded-tr-[7px]">
+                  <div className="slds-pos-absolute slds-font-weight_bold slds-text-uppercase slds-tracking-wide slds-text-white" style={{ top: 0, right: 0, padding: '2px 10px', fontSize: '10px', background: '#FF4A00', borderBottomLeftRadius: '8px', borderTopRightRadius: '7px' }}>
                     New to Salesforce
                   </div>
                 )}
-                <div className="p-5 flex items-center gap-4">
-                  <div className={`w-12 h-12 rounded-lg flex items-center justify-center flex-shrink-0 ${isInformatica ? 'bg-[#FF4A00]' : 'bg-slds-neutral-7'}`}>
-                    <Settings className="w-6 h-6 text-white" />
+                <div className="slds-p-around_medium slds-flex slds-items-center slds-gap_medium" style={{ padding: '20px' }}>
+                  <div className={`slds-border-radius_large slds-flex slds-items-center slds-justify-center slds-flex-shrink-0`} style={{ width: '48px', height: '48px', background: isInformatica ? '#FF4A00' : 'var(--slds-g-color-neutral-7)' }}>
+                    <Settings className="slds-icon-size_large slds-text-white" />
                   </div>
-                  <div className="flex-1">
-                    <div className="text-xs font-medium text-slds-brand uppercase tracking-wide">SETUP</div>
-                    <h1 className="text-lg font-bold text-slds-neutral-base">{connectorName}</h1>
+                  <div className="slds-flex-1">
+                    <div className="slds-text-size_small slds-font-weight_medium slds-text-brand slds-text-uppercase slds-tracking-wide">SETUP</div>
+                    <h1 className="slds-font-weight_bold slds-text-neutral-base" style={{ fontSize: '18px' }}>{connectorName}</h1>
                   </div>
                   <button
                     onClick={handleOpenConnectOrg}
-                    className={`px-4 py-2 text-sm font-medium text-white rounded transition-colors ${
-                      isInformatica ? 'bg-[#FF4A00] hover:bg-[#E54300]' : 'bg-slds-brand hover:bg-slds-brand-contrast-1'
-                    }`}
+                    className="slds-p-horizontal_medium slds-p-vertical_x-small slds-text-size_medium slds-font-weight_medium slds-text-white slds-border-radius_small slds-transition-colors"
+                    style={{ background: isInformatica ? '#FF4A00' : 'var(--slds-g-color-brand)' }}
                   >
                     New
                   </button>
@@ -1533,59 +1559,58 @@ export default function DataCloudSetupContent({ onBack, demoSession, onDemoSessi
               </div>
 
               {/* Standard Connections */}
-              <div className="sf-card mb-6">
+              <div className="sf-card slds-m-bottom_large">
                 <div className="sf-card-header">
-                  <div className="flex items-center gap-1.5">
-                    <h2 className="text-sm font-semibold text-slds-neutral-base">Standard Connections</h2>
-                    <Info className="w-3.5 h-3.5 text-slds-neutral-7" />
+                  <div className="slds-flex slds-items-center" style={{ gap: '6px' }}>
+                    <h2 className="slds-text-size_medium slds-font-weight_semibold slds-text-neutral-base">Standard Connections</h2>
+                    <Info className="slds-icon-size_x-small slds-text-neutral-7" />
                   </div>
                 </div>
                 {currentConnections.length === 0 ? (
-                  <div className="sf-card-body text-center py-12">
-                    <div className={`w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 ${isInformatica ? 'bg-[#FFF3ED]' : 'bg-slds-neutral-2'}`}>
-                      <Zap className={`w-7 h-7 ${isInformatica ? 'text-[#FF4A00]' : 'text-slds-neutral-7'}`} />
+                  <div className="sf-card-body slds-text-center slds-p-vertical_x-large" style={{ paddingTop: '48px', paddingBottom: '48px' }}>
+                    <div className="slds-border-radius_pill slds-flex slds-items-center slds-justify-center slds-m-bottom_medium" style={{ width: '64px', height: '64px', margin: '0 auto 16px auto', background: isInformatica ? '#FFF3ED' : 'var(--slds-g-color-neutral-2)' }}>
+                      <Zap style={{ width: '28px', height: '28px', color: isInformatica ? '#FF4A00' : 'var(--slds-g-color-neutral-7)' }} />
                     </div>
-                    <p className="text-sm font-medium text-slds-neutral-base mb-1">No connections configured</p>
-                    <p className="text-xs text-slds-neutral-7 mb-4">
+                    <p className="slds-text-size_medium slds-font-weight_medium slds-text-neutral-base slds-m-bottom_xx-small">No connections configured</p>
+                    <p className="slds-text-size_small slds-text-neutral-7 slds-m-bottom_medium">
                       {isInformatica
                         ? 'Connect your Informatica MDM instance to start syncing master data with Data Cloud.'
                         : 'Click "New" to connect a Salesforce org.'}
                     </p>
                     <button
                       onClick={handleOpenConnectOrg}
-                      className={`inline-flex items-center gap-1.5 px-4 py-2 text-sm font-medium text-white rounded transition-colors ${
-                        isInformatica ? 'bg-[#FF4A00] hover:bg-[#E54300]' : 'bg-slds-brand hover:bg-slds-brand-contrast-1'
-                      }`}
+                      className="slds-inline-flex slds-items-center slds-p-horizontal_medium slds-p-vertical_x-small slds-text-size_medium slds-font-weight_medium slds-text-white slds-border-radius_small slds-transition-colors"
+                      style={{ gap: '6px', background: isInformatica ? '#FF4A00' : 'var(--slds-g-color-brand)' }}
                     >
-                      <Plus className="w-4 h-4" /> Connect {isInformatica ? 'Informatica MDM' : 'an Org'}
+                      <Plus className="slds-icon-size_small" /> Connect {isInformatica ? 'Informatica MDM' : 'an Org'}
                     </button>
                   </div>
                 ) : (
-                  <div className="overflow-x-auto">
+                  <div className="slds-overflow-x-auto">
                     <table className="sf-table">
                       <thead>
                         <tr>
-                          <th className="w-10"></th>
-                          <th><div className="flex items-center gap-1">Connection Name <ChevronDown className="w-3 h-3 opacity-50" /></div></th>
-                          <th><div className="flex items-center gap-1">Alias <ChevronDown className="w-3 h-3 opacity-50" /></div></th>
-                          <th><div className="flex items-center gap-1">Connection Status <ChevronDown className="w-3 h-3 opacity-50" /></div></th>
-                          <th><div className="flex items-center gap-1">Last Updated <ChevronDown className="w-3 h-3 opacity-50" /></div></th>
-                          <th><div className="flex items-center gap-1">{isInformatica ? 'Tenant Id' : 'Org Id'} <ChevronDown className="w-3 h-3 opacity-50" /></div></th>
-                          <th className="w-10"></th>
+                          <th style={{ width: '40px' }}></th>
+                          <th><div className="slds-flex slds-items-center slds-gap_xx-small">Connection Name <ChevronDown className="slds-icon-size_xx-small slds-opacity_50" /></div></th>
+                          <th><div className="slds-flex slds-items-center slds-gap_xx-small">Alias <ChevronDown className="slds-icon-size_xx-small slds-opacity_50" /></div></th>
+                          <th><div className="slds-flex slds-items-center slds-gap_xx-small">Connection Status <ChevronDown className="slds-icon-size_xx-small slds-opacity_50" /></div></th>
+                          <th><div className="slds-flex slds-items-center slds-gap_xx-small">Last Updated <ChevronDown className="slds-icon-size_xx-small slds-opacity_50" /></div></th>
+                          <th><div className="slds-flex slds-items-center slds-gap_xx-small">{isInformatica ? 'Tenant Id' : 'Org Id'} <ChevronDown className="slds-icon-size_xx-small slds-opacity_50" /></div></th>
+                          <th style={{ width: '40px' }}></th>
                         </tr>
                       </thead>
                       <tbody>
                         {currentConnections.map((conn, i) => (
                           <tr key={conn.id}>
-                            <td className="text-center text-slds-neutral-7">{i + 1}</td>
-                            <td className="sf-link font-medium">{conn.connectionName}</td>
+                            <td className="slds-text-center slds-text-neutral-7">{i + 1}</td>
+                            <td className="sf-link slds-font-weight_medium">{conn.connectionName}</td>
                             <td>{conn.alias}</td>
                             <td>{conn.connectionStatus}</td>
                             <td>{conn.lastUpdated}</td>
-                            <td className="font-mono text-xs">{conn.orgId}</td>
+                            <td className="slds-text-size_small" style={{ fontFamily: 'monospace' }}>{conn.orgId}</td>
                             <td>
-                              <button className="w-6 h-6 flex items-center justify-center rounded hover:bg-slds-neutral-2 text-slds-neutral-7">
-                                <ChevronDown className="w-3.5 h-3.5" />
+                              <button className="slds-flex slds-items-center slds-justify-center slds-border-radius_small sf-hover-bg-neutral slds-text-neutral-7" style={{ width: '24px', height: '24px' }}>
+                                <ChevronDown className="slds-icon-size_x-small" />
                               </button>
                             </td>
                           </tr>
@@ -1600,19 +1625,19 @@ export default function DataCloudSetupContent({ onBack, demoSession, onDemoSessi
               {(!isInformatica || currentConnections.length > 0) && (
               <div className="sf-card">
                 <div className="sf-card-header">
-                  <div className="flex items-center gap-1.5">
-                    <h2 className="text-sm font-semibold text-slds-neutral-base">Standard Data Bundles</h2>
-                    <Info className="w-3.5 h-3.5 text-slds-neutral-7" />
+                  <div className="slds-flex slds-items-center" style={{ gap: '6px' }}>
+                    <h2 className="slds-text-size_medium slds-font-weight_semibold slds-text-neutral-base">Standard Data Bundles</h2>
+                    <Info className="slds-icon-size_x-small slds-text-neutral-7" />
                   </div>
                 </div>
-                <div className="overflow-x-auto">
+                <div className="slds-overflow-x-auto">
                   <table className="sf-table">
                     <thead>
                       <tr>
-                        <th><div className="flex items-center gap-1">Name <ChevronDown className="w-3 h-3 opacity-50" /></div></th>
-                        <th><div className="flex items-center gap-1">Installed Version <ChevronDown className="w-3 h-3 opacity-50" /></div></th>
-                        <th><div className="flex items-center gap-1">Latest Version <ChevronDown className="w-3 h-3 opacity-50" /></div></th>
-                        <th className="w-24">Action</th>
+                        <th><div className="slds-flex slds-items-center slds-gap_xx-small">Name <ChevronDown className="slds-icon-size_xx-small slds-opacity_50" /></div></th>
+                        <th><div className="slds-flex slds-items-center slds-gap_xx-small">Installed Version <ChevronDown className="slds-icon-size_xx-small slds-opacity_50" /></div></th>
+                        <th><div className="slds-flex slds-items-center slds-gap_xx-small">Latest Version <ChevronDown className="slds-icon-size_xx-small slds-opacity_50" /></div></th>
+                        <th style={{ width: '96px' }}>Action</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -1620,11 +1645,11 @@ export default function DataCloudSetupContent({ onBack, demoSession, onDemoSessi
                         const isInstalled = demoSession?.selectedBundles.includes(bundle.name);
                         return (
                         <tr key={bundle.name}>
-                          <td className="sf-link font-medium">
-                            <span className="flex items-center gap-2">
+                          <td className="sf-link slds-font-weight_medium">
+                            <span className="slds-flex slds-items-center slds-gap_x-small">
                               {bundle.name}
                               {bundle.fieldTag && (
-                                <span className={`px-1.5 py-0.5 text-[9px] font-bold text-white rounded ${isInformatica ? 'bg-[#FF4A00]' : 'bg-slds-brand'}`}>{bundle.fieldTag}</span>
+                                <span className="slds-font-weight_bold slds-text-white slds-border-radius_small" style={{ padding: '2px 6px', fontSize: '9px', background: isInformatica ? '#FF4A00' : 'var(--slds-g-color-brand)' }}>{bundle.fieldTag}</span>
                               )}
                             </span>
                           </td>
@@ -1632,8 +1657,8 @@ export default function DataCloudSetupContent({ onBack, demoSession, onDemoSessi
                           <td>{bundle.latestVersion}</td>
                           <td>
                             {isInstalled ? (
-                              <span className="inline-flex items-center gap-1 text-xs font-medium text-slds-success-1">
-                                <CheckCircle2 className="w-3.5 h-3.5" /> Installed
+                              <span className="slds-inline-flex slds-items-center slds-gap_xx-small slds-text-size_small slds-font-weight_medium slds-text-success">
+                                <CheckCircle2 className="slds-icon-size_x-small" /> Installed
                               </span>
                             ) : (
                               <button
@@ -1643,9 +1668,8 @@ export default function DataCloudSetupContent({ onBack, demoSession, onDemoSessi
                                   setInstallModalLoading(false);
                                   setInstallModalOpen(true);
                                 }}
-                                className={`px-3 py-1 text-xs font-medium text-white rounded transition-colors ${
-                                  isInformatica ? 'bg-[#FF4A00] hover:bg-[#E54300]' : 'bg-slds-brand hover:bg-slds-brand-contrast-1'
-                                }`}
+                                className="slds-p-horizontal_small slds-text-size_small slds-font-weight_medium slds-text-white slds-border-radius_small slds-transition-colors"
+                                style={{ paddingTop: '4px', paddingBottom: '4px', background: isInformatica ? '#FF4A00' : 'var(--slds-g-color-brand)' }}
                               >
                                 Install
                               </button>
@@ -1666,41 +1690,41 @@ export default function DataCloudSetupContent({ onBack, demoSession, onDemoSessi
                ═══════════════════════════════════════════════════════════ */
             <div>
               {/* Page header */}
-              <div className="bg-white border-b border-slds-border-1 px-6 py-4 flex items-center gap-4">
-                <div className="w-10 h-10 rounded bg-[#F49756] flex items-center justify-center flex-shrink-0">
-                  <LayoutGrid className="w-5 h-5 text-white" />
+              <div className="slds-bg-white slds-border_bottom slds-border-color_border-1 slds-p-horizontal_large slds-p-vertical_medium slds-flex slds-items-center slds-gap_medium">
+                <div className="slds-flex slds-items-center slds-justify-center slds-flex-shrink-0 slds-border-radius_small" style={{ width: '40px', height: '40px', background: '#F49756' }}>
+                  <LayoutGrid className="slds-icon-size_default slds-text-white" />
                 </div>
                 <div>
-                  <div className="text-xs font-medium text-slds-brand uppercase tracking-wide">SETUP</div>
-                  <h1 className="text-lg font-bold text-slds-neutral-base">Installed Packages</h1>
+                  <div className="slds-text-size_small slds-font-weight_medium slds-text-brand slds-text-uppercase slds-tracking-wide">SETUP</div>
+                  <h1 className="slds-font-weight_bold slds-text-neutral-base" style={{ fontSize: '18px' }}>Installed Packages</h1>
                 </div>
               </div>
 
-              <div className="p-6">
+              <div className="slds-p-around_large">
                 {/* Package Detail view */}
                 {detailPackage ? (
                   <div>
-                    <div className="flex items-center justify-between mb-4">
+                    <div className="slds-flex slds-items-center slds-justify-between slds-m-bottom_medium">
                       <div>
-                        <div className="text-xs text-slds-neutral-7 mb-0.5">Package Details</div>
-                        <h2 className="text-xl font-bold text-slds-neutral-base">{detailPackage.name} (Managed)</h2>
+                        <div className="slds-text-size_small slds-text-neutral-7" style={{ marginBottom: '2px' }}>Package Details</div>
+                        <h2 className="slds-text-size_x-large slds-font-weight_bold slds-text-neutral-base">{detailPackage.name} (Managed)</h2>
                       </div>
-                      <button className="text-sm text-slds-brand hover:underline">Help for this Page</button>
+                      <button className="slds-text-size_medium slds-text-brand sf-hover-underline">Help for this Page</button>
                     </div>
 
                     {/* Installed Package Detail card */}
-                    <div className="border border-slds-border-1 rounded mb-6">
-                      <div className={`px-4 py-2.5 border-b flex items-center justify-between ${detailPackage.isInformatica ? 'bg-[#FFF3ED] border-[#FFD6C0]' : 'bg-[#FAFAF9] border-slds-border-1'}`}>
-                        <span className="text-sm font-semibold text-slds-neutral-base">Installed Package Detail</span>
-                        <div className="flex items-center gap-2">
-                          <button className="px-3 py-1 text-xs font-medium border border-slds-border-1 rounded hover:bg-slds-neutral-2">Uninstall</button>
-                          <button onClick={() => setPackageDetailName('__components__:' + detailPackage.name)} className="px-3 py-1 text-xs font-medium border border-slds-border-1 rounded hover:bg-slds-neutral-2">View Components</button>
-                          <button className="px-3 py-1 text-xs font-medium border border-slds-border-1 rounded hover:bg-slds-neutral-2">Become Primary Contact</button>
-                          <button className="px-3 py-1 text-xs font-medium border border-slds-border-1 rounded hover:bg-slds-neutral-2">View Dependencies</button>
+                    <div className="slds-border_all slds-border-color_border-1 slds-border-radius_small slds-m-bottom_large">
+                      <div className={`slds-p-horizontal_medium slds-border_bottom slds-flex slds-items-center slds-justify-between`} style={{ paddingTop: '10px', paddingBottom: '10px', background: detailPackage.isInformatica ? '#FFF3ED' : '#FAFAF9', borderBottomColor: detailPackage.isInformatica ? '#FFD6C0' : 'var(--slds-g-color-border-1)' }}>
+                        <span className="slds-text-size_medium slds-font-weight_semibold slds-text-neutral-base">Installed Package Detail</span>
+                        <div className="slds-flex slds-items-center slds-gap_x-small">
+                          <button className="slds-p-horizontal_small slds-text-size_small slds-font-weight_medium slds-border_all slds-border-color_border-1 slds-border-radius_small sf-hover-bg-neutral" style={{ paddingTop: '4px', paddingBottom: '4px' }}>Uninstall</button>
+                          <button onClick={() => setPackageDetailName('__components__:' + detailPackage.name)} className="slds-p-horizontal_small slds-text-size_small slds-font-weight_medium slds-border_all slds-border-color_border-1 slds-border-radius_small sf-hover-bg-neutral" style={{ paddingTop: '4px', paddingBottom: '4px' }}>View Components</button>
+                          <button className="slds-p-horizontal_small slds-text-size_small slds-font-weight_medium slds-border_all slds-border-color_border-1 slds-border-radius_small sf-hover-bg-neutral" style={{ paddingTop: '4px', paddingBottom: '4px' }}>Become Primary Contact</button>
+                          <button className="slds-p-horizontal_small slds-text-size_small slds-font-weight_medium slds-border_all slds-border-color_border-1 slds-border-radius_small sf-hover-bg-neutral" style={{ paddingTop: '4px', paddingBottom: '4px' }}>View Dependencies</button>
                         </div>
                       </div>
-                      <div className="bg-white">
-                        <table className="w-full text-sm">
+                      <div className="slds-bg-white">
+                        <table className="slds-w-full slds-text-size_medium">
                           <tbody>
                             {[
                               ['Package Name', detailPackage.name, 'Version Number', detailPackage.versionNumber],
@@ -1713,28 +1737,28 @@ export default function DataCloudSetupContent({ onBack, demoSession, onDemoSessi
                               ['Description', detailPackage.description || '', '', ''],
                               ['Installed By', `Data Cloud, ${detailPackage.installDate}`, '', ''],
                             ].map(([label1, val1, label2, val2], i) => (
-                              <tr key={i} className="border-b border-slds-border-1 last:border-0">
-                                <td className="px-4 py-2 text-right text-slds-neutral-7 font-medium w-[160px] whitespace-nowrap">{label1}</td>
-                                <td className="px-4 py-2 text-slds-neutral-base">{val1}</td>
-                                {label2 && <td className="px-4 py-2 text-right text-slds-neutral-7 font-medium w-[200px] whitespace-nowrap">{label2}</td>}
-                                {label2 && <td className="px-4 py-2 text-slds-neutral-base">{val2}</td>}
+                              <tr key={i} className="slds-border_bottom slds-border-color_border-1" style={{ borderBottom: '1px solid var(--slds-g-color-border-1)' }}>
+                                <td className="slds-p-horizontal_medium slds-p-vertical_x-small slds-text-right slds-text-neutral-7 slds-font-weight_medium slds-nowrap" style={{ width: '160px' }}>{label1}</td>
+                                <td className="slds-p-horizontal_medium slds-p-vertical_x-small slds-text-neutral-base">{val1}</td>
+                                {label2 && <td className="slds-p-horizontal_medium slds-p-vertical_x-small slds-text-right slds-text-neutral-7 slds-font-weight_medium slds-nowrap" style={{ width: '200px' }}>{label2}</td>}
+                                {label2 && <td className="slds-p-horizontal_medium slds-p-vertical_x-small slds-text-neutral-base">{val2}</td>}
                                 {!label2 && <td colSpan={2}></td>}
                               </tr>
                             ))}
                           </tbody>
                         </table>
-                        <div className="border-t border-slds-border-1 px-4 py-3 flex items-center gap-8">
-                          <div className="flex items-center gap-2">
-                            <span className="text-sm text-slds-neutral-7 font-medium">Count Towards Limits</span>
-                            <input type="checkbox" checked={detailPackage.limits} readOnly className="w-4 h-4" />
+                        <div className="slds-border_top slds-border-color_border-1 slds-p-horizontal_medium slds-p-vertical_small slds-flex slds-items-center slds-gap_x-large">
+                          <div className="slds-flex slds-items-center slds-gap_x-small">
+                            <span className="slds-text-size_medium slds-text-neutral-7 slds-font-weight_medium">Count Towards Limits</span>
+                            <input type="checkbox" checked={detailPackage.limits} readOnly style={{ width: '16px', height: '16px' }} />
                           </div>
-                          <div className="flex items-center gap-8 ml-auto">
-                            <span className="text-sm"><span className="text-slds-neutral-7 font-medium">Tabs</span> {detailPackage.tabs}</span>
+                          <div className="slds-flex slds-items-center slds-gap_x-large" style={{ marginLeft: 'auto' }}>
+                            <span className="slds-text-size_medium"><span className="slds-text-neutral-7 slds-font-weight_medium">Tabs</span> {detailPackage.tabs}</span>
                           </div>
                         </div>
-                        <div className="border-t border-slds-border-1 px-4 py-3 flex items-center gap-8">
-                          <span className="text-sm"><span className="text-slds-neutral-7 font-medium">Apps</span> {detailPackage.apps}</span>
-                          <span className="text-sm ml-auto"><span className="text-slds-neutral-7 font-medium">Objects</span> {detailPackage.objects}</span>
+                        <div className="slds-border_top slds-border-color_border-1 slds-p-horizontal_medium slds-p-vertical_small slds-flex slds-items-center slds-gap_x-large">
+                          <span className="slds-text-size_medium"><span className="slds-text-neutral-7 slds-font-weight_medium">Apps</span> {detailPackage.apps}</span>
+                          <span className="slds-text-size_medium" style={{ marginLeft: 'auto' }}><span className="slds-text-neutral-7 slds-font-weight_medium">Objects</span> {detailPackage.objects}</span>
                         </div>
                       </div>
                     </div>
@@ -1748,26 +1772,26 @@ export default function DataCloudSetupContent({ onBack, demoSession, onDemoSessi
                     const components = compPkg?.isInformatica ? getInformaticaComponents(compPkgName) : [];
                     return (
                       <div>
-                        <div className="flex items-center justify-between mb-4">
+                        <div className="slds-flex slds-items-center slds-justify-between slds-m-bottom_medium">
                           <div>
-                            <div className="text-xs text-slds-neutral-7 mb-0.5">Package Details</div>
-                            <h2 className="text-xl font-bold text-slds-neutral-base">{compPkgName} (Managed)</h2>
+                            <div className="slds-text-size_small slds-text-neutral-7" style={{ marginBottom: '2px' }}>Package Details</div>
+                            <h2 className="slds-text-size_x-large slds-font-weight_bold slds-text-neutral-base">{compPkgName} (Managed)</h2>
                           </div>
-                          <button className="text-sm text-slds-brand hover:underline">Help for this Page</button>
+                          <button className="slds-text-size_medium slds-text-brand sf-hover-underline">Help for this Page</button>
                         </div>
 
                         {/* Installed Package Detail — compact (no View Components button) */}
-                        <div className="border border-slds-border-1 rounded mb-6">
-                          <div className={`px-4 py-2.5 border-b flex items-center justify-between ${compPkg?.isInformatica ? 'bg-[#FFF3ED] border-[#FFD6C0]' : 'bg-[#FAFAF9] border-slds-border-1'}`}>
-                            <span className="text-sm font-semibold text-slds-neutral-base">Installed Package Detail</span>
-                            <div className="flex items-center gap-2">
-                              <button className="px-3 py-1 text-xs font-medium border border-slds-border-1 rounded hover:bg-slds-neutral-2">Uninstall</button>
-                              <button className="px-3 py-1 text-xs font-medium border border-slds-border-1 rounded hover:bg-slds-neutral-2">Become Primary Contact</button>
-                              <button className="px-3 py-1 text-xs font-medium border border-slds-border-1 rounded hover:bg-slds-neutral-2">View Dependencies</button>
+                        <div className="slds-border_all slds-border-color_border-1 slds-border-radius_small slds-m-bottom_large">
+                          <div className={`slds-p-horizontal_medium slds-border_bottom slds-flex slds-items-center slds-justify-between`} style={{ paddingTop: '10px', paddingBottom: '10px', background: compPkg?.isInformatica ? '#FFF3ED' : '#FAFAF9', borderBottomColor: compPkg?.isInformatica ? '#FFD6C0' : 'var(--slds-g-color-border-1)' }}>
+                            <span className="slds-text-size_medium slds-font-weight_semibold slds-text-neutral-base">Installed Package Detail</span>
+                            <div className="slds-flex slds-items-center slds-gap_x-small">
+                              <button className="slds-p-horizontal_small slds-text-size_small slds-font-weight_medium slds-border_all slds-border-color_border-1 slds-border-radius_small sf-hover-bg-neutral" style={{ paddingTop: '4px', paddingBottom: '4px' }}>Uninstall</button>
+                              <button className="slds-p-horizontal_small slds-text-size_small slds-font-weight_medium slds-border_all slds-border-color_border-1 slds-border-radius_small sf-hover-bg-neutral" style={{ paddingTop: '4px', paddingBottom: '4px' }}>Become Primary Contact</button>
+                              <button className="slds-p-horizontal_small slds-text-size_small slds-font-weight_medium slds-border_all slds-border-color_border-1 slds-border-radius_small sf-hover-bg-neutral" style={{ paddingTop: '4px', paddingBottom: '4px' }}>View Dependencies</button>
                             </div>
                           </div>
-                          <div className="bg-white">
-                            <table className="w-full text-sm">
+                          <div className="slds-bg-white">
+                            <table className="slds-w-full slds-text-size_medium">
                               <tbody>
                                 {[
                                   ['Package Name', compPkg?.name || '', 'Version Number', compPkg?.versionNumber || ''],
@@ -1780,50 +1804,50 @@ export default function DataCloudSetupContent({ onBack, demoSession, onDemoSessi
                                   ['Description', compPkg?.description || '', '', ''],
                                   ['Installed By', `Data Cloud, ${compPkg?.installDate || ''}`, '', ''],
                                 ].map(([label1, val1, label2, val2], i) => (
-                                  <tr key={i} className="border-b border-slds-border-1 last:border-0">
-                                    <td className="px-4 py-2 text-right text-slds-neutral-7 font-medium w-[160px] whitespace-nowrap">{label1}</td>
-                                    <td className="px-4 py-2 text-slds-neutral-base">{val1}</td>
-                                    {label2 && <td className="px-4 py-2 text-right text-slds-neutral-7 font-medium w-[200px] whitespace-nowrap">{label2}</td>}
-                                    {label2 && <td className="px-4 py-2 text-slds-neutral-base">{val2}</td>}
+                                  <tr key={i} className="slds-border_bottom slds-border-color_border-1" style={{ borderBottom: '1px solid var(--slds-g-color-border-1)' }}>
+                                    <td className="slds-p-horizontal_medium slds-p-vertical_x-small slds-text-right slds-text-neutral-7 slds-font-weight_medium slds-nowrap" style={{ width: '160px' }}>{label1}</td>
+                                    <td className="slds-p-horizontal_medium slds-p-vertical_x-small slds-text-neutral-base">{val1}</td>
+                                    {label2 && <td className="slds-p-horizontal_medium slds-p-vertical_x-small slds-text-right slds-text-neutral-7 slds-font-weight_medium slds-nowrap" style={{ width: '200px' }}>{label2}</td>}
+                                    {label2 && <td className="slds-p-horizontal_medium slds-p-vertical_x-small slds-text-neutral-base">{val2}</td>}
                                     {!label2 && <td colSpan={2}></td>}
                                   </tr>
                                 ))}
                               </tbody>
                             </table>
-                            <div className="border-t border-slds-border-1 px-4 py-3 flex items-center gap-8">
-                              <span className="text-sm"><span className="text-slds-neutral-7 font-medium">Count Towards Limits</span></span>
-                              <input type="checkbox" checked={compPkg?.limits || false} readOnly className="w-4 h-4" />
-                              <span className="text-sm ml-auto"><span className="text-slds-neutral-7 font-medium">Tabs</span> {compPkg?.tabs || 0}</span>
+                            <div className="slds-border_top slds-border-color_border-1 slds-p-horizontal_medium slds-p-vertical_small slds-flex slds-items-center slds-gap_x-large">
+                              <span className="slds-text-size_medium"><span className="slds-text-neutral-7 slds-font-weight_medium">Count Towards Limits</span></span>
+                              <input type="checkbox" checked={compPkg?.limits || false} readOnly style={{ width: '16px', height: '16px' }} />
+                              <span className="slds-text-size_medium" style={{ marginLeft: 'auto' }}><span className="slds-text-neutral-7 slds-font-weight_medium">Tabs</span> {compPkg?.tabs || 0}</span>
                             </div>
-                            <div className="border-t border-slds-border-1 px-4 py-3 flex items-center gap-8">
-                              <span className="text-sm"><span className="text-slds-neutral-7 font-medium">Apps</span> {compPkg?.apps || 0}</span>
-                              <span className="text-sm ml-auto"><span className="text-slds-neutral-7 font-medium">Objects</span> {compPkg?.objects || 0}</span>
+                            <div className="slds-border_top slds-border-color_border-1 slds-p-horizontal_medium slds-p-vertical_small slds-flex slds-items-center slds-gap_x-large">
+                              <span className="slds-text-size_medium"><span className="slds-text-neutral-7 slds-font-weight_medium">Apps</span> {compPkg?.apps || 0}</span>
+                              <span className="slds-text-size_medium" style={{ marginLeft: 'auto' }}><span className="slds-text-neutral-7 slds-font-weight_medium">Objects</span> {compPkg?.objects || 0}</span>
                             </div>
                           </div>
                         </div>
 
                         {/* Metadata Components Included in Package */}
-                        <div className="border border-slds-border-1 rounded">
-                          <div className={`px-4 py-2.5 border-b ${compPkg?.isInformatica ? 'bg-[#FFF3ED] border-[#FFD6C0]' : 'bg-[#FAFAF9] border-slds-border-1'}`}>
-                            <span className="text-sm font-semibold text-slds-neutral-base">Metadata Components Included in Package</span>
+                        <div className="slds-border_all slds-border-color_border-1 slds-border-radius_small">
+                          <div className={`slds-p-horizontal_medium slds-border_bottom`} style={{ paddingTop: '10px', paddingBottom: '10px', background: compPkg?.isInformatica ? '#FFF3ED' : '#FAFAF9', borderBottomColor: compPkg?.isInformatica ? '#FFD6C0' : 'var(--slds-g-color-border-1)' }}>
+                            <span className="slds-text-size_medium slds-font-weight_semibold slds-text-neutral-base">Metadata Components Included in Package</span>
                           </div>
-                          <div className="overflow-x-auto bg-white">
-                            <table className="w-full text-sm">
+                          <div className="slds-overflow-x-auto slds-bg-white">
+                            <table className="slds-w-full slds-text-size_medium">
                               <thead>
-                                <tr className="border-b border-slds-border-1 bg-[#FAFAF9]">
-                                  <th className="px-3 py-2 text-left text-xs font-semibold text-slds-neutral-base w-10">Action</th>
-                                  <th className="px-3 py-2 text-left text-xs font-semibold text-slds-neutral-base">Component Name</th>
-                                  <th className="px-3 py-2 text-left text-xs font-semibold text-slds-neutral-base w-[120px]">Parent Object</th>
-                                  <th className="px-3 py-2 text-left text-xs font-semibold text-slds-neutral-base w-[180px]">Type</th>
+                                <tr className="slds-border_bottom slds-border-color_border-1" style={{ background: '#FAFAF9' }}>
+                                  <th className="slds-p-horizontal_small slds-p-vertical_x-small slds-text-left slds-text-size_small slds-font-weight_semibold slds-text-neutral-base" style={{ width: '40px' }}>Action</th>
+                                  <th className="slds-p-horizontal_small slds-p-vertical_x-small slds-text-left slds-text-size_small slds-font-weight_semibold slds-text-neutral-base">Component Name</th>
+                                  <th className="slds-p-horizontal_small slds-p-vertical_x-small slds-text-left slds-text-size_small slds-font-weight_semibold slds-text-neutral-base" style={{ width: '120px' }}>Parent Object</th>
+                                  <th className="slds-p-horizontal_small slds-p-vertical_x-small slds-text-left slds-text-size_small slds-font-weight_semibold slds-text-neutral-base" style={{ width: '180px' }}>Type</th>
                                 </tr>
                               </thead>
                               <tbody>
                                 {components.map((comp, i) => (
-                                  <tr key={i} className="border-b border-slds-border-1 last:border-0 hover:bg-[#F9F9F9]">
-                                    <td className="px-3 py-1.5"></td>
-                                    <td className="px-3 py-1.5 text-slds-brand hover:underline cursor-pointer font-mono text-xs">{comp.name}</td>
-                                    <td className="px-3 py-1.5 text-slds-neutral-7">{comp.parentObject}</td>
-                                    <td className="px-3 py-1.5 text-slds-neutral-base">{comp.type}</td>
+                                  <tr key={i} className="slds-border_bottom slds-border-color_border-1" style={{ borderBottom: '1px solid var(--slds-g-color-border-1)' }}>
+                                    <td className="slds-p-horizontal_small" style={{ paddingTop: '6px', paddingBottom: '6px' }}></td>
+                                    <td className="slds-p-horizontal_small slds-text-brand sf-hover-underline slds-cursor-pointer slds-text-size_small" style={{ paddingTop: '6px', paddingBottom: '6px', fontFamily: 'monospace' }}>{comp.name}</td>
+                                    <td className="slds-p-horizontal_small slds-text-neutral-7" style={{ paddingTop: '6px', paddingBottom: '6px' }}>{comp.parentObject}</td>
+                                    <td className="slds-p-horizontal_small slds-text-neutral-base" style={{ paddingTop: '6px', paddingBottom: '6px' }}>{comp.type}</td>
                                   </tr>
                                 ))}
                               </tbody>
@@ -1838,70 +1862,71 @@ export default function DataCloudSetupContent({ onBack, demoSession, onDemoSessi
                   /* ═══ INSTALLED PACKAGES LIST ═══ */
                   <div>
                     {/* Intro text */}
-                    <div className="mb-6">
-                      <h2 className="text-base font-bold text-slds-neutral-base mb-3">Installed Packages</h2>
-                      <div className="flex gap-6">
-                        <div className="flex-1 text-sm text-slds-neutral-9 space-y-2">
-                          <p>On AppExchange you can browse, test drive, download, and install pre-built apps and components right into your salesforce.com environment. <button className="text-slds-brand hover:underline">Learn More about Installing Packages</button>.</p>
+                    <div className="slds-m-bottom_large">
+                      <h2 className="slds-text-size_large slds-font-weight_bold slds-text-neutral-base slds-m-bottom_small">Installed Packages</h2>
+                      <div className="slds-flex slds-gap_large">
+                        <div className="slds-flex-1 slds-text-size_medium slds-text-neutral-9" style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                          <p>On AppExchange you can browse, test drive, download, and install pre-built apps and components right into your salesforce.com environment. <button className="slds-text-brand sf-hover-underline">Learn More about Installing Packages</button>.</p>
                           <p>Apps and components are installed in packages. Any custom apps, tabs, and custom objects are initially marked as "In Development" and are not deployed to your users. This allows you to test and customize before deploying. You can deploy the components individually using the other features in setup or as a group by clicking Deploy.</p>
                           <p>Depending on the links next to an installed package, you can take different actions from this page.</p>
                           <p>To remove a package, click <strong>Uninstall</strong>. To manage your package licenses, click <strong>Manage Licenses</strong>.</p>
                         </div>
-                        <div className="w-[200px] flex-shrink-0 border border-slds-border-1 rounded-lg p-4 text-center">
-                          <div className="w-full h-12 bg-gradient-to-r from-[#00A1E0] to-slds-brand-2 rounded flex items-center justify-center mb-2">
-                            <span className="text-white font-bold text-xs">salesforce appexchange</span>
+                        <div className="slds-flex-shrink-0 slds-border_all slds-border-color_border-1 slds-border-radius_large slds-p-around_medium slds-text-center" style={{ width: '200px' }}>
+                          <div className="slds-w-full slds-border-radius_small slds-flex slds-items-center slds-justify-center slds-m-bottom_x-small" style={{ height: '48px', background: 'linear-gradient(to right, #00A1E0, var(--slds-g-color-brand-2))' }}>
+                            <span className="slds-text-white slds-font-weight_bold slds-text-size_small">salesforce appexchange</span>
                           </div>
-                          <button className="text-sm text-slds-brand font-medium hover:underline">Visit AppExchange &raquo;</button>
+                          <button className="slds-text-size_medium slds-text-brand slds-font-weight_medium sf-hover-underline">Visit AppExchange &raquo;</button>
                         </div>
                       </div>
                     </div>
 
                     {/* Installed Packages table */}
-                    <div className="border border-slds-border-1 rounded mb-6">
-                      <div className="bg-[#FAFAF9] px-4 py-2.5 border-b border-slds-border-1">
-                        <span className="text-sm font-semibold text-slds-neutral-base">Installed Packages</span>
+                    <div className="slds-border_all slds-border-color_border-1 slds-border-radius_small slds-m-bottom_large">
+                      <div className="slds-p-horizontal_medium slds-border_bottom slds-border-color_border-1" style={{ paddingTop: '10px', paddingBottom: '10px', background: '#FAFAF9' }}>
+                        <span className="slds-text-size_medium slds-font-weight_semibold slds-text-neutral-base">Installed Packages</span>
                       </div>
-                      <div className="overflow-x-auto bg-white">
-                        <table className="w-full text-sm">
+                      <div className="slds-overflow-x-auto slds-bg-white">
+                        <table className="slds-w-full slds-text-size_medium">
                           <thead>
-                            <tr className="border-b border-slds-border-1">
-                              <th className="px-3 py-2 text-left text-xs font-semibold text-slds-neutral-base w-[70px]">Action</th>
-                              <th className="px-3 py-2 text-left text-xs font-semibold text-slds-neutral-base">Package Name</th>
-                              <th className="px-3 py-2 text-left text-xs font-semibold text-slds-neutral-base">Publisher</th>
-                              <th className="px-3 py-2 text-left text-xs font-semibold text-slds-neutral-base">Version Number</th>
-                              <th className="px-3 py-2 text-left text-xs font-semibold text-slds-neutral-base">Namespace Prefix</th>
-                              <th className="px-3 py-2 text-left text-xs font-semibold text-slds-neutral-base">Install Date</th>
-                              <th className="px-3 py-2 text-center text-xs font-semibold text-slds-neutral-base w-[50px]">Limits</th>
-                              <th className="px-3 py-2 text-center text-xs font-semibold text-slds-neutral-base w-[40px]">Apps</th>
-                              <th className="px-3 py-2 text-center text-xs font-semibold text-slds-neutral-base w-[40px]">Tabs</th>
-                              <th className="px-3 py-2 text-center text-xs font-semibold text-slds-neutral-base w-[50px]">Objects</th>
-                              <th className="px-3 py-2 text-left text-xs font-semibold text-slds-neutral-base">AppExchange Ready</th>
+                            <tr className="slds-border_bottom slds-border-color_border-1">
+                              <th className="slds-p-horizontal_small slds-p-vertical_x-small slds-text-left slds-text-size_small slds-font-weight_semibold slds-text-neutral-base" style={{ width: '70px' }}>Action</th>
+                              <th className="slds-p-horizontal_small slds-p-vertical_x-small slds-text-left slds-text-size_small slds-font-weight_semibold slds-text-neutral-base">Package Name</th>
+                              <th className="slds-p-horizontal_small slds-p-vertical_x-small slds-text-left slds-text-size_small slds-font-weight_semibold slds-text-neutral-base">Publisher</th>
+                              <th className="slds-p-horizontal_small slds-p-vertical_x-small slds-text-left slds-text-size_small slds-font-weight_semibold slds-text-neutral-base">Version Number</th>
+                              <th className="slds-p-horizontal_small slds-p-vertical_x-small slds-text-left slds-text-size_small slds-font-weight_semibold slds-text-neutral-base">Namespace Prefix</th>
+                              <th className="slds-p-horizontal_small slds-p-vertical_x-small slds-text-left slds-text-size_small slds-font-weight_semibold slds-text-neutral-base">Install Date</th>
+                              <th className="slds-p-horizontal_small slds-p-vertical_x-small slds-text-center slds-text-size_small slds-font-weight_semibold slds-text-neutral-base" style={{ width: '50px' }}>Limits</th>
+                              <th className="slds-p-horizontal_small slds-p-vertical_x-small slds-text-center slds-text-size_small slds-font-weight_semibold slds-text-neutral-base" style={{ width: '40px' }}>Apps</th>
+                              <th className="slds-p-horizontal_small slds-p-vertical_x-small slds-text-center slds-text-size_small slds-font-weight_semibold slds-text-neutral-base" style={{ width: '40px' }}>Tabs</th>
+                              <th className="slds-p-horizontal_small slds-p-vertical_x-small slds-text-center slds-text-size_small slds-font-weight_semibold slds-text-neutral-base" style={{ width: '50px' }}>Objects</th>
+                              <th className="slds-p-horizontal_small slds-p-vertical_x-small slds-text-left slds-text-size_small slds-font-weight_semibold slds-text-neutral-base">AppExchange Ready</th>
                             </tr>
                           </thead>
                           <tbody>
                             {installedPackages.map((pkg, i) => (
-                              <tr key={i} className="border-b border-slds-border-1 last:border-0 hover:bg-[#F9F9F9]">
-                                <td className="px-3 py-2 text-slds-brand hover:underline cursor-pointer text-xs">Uninstall</td>
-                                <td className="px-3 py-2">
+                              <tr key={i} className="slds-border_bottom slds-border-color_border-1" style={{ borderBottom: '1px solid var(--slds-g-color-border-1)' }}>
+                                <td className="slds-p-horizontal_small slds-p-vertical_x-small slds-text-brand sf-hover-underline slds-cursor-pointer slds-text-size_small">Uninstall</td>
+                                <td className="slds-p-horizontal_small slds-p-vertical_x-small">
                                   <button
                                     onClick={() => setPackageDetailName(pkg.name)}
-                                    className={`text-sm hover:underline ${pkg.isInformatica ? 'text-[#FF4A00] font-medium' : 'text-slds-brand'}`}
+                                    className={`slds-text-size_medium sf-hover-underline ${pkg.isInformatica ? 'slds-font-weight_medium' : 'slds-text-brand'}`}
+                                    style={pkg.isInformatica ? { color: '#FF4A00' } : undefined}
                                   >
                                     {pkg.name}
                                   </button>
                                   {pkg.description && i === 0 && (
-                                    <div className="text-xs text-slds-neutral-7 mt-0.5 ml-4">{pkg.description}</div>
+                                    <div className="slds-text-size_small slds-text-neutral-7 slds-m-top_xxx-small slds-m-left_medium">{pkg.description}</div>
                                   )}
                                 </td>
-                                <td className="px-3 py-2 text-slds-neutral-base">{pkg.publisher}</td>
-                                <td className="px-3 py-2 text-slds-neutral-base">{pkg.versionNumber}</td>
-                                <td className="px-3 py-2 text-slds-neutral-base">{pkg.namespacePrefix}</td>
-                                <td className="px-3 py-2 text-slds-neutral-base whitespace-nowrap">{pkg.installDate}</td>
-                                <td className="px-3 py-2 text-center">{pkg.limits ? <Check className="w-4 h-4 mx-auto text-slds-neutral-base" /> : ''}</td>
-                                <td className="px-3 py-2 text-center text-slds-neutral-base">{pkg.apps}</td>
-                                <td className="px-3 py-2 text-center text-slds-neutral-base">{pkg.tabs}</td>
-                                <td className="px-3 py-2 text-center text-slds-neutral-base">{pkg.objects}</td>
-                                <td className="px-3 py-2 text-slds-neutral-base">{pkg.appExchangeReady}</td>
+                                <td className="slds-p-horizontal_small slds-p-vertical_x-small slds-text-neutral-base">{pkg.publisher}</td>
+                                <td className="slds-p-horizontal_small slds-p-vertical_x-small slds-text-neutral-base">{pkg.versionNumber}</td>
+                                <td className="slds-p-horizontal_small slds-p-vertical_x-small slds-text-neutral-base">{pkg.namespacePrefix}</td>
+                                <td className="slds-p-horizontal_small slds-p-vertical_x-small slds-text-neutral-base slds-nowrap">{pkg.installDate}</td>
+                                <td className="slds-p-horizontal_small slds-p-vertical_x-small slds-text-center">{pkg.limits ? <Check className="slds-icon-size_small slds-text-neutral-base" style={{ margin: '0 auto' }} /> : ''}</td>
+                                <td className="slds-p-horizontal_small slds-p-vertical_x-small slds-text-center slds-text-neutral-base">{pkg.apps}</td>
+                                <td className="slds-p-horizontal_small slds-p-vertical_x-small slds-text-center slds-text-neutral-base">{pkg.tabs}</td>
+                                <td className="slds-p-horizontal_small slds-p-vertical_x-small slds-text-center slds-text-neutral-base">{pkg.objects}</td>
+                                <td className="slds-p-horizontal_small slds-p-vertical_x-small slds-text-neutral-base">{pkg.appExchangeReady}</td>
                               </tr>
                             ))}
                           </tbody>
@@ -1910,11 +1935,11 @@ export default function DataCloudSetupContent({ onBack, demoSession, onDemoSessi
                     </div>
 
                     {/* Uninstalled Packages */}
-                    <div className="border border-slds-border-1 rounded">
-                      <div className="bg-[#FAFAF9] px-4 py-2.5 border-b border-slds-border-1">
-                        <span className="text-sm font-semibold text-slds-neutral-base">Uninstalled Packages</span>
+                    <div className="slds-border_all slds-border-color_border-1 slds-border-radius_small">
+                      <div className="slds-p-horizontal_medium slds-border_bottom slds-border-color_border-1" style={{ paddingTop: '10px', paddingBottom: '10px', background: '#FAFAF9' }}>
+                        <span className="slds-text-size_medium slds-font-weight_semibold slds-text-neutral-base">Uninstalled Packages</span>
                       </div>
-                      <div className="bg-white px-4 py-3 text-sm text-slds-neutral-7">
+                      <div className="slds-bg-white slds-p-horizontal_medium slds-p-vertical_small slds-text-size_medium slds-text-neutral-7">
                         No uninstalled package data archives
                       </div>
                     </div>
@@ -1924,13 +1949,13 @@ export default function DataCloudSetupContent({ onBack, demoSession, onDemoSessi
             </div>
           ) : (
             /* Generic setup page placeholder */
-            <div className="p-6">
+            <div className="slds-p-around_large">
               <div className="sf-card">
                 <div className="sf-card-header">
-                  <h1 className="text-base font-semibold text-slds-neutral-base">{currentPageLabel}</h1>
+                  <h1 className="slds-text-size_large slds-font-weight_semibold slds-text-neutral-base">{currentPageLabel}</h1>
                 </div>
                 <div className="sf-card-body">
-                  <p className="text-sm text-slds-neutral-7">Setup content for {currentPageLabel}.</p>
+                  <p className="slds-text-size_medium slds-text-neutral-7">Setup content for {currentPageLabel}.</p>
                 </div>
               </div>
             </div>
@@ -1942,133 +1967,138 @@ export default function DataCloudSetupContent({ onBack, demoSession, onDemoSessi
           MODAL: Connect an Org Wizard
          ═══════════════════════════════════════════════════════════ */}
       {connectOrgOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center">
-          <div className="absolute inset-0 bg-black/50" onClick={() => setConnectOrgOpen(false)} />
+        <div className="slds-pos-fixed slds-inset-0 slds-z-50 slds-flex slds-items-center slds-justify-center">
+          <div className="slds-pos-absolute slds-inset-0" style={{ background: 'rgba(0,0,0,0.5)' }} onClick={() => setConnectOrgOpen(false)} />
 
           {/* Step: Login */}
           {wizardStep === 'login' ? (
-            <div className="relative bg-[#F0F2F5] rounded-lg shadow-2xl w-[480px] flex flex-col items-center py-12 px-8">
-              <button onClick={() => setConnectOrgOpen(false)} className="absolute top-3 right-3 w-7 h-7 flex items-center justify-center rounded hover:bg-black/5 text-slds-neutral-7">
-                <X className="w-4 h-4" />
+            <div className="slds-pos-relative slds-border-radius_large slds-shadow_large slds-flex slds-flex-col slds-items-center" style={{ background: '#F0F2F5', width: '480px', padding: '48px 32px' }}>
+              <button onClick={() => setConnectOrgOpen(false)} className="slds-pos-absolute slds-flex slds-items-center slds-justify-center slds-border-radius_small slds-text-neutral-7" style={{ top: '12px', right: '12px', width: '28px', height: '28px' }}>
+                <X className="slds-icon-size_small" />
               </button>
               {/* Logo */}
               {isInformatica ? (
-                <div className="mb-8">
-                  <InformaticaLogo className="h-14 w-auto" />
+                <div className="slds-m-bottom_x-large" style={{ marginBottom: '32px' }}>
+                  <InformaticaLogo style={{ height: '56px', width: 'auto' }} />
                 </div>
               ) : (
-                <div className="mb-8">
+                <div className="slds-m-bottom_x-large" style={{ marginBottom: '32px' }}>
                   <SalesforceCloudLogo size={100} />
                 </div>
               )}
               {/* Login form */}
-              <div className="w-full bg-white rounded-lg border border-[#D8DDE6] p-6 space-y-4">
+              <div className="slds-w-full slds-bg-white slds-border-radius_large slds-p-around_large" style={{ border: '1px solid #D8DDE6', display: 'flex', flexDirection: 'column', gap: '16px' }}>
                 <div>
-                  <label className="block text-sm text-slds-brand mb-1">Username</label>
+                  <label className="slds-text-size_medium slds-text-brand slds-m-bottom_xx-small" style={{ display: 'block', marginBottom: '4px' }}>Username</label>
                   <input
                     type="text"
                     value={loginUsername}
                     onChange={(e) => setLoginUsername(e.target.value)}
-                    className="w-full px-3 py-2.5 text-sm border border-[#D8DDE6] rounded focus:outline-none focus:border-slds-brand-2 focus:ring-2 focus:ring-[rgba(27,150,255,0.2)]"
+                    className="slds-w-full slds-p-horizontal_small slds-text-size_medium slds-border-radius_small"
+                    style={{ paddingTop: '10px', paddingBottom: '10px', border: '1px solid #D8DDE6' }}
                   />
                 </div>
                 <div>
-                  <label className="block text-sm text-slds-brand mb-1">Password</label>
+                  <label className="slds-text-size_medium slds-text-brand slds-m-bottom_xx-small" style={{ display: 'block', marginBottom: '4px' }}>Password</label>
                   <input
                     type="password"
                     value={loginPassword}
                     onChange={(e) => setLoginPassword(e.target.value)}
-                    className="w-full px-3 py-2.5 text-sm border border-[#D8DDE6] rounded focus:outline-none focus:border-slds-brand-2 focus:ring-2 focus:ring-[rgba(27,150,255,0.2)]"
+                    className="slds-w-full slds-p-horizontal_small slds-text-size_medium slds-border-radius_small"
+                    style={{ paddingTop: '10px', paddingBottom: '10px', border: '1px solid #D8DDE6' }}
                   />
                 </div>
                 <button
                   onClick={handleWizardNext}
-                  className="w-full py-2.5 text-sm font-medium text-white bg-[#4A89DC] rounded hover:bg-[#3B7BD3] transition-colors"
+                  className="slds-w-full slds-text-size_medium slds-font-weight_medium slds-text-white slds-border-radius_small slds-transition-colors"
+                  style={{ paddingTop: '10px', paddingBottom: '10px', background: '#4A89DC' }}
                 >
                   Log In
                 </button>
-                <label className="flex items-center gap-2 cursor-pointer">
-                  <input type="checkbox" checked={rememberMe} onChange={(e) => setRememberMe(e.target.checked)} className="w-4 h-4 rounded border-[#D8DDE6] text-slds-brand" />
-                  <span className="text-sm text-slds-neutral-base">Remember me</span>
+                <label className="slds-flex slds-items-center slds-gap_x-small slds-cursor-pointer">
+                  <input type="checkbox" checked={rememberMe} onChange={(e) => setRememberMe(e.target.checked)} style={{ width: '16px', height: '16px' }} />
+                  <span className="slds-text-size_medium slds-text-neutral-base">Remember me</span>
                 </label>
-                <div className="border-t border-[#D8DDE6] pt-3 flex items-center justify-between">
-                  <button className="text-sm text-slds-brand hover:underline">Forgot Your Password?</button>
-                  <button className="text-sm text-slds-brand hover:underline">Use Custom Domain</button>
+                <div className="slds-border_top slds-p-top_small slds-flex slds-items-center slds-justify-between" style={{ borderTopColor: '#D8DDE6' }}>
+                  <button className="slds-text-size_medium slds-text-brand sf-hover-underline">Forgot Your Password?</button>
+                  <button className="slds-text-size_medium slds-text-brand sf-hover-underline">Use Custom Domain</button>
                 </div>
               </div>
             </div>
           ) : wizardStep === 'permissions' ? (
             /* Step: Permissions / Allow Access */
-            <div className="relative bg-[#F0F2F5] rounded-lg shadow-2xl w-[520px] flex flex-col items-center py-12 px-8">
-              <button onClick={() => setConnectOrgOpen(false)} className="absolute top-3 right-3 w-7 h-7 flex items-center justify-center rounded hover:bg-black/5 text-slds-neutral-7">
-                <X className="w-4 h-4" />
+            <div className="slds-pos-relative slds-border-radius_large slds-shadow_large slds-flex slds-flex-col slds-items-center" style={{ background: '#F0F2F5', width: '520px', padding: '48px 32px' }}>
+              <button onClick={() => setConnectOrgOpen(false)} className="slds-pos-absolute slds-flex slds-items-center slds-justify-center slds-border-radius_small slds-text-neutral-7" style={{ top: '12px', right: '12px', width: '28px', height: '28px' }}>
+                <X className="slds-icon-size_small" />
               </button>
               {/* Logo */}
               {isInformatica ? (
-                <div className="mb-6">
-                  <InformaticaLogo className="h-14 w-auto" />
+                <div className="slds-m-bottom_large">
+                  <InformaticaLogo style={{ height: '56px', width: 'auto' }} />
                 </div>
               ) : (
-                <div className="mb-6">
+                <div className="slds-m-bottom_large">
                   <SalesforceCloudLogo size={100} />
                 </div>
               )}
-              <h2 className="text-2xl text-slds-neutral-7 mb-6">Allow Access?</h2>
-              <div className="w-full bg-white rounded-lg border border-[#D8DDE6] p-6 space-y-4">
-                <p className="text-sm text-slds-neutral-9">
+              <h2 className="slds-text-size_xx-large slds-text-neutral-7 slds-m-bottom_large">Allow Access?</h2>
+              <div className="slds-w-full slds-bg-white slds-border-radius_large slds-p-around_large" style={{ border: '1px solid #D8DDE6', display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                <p className="slds-text-size_medium slds-text-neutral-9">
                   {isInformatica ? 'Informatica MDM' : 'Data Cloud Salesforce'} Org Registration is asking to:
                 </p>
-                <ul className="list-disc ml-6 space-y-1 text-sm text-slds-neutral-base">
+                <ul className="slds-text-size_medium slds-text-neutral-base" style={{ listStyleType: 'disc', marginLeft: '24px', display: 'flex', flexDirection: 'column', gap: '4px' }}>
                   <li>Access the identity URL service</li>
                   <li>Access unique user identifiers</li>
                   <li>Manage user data via APIs</li>
                 </ul>
-                <p className="text-sm text-slds-neutral-9">
+                <p className="slds-text-size_medium slds-text-neutral-9">
                   Do you want to allow access for<br />
-                  {loginUsername}? (<button className="text-slds-brand hover:underline">Not you?</button>)
+                  {loginUsername}? (<button className="slds-text-brand sf-hover-underline">Not you?</button>)
                 </p>
-                <div className="flex items-center gap-3 pt-2">
+                <div className="slds-flex slds-items-center slds-gap_small slds-p-top_x-small">
                   <button
                     onClick={() => setConnectOrgOpen(false)}
-                    className="flex-1 py-2.5 text-sm font-medium text-slds-brand border border-[#D8DDE6] rounded hover:bg-slds-neutral-2 transition-colors"
+                    className="slds-flex-1 slds-text-size_medium slds-font-weight_medium slds-text-brand slds-border-radius_small sf-hover-bg-neutral slds-transition-colors"
+                    style={{ paddingTop: '10px', paddingBottom: '10px', border: '1px solid #D8DDE6' }}
                   >
                     Deny
                   </button>
                   <button
                     onClick={handleAllowAccess}
-                    className="flex-1 py-2.5 text-sm font-medium text-white bg-[#4A89DC] rounded hover:bg-[#3B7BD3] transition-colors"
+                    className="slds-flex-1 slds-text-size_medium slds-font-weight_medium slds-text-white slds-border-radius_small slds-transition-colors"
+                    style={{ paddingTop: '10px', paddingBottom: '10px', background: '#4A89DC' }}
                   >
                     Allow
                   </button>
                 </div>
-                <p className="text-xs text-slds-neutral-7 pt-2">
+                <p className="slds-text-size_small slds-text-neutral-7 slds-p-top_x-small">
                   To revoke access at any time, go to your personal settings.
                 </p>
               </div>
             </div>
           ) : (
             /* Steps: select-type & alias */
-            <div className="relative bg-white rounded-lg shadow-2xl w-[640px] max-h-[85vh] flex flex-col">
+            <div className="slds-pos-relative slds-bg-white slds-border-radius_large slds-shadow_large slds-flex slds-flex-col" style={{ width: '640px', maxHeight: '85vh' }}>
               {/* Header */}
-              <div className="text-center py-6 border-b border-slds-border-1">
-                <h2 className="text-xl font-normal text-slds-neutral-base">
+              <div className="slds-text-center slds-p-vertical_large slds-border_bottom slds-border-color_border-1">
+                <h2 className="slds-text-size_x-large slds-font-weight_regular slds-text-neutral-base">
                   {isInformatica ? 'Connect an Informatica Tenant' : 'Connect an Org'}
                 </h2>
               </div>
 
               {/* Body */}
-              <div className="flex-1 overflow-y-auto px-8 py-6">
+              <div className="slds-flex-1 slds-overflow-y-auto slds-p-horizontal_x-large slds-p-vertical_large">
                 {wizardStep === 'select-type' ? (
-                  <div className="space-y-6">
-                    <p className="text-sm text-slds-neutral-9">
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+                    <p className="slds-text-size_medium slds-text-neutral-9">
                       {isInformatica
                         ? 'Choose what type of Informatica tenant you would like to connect to as a master data source. '
                         : 'Choose what type of org you would like to connect to as a data source and data action target. '}
-                      <button className="text-slds-brand hover:underline">Learn More</button>
+                      <button className="slds-text-brand sf-hover-underline">Learn More</button>
                     </p>
 
                     {/* Org type cards */}
-                    <div className="grid grid-cols-2 gap-4">
+                    <div className="slds-css-grid slds-css-grid-cols-2 slds-gap_medium">
                       {(['salesforce', 'sandbox'] as const).map((type) => {
                         const selected = selectedOrgType === type;
                         const accentColor = isInformatica ? '#FF4A00' : 'var(--slds-g-color-brand)';
@@ -2076,19 +2106,19 @@ export default function DataCloudSetupContent({ onBack, demoSession, onDemoSessi
                           <button
                             key={type}
                             onClick={() => setSelectedOrgType(type)}
-                            className={`relative flex items-center justify-center h-32 rounded-lg border-2 transition-all ${
+                            className={`slds-pos-relative slds-flex slds-items-center slds-justify-center slds-border-radius_large slds-transition-all ${
                               selected
-                                ? `bg-white shadow-sm`
-                                : 'border-[#D8DDE6] bg-white hover:border-[#B0B0B0]'
+                                ? 'slds-bg-white slds-shadow_small'
+                                : 'slds-bg-white'
                             }`}
-                            style={selected ? { borderColor: accentColor } : undefined}
+                            style={{ height: '128px', border: `2px solid ${selected ? accentColor : '#D8DDE6'}` }}
                           >
                             {selected && (
-                              <div className="absolute top-0 right-0 w-7 h-7 flex items-center justify-center" style={{ backgroundColor: accentColor, clipPath: 'polygon(0 0, 100% 0, 100% 100%)' }}>
-                                <Check className="w-3 h-3 text-white absolute top-0.5 right-0.5" />
+                              <div className="slds-pos-absolute slds-flex slds-items-center slds-justify-center" style={{ top: 0, right: 0, width: '28px', height: '28px', backgroundColor: accentColor, clipPath: 'polygon(0 0, 100% 0, 100% 100%)' }}>
+                                <Check className="slds-icon-size_xx-small slds-text-white slds-pos-absolute" style={{ top: '2px', right: '2px' }} />
                               </div>
                             )}
-                            <span className="text-sm text-slds-neutral-base">
+                            <span className="slds-text-size_medium slds-text-neutral-base">
                               {isInformatica
                                 ? (type === 'salesforce' ? 'Connect to a Production Tenant' : 'Connect to a Sandbox Tenant')
                                 : (type === 'salesforce' ? 'Connect to a Salesforce Org' : 'Connect to a Sandbox Org')}
@@ -2100,17 +2130,17 @@ export default function DataCloudSetupContent({ onBack, demoSession, onDemoSessi
                   </div>
                 ) : (
                   /* Alias step */
-                  <div className="space-y-6">
-                    <p className="text-sm text-slds-neutral-9">
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+                    <p className="slds-text-size_medium slds-text-neutral-9">
                       {isInformatica
                         ? 'Assign an alias for your Informatica MDM tenant connection that contains up to 15 alphanumeric characters. You can\'t change the alias later. The alias is used in data stream names and helps you identify your tenants.'
                         : `Assign an alias for your ${connectorName} connector that contains up to 15 alphanumeric characters. You can't change the alias later. The alias is used in data stream names and helps you filter your connections.`}
                     </p>
                     <div>
-                      <label className="block text-sm text-slds-neutral-base mb-1">
-                        <span className="text-slds-error-1">*</span> {isInformatica ? 'Tenant Alias' : 'Connection Alias'}
+                      <label className="slds-text-size_medium slds-text-neutral-base slds-m-bottom_xx-small" style={{ display: 'block', marginBottom: '4px' }}>
+                        <span className="slds-text-error">*</span> {isInformatica ? 'Tenant Alias' : 'Connection Alias'}
                       </label>
-                      <div className="flex items-center gap-2">
+                      <div className="slds-flex slds-items-center slds-gap_x-small">
                         <input
                           type="text"
                           value={connectionAlias}
@@ -2118,10 +2148,11 @@ export default function DataCloudSetupContent({ onBack, demoSession, onDemoSessi
                             if (e.target.value.length <= 15) setConnectionAlias(e.target.value);
                           }}
                           placeholder="Create an alias..."
-                          className="w-72 px-3 py-2 text-sm border-2 border-slds-brand rounded focus:outline-none focus:ring-2 focus:ring-[rgba(27,150,255,0.2)]"
+                          className="slds-p-horizontal_small slds-p-vertical_x-small slds-text-size_medium slds-border-radius_small"
+                          style={{ width: '288px', border: '2px solid var(--slds-g-color-brand)' }}
                           maxLength={15}
                         />
-                        <span className="text-sm text-slds-neutral-7">{connectionAlias.length}/15</span>
+                        <span className="slds-text-size_medium slds-text-neutral-7">{connectionAlias.length}/15</span>
                       </div>
                     </div>
                   </div>
@@ -2129,25 +2160,27 @@ export default function DataCloudSetupContent({ onBack, demoSession, onDemoSessi
               </div>
 
               {/* Footer */}
-              <div className="flex items-center justify-between px-8 py-4 border-t border-slds-border-1 bg-[#FAFAF9]">
+              <div className="slds-flex slds-items-center slds-justify-between slds-p-horizontal_x-large slds-p-vertical_medium slds-border_top slds-border-color_border-1" style={{ background: '#FAFAF9' }}>
                 {wizardStep === 'select-type' ? (
                   <>
-                    <button onClick={() => setConnectOrgOpen(false)} className="px-4 py-2 text-sm font-medium text-slds-brand border border-slds-border-1 rounded hover:bg-slds-neutral-2">Cancel</button>
+                    <button onClick={() => setConnectOrgOpen(false)} className="slds-p-horizontal_medium slds-p-vertical_x-small slds-text-size_medium slds-font-weight_medium slds-text-brand slds-border_all slds-border-color_border-1 slds-border-radius_small sf-hover-bg-neutral">Cancel</button>
                     <button
                       onClick={handleWizardNext}
                       disabled={!selectedOrgType}
-                      className="px-5 py-2 text-sm font-medium text-white bg-slds-brand rounded hover:bg-slds-brand-contrast-1 disabled:opacity-50 disabled:cursor-not-allowed"
+                      className="slds-p-horizontal_medium slds-p-vertical_x-small slds-text-size_medium slds-font-weight_medium slds-text-white slds-bg-brand slds-border-radius_small slds-opacity_50 slds-cursor-not-allowed"
+                      style={{ ...(!selectedOrgType ? {} : { opacity: 1, cursor: 'pointer' }), padding: '8px 20px' }}
                     >
                       Next
                     </button>
                   </>
                 ) : (
                   <>
-                    <button onClick={handleWizardBack} className="px-4 py-2 text-sm font-medium text-slds-brand border border-slds-border-1 rounded hover:bg-slds-neutral-2">Back</button>
+                    <button onClick={handleWizardBack} className="slds-p-horizontal_medium slds-p-vertical_x-small slds-text-size_medium slds-font-weight_medium slds-text-brand slds-border_all slds-border-color_border-1 slds-border-radius_small sf-hover-bg-neutral">Back</button>
                     <button
                       onClick={handleWizardNext}
                       disabled={!connectionAlias.trim()}
-                      className="px-5 py-2 text-sm font-medium text-white bg-slds-brand rounded hover:bg-slds-brand-contrast-1 disabled:opacity-50 disabled:cursor-not-allowed"
+                      className="slds-p-horizontal_medium slds-p-vertical_x-small slds-text-size_medium slds-font-weight_medium slds-text-white slds-bg-brand slds-border-radius_small"
+                      style={{ ...(!connectionAlias.trim() ? { opacity: 0.5, cursor: 'not-allowed' } : {}), padding: '8px 20px' }}
                     >
                       Proceed
                     </button>
@@ -2163,33 +2196,33 @@ export default function DataCloudSetupContent({ onBack, demoSession, onDemoSessi
           MODAL: Install Bundle Wizard
          ═══════════════════════════════════════════════════════════ */}
       {installModalOpen && installModalBundle && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center">
-          <div className="absolute inset-0 bg-black/40" onClick={() => !installModalLoading && setInstallModalOpen(false)} />
+        <div className="slds-pos-fixed slds-inset-0 slds-z-50 slds-flex slds-items-center slds-justify-center">
+          <div className="slds-pos-absolute slds-inset-0" style={{ background: 'rgba(0,0,0,0.4)' }} onClick={() => !installModalLoading && setInstallModalOpen(false)} />
 
           {installModalLoading ? (
             /* Loading state */
-            <div className="relative bg-white rounded-lg shadow-2xl w-[520px] py-16 px-8 flex flex-col items-center">
-              <div className="w-12 h-12 border-4 border-[#E0E0E0] border-t-[#FF4A00] rounded-full animate-spin mb-6" />
-              <p className="text-sm text-slds-neutral-base font-medium">
+            <div className="slds-pos-relative slds-bg-white slds-border-radius_large slds-shadow_large slds-flex slds-flex-col slds-items-center" style={{ width: '520px', padding: '64px 32px' }}>
+              <div className="slds-border-radius_pill sf-spin slds-m-bottom_large" style={{ width: '48px', height: '48px', border: '4px solid #E0E0E0', borderTopColor: '#FF4A00' }} />
+              <p className="slds-text-size_medium slds-text-neutral-base slds-font-weight_medium">
                 Installing and granting access to {installModalChoice === 'admins' ? 'admins Only' : installModalChoice === 'all' ? 'all Users' : 'specific Profiles'}...
               </p>
             </div>
           ) : (
             /* Selection step */
-            <div className="relative bg-white rounded-lg shadow-2xl w-[600px] max-h-[85vh] flex flex-col">
-              <button onClick={() => setInstallModalOpen(false)} className="absolute top-3 right-3 w-7 h-7 flex items-center justify-center rounded hover:bg-slds-neutral-2 text-slds-neutral-7 z-10">
-                <X className="w-4 h-4" />
+            <div className="slds-pos-relative slds-bg-white slds-border-radius_large slds-shadow_large slds-flex slds-flex-col" style={{ width: '600px', maxHeight: '85vh' }}>
+              <button onClick={() => setInstallModalOpen(false)} className="slds-pos-absolute slds-flex slds-items-center slds-justify-center slds-border-radius_small sf-hover-bg-neutral slds-text-neutral-7 slds-z-10" style={{ top: '12px', right: '12px', width: '28px', height: '28px' }}>
+                <X className="slds-icon-size_small" />
               </button>
 
               {/* Header */}
-              <div className="px-8 pt-6 pb-4 border-b border-slds-border-1">
-                <h2 className="text-xl font-bold text-slds-neutral-base">
+              <div className="slds-p-horizontal_x-large slds-p-top_large slds-p-bottom_medium slds-border_bottom slds-border-color_border-1">
+                <h2 className="slds-text-size_x-large slds-font-weight_bold slds-text-neutral-base">
                   Install {installModalBundle.name === 'Informatica MDM Cloud' ? 'Customer 360' : installModalBundle.name === 'Informatica Data Quality' ? 'Organization 360' : installModalBundle.name}
                 </h2>
               </div>
 
               {/* Body */}
-              <div className="flex-1 overflow-y-auto px-8 py-6 space-y-4">
+              <div className="slds-flex-1 slds-overflow-y-auto slds-p-horizontal_x-large slds-p-vertical_large" style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
                 {/* Radio cards */}
                 {([
                   { key: 'admins' as const, label: 'Install for Admins Only', desc: 'The package will only be visible and accessible to system administrators. All custom objects, fields, and components will be restricted to admin profiles.' },
@@ -2201,19 +2234,16 @@ export default function DataCloudSetupContent({ onBack, demoSession, onDemoSessi
                     <button
                       key={opt.key}
                       onClick={() => setInstallModalChoice(opt.key)}
-                      className={`w-full text-left p-4 rounded-lg border-2 transition-all ${
-                        selected ? 'border-[#FF4A00] bg-[#FFF8F5]' : 'border-[#D8DDE6] bg-white hover:border-[#B0B0B0]'
-                      }`}
+                      className={`slds-w-full slds-text-left slds-p-around_medium slds-border-radius_large slds-transition-all`}
+                      style={{ border: `2px solid ${selected ? '#FF4A00' : '#D8DDE6'}`, background: selected ? '#FFF8F5' : 'white' }}
                     >
-                      <div className="flex items-start gap-3">
-                        <div className={`w-5 h-5 mt-0.5 rounded-full border-2 flex items-center justify-center flex-shrink-0 ${
-                          selected ? 'border-[#FF4A00]' : 'border-[#D8DDE6]'
-                        }`}>
-                          {selected && <div className="w-2.5 h-2.5 rounded-full bg-[#FF4A00]" />}
+                      <div className="slds-flex slds-items-start slds-gap_small">
+                        <div className={`slds-border-radius_pill slds-flex slds-items-center slds-justify-center slds-flex-shrink-0`} style={{ width: '20px', height: '20px', marginTop: '2px', border: `2px solid ${selected ? '#FF4A00' : '#D8DDE6'}` }}>
+                          {selected && <div className="slds-border-radius_pill" style={{ width: '10px', height: '10px', background: '#FF4A00' }} />}
                         </div>
                         <div>
-                          <div className="text-sm font-semibold text-slds-neutral-base">{opt.label}</div>
-                          <div className="text-xs text-slds-neutral-7 mt-1">{opt.desc}</div>
+                          <div className="slds-text-size_medium slds-font-weight_semibold slds-text-neutral-base">{opt.label}</div>
+                          <div className="slds-text-size_small slds-text-neutral-7 slds-m-top_xx-small">{opt.desc}</div>
                         </div>
                       </div>
                     </button>
@@ -2221,35 +2251,36 @@ export default function DataCloudSetupContent({ onBack, demoSession, onDemoSessi
                 })}
 
                 {/* Package details summary */}
-                <div className="mt-4 border-t border-slds-border-1 pt-4">
-                  <div className="grid grid-cols-2 gap-y-2 text-sm">
-                    <div className="text-slds-neutral-7">App Name</div>
-                    <div className="text-slds-neutral-base font-medium">
+                <div className="slds-m-top_medium slds-border_top slds-border-color_border-1 slds-p-top_medium">
+                  <div className="slds-css-grid slds-css-grid-cols-2 slds-text-size_medium" style={{ rowGap: '8px' }}>
+                    <div className="slds-text-neutral-7">App Name</div>
+                    <div className="slds-text-neutral-base slds-font-weight_medium">
                       {installModalBundle.name === 'Informatica MDM Cloud' ? 'Customer 360' : installModalBundle.name === 'Informatica Data Quality' ? 'Organization 360' : installModalBundle.name}
                     </div>
-                    <div className="text-slds-neutral-7">Publisher</div>
-                    <div className="text-slds-neutral-base">{informaticaBundles.some((b) => b.name === installModalBundle.name) ? 'Informatica' : 'CDP CRM 1'}</div>
-                    <div className="text-slds-neutral-7">Version Name</div>
-                    <div className="text-slds-neutral-base">Winter 2026</div>
-                    <div className="text-slds-neutral-7">Version Number</div>
-                    <div className="text-slds-neutral-base">{installModalBundle.latestVersion}</div>
-                    <div className="text-slds-neutral-7">Additional Details</div>
-                    <div><button className="text-sm text-slds-brand hover:underline">View Components</button></div>
+                    <div className="slds-text-neutral-7">Publisher</div>
+                    <div className="slds-text-neutral-base">{informaticaBundles.some((b) => b.name === installModalBundle.name) ? 'Informatica' : 'CDP CRM 1'}</div>
+                    <div className="slds-text-neutral-7">Version Name</div>
+                    <div className="slds-text-neutral-base">Winter 2026</div>
+                    <div className="slds-text-neutral-7">Version Number</div>
+                    <div className="slds-text-neutral-base">{installModalBundle.latestVersion}</div>
+                    <div className="slds-text-neutral-7">Additional Details</div>
+                    <div><button className="slds-text-size_medium slds-text-brand sf-hover-underline">View Components</button></div>
                   </div>
                 </div>
               </div>
 
               {/* Footer */}
-              <div className="flex items-center justify-end gap-3 px-8 py-4 border-t border-slds-border-1 bg-[#FAFAF9]">
+              <div className="slds-flex slds-items-center slds-justify-end slds-gap_small slds-p-horizontal_x-large slds-p-vertical_medium slds-border_top slds-border-color_border-1" style={{ background: '#FAFAF9' }}>
                 <button
                   onClick={() => setInstallModalOpen(false)}
-                  className="px-4 py-2 text-sm font-medium text-slds-brand border border-slds-border-1 rounded hover:bg-slds-neutral-2"
+                  className="slds-p-horizontal_medium slds-p-vertical_x-small slds-text-size_medium slds-font-weight_medium slds-text-brand slds-border_all slds-border-color_border-1 slds-border-radius_small sf-hover-bg-neutral"
                 >
                   Cancel
                 </button>
                 <button
                   onClick={handleInstallBundle}
-                  className="px-5 py-2 text-sm font-medium text-white bg-[#FF4A00] rounded hover:bg-[#E54300] transition-colors"
+                  className="slds-text-size_medium slds-font-weight_medium slds-text-white slds-border-radius_small slds-transition-colors"
+                  style={{ padding: '8px 20px', background: '#FF4A00' }}
                 >
                   Install
                 </button>

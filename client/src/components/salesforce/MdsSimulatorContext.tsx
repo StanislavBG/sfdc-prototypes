@@ -19,33 +19,33 @@ export function useMdsSimulator() {
 // Fullscreen blocking overlay with countdown
 function MdsDelayOverlay({ secondsLeft }: { secondsLeft: number }) {
   return (
-    <div className="fixed inset-0 z-[200] flex items-center justify-center bg-black/30 backdrop-blur-[2px]">
-      <div className="bg-white rounded-xl shadow-2xl px-10 py-8 flex flex-col items-center gap-4 min-w-[320px]">
+    <div className="sf-mds-overlay">
+      <div className="sf-mds-card">
         {/* Spinner with brain */}
-        <div className="relative w-20 h-20 flex items-center justify-center">
-          <div className="absolute inset-0 rounded-full border-[3px] border-slds-brand/20 border-t-slds-brand animate-spin" />
-          <div className="absolute inset-2 rounded-full border-[3px] border-[#FF4A00]/20 border-b-[#FF4A00] animate-spin" style={{ animationDirection: 'reverse', animationDuration: '1.5s' }} />
-          <span className="text-2xl">🧠</span>
+        <div className="sf-mds-spinner-wrap">
+          <div className="sf-mds-spinner-outer" />
+          <div className="sf-mds-spinner-inner" />
+          <span style={{ fontSize: '24px' }}>🧠</span>
         </div>
         {/* Countdown */}
-        <div className="text-center">
-          <div className="flex items-center justify-center gap-2 mb-1">
-            <div className="flex gap-0.5">
-              <div className="w-1.5 h-1.5 rounded-full bg-slds-brand animate-bounce" style={{ animationDelay: '0ms' }} />
-              <div className="w-1.5 h-1.5 rounded-full bg-slds-brand animate-bounce" style={{ animationDelay: '150ms' }} />
-              <div className="w-1.5 h-1.5 rounded-full bg-slds-brand animate-bounce" style={{ animationDelay: '300ms' }} />
+        <div className="slds-text-center">
+          <div className="slds-grid slds-grid_vertical-align-center slds-grid_align-center slds-gap_x-small slds-m-bottom_xxx-small">
+            <div className="slds-grid slds-gap_xxx-small">
+              <div className="sf-mds-dot" />
+              <div className="sf-mds-dot" style={{ animationDelay: '150ms' }} />
+              <div className="sf-mds-dot" style={{ animationDelay: '300ms' }} />
             </div>
-            <span className="text-xs font-medium text-slds-brand">Processing...</span>
+            <span className="slds-text-size_small slds-font-weight_medium slds-text-brand">Processing...</span>
           </div>
-          <div className="text-lg font-bold text-slds-neutral-base">MDS Simulator</div>
-          <div className="text-sm text-slds-neutral-7 mt-1">
-            Simulating latency — <span className="font-semibold text-[#FF4A00] tabular-nums">{secondsLeft}s</span> remaining
+          <div className="slds-text-size_large slds-font-weight_bold slds-text-neutral-base">MDS Simulator</div>
+          <div className="slds-text-size_medium slds-text-neutral-7 slds-m-top_xx-small">
+            Simulating latency — <span className="slds-font-weight_semibold" style={{ color: '#FF4A00', fontVariantNumeric: 'tabular-nums' }}>{secondsLeft}s</span> remaining
           </div>
         </div>
         {/* Progress bar */}
-        <div className="w-full h-1.5 bg-slds-border-2 rounded-full overflow-hidden mt-1">
+        <div className="sf-mds-progress-track">
           <div
-            className="h-full bg-gradient-to-r from-slds-brand to-[#FF4A00] rounded-full transition-all duration-1000 ease-linear"
+            className="sf-mds-progress-fill"
             style={{ width: `${Math.max(5, 100 - (secondsLeft / 15) * 100)}%` }}
           />
         </div>

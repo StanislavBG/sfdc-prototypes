@@ -68,10 +68,10 @@ export default function LeftNav({
                   className={`sf-left-nav-item ${isActive ? 'active' : ''}`}
                   onClick={() => onChangeTab(item.label)}
                 >
-                  {Icon && <Icon className="w-4 h-4 flex-shrink-0" />}
-                  <span className="truncate flex-1">{item.label}</span>
+                  {Icon && <Icon className="slds-icon-size_small slds-flex-shrink-0" />}
+                  <span className="slds-truncate slds-col">{item.label}</span>
                   {item.hasDropdown && (
-                    <ChevronDown className="w-3 h-3 opacity-50 flex-shrink-0" />
+                    <ChevronDown className="slds-icon-size_xx-small slds-opacity_50 slds-flex-shrink-0" />
                   )}
                 </button>
               );

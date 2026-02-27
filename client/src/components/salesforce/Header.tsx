@@ -34,7 +34,7 @@ interface HeaderProps {
 // Salesforce cloud logo SVG
 function SalesforceLogo() {
   return (
-    <svg viewBox="0 0 48 32" className="h-7 w-10" fill="white">
+    <svg viewBox="0 0 48 32" style={{ height: '28px', width: '40px' }} fill="white">
       <path d="M20 4.8c1.9-2 4.5-3.2 7.4-3.2 3.9 0 7.3 2.2 9 5.4 1.4-.6 3-.9 4.6-.9 6.2 0 11.2 5 11.2 11.2S47.2 28.5 41 28.5c-.8 0-1.6-.1-2.4-.2-1.5 2.3-4.1 3.8-7 3.8-1.5 0-2.9-.4-4.1-1.1-1.5 2.7-4.4 4.5-7.7 4.5-3.1 0-5.8-1.6-7.3-4-.9.2-1.8.4-2.7.4-5.8 0-10.5-4.7-10.5-10.5 0-3.8 2-7.2 5.1-9-.5-1.2-.8-2.5-.8-3.9C3.6 3.7 7.3 0 11.9 0c3.2 0 6 1.8 7.4 4.5l.7.3z" />
     </svg>
   );
@@ -73,65 +73,65 @@ export default function Header({
   }, [setupMenuOpen, figmaMenuOpen]);
 
   return (
-    <div className="sf-header-row1 flex items-center px-4">
+    <div className="sf-header-row1">
       {/* Left: App Launcher + Time Machine trigger + Logo + App Name */}
-      <div className="flex items-center gap-2 flex-shrink-0">
+      <div className="slds-grid slds-grid_vertical-align-center slds-gap_x-small slds-shrink-none">
         <button
           className="sf-icon-btn"
           onClick={onOpenAppLauncher}
           title="App Launcher"
         >
-          <Grid3X3 className="w-5 h-5" />
+          <Grid3X3 className="slds-square_x-small" />
         </button>
         <button
           className="sf-icon-btn"
           onClick={onOpenTimeMachine}
           title="Time Machine"
         >
-          <Clock className="w-5 h-5" />
+          <Clock className="slds-square_x-small" />
         </button>
         <SalesforceLogo />
-        <div className="w-px h-5 bg-white/20 mx-1" />
-        <span className="text-white text-sm font-semibold whitespace-nowrap">
+        <div className="sf-header-divider" />
+        <span className="slds-text-white slds-text-size_medium slds-font-weight_semibold slds-nowrap">
           {appName}
         </span>
         <button
           onClick={onOpenTimeMachine}
-          className="flex items-center gap-1 ml-1 px-2 py-0.5 rounded text-xs font-medium text-white/90 bg-white/10 hover:bg-white/20 transition-colors"
+          className="sf-timeline-badge"
         >
           {timelineData?.label || 'Today'}
-          <ChevronDown className="w-3 h-3" />
+          <ChevronDown className="slds-icon-size_xx-small" />
         </button>
       </div>
 
       {/* Center: Search (pushed to center with flex) */}
-      <div className="flex-1 flex justify-center">
+      <div className="slds-col slds-grid slds-grid_align-center">
         <GlobalSearch onSelectResult={onSelectSearchResult} />
       </div>
 
       {/* Right: Utility icons */}
-      <div className="flex items-center gap-0.5 flex-shrink-0">
+      <div className="slds-grid slds-grid_vertical-align-center slds-gap_xxx-small slds-shrink-none">
         <button className="sf-icon-btn" title="Agentforce">
-          <Smile className="w-[18px] h-[18px]" />
+          <Smile className="slds-icon-size_medium" />
         </button>
         <button className="sf-icon-btn" title="Favorites">
-          <Star className="w-[18px] h-[18px]" />
+          <Star className="slds-icon-size_medium" />
         </button>
         <button className="sf-icon-btn" title="Notifications">
-          <Bell className="w-[18px] h-[18px]" />
+          <Bell className="slds-icon-size_medium" />
         </button>
         <button className="sf-icon-btn" title="Help">
-          <CircleHelp className="w-[18px] h-[18px]" />
+          <CircleHelp className="slds-icon-size_medium" />
         </button>
 
         {/* Figma export dropdown */}
-        <div className="relative" ref={figmaMenuRef}>
+        <div className="slds-pos-relative" ref={figmaMenuRef}>
           <button
             className="sf-icon-btn"
             title="Export to Figma"
             onClick={() => setFigmaMenuOpen(!figmaMenuOpen)}
           >
-            <svg viewBox="0 0 38 57" className="w-[14px] h-[18px]" fill="currentColor">
+            <svg viewBox="0 0 38 57" className="slds-icon-size_x-small" fill="currentColor">
               <path d="M19 28.5a9.5 9.5 0 1 1 19 0 9.5 9.5 0 0 1-19 0z" />
               <path d="M0 47.5A9.5 9.5 0 0 1 9.5 38H19v9.5a9.5 9.5 0 0 1-19 0z" />
               <path d="M19 0v19h9.5a9.5 9.5 0 0 0 0-19H19z" />
@@ -141,35 +141,35 @@ export default function Header({
           </button>
 
           {figmaMenuOpen && (
-            <div className="absolute right-0 top-full mt-1 w-[260px] bg-white rounded-lg shadow-xl border border-slds-border-1 z-50">
-              <div className="flex items-center justify-between px-4 py-3 border-b border-slds-border-1">
-                <span className="text-sm font-semibold text-slds-neutral-base">Export to Figma</span>
+            <div className="sf-dropdown" style={{ width: '260px' }}>
+              <div className="sf-dropdown-header">
+                <span className="slds-text-size_small slds-font-weight_semibold" style={{ color: 'var(--slds-g-color-neutral-base)' }}>Export to Figma</span>
                 <button
                   onClick={() => setFigmaMenuOpen(false)}
-                  className="w-6 h-6 flex items-center justify-center rounded hover:bg-slds-neutral-2 text-slds-neutral-7"
+                  className="sf-dropdown-close"
                 >
-                  <X className="w-3.5 h-3.5" />
+                  <X className="slds-icon-size_x-small" />
                 </button>
               </div>
-              <div className="py-1">
+              <div className="slds-p-vertical_xx-small">
                 <button
                   onClick={() => { setFigmaMenuOpen(false); onExportSvg?.(); }}
-                  className="w-full flex items-center gap-3 px-4 py-3 hover:bg-slds-neutral-2 transition-colors"
+                  className="sf-dropdown-item"
                 >
-                  <Download className="w-4 h-4 text-slds-neutral-7" />
-                  <div className="flex-1 text-left">
-                    <span className="text-sm font-medium text-slds-neutral-base block">Download as SVG</span>
-                    <span className="text-[10px] text-slds-neutral-7">Editable vectors in Figma</span>
+                  <Download className="slds-icon-size_small" style={{ color: 'var(--slds-g-color-neutral-7)' }} />
+                  <div className="slds-col" style={{ textAlign: 'left' }}>
+                    <span className="slds-text-size_small slds-font-weight_medium" style={{ color: 'var(--slds-g-color-neutral-base)', display: 'block' }}>Download as SVG</span>
+                    <span className="slds-text-size_xx-small" style={{ color: 'var(--slds-g-color-neutral-7)' }}>Editable vectors in Figma</span>
                   </div>
                 </button>
                 <button
                   onClick={() => { setFigmaMenuOpen(false); onExportHtml?.(); }}
-                  className="w-full flex items-center gap-3 px-4 py-3 hover:bg-slds-neutral-2 transition-colors"
+                  className="sf-dropdown-item"
                 >
-                  <Clipboard className="w-4 h-4 text-slds-neutral-7" />
-                  <div className="flex-1 text-left">
-                    <span className="text-sm font-medium text-slds-neutral-base block">Copy HTML for Figma Plugin</span>
-                    <span className="text-[10px] text-slds-neutral-7">Paste into html.to.design</span>
+                  <Clipboard className="slds-icon-size_small" style={{ color: 'var(--slds-g-color-neutral-7)' }} />
+                  <div className="slds-col" style={{ textAlign: 'left' }}>
+                    <span className="slds-text-size_small slds-font-weight_medium" style={{ color: 'var(--slds-g-color-neutral-base)', display: 'block' }}>Copy HTML for Figma Plugin</span>
+                    <span className="slds-text-size_xx-small" style={{ color: 'var(--slds-g-color-neutral-7)' }}>Paste into html.to.design</span>
                   </div>
                 </button>
               </div>
@@ -178,41 +178,41 @@ export default function Header({
         </div>
 
         {/* Setup gear with dropdown */}
-        <div className="relative" ref={setupMenuRef}>
+        <div className="slds-pos-relative" ref={setupMenuRef}>
           <button
             className="sf-icon-btn"
             title="Setup"
             onClick={() => setSetupMenuOpen(!setupMenuOpen)}
           >
-            <Settings className="w-[18px] h-[18px]" />
+            <Settings className="slds-icon-size_medium" />
           </button>
 
           {setupMenuOpen && (
-            <div className="absolute right-0 top-full mt-1 w-[280px] bg-white rounded-lg shadow-xl border border-slds-border-1 z-50">
+            <div className="sf-dropdown" style={{ width: '280px' }}>
               {/* Dropdown header */}
-              <div className="flex items-center justify-between px-4 py-3 border-b border-slds-border-1">
-                <span className="text-sm font-semibold text-slds-neutral-base">Setup Menu</span>
+              <div className="sf-dropdown-header">
+                <span className="slds-text-size_small slds-font-weight_semibold" style={{ color: 'var(--slds-g-color-neutral-base)' }}>Setup Menu</span>
                 <button
                   onClick={() => setSetupMenuOpen(false)}
-                  className="w-6 h-6 flex items-center justify-center rounded hover:bg-slds-neutral-2 text-slds-neutral-7"
+                  className="sf-dropdown-close"
                 >
-                  <X className="w-3.5 h-3.5" />
+                  <X className="slds-icon-size_x-small" />
                 </button>
               </div>
               {/* Menu items */}
-              <div className="py-1">
+              <div className="slds-p-vertical_xx-small">
                 <button
                   onClick={() => {
                     setSetupMenuOpen(false);
                     onOpenDataCloudSetup?.();
                   }}
-                  className="w-full flex items-center gap-3 px-4 py-3 hover:bg-slds-neutral-2 transition-colors border-2 border-transparent hover:border-slds-brand rounded-lg mx-0"
+                  className="sf-dropdown-item sf-dropdown-item-highlight"
                 >
-                  <div className="w-8 h-8 rounded bg-[#5A3E9E] flex items-center justify-center flex-shrink-0">
-                    <Zap className="w-4 h-4 text-white" />
+                  <div className="slds-square_large slds-border-radius_medium slds-flex slds-items-center slds-justify-center slds-flex-shrink-0" style={{ background: '#5A3E9E' }}>
+                    <Zap className="slds-icon-size_small slds-text-white" />
                   </div>
-                  <span className="text-sm font-medium text-slds-neutral-base flex-1 text-left">Data Cloud Setup</span>
-                  <ExternalLink className="w-3.5 h-3.5 text-slds-neutral-7" />
+                  <span className="slds-text-size_small slds-font-weight_medium slds-col" style={{ color: 'var(--slds-g-color-neutral-base)', textAlign: 'left' }}>Data Cloud Setup</span>
+                  <ExternalLink className="slds-icon-size_x-small" style={{ color: 'var(--slds-g-color-neutral-7)' }} />
                 </button>
               </div>
             </div>
@@ -221,14 +221,14 @@ export default function Header({
 
         {/* User avatar */}
         <button
-          className="w-7 h-7 rounded-full bg-[#FF8C00] flex items-center justify-center text-white text-xs font-bold ml-1 flex-shrink-0"
+          className="sf-user-avatar"
           title="User"
         >
           U
         </button>
 
         <button className="sf-icon-btn" title="Edit Page">
-          <Pencil className="w-[16px] h-[16px]" />
+          <Pencil className="slds-icon-size_small" />
         </button>
       </div>
     </div>
