@@ -24,6 +24,14 @@ import {
   Camera,
   Search,
   RefreshCw,
+  User,
+  Shield,
+  History,
+  Zap,
+  XCircle,
+  Layers,
+  CreditCard,
+  FileText,
 } from 'lucide-react';
 import {
   useIdentityRulesets,
@@ -68,15 +76,29 @@ interface ReconciliationGroup {
 
 interface ProcessingHistoryEntry {
   id: string;
-  rowNum: number;
+  jobId: string;
+  jobType: 'full' | 'incremental' | 'aggregated';
   date: string;
-  totalSourceProfiles: number;
-  totalUnifiedProfiles: number;
-  totalKnownProfiles: number;
-  consolidationRate: string;
-  totalUnknown: number;
-  processedRecords: number;
-  aggregateStatus: 'Succeeded' | 'Failed';
+  startTime: string;
+  runReason: string;
+  triggeredBy: string;
+  duration: string;
+  sourceRecords: number;
+  unifiedProfiles: number;
+  matchedRecords: number;
+  status: 'Succeeded' | 'Failed' | 'Warning' | 'Running';
+  creditsCost: number;
+  // For aggregated rows
+  aggregatedJobCount?: number;
+}
+
+interface RulesetChangeEntry {
+  id: string;
+  date: string;
+  field: string;
+  oldValue: string;
+  newValue: string;
+  changedBy: string;
 }
 
 interface IdentityRuleset {
@@ -102,6 +124,7 @@ interface IdentityRuleset {
   matchRules: MatchRule[];
   reconciliationGroups: ReconciliationGroup[];
   processingHistory: ProcessingHistoryEntry[];
+  rulesetChanges: RulesetChangeEntry[];
   isBYOM?: boolean; // "Bring Your Own MDM" mode — installed from datakit
   byomSource?: string; // datakit source name e.g. "Informatica MDM"
   isCX?: boolean; // Customer 360 / Real Time — uses standard IR detail view
@@ -123,27 +146,129 @@ const dmoFields: Record<string, string[]> = {
 const matchMethods = ['Exact', 'Fuzzy: First Name', 'Fuzzy: Last Name', 'Fuzzy: Company Name', 'Normalized', 'Standardized'];
 
 // ── Mock Data ────────────────────────────────────────────────────────
+const runReasons = [
+  'Scheduled (Daily 2:00 AM UTC)',
+  'Scheduled (Daily 2:00 AM UTC)',
+  'Manual run',
+  'New data ingested',
+  'Ruleset change published',
+  'Data stream refresh',
+  'Reconciliation update',
+  'Scheduled (Daily 2:00 AM UTC)',
+];
+
+const users = [
+  'Sarah Johnson', 'Automated Process', 'David Kim', 'Automated Process',
+  'Sarah Johnson', 'Emily Chen', 'Automated Process', 'Automated Process',
+];
+
 function generateProcessingHistory(): ProcessingHistoryEntry[] {
   const entries: ProcessingHistoryEntry[] = [];
-  const baseDate = new Date(2026, 0, 13); // 2026-01-13
-  for (let i = 0; i < 20; i++) {
-    const date = new Date(baseDate);
-    date.setDate(date.getDate() - i * 7);
-    const isRecent = i < 2;
+  const now = new Date(2026, 2, 3, 15, 30); // 2026-03-03 3:30 PM
+
+  // Recent 24h — individual large jobs
+  const recentJobs = [
+    { hoursAgo: 1.5, reason: 'Manual run', user: 'Sarah Johnson', dur: '01:12', src: 12061, uni: 10594, matched: 1467, credits: 42.5, status: 'Succeeded' as const },
+    { hoursAgo: 6, reason: 'New data ingested', user: 'Automated Process', dur: '00:38', src: 12055, uni: 10590, matched: 1465, credits: 38.2, status: 'Succeeded' as const },
+    { hoursAgo: 14, reason: 'Scheduled (Daily 2:00 AM UTC)', user: 'Automated Process', dur: '02:45', src: 12047, uni: 10580, matched: 1467, credits: 85.0, status: 'Succeeded' as const },
+    { hoursAgo: 18, reason: 'Ruleset change published', user: 'David Kim', dur: '01:55', src: 12047, uni: 10575, matched: 1472, credits: 64.3, status: 'Warning' as const },
+  ];
+
+  for (const job of recentJobs) {
+    const t = new Date(now.getTime() - job.hoursAgo * 3600000);
     entries.push({
-      id: `ph-${i}`,
-      rowNum: i + 1,
-      date: date.toISOString().split('T')[0],
-      totalSourceProfiles: isRecent ? 12061 : 12047,
-      totalUnifiedProfiles: isRecent ? 10594 : 10570,
-      totalKnownProfiles: isRecent ? 10586 : 10566,
-      consolidationRate: '12%',
-      totalUnknown: isRecent ? 8 : 4,
-      processedRecords: i === 0 ? 14 : i === 1 ? 10641 : i === 15 ? 64 : i === 17 ? 10641 : i === 19 ? 10650 : 0,
-      aggregateStatus: 'Succeeded',
+      id: `ph-${entries.length}`,
+      jobId: `JOB-${(900100 + entries.length).toString()}`,
+      jobType: job.reason.includes('ingested') ? 'incremental' : 'full',
+      date: t.toISOString().split('T')[0],
+      startTime: t.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+      runReason: job.reason,
+      triggeredBy: job.user,
+      duration: job.dur,
+      sourceRecords: job.src,
+      unifiedProfiles: job.uni,
+      matchedRecords: job.matched,
+      status: job.status,
+      creditsCost: job.credits,
     });
   }
+
+  // Aggregated small jobs (last 24h)
+  entries.push({
+    id: 'ph-agg-today',
+    jobId: 'AGG-20260303',
+    jobType: 'aggregated',
+    date: now.toISOString().split('T')[0],
+    startTime: '',
+    runReason: '7 incremental syncs',
+    triggeredBy: 'Automated Process',
+    duration: '00:14',
+    sourceRecords: 83,
+    unifiedProfiles: 0,
+    matchedRecords: 12,
+    status: 'Succeeded',
+    creditsCost: 3.1,
+    aggregatedJobCount: 7,
+  });
+
+  // Older entries — one row per day (aggregated daily)
+  for (let d = 1; d <= 14; d++) {
+    const date = new Date(now);
+    date.setDate(date.getDate() - d);
+    const reasonIdx = d % runReasons.length;
+    const userIdx = d % users.length;
+    const hasFailed = d === 5;
+    const isLarge = d % 3 === 0;
+
+    if (isLarge) {
+      entries.push({
+        id: `ph-old-${d}`,
+        jobId: `JOB-${(899000 + d).toString()}`,
+        jobType: 'full',
+        date: date.toISOString().split('T')[0],
+        startTime: '02:00 AM',
+        runReason: runReasons[reasonIdx],
+        triggeredBy: users[userIdx],
+        duration: `0${1 + (d % 3)}:${(15 + d * 3) % 60 < 10 ? '0' : ''}${(15 + d * 3) % 60}`,
+        sourceRecords: 12040 + d * 2,
+        unifiedProfiles: 10560 + d,
+        matchedRecords: 1460 + d,
+        status: hasFailed ? 'Failed' : 'Succeeded',
+        creditsCost: 75 + d * 2.1,
+      });
+    }
+
+    entries.push({
+      id: `ph-agg-${d}`,
+      jobId: `AGG-${date.toISOString().split('T')[0].replace(/-/g, '')}`,
+      jobType: 'aggregated',
+      date: date.toISOString().split('T')[0],
+      startTime: '',
+      runReason: `${3 + (d % 5)} incremental syncs`,
+      triggeredBy: 'Automated Process',
+      duration: `00:${(8 + d % 12).toString().padStart(2, '0')}`,
+      sourceRecords: 40 + d * 7,
+      unifiedProfiles: 0,
+      matchedRecords: 5 + d,
+      status: 'Succeeded',
+      creditsCost: 1.5 + d * 0.3,
+      aggregatedJobCount: 3 + (d % 5),
+    });
+  }
+
   return entries;
+}
+
+function generateRulesetChanges(): RulesetChangeEntry[] {
+  return [
+    { id: 'rc-1', date: '2026-03-02 11:42 AM', field: 'Match Rule "Exact Email Match"', oldValue: 'Match Method: Exact', newValue: 'Match Method: Normalized', changedBy: 'David Kim' },
+    { id: 'rc-2', date: '2026-02-28 3:15 PM', field: 'Match Rule Priority', oldValue: 'Fuzzy Name: Priority 2', newValue: 'Fuzzy Name: Priority 3', changedBy: 'Sarah Johnson' },
+    { id: 'rc-3', date: '2026-02-25 9:30 AM', field: 'New Match Rule Added', oldValue: '—', newValue: 'Phone + ZIP Fuzzy Match (Priority 4)', changedBy: 'Emily Chen' },
+    { id: 'rc-4', date: '2026-02-20 2:10 PM', field: 'Reconciliation Rule', oldValue: 'Last Updated Wins', newValue: 'Source Priority', changedBy: 'Sarah Johnson' },
+    { id: 'rc-5', date: '2026-02-15 10:00 AM', field: 'Scheduling', oldValue: 'Disabled', newValue: 'Enabled — Daily 2:00 AM UTC', changedBy: 'David Kim' },
+    { id: 'rc-6', date: '2026-01-30 4:45 PM', field: 'Match Rule "Fuzzy Name" deleted', oldValue: 'Fuzzy Name + Account (Priority 3)', newValue: '—', changedBy: 'Sarah Johnson' },
+    { id: 'rc-7', date: '2026-01-22 11:20 AM', field: 'Ruleset Published', oldValue: 'Draft', newValue: 'Published', changedBy: 'Data Cloud Admin' },
+  ];
 }
 
 const mockRulesets: IdentityRuleset[] = [
@@ -229,6 +354,7 @@ const mockRulesets: IdentityRuleset[] = [
       },
     ],
     processingHistory: generateProcessingHistory(),
+    rulesetChanges: generateRulesetChanges(),
   },
 ];
 
@@ -257,6 +383,7 @@ function apiToLocal(d: IdentityRulesetData): IdentityRuleset {
     matchRules: d.matchRules ?? [],
     reconciliationGroups: d.reconciliationGroups ?? [],
     processingHistory: d.processingHistory ?? [],
+    rulesetChanges: generateRulesetChanges(),
     isBYOM: d.description?.startsWith('Installed from ') || false,
     byomSource: d.description?.startsWith('Installed from ') ? d.description.replace('Installed from ', '').replace(' datakit', '').replace(' (CX)', '') : undefined,
     isCX: d.description?.includes('(CX)') || false,
@@ -326,7 +453,7 @@ export default function IdentityResolutionContent({ demoSession, onDemoSessionCh
 
   // Navigation state
   const [selectedRuleset, setSelectedRuleset] = useState<IdentityRuleset | null>(null);
-  const [detailTab, setDetailTab] = useState<'properties' | 'details' | 'history'>('details');
+  const [detailTab, setDetailTab] = useState<'properties' | 'details' | 'history'>('properties');
 
   // Keep selectedRuleset in sync with API data after mutations
   useEffect(() => {
@@ -536,6 +663,7 @@ export default function IdentityResolutionContent({ demoSession, onDemoSessionCh
       matchRules: cxMatchRules,
       reconciliationGroups: cxReconGroups,
       processingHistory: isCXDatakit ? generateProcessingHistory() : [],
+      rulesetChanges: isCXDatakit ? generateRulesetChanges() : [],
       isBYOM: isFromDatakit,
       byomSource: isFromDatakit ? selectedDatakit : undefined,
       isCX: isCXDatakit,
@@ -1474,17 +1602,55 @@ export default function IdentityResolutionContent({ demoSession, onDemoSessionCh
           {/* ── PROCESSING HISTORY TAB ── */}
           {detailTab === 'history' && (
             <div className="slds-p-around_large" style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-              <p className="slds-text-size_medium slds-text-neutral-9">
-                Daily summaries contain the aggregate results of all runs of this ruleset from a single date.
-              </p>
-              <div className="slds-flex slds-items-center slds-justify-end slds-gap_x-small slds-text-size_small slds-text-neutral-7">
-                <Info className="slds-icon-size_x-small" />
-                <span>Automatic runs:</span>
-                <span className="slds-font-weight_medium slds-text-neutral-9">{selectedRuleset.isScheduled ? 'Enabled' : 'Disabled'}</span>
+              {/* Summary stats bar */}
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr 1fr', gap: 12 }}>
+                <div className="sf-card" style={{ padding: '14px 16px' }}>
+                  <div className="slds-text-size_small slds-text-neutral-7 slds-flex slds-items-center slds-gap_xx-small" style={{ marginBottom: 4 }}>
+                    <Zap className="slds-icon-size_xx-small" /> Total Credits (30d)
+                  </div>
+                  <div className="slds-text-size_large slds-font-weight_bold slds-text-neutral-base">
+                    {selectedRuleset.processingHistory.reduce((a, j) => a + j.creditsCost, 0).toFixed(1)}
+                  </div>
+                </div>
+                <div className="sf-card" style={{ padding: '14px 16px' }}>
+                  <div className="slds-text-size_small slds-text-neutral-7 slds-flex slds-items-center slds-gap_xx-small" style={{ marginBottom: 4 }}>
+                    <Layers className="slds-icon-size_xx-small" /> Jobs (last 24h)
+                  </div>
+                  <div className="slds-text-size_large slds-font-weight_bold slds-text-neutral-base">
+                    {selectedRuleset.processingHistory.filter(j => {
+                      const d = new Date(j.date + 'T12:00:00');
+                      return (Date.now() - d.getTime()) < 2 * 86400000;
+                    }).length}
+                  </div>
+                </div>
+                <div className="sf-card" style={{ padding: '14px 16px' }}>
+                  <div className="slds-text-size_small slds-text-neutral-7 slds-flex slds-items-center slds-gap_xx-small" style={{ marginBottom: 4 }}>
+                    <Clock className="slds-icon-size_xx-small" /> Schedule
+                  </div>
+                  <div className="slds-text-size_medium slds-font-weight_semibold slds-text-neutral-base">
+                    {selectedRuleset.isScheduled ? 'Daily 2:00 AM' : 'Disabled'}
+                  </div>
+                </div>
+                <div className="sf-card" style={{ padding: '14px 16px' }}>
+                  <div className="slds-text-size_small slds-text-neutral-7 slds-flex slds-items-center slds-gap_xx-small" style={{ marginBottom: 4 }}>
+                    <Shield className="slds-icon-size_xx-small" /> Ruleset Changes
+                  </div>
+                  <div className="slds-text-size_large slds-font-weight_bold slds-text-neutral-base">
+                    {selectedRuleset.rulesetChanges.length}
+                  </div>
+                </div>
               </div>
+
+              {/* Job History table */}
               <div className="sf-card">
                 <div className="sf-card-header">
-                  <h2 className="slds-text-size_medium slds-font-weight_semibold slds-text-neutral-base">Daily Processing Summary</h2>
+                  <h2 className="slds-text-size_medium slds-font-weight_semibold slds-text-neutral-base slds-flex slds-items-center slds-gap_x-small">
+                    <History className="slds-icon-size_small" />
+                    Job History
+                  </h2>
+                  <div className="slds-flex slds-items-center slds-gap_x-small slds-text-size_small slds-text-neutral-7">
+                    <span>Large jobs shown individually &middot; Small incremental syncs aggregated daily</span>
+                  </div>
                 </div>
                 {selectedRuleset.processingHistory.length === 0 ? (
                   <div className="sf-card-body slds-text-center slds-p-vertical_x-large" style={{ paddingTop: '48px', paddingBottom: '48px' }}>
@@ -1496,32 +1662,143 @@ export default function IdentityResolutionContent({ demoSession, onDemoSessionCh
                     <table className="sf-table">
                       <thead>
                         <tr>
-                          <th style={{ width: '48px' }}></th>
-                          <th><div className="slds-flex slds-items-center slds-gap_xx-small">Date <ChevronDown className="slds-icon-size_xx-small" /></div></th>
-                          <th><div className="slds-flex slds-items-center slds-gap_xx-small">Total Source P... <ChevronDown className="slds-icon-size_xx-small" /></div></th>
-                          <th><div className="slds-flex slds-items-center slds-gap_xx-small">Total Unified P... <ChevronDown className="slds-icon-size_xx-small" /></div></th>
-                          <th><div className="slds-flex slds-items-center slds-gap_xx-small">Total Known P... <ChevronDown className="slds-icon-size_xx-small" /></div></th>
-                          <th><div className="slds-flex slds-items-center slds-gap_xx-small">Consolidation ... <ChevronDown className="slds-icon-size_xx-small" /></div></th>
-                          <th><div className="slds-flex slds-items-center slds-gap_xx-small">Total Unknow... <ChevronDown className="slds-icon-size_xx-small" /></div></th>
-                          <th><div className="slds-flex slds-items-center slds-gap_xx-small">Processed Re... <ChevronDown className="slds-icon-size_xx-small" /></div></th>
-                          <th><div className="slds-flex slds-items-center slds-gap_xx-small">Aggregate Sta... <ChevronDown className="slds-icon-size_xx-small" /></div></th>
+                          <th style={{ width: 40 }}></th>
+                          <th>Date / Time</th>
+                          <th>Job ID</th>
+                          <th>Run Reason</th>
+                          <th>User</th>
+                          <th>Duration</th>
+                          <th style={{ textAlign: 'right' }}>Records</th>
+                          <th style={{ textAlign: 'right' }}>Credits</th>
+                          <th>Status</th>
                         </tr>
                       </thead>
                       <tbody>
-                        {selectedRuleset.processingHistory.map((entry) => (
-                          <tr key={entry.id}>
-                            <td className="slds-text-center slds-text-neutral-7">{entry.rowNum}</td>
-                            <td>{entry.date}</td>
-                            <td>{fmt(entry.totalSourceProfiles)}</td>
-                            <td>{fmt(entry.totalUnifiedProfiles)}</td>
-                            <td>{fmt(entry.totalKnownProfiles)}</td>
-                            <td>{entry.consolidationRate}</td>
-                            <td>{entry.totalUnknown}</td>
-                            <td>{fmt(entry.processedRecords)}</td>
+                        {selectedRuleset.processingHistory.map((entry) => {
+                          const isAgg = entry.jobType === 'aggregated';
+                          return (
+                            <tr key={entry.id} style={isAgg ? { background: '#FAFAF9' } : undefined}>
+                              <td style={{ textAlign: 'center' }}>
+                                {entry.status === 'Succeeded' ? (
+                                  <CheckCircle2 className="slds-icon-size_x-small" style={{ color: 'var(--slds-g-color-success-1)' }} />
+                                ) : entry.status === 'Failed' ? (
+                                  <XCircle className="slds-icon-size_x-small" style={{ color: 'var(--slds-g-color-error-1)' }} />
+                                ) : entry.status === 'Warning' ? (
+                                  <AlertTriangle className="slds-icon-size_x-small" style={{ color: 'var(--slds-g-color-warning-1)' }} />
+                                ) : (
+                                  <Loader2 className="slds-icon-size_x-small slds-text-brand sf-spin" />
+                                )}
+                              </td>
+                              <td>
+                                <div>
+                                  <span className="slds-font-weight_medium">{entry.date}</span>
+                                  {entry.startTime && (
+                                    <span className="slds-text-neutral-7 slds-m-left_xx-small">{entry.startTime}</span>
+                                  )}
+                                </div>
+                              </td>
+                              <td>
+                                {isAgg ? (
+                                  <span className="sf-badge sf-badge-neutral" style={{ fontSize: 10 }}>
+                                    <Layers className="slds-icon-size_xx-small slds-m-right_xxx-small" />
+                                    {entry.aggregatedJobCount} jobs
+                                  </span>
+                                ) : (
+                                  <span className="slds-text-size_small slds-text-neutral-7 sf-tabular-nums">{entry.jobId}</span>
+                                )}
+                              </td>
+                              <td>
+                                <span className={`slds-text-size_small ${entry.runReason.includes('Manual') || entry.runReason.includes('Ruleset change') ? 'slds-font-weight_medium' : ''}`}>
+                                  {entry.runReason}
+                                </span>
+                              </td>
+                              <td>
+                                <div className="slds-flex slds-items-center slds-gap_xx-small">
+                                  <User className="slds-icon-size_xx-small slds-text-neutral-7" />
+                                  <span className="slds-text-size_small">{entry.triggeredBy}</span>
+                                </div>
+                              </td>
+                              <td>
+                                <span className="sf-tabular-nums slds-text-size_small">{entry.duration}</span>
+                              </td>
+                              <td style={{ textAlign: 'right' }}>
+                                <span className="sf-tabular-nums slds-text-size_small">{fmt(entry.sourceRecords)}</span>
+                              </td>
+                              <td style={{ textAlign: 'right' }}>
+                                <span className="sf-tabular-nums slds-text-size_small slds-font-weight_medium" style={{ color: entry.creditsCost > 50 ? 'var(--slds-g-color-warning-1)' : undefined }}>
+                                  {entry.creditsCost.toFixed(1)}
+                                </span>
+                              </td>
+                              <td>
+                                <span className={`sf-badge ${
+                                  entry.status === 'Succeeded' ? 'sf-badge-success' :
+                                  entry.status === 'Failed' ? 'sf-badge-error' :
+                                  entry.status === 'Warning' ? 'sf-badge-warning' :
+                                  'sf-badge-info'
+                                }`}>
+                                  {entry.status}
+                                </span>
+                              </td>
+                            </tr>
+                          );
+                        })}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
+              </div>
+
+              {/* Ruleset Change Audit Log */}
+              <div className="sf-card">
+                <div className="sf-card-header">
+                  <h2 className="slds-text-size_medium slds-font-weight_semibold slds-text-neutral-base slds-flex slds-items-center slds-gap_x-small">
+                    <Shield className="slds-icon-size_small" />
+                    Ruleset Change Log
+                  </h2>
+                  <span className="slds-text-size_small slds-text-neutral-7">
+                    Track what was changed, who made the change, and when
+                  </span>
+                </div>
+                {selectedRuleset.rulesetChanges.length === 0 ? (
+                  <div className="sf-card-body slds-text-center slds-p-vertical_x-large" style={{ paddingTop: '40px', paddingBottom: '40px' }}>
+                    <Shield className="slds-text-neutral-7" style={{ width: '28px', height: '28px', margin: '0 auto 8px' }} />
+                    <p className="slds-text-size_medium slds-text-neutral-7">No ruleset changes recorded</p>
+                  </div>
+                ) : (
+                  <div className="slds-overflow-x-auto">
+                    <table className="sf-table">
+                      <thead>
+                        <tr>
+                          <th style={{ width: 40 }}></th>
+                          <th>Date</th>
+                          <th>Change</th>
+                          <th>Previous Value</th>
+                          <th>New Value</th>
+                          <th>Changed By</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {selectedRuleset.rulesetChanges.map((change) => (
+                          <tr key={change.id}>
+                            <td style={{ textAlign: 'center' }}>
+                              <FileText className="slds-icon-size_x-small slds-text-neutral-7" />
+                            </td>
+                            <td>
+                              <span className="slds-text-size_small slds-font-weight_medium">{change.date}</span>
+                            </td>
+                            <td>
+                              <span className="slds-text-size_small slds-font-weight_medium slds-text-brand">{change.field}</span>
+                            </td>
+                            <td>
+                              <span className="slds-text-size_small slds-text-neutral-7">{change.oldValue}</span>
+                            </td>
+                            <td>
+                              <span className="slds-text-size_small slds-font-weight_medium">{change.newValue}</span>
+                            </td>
                             <td>
                               <div className="slds-flex slds-items-center slds-gap_xx-small">
-                                <AlertTriangle className="slds-icon-size_x-small" style={{ color: '#B7791F' }} />
-                                <span>{entry.aggregateStatus}</span>
+                                <User className="slds-icon-size_xx-small slds-text-neutral-7" />
+                                <span className="slds-text-size_small">{change.changedBy}</span>
                               </div>
                             </td>
                           </tr>
