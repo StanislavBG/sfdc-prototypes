@@ -465,9 +465,12 @@ interface IdentityResolutionContentProps {
   demoSession?: DemoSessionState;
   onDemoSessionChange?: (session: DemoSessionState) => void;
   currentTimeline?: string;
+  initialRulesetSlug?: string;
+  initialDetailTab?: string;
+  onNavigate?: (rulesetSlug?: string, detailTab?: string) => void;
 }
 
-export default function IdentityResolutionContent({ demoSession, onDemoSessionChange, currentTimeline }: IdentityResolutionContentProps) {
+export default function IdentityResolutionContent({ demoSession, onDemoSessionChange, currentTimeline, initialRulesetSlug, initialDetailTab, onNavigate }: IdentityResolutionContentProps) {
   const { triggerDelay } = useMdsSimulator();
 
   // ── API hooks ─────────────────────────────────────────────────────
@@ -490,9 +493,43 @@ export default function IdentityResolutionContent({ demoSession, onDemoSessionCh
   // Convert API data → local typed rulesets
   const rulesets: IdentityRuleset[] = (apiRulesets ?? []).map(apiToLocal);
 
+  // Helper: slug from ruleset name
+  const rulesetToSlug = (rs: IdentityRuleset) =>
+    rs.rulesetName.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+
   // Navigation state
   const [selectedRuleset, setSelectedRuleset] = useState<IdentityRuleset | null>(null);
-  const [detailTab, setDetailTab] = useState<'properties' | 'details' | 'history'>('properties');
+  const initDetailTab = (initialDetailTab === 'properties' || initialDetailTab === 'details' || initialDetailTab === 'history')
+    ? initialDetailTab : 'properties';
+  const [detailTab, setDetailTab] = useState<'properties' | 'details' | 'history'>(initDetailTab);
+
+  // Restore from URL: select ruleset matching initialRulesetSlug once data loads
+  const restoredFromUrl = useRef(false);
+  useEffect(() => {
+    if (restoredFromUrl.current || !initialRulesetSlug || rulesets.length === 0) return;
+    const match = rulesets.find((rs) => rulesetToSlug(rs) === initialRulesetSlug);
+    if (match) {
+      restoredFromUrl.current = true;
+      setSelectedRuleset(match);
+    }
+  }, [rulesets, initialRulesetSlug]);
+
+  // Notify parent of navigation changes (URL update)
+  const selectRuleset = (rs: IdentityRuleset | null) => {
+    setSelectedRuleset(rs);
+    if (rs) {
+      onNavigate?.(rulesetToSlug(rs), detailTab);
+    } else {
+      onNavigate?.(undefined, undefined);
+    }
+  };
+
+  const changeDetailTab = (tab: 'properties' | 'details' | 'history') => {
+    setDetailTab(tab);
+    if (selectedRuleset) {
+      onNavigate?.(rulesetToSlug(selectedRuleset), tab);
+    }
+  };
 
   // Keep selectedRuleset in sync with API data after mutations
   useEffect(() => {
@@ -905,7 +942,7 @@ export default function IdentityResolutionContent({ demoSession, onDemoSessionCh
       <div className="slds-h-full slds-flex slds-flex-col">
         {/* Breadcrumb */}
         <div className="slds-bg-white slds-border_bottom slds-border-color_border-1 slds-p-horizontal_large slds-p-vertical_x-small slds-flex slds-items-center slds-gap_x-small">
-          <button onClick={() => setSelectedRuleset(null)} className="slds-flex slds-items-center slds-gap_xx-small slds-text-size_small slds-text-brand sf-hover-underline">
+          <button onClick={() => selectRuleset(null)} className="slds-flex slds-items-center slds-gap_xx-small slds-text-size_small slds-text-brand sf-hover-underline">
             <ArrowLeft className="slds-icon-size_x-small" />
             Identity Resolutions
           </button>
@@ -1354,7 +1391,7 @@ export default function IdentityResolutionContent({ demoSession, onDemoSessionCh
       <div className="slds-h-full slds-flex slds-flex-col">
         {/* Breadcrumb */}
         <div className="slds-bg-white slds-border_bottom slds-border-color_border-1 slds-p-horizontal_large slds-p-vertical_x-small slds-flex slds-items-center slds-gap_x-small">
-          <button onClick={() => setSelectedRuleset(null)} className="slds-flex slds-items-center slds-gap_xx-small slds-text-size_small slds-text-brand sf-hover-underline">
+          <button onClick={() => selectRuleset(null)} className="slds-flex slds-items-center slds-gap_xx-small slds-text-size_small slds-text-brand sf-hover-underline">
             <ArrowLeft className="slds-icon-size_x-small" />
             Identity Resolutions
           </button>
@@ -1408,7 +1445,7 @@ export default function IdentityResolutionContent({ demoSession, onDemoSessionCh
           {(['properties', 'details', 'history'] as const).map((tab) => {
             const labels = { properties: 'Ruleset Properties', details: 'Details', history: 'Processing History' };
             return (
-              <button key={tab} className={`sf-tab ${detailTab === tab ? 'active' : ''}`} onClick={() => setDetailTab(tab)}>
+              <button key={tab} className={`sf-tab ${detailTab === tab ? 'active' : ''}`} onClick={() => changeDetailTab(tab)}>
                 {labels[tab]}
               </button>
             );
@@ -2389,7 +2426,7 @@ export default function IdentityResolutionContent({ demoSession, onDemoSessionCh
                   <tbody>
                     {sessionRulesets.map((rs) => (
                       <tr key={rs.id}>
-                        <td><button onClick={() => { setSelectedRuleset(rs); setDetailTab('details'); }} className="sf-link slds-font-weight_medium">{rs.rulesetName}</button></td>
+                        <td><button onClick={() => { selectRuleset(rs); changeDetailTab('details'); }} className="sf-link slds-font-weight_medium">{rs.rulesetName}</button></td>
                         <td>{rs.rulesetId}</td>
                         <td>{rs.dataSpace}</td>
                         <td>{rs.primaryDataModelObject}</td>
@@ -2434,7 +2471,7 @@ export default function IdentityResolutionContent({ demoSession, onDemoSessionCh
               <tbody>
                 {rulesets.map((rs) => (
                   <tr key={rs.id}>
-                    <td><button onClick={() => { setSelectedRuleset(rs); setDetailTab('details'); }} className="sf-link slds-font-weight_medium">{rs.rulesetName}</button></td>
+                    <td><button onClick={() => { selectRuleset(rs); changeDetailTab('details'); }} className="sf-link slds-font-weight_medium">{rs.rulesetName}</button></td>
                     <td>{rs.rulesetId}</td>
                     <td>{rs.dataSpace}</td>
                     <td>{rs.primaryDataModelObject}</td>
