@@ -51,6 +51,15 @@ export const api = {
       method: 'POST' as const,
       path: '/api/drive/files/:id/star' as const,
     },
+    createTextFile: {
+      method: 'POST' as const,
+      path: '/api/drive/files/text' as const,
+      input: z.object({
+        name: z.string().min(1).max(255),
+        content: z.string(),
+        parentId: z.number().nullable().optional(),
+      }),
+    },
   },
   helpDocs: {
     upload: {
