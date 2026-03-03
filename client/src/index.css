@@ -1042,9 +1042,35 @@
 .sf-left-nav-section-header {
   display: flex;
   align-items: center;
-  gap: 8px;
-  padding: 10px 12px 4px;
+  gap: 6px;
+  width: 100%;
+  padding: 9px 12px;
   position: relative;
+  border: none;
+  background: none;
+  cursor: pointer;
+  text-align: left;
+  transition: background 0.1s ease;
+}
+
+.sf-left-nav-section-header:hover {
+  background: var(--slds-g-color-neutral-2);
+}
+
+.sf-left-nav-section-chevron {
+  width: 14px;
+  height: 14px;
+  color: var(--slds-g-color-neutral-6);
+  flex-shrink: 0;
+  transition: transform 0.15s ease;
+}
+
+.sf-left-nav-section-chevron.expanded {
+  transform: rotate(90deg);
+}
+
+.sf-left-nav-section-header.active .sf-left-nav-section-chevron {
+  color: var(--slds-g-color-brand);
 }
 
 .sf-left-nav-section-header.active {
