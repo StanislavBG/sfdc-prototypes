@@ -1177,6 +1177,38 @@
   border-radius: 0 3px 3px 0;
 }
 
+/* ── URL Breadcrumb bar ── */
+.sf-url-breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  padding: 6px 16px;
+  background: var(--slds-g-color-neutral-1);
+  border-bottom: 1px solid var(--slds-g-color-border-1);
+  font-size: 12px;
+  font-family: 'SF Mono', 'Menlo', 'Monaco', 'Consolas', monospace;
+  color: var(--slds-g-color-neutral-7);
+  flex-shrink: 0;
+}
+
+.sf-url-breadcrumb-sep {
+  margin: 0 6px;
+  color: var(--slds-g-color-neutral-5);
+}
+
+.sf-url-breadcrumb-root {
+  color: var(--slds-g-color-neutral-6);
+}
+
+.sf-url-breadcrumb-segment {
+  color: var(--slds-g-color-neutral-7);
+}
+
+.sf-url-breadcrumb-current {
+  color: var(--slds-g-color-brand);
+  font-weight: 600;
+}
+
 /* ==========================================
    Agentforce Panel (right side)
    ========================================== */
