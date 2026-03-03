@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import {
   Home,
   Database,
@@ -95,9 +95,11 @@ export default function LeftNav({
   );
 
   // Auto-expand the section that contains the active tab
-  if (activeGroupIdx >= 0 && !expandedSections.has(activeGroupIdx)) {
-    setExpandedSections((prev) => new Set(prev).add(activeGroupIdx));
-  }
+  useEffect(() => {
+    if (activeGroupIdx >= 0 && !expandedSections.has(activeGroupIdx)) {
+      setExpandedSections((prev) => new Set(prev).add(activeGroupIdx));
+    }
+  }, [activeGroupIdx]);
 
   // Filter items by quick find
   const query = quickFind.trim().toLowerCase();
