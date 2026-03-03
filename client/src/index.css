@@ -955,8 +955,8 @@
    Left Navigation (vertical sidebar)
    ========================================== */
 .sf-left-nav {
-  width: 220px;
-  min-width: 220px;
+  width: 240px;
+  min-width: 240px;
   background: white;
   border-right: 1px solid var(--slds-g-color-border-1);
   display: flex;
@@ -964,6 +964,44 @@
   height: calc(100vh - 44px);
 }
 
+/* Quick find search bar */
+.sf-left-nav-search {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--slds-g-color-border-1);
+  flex-shrink: 0;
+}
+
+.sf-left-nav-search-icon {
+  width: 16px;
+  height: 16px;
+  color: var(--slds-g-color-neutral-7);
+  flex-shrink: 0;
+}
+
+.sf-left-nav-search-input {
+  border: 1px solid var(--slds-g-color-border-1);
+  border-radius: 4px;
+  padding: 6px 10px;
+  font-size: 13px;
+  width: 100%;
+  outline: none;
+  background: white;
+  color: var(--slds-g-color-neutral-base);
+}
+
+.sf-left-nav-search-input::placeholder {
+  color: var(--slds-g-color-neutral-6);
+}
+
+.sf-left-nav-search-input:focus {
+  border-color: var(--slds-g-color-brand);
+  box-shadow: 0 0 0 1px var(--slds-g-color-brand);
+}
+
+/* Legacy header (unused in modern layout but kept for compat) */
 .sf-left-nav-app-header {
   display: flex;
   align-items: center;
@@ -993,9 +1031,74 @@
 .sf-left-nav-body {
   flex: 1;
   overflow-y: auto;
-  padding: 8px 0;
+  padding: 4px 0;
 }
 
+/* ── Modern section-header layout (Data Cloud) ── */
+.sf-left-nav-section {
+  margin-bottom: 2px;
+}
+
+.sf-left-nav-section-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 12px 4px;
+  position: relative;
+}
+
+.sf-left-nav-section-header.active {
+  background: #EEF4FF;
+}
+
+.sf-left-nav-section-header.active::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  background: var(--slds-g-color-brand);
+  border-radius: 0 3px 3px 0;
+}
+
+.sf-left-nav-section-icon {
+  width: 18px;
+  height: 18px;
+  color: var(--slds-g-color-neutral-7);
+  flex-shrink: 0;
+}
+
+.sf-left-nav-section-header.active .sf-left-nav-section-icon {
+  color: var(--slds-g-color-brand);
+}
+
+.sf-left-nav-section-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--slds-g-color-neutral-base);
+}
+
+.sf-left-nav-section-header.active .sf-left-nav-section-title {
+  color: var(--slds-g-color-brand);
+}
+
+/* Section-level items (no per-item icons, indented under header) */
+.sf-left-nav-item--section {
+  padding-left: 40px;
+  padding-right: 12px;
+  gap: 0;
+  justify-content: space-between;
+}
+
+.sf-left-nav-chevron {
+  width: 12px;
+  height: 12px;
+  color: var(--slds-g-color-neutral-6);
+  flex-shrink: 0;
+}
+
+/* ── Legacy group layout (Sales, Service, etc.) ── */
 .sf-left-nav-group {
   margin-bottom: 4px;
 }
@@ -1009,6 +1112,7 @@
   padding: 12px 16px 4px;
 }
 
+/* ── Shared item styles ── */
 .sf-left-nav-item {
   display: flex;
   align-items: center;
@@ -2961,4 +3065,554 @@
 
 .bilko-preview-card {
   width: 100%;
+}
+
+/* ==========================================
+   Google Drive — File Storage UI
+   ========================================== */
+
+/* Drive sidebar nav items */
+.sf-drive-nav-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 16px;
+  border-radius: 24px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--slds-g-color-neutral-base);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  transition: background 0.15s ease;
+  width: 100%;
+  text-align: left;
+}
+
+.sf-drive-nav-item:hover {
+  background: #E8F0FE;
+}
+
+.sf-drive-nav-item.active {
+  background: #C2E7FF;
+  color: #001D35;
+  font-weight: 600;
+}
+
+/* Folder cards (grid view) */
+.sf-drive-folder-card {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 12px;
+  background: #fff;
+  border: 1px solid var(--slds-g-color-border-2);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  min-height: 44px;
+}
+
+.sf-drive-folder-card:hover {
+  background: #F8F9FA;
+  border-color: #C4C7C5;
+}
+
+/* File cards (grid view) */
+.sf-drive-file-card {
+  background: #fff;
+  border: 1px solid var(--slds-g-color-border-2);
+  border-radius: 8px;
+  cursor: pointer;
+  overflow: hidden;
+  transition: all 0.15s ease;
+}
+
+.sf-drive-file-card:hover {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+  border-color: #C4C7C5;
+}
+
+.sf-drive-file-card-preview {
+  height: 140px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #F8F9FA;
+  border-bottom: 1px solid var(--slds-g-color-border-2);
+}
+
+.sf-drive-file-card-footer {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  min-height: 40px;
+}
+
+/* More button (hidden by default, shown on hover) */
+.sf-drive-more-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  opacity: 0;
+  transition: all 0.15s ease;
+  flex-shrink: 0;
+  color: var(--slds-g-color-neutral-7);
+}
+
+.sf-drive-folder-card:hover .sf-drive-more-btn,
+.sf-drive-file-card:hover .sf-drive-more-btn,
+tr:hover .sf-drive-more-btn {
+  opacity: 1;
+}
+
+.sf-drive-more-btn:hover {
+  background: rgba(0, 0, 0, 0.06);
+}
+
+/* Context menu */
+.sf-drive-context-menu {
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.15), 0 0 0 1px rgba(0, 0, 0, 0.05);
+  padding: 4px 0;
+  min-width: 200px;
+  z-index: 100;
+}
+
+.sf-drive-context-menu button {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 8px 16px;
+  font-size: 13px;
+  color: var(--slds-g-color-neutral-base);
+  background: none;
+  border: none;
+  cursor: pointer;
+  text-align: left;
+}
+
+.sf-drive-context-menu button:hover {
+  background: #F1F3F4;
+}
+
+/* Danger hover for delete button in preview */
+.sf-btn-danger-hover:hover {
+  color: var(--slds-g-color-error-1) !important;
+  border-color: var(--slds-g-color-error-1) !important;
+}
+
+/* ==========================================
+   Workflow Capture — Floating UI
+   ========================================== */
+
+/* Camera flash effect */
+.wfc-flash {
+  position: fixed;
+  inset: 0;
+  background: white;
+  opacity: 0.6;
+  z-index: 9999;
+  pointer-events: none;
+  animation: wfc-flash-anim 200ms ease-out forwards;
+}
+
+@keyframes wfc-flash-anim {
+  0% { opacity: 0.7; }
+  100% { opacity: 0; }
+}
+
+/* ---- Capture bar (top, floating above everything) ---- */
+.wfc-capture-bar {
+  position: fixed;
+  top: 52px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 9990;
+  pointer-events: auto;
+}
+
+.wfc-capture-bar-inner {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 14px;
+  background: #1a1a1a;
+  border-radius: 32px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(255,255,255,0.08);
+  color: #fff;
+}
+
+.wfc-rec-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #EA4335;
+  animation: wfc-pulse 1.5s ease-in-out infinite;
+  flex-shrink: 0;
+}
+
+@keyframes wfc-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.3; }
+}
+
+.wfc-label {
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+}
+
+.wfc-divider {
+  width: 1px;
+  height: 18px;
+  background: rgba(255,255,255,0.2);
+  flex-shrink: 0;
+}
+
+.wfc-step-count {
+  font-size: 11px;
+  color: rgba(255,255,255,0.7);
+  white-space: nowrap;
+}
+
+.wfc-capture-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 14px;
+  background: #EA4335;
+  color: #fff;
+  border: none;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  white-space: nowrap;
+}
+
+.wfc-capture-btn:hover {
+  background: #d33426;
+  transform: scale(1.03);
+}
+
+.wfc-capture-btn:active {
+  transform: scale(0.97);
+}
+
+.wfc-capture-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.wfc-tool-btn {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 10px;
+  background: rgba(255,255,255,0.1);
+  color: rgba(255,255,255,0.9);
+  border: none;
+  border-radius: 16px;
+  font-size: 11px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.15s ease;
+  white-space: nowrap;
+}
+
+.wfc-tool-btn:hover {
+  background: rgba(255,255,255,0.2);
+}
+
+.wfc-tool-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.wfc-export-btn {
+  background: rgba(66, 133, 244, 0.3);
+}
+
+.wfc-export-btn:hover {
+  background: rgba(66, 133, 244, 0.5);
+}
+
+.wfc-stop-btn {
+  background: rgba(255, 255, 255, 0.15);
+}
+
+.wfc-stop-btn:hover {
+  background: rgba(255, 82, 82, 0.4);
+}
+
+/* ---- Notes panel (bottom) ---- */
+.wfc-notes-panel {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 9980;
+  background: #fff;
+  border-top: 1px solid #e0e0e0;
+  box-shadow: 0 -4px 24px rgba(0, 0, 0, 0.1);
+  max-height: 320px;
+  display: flex;
+  flex-direction: column;
+}
+
+.wfc-notes-handle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 20px;
+  background: #fafafa;
+  border-bottom: 1px solid #e8e8e8;
+  cursor: pointer;
+  user-select: none;
+}
+
+.wfc-notes-handle:hover {
+  background: #f0f0f0;
+}
+
+.wfc-notes-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: #1a1a1a;
+}
+
+.wfc-notes-subtitle {
+  font-size: 11px;
+  color: #888;
+}
+
+.wfc-notes-body {
+  flex: 1;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ---- Thumbnail strip ---- */
+.wfc-thumbs-strip {
+  display: flex;
+  gap: 8px;
+  padding: 12px 20px;
+  overflow-x: auto;
+  border-bottom: 1px solid #eee;
+  background: #fafafa;
+  flex-shrink: 0;
+}
+
+.wfc-thumbs-strip::-webkit-scrollbar {
+  height: 4px;
+}
+
+.wfc-thumbs-strip::-webkit-scrollbar-thumb {
+  background: #ccc;
+  border-radius: 2px;
+}
+
+.wfc-thumb {
+  flex-shrink: 0;
+  width: 140px;
+  border: 2px solid transparent;
+  border-radius: 8px;
+  background: #fff;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  overflow: hidden;
+  position: relative;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+}
+
+.wfc-thumb:hover {
+  border-color: #4285F4;
+  box-shadow: 0 2px 8px rgba(66, 133, 244, 0.2);
+}
+
+.wfc-thumb.selected {
+  border-color: #4285F4;
+  box-shadow: 0 0 0 2px rgba(66, 133, 244, 0.2);
+}
+
+.wfc-thumb-img {
+  height: 80px;
+  overflow: hidden;
+  background: #f5f5f5;
+}
+
+.wfc-thumb-img img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: top left;
+}
+
+.wfc-thumb-footer {
+  padding: 4px 8px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.wfc-thumb-label {
+  font-size: 10px;
+  font-weight: 600;
+  color: #444;
+}
+
+.wfc-thumb-actions {
+  display: flex;
+  gap: 2px;
+  opacity: 0;
+  transition: opacity 0.15s ease;
+}
+
+.wfc-thumb:hover .wfc-thumb-actions {
+  opacity: 1;
+}
+
+.wfc-thumb-action {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  border-radius: 4px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #888;
+  transition: all 0.1s ease;
+}
+
+.wfc-thumb-action:hover {
+  background: #eee;
+  color: #444;
+}
+
+.wfc-thumb-delete:hover {
+  background: #fde8e8;
+  color: #EA4335;
+}
+
+.wfc-thumb-has-note {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #4285F4;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ---- Note editor ---- */
+.wfc-note-editor {
+  flex: 1;
+  padding: 12px 20px;
+  overflow: auto;
+}
+
+.wfc-note-editor-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.wfc-note-editor-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: #444;
+  flex: 1;
+}
+
+.wfc-note-textarea {
+  width: 100%;
+  padding: 10px 14px;
+  font-size: 13px;
+  line-height: 1.5;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  resize: none;
+  outline: none;
+  background: #fafafa;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+
+.wfc-note-textarea:focus {
+  border-color: #4285F4;
+  box-shadow: 0 0 0 2px rgba(66, 133, 244, 0.15);
+  background: #fff;
+}
+
+.wfc-note-empty {
+  font-size: 13px;
+  color: #999;
+  text-align: center;
+  padding: 20px;
+}
+
+/* ---- Voice button ---- */
+.wfc-voice-btn {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 12px;
+  border-radius: 16px;
+  border: 1px solid #ddd;
+  background: #fff;
+  font-size: 11px;
+  font-weight: 500;
+  cursor: pointer;
+  color: #444;
+  transition: all 0.15s ease;
+  position: relative;
+}
+
+.wfc-voice-btn:hover {
+  border-color: #4285F4;
+  color: #4285F4;
+}
+
+.wfc-voice-btn.recording {
+  border-color: #EA4335;
+  color: #EA4335;
+  background: #fef2f2;
+}
+
+.wfc-voice-label {
+  white-space: nowrap;
+}
+
+.wfc-voice-pulse {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #EA4335;
+  animation: wfc-pulse 1s ease-in-out infinite;
+}
+
+/* Active state indicator for menu items */
+.sf-dropdown-item-active {
+  background: rgba(234, 67, 53, 0.05) !important;
 }

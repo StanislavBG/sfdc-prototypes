@@ -12,6 +12,7 @@ import {
   Download,
   Clipboard,
   Diamond,
+  Camera,
 } from 'lucide-react';
 import GlobalSearch from './GlobalSearch';
 import { timelines } from './TimeMachine';
@@ -28,6 +29,8 @@ interface HeaderProps {
   onExportSvg?: () => void;
   onExportHtml?: () => void;
   onOpenBSChart?: () => void;
+  onToggleWorkflowCapture?: () => void;
+  workflowCaptureActive?: boolean;
 }
 
 // Figma logo SVG icon
@@ -63,6 +66,8 @@ export default function Header({
   onExportSvg,
   onExportHtml,
   onOpenBSChart,
+  onToggleWorkflowCapture,
+  workflowCaptureActive,
 }: HeaderProps) {
   const timelineData = timelines.find((t) => t.id === currentTimeline);
   const [setupMenuOpen, setSetupMenuOpen] = useState(false);
@@ -158,6 +163,21 @@ export default function Header({
                   <div className="slds-col" style={{ textAlign: 'left' }}>
                     <span className="slds-text-size_small slds-font-weight_medium" style={{ color: 'var(--slds-g-color-neutral-base)', display: 'block' }}>BS Chart</span>
                     <span className="slds-text-size_xx-small" style={{ color: 'var(--slds-g-color-neutral-7)' }}>Create diagrams & flowcharts</span>
+                  </div>
+                </button>
+                {/* Workflow Capture */}
+                <button
+                  onClick={() => { setToolsMenuOpen(false); onToggleWorkflowCapture?.(); }}
+                  className={`sf-dropdown-item ${workflowCaptureActive ? 'sf-dropdown-item-active' : ''}`}
+                >
+                  <div className="slds-square_large slds-border-radius_medium slds-flex slds-items-center slds-justify-center slds-flex-shrink-0" style={{ background: workflowCaptureActive ? '#EA4335' : '#0F9D58' }}>
+                    <Camera className="slds-icon-size_small slds-text-white" />
+                  </div>
+                  <div className="slds-col" style={{ textAlign: 'left' }}>
+                    <span className="slds-text-size_small slds-font-weight_medium" style={{ color: 'var(--slds-g-color-neutral-base)', display: 'block' }}>
+                      {workflowCaptureActive ? 'Workflow Capture (ON)' : 'Workflow Capture'}
+                    </span>
+                    <span className="slds-text-size_xx-small" style={{ color: 'var(--slds-g-color-neutral-7)' }}>Capture screens + notes for Figma</span>
                   </div>
                 </button>
                 {/* Figma export */}
