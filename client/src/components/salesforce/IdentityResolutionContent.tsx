@@ -1683,11 +1683,12 @@ export default function IdentityResolutionContent({ demoSession, onDemoSessionCh
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr 1fr', gap: 12 }}>
                 <div className="sf-card" style={{ padding: '14px 16px' }}>
                   <div className="slds-text-size_small slds-text-neutral-7 slds-flex slds-items-center slds-gap_xx-small" style={{ marginBottom: 4 }}>
-                    <Zap className="slds-icon-size_xx-small" /> Total Credits (30d)
+                    <Zap className="slds-icon-size_xx-small" /> Processed Records (30d)
                   </div>
                   <div className="slds-text-size_large slds-font-weight_bold slds-text-neutral-base">
-                    {selectedRuleset.processingHistory.reduce((a, j) => a + j.creditsCost, 0).toFixed(1)}
+                    {fmt(selectedRuleset.processingHistory.reduce((a, j) => a + j.sourceRecords, 0))}
                   </div>
+                  <div className="slds-text-size_x-small slds-text-neutral-7" style={{ marginTop: 2 }}>Billing meter</div>
                 </div>
                 <div className="sf-card" style={{ padding: '14px 16px' }}>
                   <div className="slds-text-size_small slds-text-neutral-7 slds-flex slds-items-center slds-gap_xx-small" style={{ marginBottom: 4 }}>
@@ -1745,8 +1746,7 @@ export default function IdentityResolutionContent({ demoSession, onDemoSessionCh
                           <th>Run Reason</th>
                           <th>User</th>
                           <th>Duration</th>
-                          <th style={{ textAlign: 'right' }}>Records</th>
-                          <th style={{ textAlign: 'right' }}>Credits</th>
+                          <th style={{ textAlign: 'right' }}>Records <span className="slds-text-size_x-small slds-font-weight_normal slds-text-neutral-6" title="Billing meter">(metered)</span></th>
                           <th>Status</th>
                         </tr>
                       </thead>
@@ -1800,11 +1800,6 @@ export default function IdentityResolutionContent({ demoSession, onDemoSessionCh
                               </td>
                               <td style={{ textAlign: 'right' }}>
                                 <span className="sf-tabular-nums slds-text-size_small">{fmt(entry.sourceRecords)}</span>
-                              </td>
-                              <td style={{ textAlign: 'right' }}>
-                                <span className="sf-tabular-nums slds-text-size_small slds-font-weight_medium" style={{ color: entry.creditsCost > 50 ? 'var(--slds-g-color-warning-1)' : undefined }}>
-                                  {entry.creditsCost.toFixed(1)}
-                                </span>
                               </td>
                               <td>
                                 <span className={`sf-badge ${
