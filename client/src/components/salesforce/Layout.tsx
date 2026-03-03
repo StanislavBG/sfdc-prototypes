@@ -1,4 +1,4 @@
-import { useState, useRef, useCallback } from 'react';
+import { useState, useRef, useCallback, useEffect } from 'react';
 import { toSvg } from 'html-to-image';
 import Header from './Header';
 import LeftNav from './LeftNav';
@@ -18,6 +18,84 @@ import WorkflowCapture from './WorkflowCapture';
 import { MdsSimulatorProvider } from './MdsSimulatorContext';
 import { salesforceApps, type Workflow } from '@/lib/mock-data';
 
+// ── URL Routing Utilities ──────────────────────────────────────────
+// Convert nav label → URL slug (kebab-case)
+function toSlug(label: string): string {
+  return label.toLowerCase().replace(/\s+/g, '-');
+}
+
+// Convert URL slug → nav label (lookup table for known routes)
+const slugToTab: Record<string, string> = {};
+const tabToSlug: Record<string, string> = {};
+
+// Populated from the nav groups at init time
+function registerTab(label: string) {
+  const slug = toSlug(label);
+  slugToTab[slug] = label;
+  tabToSlug[label] = slug;
+}
+
+// Register all known tabs
+[
+  'Home', 'Data Streams', 'Data Lake Objects', 'Data Transforms', 'Data Model',
+  'Identity Resolutions', 'Data Spaces', 'Data Governance', 'Data Catalog',
+  'Search Indexes', 'Secondary Indexes', 'Document AI', 'Content Viewer',
+  'Content Lens', 'Google Drive', 'Semantic Search', 'Segments',
+  'Calculated Insights', 'Data Graphs', 'View Data', 'Einstein Studio',
+  'Semantic Models', 'Reports', 'Dashboards', 'Activations',
+  'Activation Targets', 'Communication Capping', 'Data Actions',
+  'Data Action Targets', 'Data Explorer', 'Profile Explorer', 'Query Editor',
+].forEach(registerTab);
+
+// IR detail tab slug mapping
+const irTabSlugs: Record<string, string> = {
+  properties: 'properties',
+  details: 'details',
+  history: 'processing-history',
+};
+const irSlugToTab: Record<string, string> = {
+  properties: 'properties',
+  details: 'details',
+  'processing-history': 'history',
+};
+
+interface UrlState {
+  tab: string;
+  irRulesetSlug?: string;
+  irDetailTab?: string;
+}
+
+function parseUrl(pathname: string): UrlState {
+  const parts = pathname.replace(/^\/+|\/+$/g, '').split('/').filter(Boolean);
+  if (parts.length === 0) return { tab: 'Data Streams' };
+
+  const firstSlug = parts[0];
+  const tab = slugToTab[firstSlug];
+  if (!tab) return { tab: 'Data Streams' };
+
+  // IR sub-routes: /identity-resolutions/:rulesetSlug/:detailTab
+  if (firstSlug === 'identity-resolutions' && parts.length >= 2) {
+    const rulesetSlug = parts[1];
+    const detailTabSlug = parts[2] || 'properties';
+    return {
+      tab: 'Identity Resolutions',
+      irRulesetSlug: rulesetSlug,
+      irDetailTab: irSlugToTab[detailTabSlug] || 'properties',
+    };
+  }
+
+  return { tab };
+}
+
+function buildUrl(tab: string, irRulesetSlug?: string, irDetailTab?: string): string {
+  const slug = tabToSlug[tab] || toSlug(tab);
+  if (tab === 'Identity Resolutions' && irRulesetSlug) {
+    const dtSlug = irDetailTab ? (irTabSlugs[irDetailTab] || irDetailTab) : 'properties';
+    return `/${slug}/${irRulesetSlug}/${dtSlug}`;
+  }
+  return `/${slug}`;
+}
+
 // ── Demo Session State ─────────────────────────────────────────────
 // Tracks user selections across the multi-step demo flow:
 // 1) Create Informatica Connections → remembered names
@@ -33,11 +111,33 @@ interface LayoutProps {
   children?: React.ReactNode;
 }
 
+// ── URL Breadcrumb ─────────────────────────────────────────────────
+function UrlBreadcrumb({ tab, rulesetSlug, detailTab }: { tab: string; rulesetSlug?: string; detailTab?: string }) {
+  const url = buildUrl(tab, rulesetSlug, detailTab);
+  const segments = url.replace(/^\//, '').split('/').filter(Boolean);
+  return (
+    <div className="sf-url-breadcrumb">
+      <span className="sf-url-breadcrumb-segment sf-url-breadcrumb-root">setup</span>
+      {segments.map((seg, i) => (
+        <span key={i}>
+          <span className="sf-url-breadcrumb-sep">&gt;</span>
+          <span className={`sf-url-breadcrumb-segment ${i === segments.length - 1 ? 'sf-url-breadcrumb-current' : ''}`}>
+            {seg}
+          </span>
+        </span>
+      ))}
+    </div>
+  );
+}
+
 export default function Layout({ children }: LayoutProps) {
+  // Parse initial URL to set starting state
+  const initialUrl = parseUrl(window.location.pathname);
+
   const [activeWorkflow, setActiveWorkflow] = useState<Workflow | null>(null);
   const [timeMachineOpen, setTimeMachineOpen] = useState(false);
   const [currentTimeline, setCurrentTimeline] = useState('today');
-  const [activeTab, setActiveTab] = useState('Data Streams');
+  const [activeTab, setActiveTab] = useState(initialUrl.tab);
   const [agentMinimized, setAgentMinimized] = useState(false);
   const [currentApp, setCurrentApp] = useState('data-cloud');
   const [appLauncherOpen, setAppLauncherOpen] = useState(false);
@@ -45,6 +145,10 @@ export default function Layout({ children }: LayoutProps) {
   const [showBSChart, setShowBSChart] = useState(false);
   const [workflowCaptureActive, setWorkflowCaptureActive] = useState(false);
   const [exportToast, setExportToast] = useState<string | null>(null);
+
+  // IR sub-route state (from URL)
+  const [irRulesetSlug, setIrRulesetSlug] = useState<string | undefined>(initialUrl.irRulesetSlug);
+  const [irDetailTab, setIrDetailTab] = useState<string | undefined>(initialUrl.irDetailTab);
 
   // Demo session state — shared across Setup & IR pages
   const [demoSession, setDemoSession] = useState<DemoSessionState>({
@@ -54,11 +158,56 @@ export default function Layout({ children }: LayoutProps) {
   });
 
   const mainRef = useRef<HTMLElement>(null);
+  const suppressUrlPush = useRef(false);
 
   const isAdmin = currentTimeline === 'context-explorer';
   const effectiveApp = isAdmin ? 'admin' : currentApp;
   const currentAppData = salesforceApps.find((a) => a.id === effectiveApp);
   const appName = currentAppData?.name || 'Data 360';
+
+  // ── URL ↔ State sync ──────────────────────────────────────────────
+  // Push URL when navigation state changes
+  useEffect(() => {
+    if (suppressUrlPush.current) {
+      suppressUrlPush.current = false;
+      return;
+    }
+    const url = buildUrl(activeTab, irRulesetSlug, irDetailTab);
+    if (window.location.pathname !== url) {
+      window.history.pushState({ tab: activeTab, irRulesetSlug, irDetailTab }, '', url);
+    }
+  }, [activeTab, irRulesetSlug, irDetailTab]);
+
+  // Handle browser back / forward
+  useEffect(() => {
+    const onPopState = () => {
+      const parsed = parseUrl(window.location.pathname);
+      suppressUrlPush.current = true;
+      setActiveTab(parsed.tab);
+      setIrRulesetSlug(parsed.irRulesetSlug);
+      setIrDetailTab(parsed.irDetailTab);
+    };
+    window.addEventListener('popstate', onPopState);
+    return () => window.removeEventListener('popstate', onPopState);
+  }, []);
+
+  // Navigation helper that also updates URL sub-route state
+  const navigateTo = useCallback((tab: string, rulesetSlug?: string, detailTab?: string) => {
+    setActiveTab(tab);
+    setIrRulesetSlug(tab === 'Identity Resolutions' ? rulesetSlug : undefined);
+    setIrDetailTab(tab === 'Identity Resolutions' ? detailTab : undefined);
+  }, []);
+
+  // Wrapper for setActiveTab that clears IR sub-route
+  const handleChangeTab = useCallback((tab: string) => {
+    navigateTo(tab);
+  }, [navigateTo]);
+
+  // Callback for IR content to update URL when navigating to detail views
+  const handleIrNavigate = useCallback((rulesetSlug?: string, detailTab?: string) => {
+    setIrRulesetSlug(rulesetSlug);
+    setIrDetailTab(detailTab);
+  }, []);
 
   const handleSelectSearchResult = (id: string) => {
     console.log('Selected search result:', id);
@@ -68,9 +217,9 @@ export default function Layout({ children }: LayoutProps) {
     setCurrentTimeline(id);
     setShowDataCloudSetup(false);
     if (id === 'context-explorer') {
-      setActiveTab('Google Drive');
+      navigateTo('Google Drive');
     } else if ((id === 'today' || id === '264-release') && activeTab === 'Google Drive' && currentApp !== 'data-cloud') {
-      setActiveTab('Data Streams');
+      navigateTo('Data Streams');
     }
   };
 
@@ -79,13 +228,13 @@ export default function Layout({ children }: LayoutProps) {
     setShowDataCloudSetup(false);
     if (appId === 'admin') {
       setCurrentTimeline('context-explorer');
-      setActiveTab('Google Drive');
+      navigateTo('Google Drive');
     } else if (appId === 'data-cloud') {
       setCurrentTimeline('today');
-      setActiveTab('Data Streams');
+      navigateTo('Data Streams');
     } else {
       setCurrentTimeline('today');
-      setActiveTab('Home');
+      navigateTo('Home');
     }
   };
 
@@ -143,7 +292,7 @@ export default function Layout({ children }: LayoutProps) {
           onSetup={() => {
             setShowDataCloudSetup(false);
             setCurrentTimeline('context-explorer');
-            setActiveTab('Google Drive');
+            navigateTo('Google Drive');
           }}
           onOpenAppLauncher={() => setAppLauncherOpen(!appLauncherOpen)}
           onOpenDataCloudSetup={() => {}}
@@ -216,9 +365,11 @@ export default function Layout({ children }: LayoutProps) {
           <LeftNav
             currentApp={effectiveApp}
             activeTab={activeTab}
-            onChangeTab={setActiveTab}
+            onChangeTab={handleChangeTab}
           />
           <main ref={mainRef} className="sf-layout-main">
+            {/* URL breadcrumb bar */}
+            <UrlBreadcrumb tab={activeTab} rulesetSlug={irRulesetSlug} detailTab={irDetailTab} />
             {children || (
               activeTab === 'Home' ? (
                 <HomeContent />
@@ -227,7 +378,7 @@ export default function Layout({ children }: LayoutProps) {
               ) : activeTab === 'Semantic Search' ? (
                 <SemanticSearchContent />
               ) : activeTab === 'Identity Resolutions' ? (
-                <IdentityResolutionContent demoSession={demoSession} onDemoSessionChange={setDemoSession} currentTimeline={currentTimeline} />
+                <IdentityResolutionContent demoSession={demoSession} onDemoSessionChange={setDemoSession} currentTimeline={currentTimeline} initialRulesetSlug={irRulesetSlug} initialDetailTab={irDetailTab} onNavigate={handleIrNavigate} />
               ) : activeTab === 'Data Streams' ? (
                 <DataStreamsContent demoSession={demoSession} currentTimeline={currentTimeline} />
               ) : (
