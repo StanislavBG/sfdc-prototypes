@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import {
   Home,
   Database,
@@ -74,14 +74,37 @@ export default function LeftNav({
   // Do any groups use section-header icons? (modern Data Cloud style)
   const useSectionHeaders = groups.some((g) => !!g.icon);
 
+  // Collapsible sections — only first section expanded by default
+  const [expandedSections, setExpandedSections] = useState<Set<number>>(() => new Set([0]));
+
+  const toggleSection = (idx: number) => {
+    setExpandedSections((prev) => {
+      const next = new Set(prev);
+      if (next.has(idx)) {
+        next.delete(idx);
+      } else {
+        next.add(idx);
+      }
+      return next;
+    });
+  };
+
   // Find which group contains the active tab
   const activeGroupIdx = groups.findIndex((g) =>
     g.items.some((item) => item.label === activeTab)
   );
 
+  // Auto-expand the section that contains the active tab
+  useEffect(() => {
+    if (activeGroupIdx >= 0 && !expandedSections.has(activeGroupIdx)) {
+      setExpandedSections((prev) => new Set(prev).add(activeGroupIdx));
+    }
+  }, [activeGroupIdx]);
+
   // Filter items by quick find
   const query = quickFind.trim().toLowerCase();
-  const filteredGroups = query
+  const isSearching = query.length > 0;
+  const filteredGroups = isSearching
     ? groups
         .map((g) => ({
           ...g,
@@ -115,36 +138,42 @@ export default function LeftNav({
             const GroupIcon = group.icon ? groupIcons[group.icon] : null;
             const origIdx = groups.indexOf(group);
             const isActiveSection = origIdx === activeGroupIdx;
+            const isExpanded = isSearching || expandedSections.has(origIdx);
 
             return (
               <div key={gi} className="sf-left-nav-section">
                 {group.title && (
-                  <div
+                  <button
                     className={`sf-left-nav-section-header ${isActiveSection ? 'active' : ''}`}
+                    onClick={() => toggleSection(origIdx)}
                   >
+                    <ChevronRight
+                      className={`sf-left-nav-section-chevron ${isExpanded ? 'expanded' : ''}`}
+                    />
                     {GroupIcon && (
                       <GroupIcon className="sf-left-nav-section-icon" />
                     )}
                     <span className="sf-left-nav-section-title">
                       {group.title}
                     </span>
-                  </div>
+                  </button>
                 )}
-                {group.items.map((item) => {
-                  const isActive = activeTab === item.label;
-                  return (
-                    <button
-                      key={item.label}
-                      className={`sf-left-nav-item sf-left-nav-item--section ${isActive ? 'active' : ''}`}
-                      onClick={() => onChangeTab(item.label)}
-                    >
-                      <span className="slds-truncate">{item.label}</span>
-                      {item.hasDropdown && (
-                        <ChevronRight className="sf-left-nav-chevron" />
-                      )}
-                    </button>
-                  );
-                })}
+                {isExpanded &&
+                  group.items.map((item) => {
+                    const isActive = activeTab === item.label;
+                    return (
+                      <button
+                        key={item.label}
+                        className={`sf-left-nav-item sf-left-nav-item--section ${isActive ? 'active' : ''}`}
+                        onClick={() => onChangeTab(item.label)}
+                      >
+                        <span className="slds-truncate">{item.label}</span>
+                        {item.hasDropdown && (
+                          <ChevronRight className="sf-left-nav-chevron" />
+                        )}
+                      </button>
+                    );
+                  })}
               </div>
             );
           })}
