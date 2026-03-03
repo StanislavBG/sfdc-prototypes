@@ -37,7 +37,7 @@ export default function Layout({ children }: LayoutProps) {
   const [activeWorkflow, setActiveWorkflow] = useState<Workflow | null>(null);
   const [timeMachineOpen, setTimeMachineOpen] = useState(false);
   const [currentTimeline, setCurrentTimeline] = useState('today');
-  const [activeTab, setActiveTab] = useState('Home');
+  const [activeTab, setActiveTab] = useState('Data Streams');
   const [agentMinimized, setAgentMinimized] = useState(false);
   const [currentApp, setCurrentApp] = useState('data-cloud');
   const [appLauncherOpen, setAppLauncherOpen] = useState(false);
@@ -70,7 +70,7 @@ export default function Layout({ children }: LayoutProps) {
     if (id === 'context-explorer') {
       setActiveTab('Google Drive');
     } else if ((id === 'today' || id === '264-release') && activeTab === 'Google Drive' && currentApp !== 'data-cloud') {
-      setActiveTab('Home');
+      setActiveTab('Data Streams');
     }
   };
 
@@ -80,6 +80,9 @@ export default function Layout({ children }: LayoutProps) {
     if (appId === 'admin') {
       setCurrentTimeline('context-explorer');
       setActiveTab('Google Drive');
+    } else if (appId === 'data-cloud') {
+      setCurrentTimeline('today');
+      setActiveTab('Data Streams');
     } else {
       setCurrentTimeline('today');
       setActiveTab('Home');
