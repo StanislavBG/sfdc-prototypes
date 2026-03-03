@@ -325,6 +325,48 @@ export async function registerRoutes(
     }
   });
 
+  /** Create a text file from pasted content */
+  app.post(api.driveFiles.createTextFile.path, async (req, res) => {
+    try {
+      const input = api.driveFiles.createTextFile.input.parse(req.body);
+      const name = input.name;
+
+      // Detect mime type from extension
+      const ext = name.split('.').pop()?.toLowerCase() || '';
+      const mimeMap: Record<string, string> = {
+        txt: 'text/plain', md: 'text/markdown', json: 'application/json',
+        csv: 'text/csv', xml: 'application/xml', html: 'text/html',
+        css: 'text/css', js: 'application/javascript', ts: 'application/typescript',
+        yaml: 'application/x-yaml', yml: 'application/x-yaml',
+      };
+      const mimeType = mimeMap[ext] || 'text/plain';
+      const size = Buffer.byteLength(input.content, 'utf-8');
+
+      const result = await pool.query(
+        `INSERT INTO drive_files (name, mime_type, size, is_folder, parent_id, content)
+         VALUES ($1, $2, $3, false, $4, $5)
+         RETURNING id, name, mime_type, size, is_folder, parent_id, starred, created_at, updated_at`,
+        [name, mimeType, size, input.parentId ?? null, input.content]
+      );
+      const r = result.rows[0];
+      res.status(201).json({
+        id: r.id,
+        name: r.name,
+        mimeType: r.mime_type,
+        size: Number(r.size),
+        isFolder: r.is_folder,
+        parentId: r.parent_id,
+        starred: r.starred,
+        createdAt: r.created_at,
+        updatedAt: r.updated_at,
+      });
+    } catch (err: any) {
+      if (err instanceof z.ZodError) return res.status(400).json({ message: err.errors[0].message });
+      console.error("Create text file error:", err);
+      res.status(500).json({ message: err.message });
+    }
+  });
+
   // =========================================================================
   // Help Documents
   // =========================================================================

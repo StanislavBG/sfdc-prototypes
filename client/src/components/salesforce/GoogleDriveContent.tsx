@@ -27,6 +27,9 @@ import {
   Plus,
   Clock,
   StarOff,
+  ClipboardPaste,
+  ChevronDown,
+  FilePlus2,
 } from 'lucide-react';
 
 // ---------------------------------------------------------------------------
@@ -152,6 +155,15 @@ export default function GoogleDriveContent() {
 
   // Context menu
   const [contextMenu, setContextMenu] = useState<{ fileId: number; x: number; y: number } | null>(null);
+
+  // New menu (dropdown from New button)
+  const [showNewMenu, setShowNewMenu] = useState(false);
+
+  // Paste-to-file modal
+  const [showPasteModal, setShowPasteModal] = useState(false);
+  const [pasteFileName, setPasteFileName] = useState('');
+  const [pasteContent, setPasteContent] = useState('');
+  const [pasteSaving, setPasteSaving] = useState(false);
 
   // Errors
   const [error, setError] = useState<string | null>(null);
@@ -372,6 +384,50 @@ export default function GoogleDriveContent() {
     setIsSearching(false);
   };
 
+  // ------ Paste-to-file ------
+
+  const openPasteModal = () => {
+    setShowPasteModal(true);
+    setPasteFileName('');
+    setPasteContent('');
+    setPasteSaving(false);
+    setShowNewMenu(false);
+  };
+
+  const saveTextFile = async () => {
+    if (!pasteFileName.trim() || !pasteContent.trim()) return;
+    setPasteSaving(true);
+    setError(null);
+    try {
+      // Auto-append .txt if no extension
+      let name = pasteFileName.trim();
+      if (!name.includes('.')) {
+        name += '.txt';
+      }
+
+      const res = await fetch('/api/drive/files/text', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name,
+          content: pasteContent,
+          parentId: currentFolderId,
+        }),
+      });
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({ message: 'Save failed' }));
+        throw new Error(err.message);
+      }
+      setShowPasteModal(false);
+      setPasteFileName('');
+      setPasteContent('');
+      await loadFiles();
+    } catch (err: any) {
+      setError(err.message || 'Failed to save file');
+    }
+    setPasteSaving(false);
+  };
+
   // Separate folders and files
   const folders = files.filter(f => f.isFolder);
   const regularFiles = files.filter(f => !f.isFolder);
@@ -381,27 +437,47 @@ export default function GoogleDriveContent() {
   return (
     <div
       className="h-full flex"
-      onClick={() => setContextMenu(null)}
+      onClick={() => { setContextMenu(null); setShowNewMenu(false); }}
     >
       {/* ---- Drive sidebar ---- */}
       <div style={{ width: 220, flexShrink: 0, borderRight: '1px solid var(--slds-g-color-border-2)', background: '#fff', display: 'flex', flexDirection: 'column' }}>
-        {/* New button */}
-        <div style={{ padding: '16px 16px 8px' }}>
+        {/* New button with dropdown */}
+        <div style={{ padding: '16px 16px 8px', position: 'relative' }}>
           <button
-            onClick={() => fileRef.current?.click()}
+            onClick={() => setShowNewMenu(!showNewMenu)}
             className="sf-btn sf-btn-brand"
             style={{ width: '100%', gap: 8, justifyContent: 'center', borderRadius: 24, height: 40, fontSize: 14, fontWeight: 500 }}
           >
             <Plus className="w-4 h-4" />
             New
+            <ChevronDown className="w-3.5 h-3.5" style={{ marginLeft: 2 }} />
           </button>
           <input
             ref={fileRef}
             type="file"
             multiple
             className="sf-hidden"
-            onChange={(e) => handleUpload(e.target.files)}
+            onChange={(e) => { handleUpload(e.target.files); setShowNewMenu(false); }}
           />
+
+          {/* New menu dropdown */}
+          {showNewMenu && (
+            <div
+              className="sf-drive-context-menu"
+              style={{ position: 'absolute', top: '100%', left: 16, right: 16, marginTop: 4, zIndex: 50 }}
+            >
+              <button onClick={() => { fileRef.current?.click(); }}>
+                <Upload className="w-4 h-4" /> Upload file
+              </button>
+              <button onClick={() => { setShowNewFolder(true); setShowNewMenu(false); }}>
+                <FolderPlus className="w-4 h-4" /> New folder
+              </button>
+              <div style={{ height: 1, background: 'var(--slds-g-color-border-2)', margin: '4px 0' }} />
+              <button onClick={openPasteModal}>
+                <ClipboardPaste className="w-4 h-4" /> Paste text to file
+              </button>
+            </div>
+          )}
         </div>
 
         {/* Nav items */}
@@ -940,6 +1016,158 @@ export default function GoogleDriveContent() {
           </div>
         );
       })()}
+
+      {/* ---- Paste-to-file modal ---- */}
+      {showPasteModal && (
+        <div
+          className="fixed inset-0 z-50"
+          style={{ background: 'rgba(0,0,0,0.4)' }}
+          onClick={() => { if (!pasteSaving) setShowPasteModal(false); }}
+        >
+          <div
+            onClick={(e) => e.stopPropagation()}
+            style={{
+              position: 'absolute',
+              top: '50%', left: '50%',
+              transform: 'translate(-50%, -50%)',
+              width: '90%', maxWidth: 720,
+              maxHeight: '85vh',
+              background: '#fff',
+              borderRadius: 12,
+              boxShadow: '0 8px 32px rgba(0,0,0,0.2)',
+              display: 'flex', flexDirection: 'column',
+              overflow: 'hidden',
+            }}
+          >
+            {/* Modal header */}
+            <div style={{
+              padding: '16px 24px',
+              borderBottom: '1px solid var(--slds-g-color-border-2)',
+              display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+            }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                <div style={{
+                  width: 36, height: 36, borderRadius: 8,
+                  background: '#E8F0FE', display: 'flex', alignItems: 'center', justifyContent: 'center',
+                }}>
+                  <ClipboardPaste className="w-5 h-5" style={{ color: '#4285F4' }} />
+                </div>
+                <div>
+                  <div className="slds-text-size_medium slds-font-weight_semibold">Create file from text</div>
+                  <div className="slds-text-size_small slds-text-neutral-7">Paste or type content to save as a file</div>
+                </div>
+              </div>
+              <button
+                onClick={() => setShowPasteModal(false)}
+                disabled={pasteSaving}
+                className="sf-action-btn"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            {/* Modal body */}
+            <div style={{ padding: 24, flex: 1, overflow: 'auto', display: 'flex', flexDirection: 'column', gap: 16 }}>
+              {/* File name */}
+              <div>
+                <label className="slds-text-size_small slds-font-weight_medium slds-text-neutral-7" style={{ display: 'block', marginBottom: 6 }}>
+                  File name
+                </label>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                  <FilePlus2 className="w-5 h-5" style={{ color: '#4285F4', flexShrink: 0 }} />
+                  <input
+                    type="text"
+                    placeholder="my-notes.txt"
+                    value={pasteFileName}
+                    onChange={(e) => setPasteFileName(e.target.value)}
+                    onKeyDown={(e) => { if (e.key === 'Enter' && pasteFileName.trim() && pasteContent.trim()) saveTextFile(); }}
+                    className="sf-input"
+                    style={{ flex: 1, height: 40, fontSize: 14 }}
+                    autoFocus
+                  />
+                </div>
+                <div className="slds-text-size_small slds-text-neutral-7" style={{ marginTop: 4, marginLeft: 28 }}>
+                  Include an extension (.txt, .md, .json, .csv, etc.) or .txt will be added automatically
+                </div>
+              </div>
+
+              {/* Content area */}
+              <div style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
+                <label className="slds-text-size_small slds-font-weight_medium slds-text-neutral-7" style={{ display: 'block', marginBottom: 6 }}>
+                  Content
+                </label>
+                <textarea
+                  placeholder="Paste or type your content here..."
+                  value={pasteContent}
+                  onChange={(e) => setPasteContent(e.target.value)}
+                  style={{
+                    flex: 1,
+                    minHeight: 280,
+                    padding: 16,
+                    fontSize: 13,
+                    lineHeight: 1.6,
+                    fontFamily: 'monospace',
+                    border: '1px solid var(--slds-g-color-border-1)',
+                    borderRadius: 8,
+                    resize: 'vertical',
+                    background: '#FAFAF9',
+                    outline: 'none',
+                    transition: 'border-color 0.15s ease, box-shadow 0.15s ease',
+                  }}
+                  onFocus={(e) => {
+                    e.currentTarget.style.borderColor = 'var(--slds-g-color-brand)';
+                    e.currentTarget.style.boxShadow = '0 0 0 2px rgba(1, 118, 211, 0.15)';
+                  }}
+                  onBlur={(e) => {
+                    e.currentTarget.style.borderColor = 'var(--slds-g-color-border-1)';
+                    e.currentTarget.style.boxShadow = 'none';
+                  }}
+                />
+                {pasteContent && (
+                  <div className="slds-text-size_small slds-text-neutral-7" style={{ marginTop: 6, textAlign: 'right' }}>
+                    {pasteContent.length.toLocaleString()} characters &middot; {formatFileSize(new Blob([pasteContent]).size)}
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Modal footer */}
+            <div style={{
+              padding: '16px 24px',
+              borderTop: '1px solid var(--slds-g-color-border-2)',
+              display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: 12,
+              background: '#FAFAF9',
+            }}>
+              <button
+                onClick={() => setShowPasteModal(false)}
+                disabled={pasteSaving}
+                className="sf-btn sf-btn-neutral"
+                style={{ height: 36, minWidth: 80 }}
+              >
+                Cancel
+              </button>
+              <button
+                onClick={saveTextFile}
+                disabled={pasteSaving || !pasteFileName.trim() || !pasteContent.trim()}
+                className="sf-btn sf-btn-brand"
+                style={{ height: 36, minWidth: 120, gap: 8 }}
+              >
+                {pasteSaving ? (
+                  <>
+                    <Loader2 className="w-4 h-4 sf-spin" />
+                    Saving...
+                  </>
+                ) : (
+                  <>
+                    <FilePlus2 className="w-4 h-4" />
+                    Save file
+                  </>
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
