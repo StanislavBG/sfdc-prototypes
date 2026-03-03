@@ -14,6 +14,7 @@ import WorkflowArea from './WorkflowArea';
 import TimeMachine from './TimeMachine';
 import AppLauncher from './AppLauncher';
 import BSChartPlayground from './BSChartPlayground';
+import WorkflowCapture from './WorkflowCapture';
 import { MdsSimulatorProvider } from './MdsSimulatorContext';
 import { salesforceApps, type Workflow } from '@/lib/mock-data';
 
@@ -42,6 +43,7 @@ export default function Layout({ children }: LayoutProps) {
   const [appLauncherOpen, setAppLauncherOpen] = useState(false);
   const [showDataCloudSetup, setShowDataCloudSetup] = useState(false);
   const [showBSChart, setShowBSChart] = useState(false);
+  const [workflowCaptureActive, setWorkflowCaptureActive] = useState(false);
   const [exportToast, setExportToast] = useState<string | null>(null);
 
   // Demo session state — shared across Setup & IR pages
@@ -145,6 +147,8 @@ export default function Layout({ children }: LayoutProps) {
           onExportSvg={handleExportSvg}
           onExportHtml={handleExportHtml}
           onOpenBSChart={() => setShowBSChart(true)}
+          onToggleWorkflowCapture={() => setWorkflowCaptureActive((v) => !v)}
+          workflowCaptureActive={workflowCaptureActive}
         />
         <div className="sf-layout-body">
           <main ref={mainRef} className="sf-layout-main">
@@ -164,6 +168,11 @@ export default function Layout({ children }: LayoutProps) {
           currentApp={effectiveApp}
         />
         {showBSChart && <BSChartPlayground onClose={() => setShowBSChart(false)} />}
+        <WorkflowCapture
+          active={workflowCaptureActive}
+          onDeactivate={() => setWorkflowCaptureActive(false)}
+          captureTargetRef={mainRef}
+        />
         {exportToast && (
           <div className="sf-export-toast">
             {exportToast}
@@ -193,6 +202,8 @@ export default function Layout({ children }: LayoutProps) {
         onExportSvg={handleExportSvg}
         onExportHtml={handleExportHtml}
         onOpenBSChart={() => setShowBSChart(true)}
+        onToggleWorkflowCapture={() => setWorkflowCaptureActive((v) => !v)}
+        workflowCaptureActive={workflowCaptureActive}
       />
 
       {/* Body: conditionally render based on timeline */}
@@ -272,6 +283,13 @@ export default function Layout({ children }: LayoutProps) {
 
       {/* BS Chart Playground — global overlay, not affected by timeline */}
       {showBSChart && <BSChartPlayground onClose={() => setShowBSChart(false)} />}
+
+      {/* Workflow Capture — floating overlay */}
+      <WorkflowCapture
+        active={workflowCaptureActive}
+        onDeactivate={() => setWorkflowCaptureActive(false)}
+        captureTargetRef={mainRef}
+      />
 
       {/* Export toast notification */}
       {exportToast && (
