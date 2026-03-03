@@ -382,7 +382,7 @@ function apiToLocal(d: IdentityRulesetData): IdentityRuleset {
     consolidationRate: d.consolidationRate,
     matchRules: d.matchRules ?? [],
     reconciliationGroups: d.reconciliationGroups ?? [],
-    processingHistory: d.processingHistory ?? [],
+    processingHistory: generateProcessingHistory(),
     rulesetChanges: generateRulesetChanges(),
     isBYOM: d.description?.startsWith('Installed from ') || false,
     byomSource: d.description?.startsWith('Installed from ') ? d.description.replace('Installed from ', '').replace(' datakit', '').replace(' (CX)', '') : undefined,
