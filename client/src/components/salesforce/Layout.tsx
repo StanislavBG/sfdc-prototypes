@@ -4,7 +4,8 @@ import Header from './Header';
 import LeftNav from './LeftNav';
 import AgentPanel from './AgentPanel';
 import HomeContent from './HomeContent';
-import HelpDocExplorer from './HelpDocExplorer';
+import GoogleDriveContent from './GoogleDriveContent';
+import SemanticSearchContent from './SemanticSearchContent';
 import IdentityResolutionContent from './IdentityResolutionContent';
 import DataStreamsContent from './DataStreamsContent';
 import DataCloudSetupContent from './DataCloudSetupContent';
@@ -65,8 +66,8 @@ export default function Layout({ children }: LayoutProps) {
     setCurrentTimeline(id);
     setShowDataCloudSetup(false);
     if (id === 'context-explorer') {
-      setActiveTab('Context Manager');
-    } else if ((id === 'today' || id === '264-release') && activeTab === 'Context Manager' && currentApp !== 'data-cloud') {
+      setActiveTab('Google Drive');
+    } else if ((id === 'today' || id === '264-release') && activeTab === 'Google Drive' && currentApp !== 'data-cloud') {
       setActiveTab('Home');
     }
   };
@@ -76,7 +77,7 @@ export default function Layout({ children }: LayoutProps) {
     setShowDataCloudSetup(false);
     if (appId === 'admin') {
       setCurrentTimeline('context-explorer');
-      setActiveTab('Context Manager');
+      setActiveTab('Google Drive');
     } else {
       setCurrentTimeline('today');
       setActiveTab('Home');
@@ -137,7 +138,7 @@ export default function Layout({ children }: LayoutProps) {
           onSetup={() => {
             setShowDataCloudSetup(false);
             setCurrentTimeline('context-explorer');
-            setActiveTab('Context Manager');
+            setActiveTab('Google Drive');
           }}
           onOpenAppLauncher={() => setAppLauncherOpen(!appLauncherOpen)}
           onOpenDataCloudSetup={() => {}}
@@ -185,7 +186,7 @@ export default function Layout({ children }: LayoutProps) {
         onSelectSearchResult={handleSelectSearchResult}
         onSetup={() => {
           setCurrentTimeline('context-explorer');
-          setActiveTab('Context Manager');
+          setActiveTab('Google Drive');
         }}
         onOpenAppLauncher={() => setAppLauncherOpen(!appLauncherOpen)}
         onOpenDataCloudSetup={() => setShowDataCloudSetup(true)}
@@ -207,8 +208,10 @@ export default function Layout({ children }: LayoutProps) {
             {children || (
               activeTab === 'Home' ? (
                 <HomeContent />
-              ) : activeTab === 'Context Manager' ? (
-                <HelpDocExplorer />
+              ) : activeTab === 'Google Drive' ? (
+                <GoogleDriveContent />
+              ) : activeTab === 'Semantic Search' ? (
+                <SemanticSearchContent />
               ) : activeTab === 'Identity Resolutions' ? (
                 <IdentityResolutionContent demoSession={demoSession} onDemoSessionChange={setDemoSession} currentTimeline={currentTimeline} />
               ) : activeTab === 'Data Streams' ? (
