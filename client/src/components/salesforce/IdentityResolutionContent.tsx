@@ -92,6 +92,19 @@ interface ProcessingHistoryEntry {
   aggregatedJobCount?: number;
 }
 
+interface LegacyProcessingHistoryEntry {
+  id: string;
+  rowNum: number;
+  date: string;
+  totalSourceProfiles: number;
+  totalUnifiedProfiles: number;
+  totalKnownProfiles: number;
+  consolidationRate: string;
+  totalUnknown: number;
+  processedRecords: number;
+  aggregateStatus: 'Succeeded' | 'Failed';
+}
+
 interface RulesetChangeEntry {
   id: string;
   date: string;
@@ -124,6 +137,7 @@ interface IdentityRuleset {
   matchRules: MatchRule[];
   reconciliationGroups: ReconciliationGroup[];
   processingHistory: ProcessingHistoryEntry[];
+  legacyProcessingHistory: LegacyProcessingHistoryEntry[];
   rulesetChanges: RulesetChangeEntry[];
   isBYOM?: boolean; // "Bring Your Own MDM" mode — installed from datakit
   byomSource?: string; // datakit source name e.g. "Informatica MDM"
@@ -259,6 +273,29 @@ function generateProcessingHistory(): ProcessingHistoryEntry[] {
   return entries;
 }
 
+function generateLegacyProcessingHistory(): LegacyProcessingHistoryEntry[] {
+  const entries: LegacyProcessingHistoryEntry[] = [];
+  const baseDate = new Date(2026, 0, 13); // 2026-01-13
+  for (let i = 0; i < 20; i++) {
+    const date = new Date(baseDate);
+    date.setDate(date.getDate() - i * 7);
+    const isRecent = i < 2;
+    entries.push({
+      id: `ph-${i}`,
+      rowNum: i + 1,
+      date: date.toISOString().split('T')[0],
+      totalSourceProfiles: isRecent ? 12061 : 12047,
+      totalUnifiedProfiles: isRecent ? 10594 : 10570,
+      totalKnownProfiles: isRecent ? 10586 : 10566,
+      consolidationRate: '12%',
+      totalUnknown: isRecent ? 8 : 4,
+      processedRecords: i === 0 ? 14 : i === 1 ? 10641 : i === 15 ? 64 : i === 17 ? 10641 : i === 19 ? 10650 : 0,
+      aggregateStatus: 'Succeeded',
+    });
+  }
+  return entries;
+}
+
 function generateRulesetChanges(): RulesetChangeEntry[] {
   return [
     { id: 'rc-1', date: '2026-03-02 11:42 AM', field: 'Match Rule "Exact Email Match"', oldValue: 'Match Method: Exact', newValue: 'Match Method: Normalized', changedBy: 'David Kim' },
@@ -354,6 +391,7 @@ const mockRulesets: IdentityRuleset[] = [
       },
     ],
     processingHistory: generateProcessingHistory(),
+    legacyProcessingHistory: generateLegacyProcessingHistory(),
     rulesetChanges: generateRulesetChanges(),
   },
 ];
@@ -383,6 +421,7 @@ function apiToLocal(d: IdentityRulesetData): IdentityRuleset {
     matchRules: d.matchRules ?? [],
     reconciliationGroups: d.reconciliationGroups ?? [],
     processingHistory: generateProcessingHistory(),
+    legacyProcessingHistory: generateLegacyProcessingHistory(),
     rulesetChanges: generateRulesetChanges(),
     isBYOM: d.description?.startsWith('Installed from ') || false,
     byomSource: d.description?.startsWith('Installed from ') ? d.description.replace('Installed from ', '').replace(' datakit', '').replace(' (CX)', '') : undefined,
@@ -663,6 +702,7 @@ export default function IdentityResolutionContent({ demoSession, onDemoSessionCh
       matchRules: cxMatchRules,
       reconciliationGroups: cxReconGroups,
       processingHistory: isCXDatakit ? generateProcessingHistory() : [],
+      legacyProcessingHistory: isCXDatakit ? generateLegacyProcessingHistory() : [],
       rulesetChanges: isCXDatakit ? generateRulesetChanges() : [],
       isBYOM: isFromDatakit,
       byomSource: isFromDatakit ? selectedDatakit : undefined,
@@ -1600,7 +1640,7 @@ export default function IdentityResolutionContent({ demoSession, onDemoSessionCh
           )}
 
           {/* ── PROCESSING HISTORY TAB ── */}
-          {detailTab === 'history' && (
+          {detailTab === 'history' && currentTimeline === '264-release' && (
             <div className="slds-p-around_large" style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
               {/* Summary stats bar */}
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr 1fr', gap: 12 }}>
@@ -1799,6 +1839,69 @@ export default function IdentityResolutionContent({ demoSession, onDemoSessionCh
                               <div className="slds-flex slds-items-center slds-gap_xx-small">
                                 <User className="slds-icon-size_xx-small slds-text-neutral-7" />
                                 <span className="slds-text-size_small">{change.changedBy}</span>
+                              </div>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+
+          {/* ── PROCESSING HISTORY TAB (Today — legacy Daily Processing Summary) ── */}
+          {detailTab === 'history' && currentTimeline !== '264-release' && (
+            <div className="slds-p-around_large" style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+              <p className="slds-text-size_medium slds-text-neutral-9">
+                Daily summaries contain the aggregate results of all runs of this ruleset from a single date.
+              </p>
+              <div className="slds-flex slds-items-center slds-justify-end slds-gap_x-small slds-text-size_small slds-text-neutral-7">
+                <Info className="slds-icon-size_x-small" />
+                <span>Automatic runs:</span>
+                <span className="slds-font-weight_medium slds-text-neutral-9">{selectedRuleset.isScheduled ? 'Enabled' : 'Disabled'}</span>
+              </div>
+              <div className="sf-card">
+                <div className="sf-card-header">
+                  <h2 className="slds-text-size_medium slds-font-weight_semibold slds-text-neutral-base">Daily Processing Summary</h2>
+                </div>
+                {selectedRuleset.legacyProcessingHistory.length === 0 ? (
+                  <div className="sf-card-body slds-text-center slds-p-vertical_x-large" style={{ paddingTop: '48px', paddingBottom: '48px' }}>
+                    <Clock className="slds-text-neutral-7 slds-m-bottom_x-small" style={{ width: '32px', height: '32px', margin: '0 auto 8px' }} />
+                    <p className="slds-text-size_medium slds-text-neutral-7">No processing history available</p>
+                  </div>
+                ) : (
+                  <div className="slds-overflow-x-auto">
+                    <table className="sf-table">
+                      <thead>
+                        <tr>
+                          <th style={{ width: '48px' }}></th>
+                          <th><div className="slds-flex slds-items-center slds-gap_xx-small">Date <ChevronDown className="slds-icon-size_xx-small" /></div></th>
+                          <th><div className="slds-flex slds-items-center slds-gap_xx-small">Total Source P... <ChevronDown className="slds-icon-size_xx-small" /></div></th>
+                          <th><div className="slds-flex slds-items-center slds-gap_xx-small">Total Unified P... <ChevronDown className="slds-icon-size_xx-small" /></div></th>
+                          <th><div className="slds-flex slds-items-center slds-gap_xx-small">Total Known P... <ChevronDown className="slds-icon-size_xx-small" /></div></th>
+                          <th><div className="slds-flex slds-items-center slds-gap_xx-small">Consolidation ... <ChevronDown className="slds-icon-size_xx-small" /></div></th>
+                          <th><div className="slds-flex slds-items-center slds-gap_xx-small">Total Unknow... <ChevronDown className="slds-icon-size_xx-small" /></div></th>
+                          <th><div className="slds-flex slds-items-center slds-gap_xx-small">Processed Re... <ChevronDown className="slds-icon-size_xx-small" /></div></th>
+                          <th><div className="slds-flex slds-items-center slds-gap_xx-small">Aggregate Sta... <ChevronDown className="slds-icon-size_xx-small" /></div></th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {selectedRuleset.legacyProcessingHistory.map((entry) => (
+                          <tr key={entry.id}>
+                            <td className="slds-text-center slds-text-neutral-7">{entry.rowNum}</td>
+                            <td>{entry.date}</td>
+                            <td>{fmt(entry.totalSourceProfiles)}</td>
+                            <td>{fmt(entry.totalUnifiedProfiles)}</td>
+                            <td>{fmt(entry.totalKnownProfiles)}</td>
+                            <td>{entry.consolidationRate}</td>
+                            <td>{entry.totalUnknown}</td>
+                            <td>{fmt(entry.processedRecords)}</td>
+                            <td>
+                              <div className="slds-flex slds-items-center slds-gap_xx-small">
+                                <AlertTriangle className="slds-icon-size_x-small" style={{ color: '#B7791F' }} />
+                                <span>{entry.aggregateStatus}</span>
                               </div>
                             </td>
                           </tr>
