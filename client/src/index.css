@@ -2962,3 +2962,147 @@
 .bilko-preview-card {
   width: 100%;
 }
+
+/* ==========================================
+   Google Drive — File Storage UI
+   ========================================== */
+
+/* Drive sidebar nav items */
+.sf-drive-nav-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 16px;
+  border-radius: 24px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--slds-g-color-neutral-base);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  transition: background 0.15s ease;
+  width: 100%;
+  text-align: left;
+}
+
+.sf-drive-nav-item:hover {
+  background: #E8F0FE;
+}
+
+.sf-drive-nav-item.active {
+  background: #C2E7FF;
+  color: #001D35;
+  font-weight: 600;
+}
+
+/* Folder cards (grid view) */
+.sf-drive-folder-card {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 12px;
+  background: #fff;
+  border: 1px solid var(--slds-g-color-border-2);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  min-height: 44px;
+}
+
+.sf-drive-folder-card:hover {
+  background: #F8F9FA;
+  border-color: #C4C7C5;
+}
+
+/* File cards (grid view) */
+.sf-drive-file-card {
+  background: #fff;
+  border: 1px solid var(--slds-g-color-border-2);
+  border-radius: 8px;
+  cursor: pointer;
+  overflow: hidden;
+  transition: all 0.15s ease;
+}
+
+.sf-drive-file-card:hover {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+  border-color: #C4C7C5;
+}
+
+.sf-drive-file-card-preview {
+  height: 140px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #F8F9FA;
+  border-bottom: 1px solid var(--slds-g-color-border-2);
+}
+
+.sf-drive-file-card-footer {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  min-height: 40px;
+}
+
+/* More button (hidden by default, shown on hover) */
+.sf-drive-more-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  opacity: 0;
+  transition: all 0.15s ease;
+  flex-shrink: 0;
+  color: var(--slds-g-color-neutral-7);
+}
+
+.sf-drive-folder-card:hover .sf-drive-more-btn,
+.sf-drive-file-card:hover .sf-drive-more-btn,
+tr:hover .sf-drive-more-btn {
+  opacity: 1;
+}
+
+.sf-drive-more-btn:hover {
+  background: rgba(0, 0, 0, 0.06);
+}
+
+/* Context menu */
+.sf-drive-context-menu {
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.15), 0 0 0 1px rgba(0, 0, 0, 0.05);
+  padding: 4px 0;
+  min-width: 200px;
+  z-index: 100;
+}
+
+.sf-drive-context-menu button {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 8px 16px;
+  font-size: 13px;
+  color: var(--slds-g-color-neutral-base);
+  background: none;
+  border: none;
+  cursor: pointer;
+  text-align: left;
+}
+
+.sf-drive-context-menu button:hover {
+  background: #F1F3F4;
+}
+
+/* Danger hover for delete button in preview */
+.sf-btn-danger-hover:hover {
+  color: var(--slds-g-color-error-1) !important;
+  border-color: var(--slds-g-color-error-1) !important;
+}

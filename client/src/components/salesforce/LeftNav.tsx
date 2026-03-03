@@ -13,7 +13,8 @@ import {
   Target,
   Zap,
   ChevronDown,
-  FileText,
+  HardDrive,
+  FileSearch,
 } from 'lucide-react';
 import { appNavGroups, type NavGroup } from '@/lib/mock-data';
 
@@ -32,7 +33,8 @@ const navIcons: Record<string, React.ElementType> = {
   Segments: Users,
   'Activation Targets': Target,
   Activations: Zap,
-  'Context Manager': FileText,
+  'Google Drive': HardDrive,
+  'Semantic Search': FileSearch,
 };
 
 interface LeftNavProps {

@@ -85,7 +85,8 @@ export const appNavGroups: Record<string, NavGroup[]> = {
     {
       title: 'Knowledge',
       items: [
-        { label: 'Context Manager' },
+        { label: 'Google Drive' },
+        { label: 'Semantic Search' },
       ],
     },
   ],
@@ -130,7 +131,7 @@ export const appNavGroups: Record<string, NavGroup[]> = {
   admin: [
     {
       title: '',
-      items: [{ label: 'Context Manager' }],
+      items: [{ label: 'Google Drive' }],
     },
   ],
 };

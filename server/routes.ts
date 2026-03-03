@@ -8,7 +8,7 @@ import { generateEmbedding } from "./embeddings";
 import { pool } from "./db";
 import { z } from "zod";
 
-const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 20 * 1024 * 1024 } });
+const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 50 * 1024 * 1024 } });
 
 export async function registerRoutes(
   httpServer: Server,
@@ -21,9 +21,308 @@ export async function registerRoutes(
     await storage.createGreeting({ message: "Hello World" });
   }
 
+  // Create drive_files table
+  try {
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS drive_files (
+        id SERIAL PRIMARY KEY,
+        name TEXT NOT NULL,
+        mime_type TEXT NOT NULL DEFAULT 'application/octet-stream',
+        size BIGINT NOT NULL DEFAULT 0,
+        is_folder BOOLEAN NOT NULL DEFAULT false,
+        parent_id INTEGER REFERENCES drive_files(id) ON DELETE CASCADE,
+        content TEXT,
+        starred BOOLEAN NOT NULL DEFAULT false,
+        created_at TIMESTAMPTZ DEFAULT NOW(),
+        updated_at TIMESTAMPTZ DEFAULT NOW()
+      )
+    `);
+  } catch (err) {
+    console.error("Failed to create drive_files table:", err);
+  }
+
   app.get(api.greeting.get.path, async (_req, res) => {
     const greeting = await storage.getGreeting();
     res.json({ message: greeting?.message || "Hello World" });
+  });
+
+  // =========================================================================
+  // Google Drive — File Storage
+  // =========================================================================
+
+  /** List files in a folder (or root). Query params: ?parentId=N&starred=true */
+  app.get(api.driveFiles.list.path, async (req, res) => {
+    try {
+      const parentId = req.query.parentId ? Number(req.query.parentId) : null;
+      const starred = req.query.starred === "true";
+      const search = req.query.q ? String(req.query.q).trim() : null;
+
+      let query: string;
+      let params: any[];
+
+      if (search) {
+        query = `SELECT id, name, mime_type, size, is_folder, parent_id, starred, created_at, updated_at
+                 FROM drive_files WHERE LOWER(name) LIKE $1
+                 ORDER BY is_folder DESC, LOWER(name) ASC`;
+        params = [`%${search.toLowerCase()}%`];
+      } else if (starred) {
+        query = `SELECT id, name, mime_type, size, is_folder, parent_id, starred, created_at, updated_at
+                 FROM drive_files WHERE starred = true
+                 ORDER BY is_folder DESC, LOWER(name) ASC`;
+        params = [];
+      } else if (parentId === null) {
+        query = `SELECT id, name, mime_type, size, is_folder, parent_id, starred, created_at, updated_at
+                 FROM drive_files WHERE parent_id IS NULL
+                 ORDER BY is_folder DESC, LOWER(name) ASC`;
+        params = [];
+      } else {
+        query = `SELECT id, name, mime_type, size, is_folder, parent_id, starred, created_at, updated_at
+                 FROM drive_files WHERE parent_id = $1
+                 ORDER BY is_folder DESC, LOWER(name) ASC`;
+        params = [parentId];
+      }
+
+      const result = await pool.query(query, params);
+      res.json(result.rows.map((r: any) => ({
+        id: r.id,
+        name: r.name,
+        mimeType: r.mime_type,
+        size: Number(r.size),
+        isFolder: r.is_folder,
+        parentId: r.parent_id,
+        starred: r.starred,
+        createdAt: r.created_at,
+        updatedAt: r.updated_at,
+      })));
+    } catch (err) {
+      console.error("List drive files error:", err);
+      res.json([]);
+    }
+  });
+
+  /** Get single file (with content for preview) */
+  app.get(api.driveFiles.get.path, async (req, res) => {
+    try {
+      const result = await pool.query(
+        "SELECT * FROM drive_files WHERE id = $1", [Number(req.params.id)]
+      );
+      if (result.rows.length === 0) return res.status(404).json({ message: "Not found" });
+      const r = result.rows[0];
+      res.json({
+        id: r.id,
+        name: r.name,
+        mimeType: r.mime_type,
+        size: Number(r.size),
+        isFolder: r.is_folder,
+        parentId: r.parent_id,
+        starred: r.starred,
+        content: r.content,
+        createdAt: r.created_at,
+        updatedAt: r.updated_at,
+      });
+    } catch (err: any) {
+      console.error("Get drive file error:", err);
+      res.status(500).json({ message: err.message });
+    }
+  });
+
+  /** Upload file(s) */
+  app.post(api.driveFiles.upload.path, upload.array("files", 20), async (req, res) => {
+    try {
+      const files = req.files as Express.Multer.File[];
+      if (!files || files.length === 0) return res.status(400).json({ message: "No files uploaded" });
+
+      const parentId = req.body.parentId ? Number(req.body.parentId) : null;
+      const results: any[] = [];
+
+      for (const file of files) {
+        const name = file.originalname;
+        const mimeType = file.mimetype || "application/octet-stream";
+        const size = file.size;
+
+        // Store text content directly, binary as base64
+        const isText = mimeType.startsWith("text/") ||
+          mimeType === "application/json" ||
+          mimeType === "application/xml" ||
+          mimeType === "application/javascript" ||
+          mimeType === "application/typescript" ||
+          mimeType.includes("yaml") ||
+          mimeType.includes("markdown") ||
+          mimeType.includes("csv") ||
+          name.endsWith(".md") ||
+          name.endsWith(".txt") ||
+          name.endsWith(".json") ||
+          name.endsWith(".csv") ||
+          name.endsWith(".xml") ||
+          name.endsWith(".yaml") ||
+          name.endsWith(".yml") ||
+          name.endsWith(".js") ||
+          name.endsWith(".ts") ||
+          name.endsWith(".html") ||
+          name.endsWith(".css") ||
+          name.endsWith(".mhtml") ||
+          name.endsWith(".mht");
+
+        const content = isText ? file.buffer.toString("utf-8") : file.buffer.toString("base64");
+
+        const result = await pool.query(
+          `INSERT INTO drive_files (name, mime_type, size, is_folder, parent_id, content)
+           VALUES ($1, $2, $3, false, $4, $5)
+           RETURNING id, name, mime_type, size, is_folder, parent_id, starred, created_at, updated_at`,
+          [name, mimeType, size, parentId, content]
+        );
+        const r = result.rows[0];
+        results.push({
+          id: r.id,
+          name: r.name,
+          mimeType: r.mime_type,
+          size: Number(r.size),
+          isFolder: r.is_folder,
+          parentId: r.parent_id,
+          starred: r.starred,
+          createdAt: r.created_at,
+          updatedAt: r.updated_at,
+        });
+      }
+
+      res.status(201).json(results);
+    } catch (err: any) {
+      console.error("Upload drive file error:", err);
+      res.status(500).json({ message: err.message || "Upload failed" });
+    }
+  });
+
+  /** Create folder */
+  app.post(api.driveFiles.createFolder.path, async (req, res) => {
+    try {
+      const input = api.driveFiles.createFolder.input.parse(req.body);
+      const result = await pool.query(
+        `INSERT INTO drive_files (name, mime_type, size, is_folder, parent_id)
+         VALUES ($1, 'application/x-folder', 0, true, $2)
+         RETURNING id, name, mime_type, size, is_folder, parent_id, starred, created_at, updated_at`,
+        [input.name, input.parentId ?? null]
+      );
+      const r = result.rows[0];
+      res.status(201).json({
+        id: r.id,
+        name: r.name,
+        mimeType: r.mime_type,
+        size: 0,
+        isFolder: r.is_folder,
+        parentId: r.parent_id,
+        starred: r.starred,
+        createdAt: r.created_at,
+        updatedAt: r.updated_at,
+      });
+    } catch (err: any) {
+      if (err instanceof z.ZodError) return res.status(400).json({ message: err.errors[0].message });
+      console.error("Create folder error:", err);
+      res.status(500).json({ message: err.message });
+    }
+  });
+
+  /** Update file (rename / move) */
+  app.put(api.driveFiles.update.path, async (req, res) => {
+    try {
+      const id = Number(req.params.id);
+      const input = api.driveFiles.update.input.parse(req.body);
+      const sets: string[] = [];
+      const params: any[] = [];
+      let idx = 1;
+
+      if (input.name !== undefined) {
+        sets.push(`name = $${idx++}`);
+        params.push(input.name);
+      }
+      if (input.parentId !== undefined) {
+        sets.push(`parent_id = $${idx++}`);
+        params.push(input.parentId);
+      }
+      sets.push(`updated_at = NOW()`);
+      params.push(id);
+
+      const result = await pool.query(
+        `UPDATE drive_files SET ${sets.join(", ")} WHERE id = $${idx} RETURNING *`,
+        params
+      );
+      if (result.rows.length === 0) return res.status(404).json({ message: "Not found" });
+      const r = result.rows[0];
+      res.json({
+        id: r.id,
+        name: r.name,
+        mimeType: r.mime_type,
+        size: Number(r.size),
+        isFolder: r.is_folder,
+        parentId: r.parent_id,
+        starred: r.starred,
+        createdAt: r.created_at,
+        updatedAt: r.updated_at,
+      });
+    } catch (err: any) {
+      if (err instanceof z.ZodError) return res.status(400).json({ message: err.errors[0].message });
+      console.error("Update drive file error:", err);
+      res.status(500).json({ message: err.message });
+    }
+  });
+
+  /** Delete file or folder (cascades) */
+  app.delete(api.driveFiles.delete.path, async (req, res) => {
+    try {
+      await pool.query("DELETE FROM drive_files WHERE id = $1", [Number(req.params.id)]);
+      res.json({ deleted: true });
+    } catch (err: any) {
+      console.error("Delete drive file error:", err);
+      res.status(500).json({ message: err.message });
+    }
+  });
+
+  /** Download file content */
+  app.get(api.driveFiles.download.path, async (req, res) => {
+    try {
+      const result = await pool.query("SELECT * FROM drive_files WHERE id = $1", [Number(req.params.id)]);
+      if (result.rows.length === 0) return res.status(404).json({ message: "Not found" });
+      const r = result.rows[0];
+      if (r.is_folder) return res.status(400).json({ message: "Cannot download a folder" });
+
+      const isText = r.mime_type.startsWith("text/") ||
+        r.mime_type === "application/json" ||
+        r.mime_type === "application/xml" ||
+        r.mime_type.includes("yaml") ||
+        r.mime_type.includes("markdown");
+
+      res.setHeader("Content-Disposition", `attachment; filename="${r.name}"`);
+      res.setHeader("Content-Type", r.mime_type);
+
+      if (isText) {
+        res.send(r.content);
+      } else {
+        res.send(Buffer.from(r.content, "base64"));
+      }
+    } catch (err: any) {
+      console.error("Download drive file error:", err);
+      res.status(500).json({ message: err.message });
+    }
+  });
+
+  /** Toggle star */
+  app.post(api.driveFiles.star.path, async (req, res) => {
+    try {
+      const id = Number(req.params.id);
+      const result = await pool.query(
+        "UPDATE drive_files SET starred = NOT starred, updated_at = NOW() WHERE id = $1 RETURNING *",
+        [id]
+      );
+      if (result.rows.length === 0) return res.status(404).json({ message: "Not found" });
+      const r = result.rows[0];
+      res.json({
+        id: r.id,
+        name: r.name,
+        starred: r.starred,
+      });
+    } catch (err: any) {
+      console.error("Star drive file error:", err);
+      res.status(500).json({ message: err.message });
+    }
   });
 
   // =========================================================================

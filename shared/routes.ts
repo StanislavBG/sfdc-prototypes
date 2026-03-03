@@ -10,6 +10,48 @@ export const api = {
       },
     },
   },
+  driveFiles: {
+    list: {
+      method: 'GET' as const,
+      path: '/api/drive/files' as const,
+    },
+    get: {
+      method: 'GET' as const,
+      path: '/api/drive/files/:id' as const,
+    },
+    upload: {
+      method: 'POST' as const,
+      path: '/api/drive/files/upload' as const,
+    },
+    createFolder: {
+      method: 'POST' as const,
+      path: '/api/drive/folders' as const,
+      input: z.object({
+        name: z.string().min(1).max(255),
+        parentId: z.number().nullable().optional(),
+      }),
+    },
+    update: {
+      method: 'PUT' as const,
+      path: '/api/drive/files/:id' as const,
+      input: z.object({
+        name: z.string().min(1).max(255).optional(),
+        parentId: z.number().nullable().optional(),
+      }),
+    },
+    delete: {
+      method: 'DELETE' as const,
+      path: '/api/drive/files/:id' as const,
+    },
+    download: {
+      method: 'GET' as const,
+      path: '/api/drive/files/:id/download' as const,
+    },
+    star: {
+      method: 'POST' as const,
+      path: '/api/drive/files/:id/star' as const,
+    },
+  },
   helpDocs: {
     upload: {
       method: 'POST' as const,
