@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import {
   Home,
   Database,
@@ -13,12 +14,31 @@ import {
   Target,
   Zap,
   ChevronDown,
+  ChevronRight,
   HardDrive,
   FileSearch,
+  ListFilter,
+  Landmark,
+  FileText,
+  Grid3X3,
+  TrendingUp,
+  Timer,
+  Share2,
 } from 'lucide-react';
 import { appNavGroups, type NavGroup } from '@/lib/mock-data';
 
-// Map nav labels to icons for visual clarity
+// Map group-level icon identifiers → lucide components (for section headers)
+const groupIcons: Record<string, React.ElementType> = {
+  'list-filter': ListFilter,
+  'landmark': Landmark,
+  'file-text': FileText,
+  'grid-3x3': Grid3X3,
+  'trending-up': TrendingUp,
+  'timer': Timer,
+  'share-2': Share2,
+};
+
+// Legacy per-item icons (for apps that don't use section-header icons)
 const navIcons: Record<string, React.ElementType> = {
   Home,
   'Data Streams': Database,
@@ -48,18 +68,99 @@ export default function LeftNav({
   activeTab,
   onChangeTab,
 }: LeftNavProps) {
+  const [quickFind, setQuickFind] = useState('');
   const groups: NavGroup[] = appNavGroups[currentApp] || appNavGroups['data-cloud'];
 
+  // Do any groups use section-header icons? (modern Data Cloud style)
+  const useSectionHeaders = groups.some((g) => !!g.icon);
+
+  // Find which group contains the active tab
+  const activeGroupIdx = groups.findIndex((g) =>
+    g.items.some((item) => item.label === activeTab)
+  );
+
+  // Filter items by quick find
+  const query = quickFind.trim().toLowerCase();
+  const filteredGroups = query
+    ? groups
+        .map((g) => ({
+          ...g,
+          items: g.items.filter(
+            (item) =>
+              item.label.toLowerCase().includes(query) ||
+              g.title.toLowerCase().includes(query)
+          ),
+        }))
+        .filter((g) => g.items.length > 0 || g.title.toLowerCase().includes(query))
+    : groups;
+
+  // ── Modern section-header layout (Data Cloud) ──
+  if (useSectionHeaders) {
+    return (
+      <nav className="sf-left-nav">
+        {/* Quick find search */}
+        <div className="sf-left-nav-search">
+          <Search className="sf-left-nav-search-icon" />
+          <input
+            type="text"
+            placeholder="Quick find"
+            value={quickFind}
+            onChange={(e) => setQuickFind(e.target.value)}
+            className="sf-left-nav-search-input"
+          />
+        </div>
+
+        <div className="sf-left-nav-body">
+          {filteredGroups.map((group, gi) => {
+            const GroupIcon = group.icon ? groupIcons[group.icon] : null;
+            const origIdx = groups.indexOf(group);
+            const isActiveSection = origIdx === activeGroupIdx;
+
+            return (
+              <div key={gi} className="sf-left-nav-section">
+                {group.title && (
+                  <div
+                    className={`sf-left-nav-section-header ${isActiveSection ? 'active' : ''}`}
+                  >
+                    {GroupIcon && (
+                      <GroupIcon className="sf-left-nav-section-icon" />
+                    )}
+                    <span className="sf-left-nav-section-title">
+                      {group.title}
+                    </span>
+                  </div>
+                )}
+                {group.items.map((item) => {
+                  const isActive = activeTab === item.label;
+                  return (
+                    <button
+                      key={item.label}
+                      className={`sf-left-nav-item sf-left-nav-item--section ${isActive ? 'active' : ''}`}
+                      onClick={() => onChangeTab(item.label)}
+                    >
+                      <span className="slds-truncate">{item.label}</span>
+                      {item.hasDropdown && (
+                        <ChevronRight className="sf-left-nav-chevron" />
+                      )}
+                    </button>
+                  );
+                })}
+              </div>
+            );
+          })}
+        </div>
+      </nav>
+    );
+  }
+
+  // ── Legacy layout (Sales, Service, Marketing, Admin) ──
   return (
     <nav className="sf-left-nav">
-      {/* Scrollable nav groups */}
       <div className="sf-left-nav-body">
         {groups.map((group, gi) => (
           <div key={gi} className="sf-left-nav-group">
             {group.title && (
-              <div className="sf-left-nav-group-title">
-                {group.title}
-              </div>
+              <div className="sf-left-nav-group-title">{group.title}</div>
             )}
             {group.items.map((item) => {
               const Icon = navIcons[item.label];
@@ -70,7 +171,9 @@ export default function LeftNav({
                   className={`sf-left-nav-item ${isActive ? 'active' : ''}`}
                   onClick={() => onChangeTab(item.label)}
                 >
-                  {Icon && <Icon className="slds-icon-size_small slds-flex-shrink-0" />}
+                  {Icon && (
+                    <Icon className="slds-icon-size_small slds-flex-shrink-0" />
+                  )}
                   <span className="slds-truncate slds-col">{item.label}</span>
                   {item.hasDropdown && (
                     <ChevronDown className="slds-icon-size_xx-small slds-opacity_50 slds-flex-shrink-0" />

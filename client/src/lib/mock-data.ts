@@ -41,53 +41,80 @@ export interface NavTab {
 // Grouped navigation for vertical left-nav (Data Cloud groupings based on official docs)
 export interface NavGroup {
   title: string;
+  icon?: string; // lucide icon identifier for section header
   items: NavTab[];
 }
 
 export const appNavGroups: Record<string, NavGroup[]> = {
   'data-cloud': [
     {
-      title: '',
-      items: [{ label: 'Home' }],
-    },
-    {
-      title: 'Data Management',
+      title: 'Connect & Unify',
+      icon: 'list-filter',
       items: [
-        { label: 'Data Streams', hasDropdown: true },
+        { label: 'Data Streams' },
+        { label: 'Data Lake Objects' },
+        { label: 'Data Transforms' },
         { label: 'Data Model' },
-        { label: 'Data Explorer' },
+        { label: 'Identity Resolutions' },
       ],
     },
     {
-      title: 'Unify',
+      title: 'Govern Data',
+      icon: 'landmark',
       items: [
-        { label: 'Identity Resolutions', hasDropdown: true },
-        { label: 'Profile Explorer' },
+        { label: 'Data Spaces' },
+        { label: 'Data Governance', hasDropdown: true },
+        { label: 'Data Catalog', hasDropdown: true },
       ],
     },
     {
-      title: 'Insights & Analytics',
+      title: 'Process Content',
+      icon: 'file-text',
       items: [
-        { label: 'Calculated Insights', hasDropdown: true },
-        { label: 'Query Editor', hasDropdown: true },
+        { label: 'Search Indexes' },
+        { label: 'Secondary Indexes' },
+        { label: 'Document AI' },
+        { label: 'Content Viewer' },
+        { label: 'Content Lens' },
+        { label: 'Google Drive' },
+        { label: 'Semantic Search' },
+      ],
+    },
+    {
+      title: 'Query & Segment',
+      icon: 'grid-3x3',
+      items: [
+        { label: 'Segments' },
+        { label: 'Calculated Insights' },
+        { label: 'Data Graphs' },
+        { label: 'View Data', hasDropdown: true },
+      ],
+    },
+    {
+      title: 'Analyze & Predict',
+      icon: 'trending-up',
+      items: [
+        { label: 'Einstein Studio', hasDropdown: true },
+        { label: 'Semantic Models' },
         { label: 'Reports', hasDropdown: true },
         { label: 'Dashboards', hasDropdown: true },
       ],
     },
     {
-      title: 'Segmentation & Activation',
+      title: 'Act on Data',
+      icon: 'timer',
       items: [
-        { label: 'Segments', hasDropdown: true },
-        { label: 'Activation Targets', hasDropdown: true },
-        { label: 'Activations', hasDropdown: true },
+        { label: 'Activations' },
+        { label: 'Activation Targets' },
+        { label: 'Communication Capping' },
+        { label: 'Data Actions' },
+        { label: 'Data Action Targets' },
       ],
     },
     {
-      title: 'Knowledge',
-      items: [
-        { label: 'Google Drive' },
-        { label: 'Semantic Search' },
-      ],
+      title: 'Build & Share',
+      icon: 'share-2',
+      items: [],
     },
   ],
   sales: [
