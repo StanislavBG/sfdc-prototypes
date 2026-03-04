@@ -10,35 +10,36 @@
 
 The Processing History tab within an Identity Resolution ruleset provides administrators and data stewards with visibility into how identity resolution jobs have performed over time. It surfaces key metrics about profile unification, record processing volumes, and job outcomes.
 
-This PRD documents the **current state** (Daily Processing Summary table) and specifies enhancements introduced in the **264 Release**: a **Job History** table with per-job granularity, a **Ruleset Change Log** for governance and auditability, and **Core API access** to expose job history and change log data programmatically.
+This PRD documents the **current state** (Daily Processing Summary table) and specifies enhancements for the **264 Release**: a **Job History** view with per-job granularity, a **Ruleset Change Log** for governance and auditability, and **API access** so customers can build on this data programmatically.
 
 ---
 
-## 2. Core API Access (264 Release)
+## 2. API Access (264 Release)
 
-Job history and ruleset change log data must be accessible via Salesforce Core APIs (REST and Connect API), not only through the Data Cloud UI. This enables programmatic access for customers and partners who need to:
+Job history and ruleset change log data must be accessible via APIs — not only through the Data Cloud UI. Customers and partners need programmatic access to:
 
 - **Build custom dashboards and reporting** on identity resolution performance, consolidation rates, and job outcomes
-- **Integrate processing metrics into external monitoring and alerting systems** (Datadog, Splunk, PagerDuty, etc.) for real-time operational visibility
+- **Integrate processing metrics into their existing monitoring and alerting workflows** for real-time operational visibility
 - **Automate cost tracking** by pulling processed record counts and credit consumption data into billing reconciliation workflows
 - **Enable ISV/partner applications** to surface identity resolution job health and governance data natively
 
-### 2.1 API Endpoints
+### 2.1 Capabilities
 
-| Endpoint | Method | Description |
-|---|---|---|
-| `/services/data/vXX.0/ssot/identity-resolution/rulesets/{rulesetId}/jobs` | GET | Returns paginated job history for a ruleset, including job ID, run reason, user, duration, records processed, and status. Supports query parameters for date range filtering and pagination. |
-| `/services/data/vXX.0/ssot/identity-resolution/rulesets/{rulesetId}/jobs/{jobId}` | GET | Returns full detail for a single job. |
-| `/services/data/vXX.0/ssot/identity-resolution/rulesets/{rulesetId}/changes` | GET | Returns the ruleset change log — configuration changes with timestamps, changed-by user, previous and new values. |
-| `/services/data/vXX.0/ssot/identity-resolution/rulesets/{rulesetId}/stats` | GET | Returns the summary stats (processed records 30d, jobs last 24h, schedule, change count) surfaced in the UI stats bar. |
+The API should support the following use cases:
 
-### 2.2 Design Notes
+| Capability | Description |
+|---|---|
+| **Retrieve job history** | Paginated list of jobs for a ruleset, with date-range filtering. Returns the same data visible in the Job History table. |
+| **Retrieve single job detail** | Full detail for an individual job run. |
+| **Retrieve ruleset change log** | Configuration change history with timestamps, who made each change, and what changed. |
+| **Retrieve summary stats** | The at-a-glance KPIs displayed in the summary stats bar (processed records, recent job count, schedule status, change count). |
 
-- All endpoints require the `cdp_api` or equivalent Data Cloud API permission set.
-- Responses follow the standard Salesforce REST API envelope (records array, pagination via `nextPageUrl`).
-- Date range filtering via `startDate` and `endDate` query parameters (ISO 8601).
-- The `/jobs` endpoint returns both individual and aggregated job rows, matching the UI behavior. Aggregated rows include a `jobType: "aggregated"` field and a `jobCount` field.
-- The `/changes` endpoint returns change log entries in reverse chronological order.
+### 2.2 Expectations
+
+- Access must be governed by appropriate Data Cloud permissions.
+- Responses should follow standard Salesforce API conventions, including pagination.
+- Date-range filtering should be supported for job history queries.
+- The API should surface both individual and aggregated job entries, consistent with the UI behavior.
 
 ---
 
@@ -53,90 +54,85 @@ A descriptive subtitle reads:
 
 An indicator also displays whether **Automatic runs** are Enabled or Disabled. Jobs run automatically once per day in batch mode, though they may be skipped if there are no changes to source data, object mappings, or ruleset configurations. On-demand runs (triggered by rule changes) can be executed up to 4 times per 24-hour period per ruleset per data space.
 
-### 3.2 Field Definitions
+### 3.2 What Customers See Today
 
-| # | Column Label | Field | Description |
-|---|---|---|---|
-| 1 | *(row number)* | `rowNum` | Sequential row number for display ordering. Not a data field; serves as a visual index within the table. |
-| 2 | **Date** | `date` | The calendar date (YYYY-MM-DD) for which the processing results are aggregated. Each row represents one day's combined output from all identity resolution runs for this ruleset. |
-| 3 | **Total Source Profiles** | `totalSourceProfiles` | The total number of individual source records (across all connected data streams and DMOs) that were evaluated as input to the identity resolution process on this date. A "source profile" is a record representing a single individual as they exist in one specific source system (e.g., a Contact from Sales Cloud, a subscriber from Marketing Cloud). Each source profile encompasses the Individual DMO record plus all related records (Contact Point Email, Contact Point Phone, Contact Point Address, Party Identifiers), but is counted as a single source profile for both metric and billing purposes. |
-| 4 | **Total Unified Profiles** | `totalUnifiedProfiles` | The total number of distinct unified (golden) profiles that exist after the identity resolution process completes. A Unified Profile is the output of the matching and reconciliation process — it represents a single real-world person created by linking and merging multiple source profiles across different data sources. This is the primary output metric of identity resolution. |
-| 5 | **Total Known Profiles** | `totalKnownProfiles` | The count of Unified Individual Profiles classified as "Known." A Unified Profile is considered Known when it was created from at least one source profile containing personally identifiable information (PII) such as an email address, phone number, name, or loyalty ID. Known profiles count toward the org's Data Cloud profile entitlement limit (profile volume licensing). `Total Known + Total Unknown = Total Unified Profiles`. |
-| 6 | **Consolidation Rate** | `consolidationRate` | The percentage of source profiles consolidated into unified profiles, calculated as: `(1 - (Total Unified Profiles / Total Source Profiles)) x 100`. A higher rate means more aggressive merging; a lower rate means more conservative matching. Typical healthy ranges are 10–30% depending on data quality and match rule strictness. Adding more match rules increases the rate; adding more AND criteria within rules decreases it. |
-| 7 | **Total Unknown** | `totalUnknown` | The count of Unified Individual Profiles classified as "Anonymous." A profile is considered Anonymous when it was created exclusively from source profiles with only non-PII identifiers (cookie IDs, IP addresses, device IDs). Anonymous profiles do **not** count toward the org's Data Cloud profile entitlement limit. If a previously anonymous profile later acquires PII (e.g., the user logs in), it transitions from Unknown to Known. |
-| 8 | **Processed Records** | `processedRecords` | The number of source profiles actively evaluated and processed by the identity resolution engine during this date's runs. **This is the billing meter for Batch Profile Unification credit consumption** (0.1 Data Cloud credits per source profile processed). After the initial full run, only new or modified source profiles are processed in subsequent runs. A value of 0 indicates no new or changed records needed processing (no delta). Modifications include any attribute change, record deletions, and consent/suppression changes via the Consent API. Identity resolution also re-evaluates existing profiles affected by newly ingested data (cascading re-evaluation), so adding N new records may result in processing > N total records. |
-| 9 | **Aggregate Status** | `aggregateStatus` | The overall outcome status for all identity resolution runs on this date. Values: **Succeeded** — all runs completed without error; **Failed** — one or more runs encountered an error and did not complete successfully. When any individual run within the day fails, the aggregate status reflects the failure. |
+| Column | What It Tells the Customer |
+|---|---|
+| **Date** | Which day's results they are looking at. |
+| **Total Source Profiles** | How many individual source records were evaluated. A "source profile" is a person as they exist in one source system (e.g., a Contact from Sales Cloud), including all their related records (emails, phones, addresses, identifiers). Counted as a single profile for both metrics and billing. |
+| **Total Unified Profiles** | How many distinct golden profiles exist after matching and merging. This is the primary output — each represents a single real-world person. |
+| **Total Known Profiles** | How many unified profiles contain PII (email, phone, name, loyalty ID). Known profiles count toward the org's Data Cloud profile entitlement. |
+| **Consolidation Rate** | The percentage of source profiles consolidated into unified profiles. Higher means more aggressive merging; lower means more conservative matching. Typical healthy ranges are 10–30%. Adding more match rules increases the rate; adding more AND criteria within rules decreases it. |
+| **Total Unknown** | How many unified profiles were created from non-PII identifiers only (cookies, device IDs). Anonymous profiles do **not** count toward entitlement limits. They transition to Known when PII is later acquired. |
+| **Processed Records** | How many source profiles were actively evaluated. **This is the billing meter** — each processed profile consumes 0.1 Data Cloud credits. After the initial full run, only new or changed profiles are processed. A value of 0 means no delta existed. |
+| **Aggregate Status** | Whether all runs that day succeeded or any failed. |
 
 ---
 
 ## 4. 264 Release — Enhanced Processing History
 
-### 4.1 Design Rationale
+### 4.1 Customer Problems We're Solving
 
-Voice of Customer (VOC) feedback identified three key gaps in the current Daily Processing Summary:
+Voice of Customer (VOC) feedback identified three key gaps:
 
-1. **Lack of job-level granularity** — Aggregating all runs into a single daily row obscures individual job outcomes, making it difficult to diagnose issues or understand what triggered each run.
-2. **No governance trail for ruleset changes** — Identity Resolution is credit-intensive. Administrators need to track *who* changed *what* in a ruleset and *when*, to understand the impact of configuration changes on processing costs and match quality.
-3. **Missing operational context** — The current table does not capture *why* a job ran (trigger reason), *who* initiated it, or *how long* it took, all of which are essential for operational monitoring.
+1. **"I can't tell what happened"** — Aggregating all runs into a single daily row hides individual job outcomes. When something goes wrong, customers can't diagnose which run failed, what triggered it, or how long it took.
+2. **"I don't know who changed what"** — Identity Resolution is credit-intensive. Administrators have no way to track *who* changed *what* in a ruleset and *when*, making it impossible to understand the impact of configuration changes on costs and match quality.
+3. **"I don't have enough context"** — The current table doesn't capture *why* a job ran, *who* initiated it, or *how long* it took — all essential for day-to-day operational monitoring and troubleshooting.
 
 ### 4.2 Summary Stats Bar
 
 A new summary stats bar appears above the tables, providing at-a-glance KPIs:
 
-| Stat | Description |
+| Stat | What It Tells the Customer |
 |---|---|
-| **Processed Records (30d)** | Sum of all processed records across all jobs in the last 30 days. This is the billing meter total — reflects cumulative Batch Profile Unification credit consumption for the period. Labeled with a "Billing meter" subtitle for clarity. |
-| **Jobs (last 24h)** | Count of identity resolution jobs (both individual and aggregated) that ran in the last 24 hours. |
-| **Schedule** | Current scheduling status: the configured schedule (e.g., "Daily 2:00 AM") or "Disabled" if no schedule is active. |
-| **Ruleset Changes** | Total count of recorded ruleset configuration changes in the audit log. |
+| **Processed Records (30d)** | Total credit-consuming records over the last 30 days. Clearly labeled as a billing meter so customers can track cost exposure. |
+| **Jobs (last 24h)** | How many identity resolution jobs ran recently — helps customers assess system activity. |
+| **Schedule** | Whether automatic runs are configured and when they're set to execute, or if scheduling is disabled. |
+| **Ruleset Changes** | How many configuration changes have been made — signals governance activity at a glance. |
 
-### 4.3 Table 1: Job History
+### 4.3 Job History
 
-The Job History table replaces the Daily Processing Summary with per-job granularity. The design principle is:
-- **Large jobs** (full reprocessing, manual runs, ruleset-change-triggered runs) are listed as **individual rows**.
-- **Small incremental syncs** (automated delta processing with low record counts) are **aggregated into a single daily row** to reduce noise.
-- Only the **last 24 hours** show individual job detail; older entries show one row per day (large jobs individually, small jobs aggregated).
+The Job History view replaces the Daily Processing Summary with per-job granularity. The design principle is:
+- **Large or significant jobs** (full reprocessing, manual runs, runs triggered by ruleset changes) are shown as **individual entries** so customers can inspect each one.
+- **Small incremental syncs** (automated delta processing with low record counts) are **grouped by day** to reduce noise and keep the view manageable.
+- The **last 24 hours** show full individual detail; older entries group small jobs while still showing large jobs individually.
 
 A subtitle reads:
 > *"Large jobs shown individually. Small incremental syncs aggregated daily."*
 
-#### 4.3.1 Field Definitions
+#### 4.3.1 What Customers See Per Job
 
-| # | Column Label | Field | Description |
-|---|---|---|---|
-| 1 | *(status icon)* | `status` (icon) | A visual status indicator in the first column. Displays a contextual icon: green checkmark (Succeeded), red X-circle (Failed), amber triangle (Warning), or spinning loader (Running). Provides at-a-glance job health without reading the status text. |
-| 2 | **Date / Time** | `date`, `startTime` | The date and time when the job started. Date displayed in YYYY-MM-DD format with the start time alongside (e.g., "2026-03-03 2:00 PM"). For aggregated rows, only the date is shown (no start time) since the row represents multiple jobs across the day. |
-| 3 | **Job ID** | `jobId` | A unique system-generated identifier for the job (e.g., "JOB-900103"). For **aggregated rows**, this column instead displays a badge showing the count of jobs rolled up (e.g., "7 jobs") with a layers icon, indicating this is a summary row rather than an individual job. |
-| 4 | **Run Reason** | `runReason` | The trigger that caused this identity resolution job to execute. Captures the *why* behind each run. Common values: "Scheduled (Daily 2:00 AM UTC)" — cron-triggered run; "Manual run" — user-initiated execution; "New data ingested" — triggered by incoming data stream refresh; "Ruleset change published" — triggered after match rule or reconciliation rule modification (causes full re-evaluation of all source profiles); "Data stream refresh" — triggered by upstream data changes. For aggregated rows, shows the count of incremental syncs (e.g., "7 incremental syncs"). Note: "Ruleset change published" runs are significant cost events because they trigger full reprocessing of all source profiles. |
-| 5 | **User** | `triggeredBy` | The user or system process that triggered the job. Displays the full name of the user who initiated the run (e.g., "Sarah Johnson" for a manual run) or "Automated Process" for system-triggered jobs (scheduled runs, data-ingestion triggers). Accompanied by a user icon for visual clarity. |
-| 6 | **Duration** | `duration` | The wall-clock time the job took to complete, displayed in HH:MM format (e.g., "01:12" for 1 hour 12 minutes, "00:38" for 38 minutes). For aggregated rows, shows the cumulative duration of all rolled-up jobs. Helps administrators identify unexpectedly long-running jobs that may indicate data quality issues or scaling concerns. |
-| 7 | **Records (metered)** | `sourceRecords` | The number of source records processed in this job. **This is the per-job billing meter** — each source profile processed consumes 0.1 Data Cloud credits (100,000 credits per 1M source profiles). The column header includes a "(metered)" annotation to indicate this is the billing-relevant field. Displayed right-aligned with locale-formatted numbers (e.g., "12,061"). For aggregated rows, shows the combined record count across all rolled-up jobs. Administrators should monitor this field to understand credit consumption patterns and detect unexpected spikes from cascading re-evaluation. |
-| 8 | **Status** | `status` | The outcome of the job displayed as a colored badge. Values: **Succeeded** (green) — job completed without errors; **Failed** (red) — job encountered an error and did not complete; **Warning** (amber) — job completed but with non-fatal issues (e.g., partial match failures, data quality warnings); **Running** (blue, animated) — job is currently in progress. |
+| Column | What It Tells the Customer |
+|---|---|
+| **Status indicator** | At-a-glance job health — green for success, red for failure, amber for warnings, animated for in-progress. |
+| **Date / Time** | When the job started. Grouped entries show only the date since they represent multiple runs. |
+| **Job ID** | A unique identifier for individual jobs. Grouped entries show a count (e.g., "7 jobs") so customers know how many runs are summarized. |
+| **Run Reason** | *Why* this job ran — scheduled, manually triggered, caused by new data, or caused by a ruleset configuration change. This is the most-requested piece of missing context. Ruleset-change-triggered runs are especially important because they cause full reprocessing and significant credit consumption. |
+| **User** | *Who* triggered the run — a named user for manual actions, or "Automated Process" for system-initiated jobs. |
+| **Duration** | How long the job took. Helps customers spot unexpectedly long runs that may indicate data quality issues. |
+| **Records (metered)** | How many source profiles were processed — the per-job billing meter. Annotated as "metered" so customers always know this drives credit consumption. |
+| **Status** | The job outcome as a labeled badge — Succeeded, Failed, Warning, or Running. |
 
-#### 4.3.2 Aggregated Row Styling
+#### 4.3.2 Grouped Entries
 
-Aggregated rows (where `jobType === 'aggregated'`) are visually distinguished with:
-- A light grey background (`#FAFAF9`) to differentiate from individual job rows.
-- A "layers" badge in the Job ID column showing the job count.
-- No start time in the Date / Time column.
+Grouped entries (representing multiple small syncs in a single day) are visually distinct from individual jobs, so customers can easily tell the difference. They show combined metrics (total duration, total records) across all grouped runs.
 
-### 4.4 Table 2: Ruleset Change Log
+### 4.4 Ruleset Change Log
 
-A new **Ruleset Change Log** table is added below the Job History table to provide a complete audit trail of all configuration changes to the identity resolution ruleset.
+A new **Ruleset Change Log** appears below the Job History, providing a complete audit trail of all configuration changes.
 
 A subtitle reads:
 > *"Track what was changed, who made the change, and when."*
 
-#### 4.4.1 Field Definitions
+#### 4.4.1 What Customers See Per Change
 
-| # | Column Label | Field | Description |
-|---|---|---|---|
-| 1 | *(icon)* | — | A document icon in the first column to visually identify each row as a change record. |
-| 2 | **Date** | `date` | The date and time when the configuration change was made, displayed in a human-readable format (e.g., "2026-03-02 11:42 AM"). |
-| 3 | **Change** | `field` | A description of what was changed in the ruleset. Displayed in the brand color (blue) with medium font weight to draw attention. Examples: "Match Rule 'Exact Email Match'" (a match rule was modified), "Match Rule Priority" (rule ordering was changed), "New Match Rule Added" (a new rule was created), "Reconciliation Rule" (a reconciliation setting was updated), "Scheduling" (the run schedule was modified), "Match Rule 'Fuzzy Name' deleted" (a rule was removed), "Ruleset Published" (the ruleset was moved from Draft to Published). |
-| 4 | **Previous Value** | `oldValue` | The value of the field *before* the change was made. Displayed in muted text. Shows "—" when there was no previous value (e.g., when adding a new rule or publishing for the first time). |
-| 5 | **New Value** | `newValue` | The value of the field *after* the change was applied. Displayed with medium font weight. Shows "—" when the change was a deletion (e.g., removing a match rule). |
-| 6 | **Changed By** | `changedBy` | The full name of the user who made the configuration change. Accompanied by a user icon for visual consistency with the Job History table. System-initiated changes (e.g., automated publish workflows) display "Data Cloud Admin" or the relevant system identity. |
+| Column | What It Tells the Customer |
+|---|---|
+| **Date** | When the change was made. |
+| **Change** | A human-readable description of what was modified — e.g., a match rule was edited, a new rule was added, rule priority was reordered, a reconciliation setting was updated, the schedule was changed, or the ruleset was published. |
+| **Previous Value** | What the setting was *before* the change. Shows "—" for net-new additions. |
+| **New Value** | What the setting is *after* the change. Shows "—" for deletions. |
+| **Changed By** | The person who made the change. |
 
 ---
 
@@ -150,7 +146,7 @@ Identity Resolution uses the **Batch Profile Unification** credit meter:
 
 ### 5.2 What Counts as a Processed Record
 
-A single processed record is one **source profile** — defined as an Individual DMO record together with all of its related records (Contact Point Email, Contact Point Phone, Contact Point Address, Party Identifiers, related custom DMOs). Even though a source profile may span multiple DMO rows, it is counted as **one** processed record for billing.
+A single processed record is one **source profile** — an Individual together with all related records (emails, phones, addresses, identifiers). Even though a source profile may span multiple data model object rows, it is counted as **one** processed record for billing.
 
 ### 5.3 When Records Are Processed
 
@@ -165,7 +161,7 @@ A single processed record is one **source profile** — defined as an Individual
 
 ### 5.4 Cascading Re-evaluation
 
-Identity Resolution does not just unify new records — it re-evaluates existing profiles that may be affected by newly ingested data. For example, adding 10,000 new records could impact 20,000 existing profiles, resulting in 30,000 processed records and corresponding credit consumption. This cascading effect is a significant cost consideration and is why the "Records (metered)" column may show values higher than expected based on raw data ingestion volumes.
+Identity Resolution doesn't just unify new records — it re-evaluates existing profiles that may be affected by newly ingested data. For example, adding 10,000 new records could impact 20,000 existing profiles, resulting in 30,000 processed records and corresponding credit consumption. This cascading effect is a significant cost consideration and is why the "Records (metered)" column may show values higher than expected based on raw data ingestion volumes.
 
 ---
 
@@ -173,14 +169,14 @@ Identity Resolution does not just unify new records — it re-evaluates existing
 
 | Aspect | Today | 264 Release |
 |---|---|---|
-| **Processing History table** | Daily Processing Summary (aggregated daily rows) | Job History (per-job rows with daily aggregation for small syncs) |
-| **Billing meter indicator** | `Processed Records` column (no visual distinction) | `Records (metered)` column with summary stats bar showing 30-day total labeled "Billing meter" |
-| **Governance** | None | Ruleset Change Log table |
+| **Processing History** | Daily Processing Summary (aggregated daily rows) | Job History (per-job rows with daily grouping for small syncs) |
+| **Billing meter visibility** | Processed Records column (no visual distinction) | Records (metered) column with summary stats bar showing 30-day total labeled "Billing meter" |
+| **Governance** | None | Ruleset Change Log |
 | **Operational context** | Date + Status only | Date/Time, Job ID, Run Reason, User, Duration, Status |
 | **Default detail tab** | Details | Ruleset Properties |
-| **API access** | None | Core REST API endpoints for job history, change log, and summary stats |
+| **API access** | None | API endpoints for job history, change log, and summary stats |
 
-The Today view (Daily Processing Summary) remains available and unchanged for the current release. The 264 Release view is additive — it does not remove any existing data; it presents the same underlying processing data with greater granularity and adds the new governance table.
+The Today view (Daily Processing Summary) remains available and unchanged for the current release. The 264 Release view is additive — it does not remove any existing data; it presents the same underlying processing data with greater granularity and adds the new governance view.
 
 ---
 
@@ -193,4 +189,4 @@ The Today view (Daily Processing Summary) remains available and unchanged for th
 - [Identity Resolution: Consolidation Rates](https://help.salesforce.com/s/articleView?id=sf.c360_a_resolution_troubleshooting_ci_consolidation_rate.htm&language=en_US&type=5)
 - [Troubleshoot Identity Resolution Processing Errors](https://help.salesforce.com/s/articleView?id=data.c360_a_resolution_troubleshooting_ir_errors.htm&language=en_US&type=5)
 - [Data Cloud Credit Consumption Insights (Trailhead)](https://trailhead.salesforce.com/content/learn/modules/data-cloud-credit-consumption-quick-look/get-started-with-data-cloud-credit-consumption)
-- [Track Known and Anonymous Individual Profiles (Spring '22)](https://help.salesforce.com/s/articleView?id=release-notes.cdp_rn_2022_spring_setup_anonymous_and_known_profiles.htm&language=en_US&release=236&type=5)
+- [Track Known and Anonymous Individual Profiles (Spring '22)](https://help.salesforce.com/s/articleView?id=release-notes.cdp_rn_2024_spring_setup_anonymous_and_known_profiles.htm&language=en_US&release=236&type=5)
