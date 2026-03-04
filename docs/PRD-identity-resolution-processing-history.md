@@ -155,7 +155,20 @@ The Today view (Daily Processing Summary) remains available and unchanged for th
 
 ---
 
-## 6. References
+## 6. Future Consideration — Core API Access
+
+Make job history accessible via Core APIs, enabling better transparency and usability. Job history data (run dates, processed records, statuses, job IDs) is currently only available through the Data Cloud UI and is not exposed through Salesforce Core APIs (REST/SOAP). This limits programmatic access for customers who want to:
+
+- Build custom dashboards or reporting on identity resolution performance
+- Integrate processing metrics into external monitoring and alerting systems (Datadog, Splunk, etc.)
+- Automate cost tracking by pulling processed record counts into billing reconciliation workflows
+- Enable ISV/partner applications to surface IR job health without screen-scraping
+
+Exposing job history and ruleset change log data via Core APIs (e.g., a `/services/data/vXX.0/ssot/identity-resolution/rulesets/{id}/jobs` endpoint or Connect API resource) would bring this functionality in line with other Data Cloud features that already have API parity.
+
+---
+
+## 7. References
 
 - [Identity Resolution Ruleset Processing Results](https://help.salesforce.com/s/articleView?id=sf.c360_a_resolution_summary.htm&language=en_US&type=5)
 - [View Daily Summary Results for Identity Resolution (Winter '24)](https://help.salesforce.com/s/articleView?id=release-notes.cdp_rn_2024_winter_ir_ruleset_processing_summary.htm&language=en_US&release=246&type=5)
