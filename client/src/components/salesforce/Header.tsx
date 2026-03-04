@@ -11,7 +11,6 @@ import {
   Zap,
   Download,
   Clipboard,
-  Diamond,
   Camera,
 } from 'lucide-react';
 import GlobalSearch from './GlobalSearch';
@@ -28,7 +27,6 @@ interface HeaderProps {
   onOpenDataCloudSetup?: () => void;
   onExportSvg?: () => void;
   onExportHtml?: () => void;
-  onOpenBSChart?: () => void;
   onToggleWorkflowCapture?: () => void;
   workflowCaptureActive?: boolean;
 }
@@ -65,7 +63,6 @@ export default function Header({
   onOpenDataCloudSetup,
   onExportSvg,
   onExportHtml,
-  onOpenBSChart,
   onToggleWorkflowCapture,
   workflowCaptureActive,
 }: HeaderProps) {
@@ -130,7 +127,7 @@ export default function Header({
       {/* Right: Utility icons */}
       <div className="slds-grid slds-grid_vertical-align-center slds-gap_xxx-small slds-shrink-none">
 
-        {/* Global tools dropdown (BS Chart + Figma) — replaces Smile/Star/Bell/Help */}
+        {/* Global tools dropdown — replaces Smile/Star/Bell/Help */}
         <div className="slds-pos-relative" ref={toolsMenuRef}>
           <button
             className="sf-icon-btn"
@@ -152,19 +149,6 @@ export default function Header({
                 </button>
               </div>
               <div className="slds-p-vertical_xx-small">
-                {/* BS Chart */}
-                <button
-                  onClick={() => { setToolsMenuOpen(false); onOpenBSChart?.(); }}
-                  className="sf-dropdown-item"
-                >
-                  <div className="slds-square_large slds-border-radius_medium slds-flex slds-items-center slds-justify-center slds-flex-shrink-0" style={{ background: '#F59E0B' }}>
-                    <Diamond className="slds-icon-size_small slds-text-white" />
-                  </div>
-                  <div className="slds-col" style={{ textAlign: 'left' }}>
-                    <span className="slds-text-size_small slds-font-weight_medium" style={{ color: 'var(--slds-g-color-neutral-base)', display: 'block' }}>BS Chart</span>
-                    <span className="slds-text-size_xx-small" style={{ color: 'var(--slds-g-color-neutral-7)' }}>Create diagrams & flowcharts</span>
-                  </div>
-                </button>
                 {/* Workflow Capture */}
                 <button
                   onClick={() => { setToolsMenuOpen(false); onToggleWorkflowCapture?.(); }}

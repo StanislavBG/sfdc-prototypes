@@ -48,6 +48,10 @@ export interface NavGroup {
 export const appNavGroups: Record<string, NavGroup[]> = {
   'data-cloud': [
     {
+      title: '',
+      items: [{ label: 'Home' }],
+    },
+    {
       title: 'Connect & Unify',
       icon: 'list-filter',
       items: [

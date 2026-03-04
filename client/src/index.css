@@ -474,10 +474,11 @@
    Layout root + body + main
    ========================================== */
 .sf-layout-root {
-  min-height: 100vh;
+  height: 100vh;
   display: flex;
   flex-direction: column;
   background: var(--slds-g-color-neutral-2);
+  overflow: hidden;
 }
 
 .sf-layout-body {
@@ -3668,6 +3669,27 @@ tr:hover .sf-drive-more-btn {
   border-radius: 50%;
   background: #EA4335;
   animation: wfc-pulse 1s ease-in-out infinite;
+}
+
+.wfc-interim-text {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 14px;
+  font-size: 12px;
+  color: #888;
+  font-style: italic;
+  background: #fef9f0;
+  border-left: 2px solid #EA4335;
+  min-height: 24px;
+}
+
+.wfc-voice-error {
+  padding: 6px 14px;
+  font-size: 12px;
+  color: #c23934;
+  background: #fef0ef;
+  border-left: 2px solid #EA4335;
 }
 
 /* Active state indicator for menu items */
