@@ -10,13 +10,41 @@
 
 The Processing History tab within an Identity Resolution ruleset provides administrators and data stewards with visibility into how identity resolution jobs have performed over time. It surfaces key metrics about profile unification, record processing volumes, and job outcomes.
 
-This PRD documents the **current state** (Daily Processing Summary table) and specifies two new tracking tables introduced in the **264 Release**: a **Job History** table with per-job granularity and a **Ruleset Change Log** for governance and auditability.
+This PRD documents the **current state** (Daily Processing Summary table) and specifies enhancements introduced in the **264 Release**: a **Job History** table with per-job granularity, a **Ruleset Change Log** for governance and auditability, and **Core API access** to expose job history and change log data programmatically.
 
 ---
 
-## 2. Current State — Daily Processing Summary
+## 2. Core API Access (264 Release)
 
-### 2.1 Description
+Job history and ruleset change log data must be accessible via Salesforce Core APIs (REST and Connect API), not only through the Data Cloud UI. This enables programmatic access for customers and partners who need to:
+
+- **Build custom dashboards and reporting** on identity resolution performance, consolidation rates, and job outcomes
+- **Integrate processing metrics into external monitoring and alerting systems** (Datadog, Splunk, PagerDuty, etc.) for real-time operational visibility
+- **Automate cost tracking** by pulling processed record counts and credit consumption data into billing reconciliation workflows
+- **Enable ISV/partner applications** to surface identity resolution job health and governance data natively
+
+### 2.1 API Endpoints
+
+| Endpoint | Method | Description |
+|---|---|---|
+| `/services/data/vXX.0/ssot/identity-resolution/rulesets/{rulesetId}/jobs` | GET | Returns paginated job history for a ruleset, including job ID, run reason, user, duration, records processed, and status. Supports query parameters for date range filtering and pagination. |
+| `/services/data/vXX.0/ssot/identity-resolution/rulesets/{rulesetId}/jobs/{jobId}` | GET | Returns full detail for a single job. |
+| `/services/data/vXX.0/ssot/identity-resolution/rulesets/{rulesetId}/changes` | GET | Returns the ruleset change log — configuration changes with timestamps, changed-by user, previous and new values. |
+| `/services/data/vXX.0/ssot/identity-resolution/rulesets/{rulesetId}/stats` | GET | Returns the summary stats (processed records 30d, jobs last 24h, schedule, change count) surfaced in the UI stats bar. |
+
+### 2.2 Design Notes
+
+- All endpoints require the `cdp_api` or equivalent Data Cloud API permission set.
+- Responses follow the standard Salesforce REST API envelope (records array, pagination via `nextPageUrl`).
+- Date range filtering via `startDate` and `endDate` query parameters (ISO 8601).
+- The `/jobs` endpoint returns both individual and aggregated job rows, matching the UI behavior. Aggregated rows include a `jobType: "aggregated"` field and a `jobCount` field.
+- The `/changes` endpoint returns change log entries in reverse chronological order.
+
+---
+
+## 3. Current State — Daily Processing Summary
+
+### 3.1 Description
 
 The Daily Processing Summary table aggregates the results of all identity resolution runs from a single calendar date into one row. It provides a high-level view of the ruleset's unification output and processing volumes over time.
 
@@ -25,7 +53,7 @@ A descriptive subtitle reads:
 
 An indicator also displays whether **Automatic runs** are Enabled or Disabled. Jobs run automatically once per day in batch mode, though they may be skipped if there are no changes to source data, object mappings, or ruleset configurations. On-demand runs (triggered by rule changes) can be executed up to 4 times per 24-hour period per ruleset per data space.
 
-### 2.2 Field Definitions
+### 3.2 Field Definitions
 
 | # | Column Label | Field | Description |
 |---|---|---|---|
@@ -41,9 +69,9 @@ An indicator also displays whether **Automatic runs** are Enabled or Disabled. J
 
 ---
 
-## 3. 264 Release — Enhanced Processing History
+## 4. 264 Release — Enhanced Processing History
 
-### 3.1 Design Rationale
+### 4.1 Design Rationale
 
 Voice of Customer (VOC) feedback identified three key gaps in the current Daily Processing Summary:
 
@@ -51,7 +79,7 @@ Voice of Customer (VOC) feedback identified three key gaps in the current Daily 
 2. **No governance trail for ruleset changes** — Identity Resolution is credit-intensive. Administrators need to track *who* changed *what* in a ruleset and *when*, to understand the impact of configuration changes on processing costs and match quality.
 3. **Missing operational context** — The current table does not capture *why* a job ran (trigger reason), *who* initiated it, or *how long* it took, all of which are essential for operational monitoring.
 
-### 3.2 Summary Stats Bar
+### 4.2 Summary Stats Bar
 
 A new summary stats bar appears above the tables, providing at-a-glance KPIs:
 
@@ -62,7 +90,7 @@ A new summary stats bar appears above the tables, providing at-a-glance KPIs:
 | **Schedule** | Current scheduling status: the configured schedule (e.g., "Daily 2:00 AM") or "Disabled" if no schedule is active. |
 | **Ruleset Changes** | Total count of recorded ruleset configuration changes in the audit log. |
 
-### 3.3 Table 1: Job History
+### 4.3 Table 1: Job History
 
 The Job History table replaces the Daily Processing Summary with per-job granularity. The design principle is:
 - **Large jobs** (full reprocessing, manual runs, ruleset-change-triggered runs) are listed as **individual rows**.
@@ -72,7 +100,7 @@ The Job History table replaces the Daily Processing Summary with per-job granula
 A subtitle reads:
 > *"Large jobs shown individually. Small incremental syncs aggregated daily."*
 
-#### 3.3.1 Field Definitions
+#### 4.3.1 Field Definitions
 
 | # | Column Label | Field | Description |
 |---|---|---|---|
@@ -85,21 +113,21 @@ A subtitle reads:
 | 7 | **Records (metered)** | `sourceRecords` | The number of source records processed in this job. **This is the per-job billing meter** — each source profile processed consumes 0.1 Data Cloud credits (100,000 credits per 1M source profiles). The column header includes a "(metered)" annotation to indicate this is the billing-relevant field. Displayed right-aligned with locale-formatted numbers (e.g., "12,061"). For aggregated rows, shows the combined record count across all rolled-up jobs. Administrators should monitor this field to understand credit consumption patterns and detect unexpected spikes from cascading re-evaluation. |
 | 8 | **Status** | `status` | The outcome of the job displayed as a colored badge. Values: **Succeeded** (green) — job completed without errors; **Failed** (red) — job encountered an error and did not complete; **Warning** (amber) — job completed but with non-fatal issues (e.g., partial match failures, data quality warnings); **Running** (blue, animated) — job is currently in progress. |
 
-#### 3.3.2 Aggregated Row Styling
+#### 4.3.2 Aggregated Row Styling
 
 Aggregated rows (where `jobType === 'aggregated'`) are visually distinguished with:
 - A light grey background (`#FAFAF9`) to differentiate from individual job rows.
 - A "layers" badge in the Job ID column showing the job count.
 - No start time in the Date / Time column.
 
-### 3.4 Table 2: Ruleset Change Log
+### 4.4 Table 2: Ruleset Change Log
 
 A new **Ruleset Change Log** table is added below the Job History table to provide a complete audit trail of all configuration changes to the identity resolution ruleset.
 
 A subtitle reads:
 > *"Track what was changed, who made the change, and when."*
 
-#### 3.4.1 Field Definitions
+#### 4.4.1 Field Definitions
 
 | # | Column Label | Field | Description |
 |---|---|---|---|
@@ -112,19 +140,19 @@ A subtitle reads:
 
 ---
 
-## 4. Billing & Credit Consumption
+## 5. Billing & Credit Consumption
 
-### 4.1 Credit Rate
+### 5.1 Credit Rate
 
 Identity Resolution uses the **Batch Profile Unification** credit meter:
 - **0.1 credits per source profile processed** (100,000 credits per 1,000,000 source profiles)
 - At Salesforce's published add-on pricing of $1,000 USD per 100,000 credits, processing 1M source profiles costs approximately $1,000 USD (before any included credit allowances)
 
-### 4.2 What Counts as a Processed Record
+### 5.2 What Counts as a Processed Record
 
 A single processed record is one **source profile** — defined as an Individual DMO record together with all of its related records (Contact Point Email, Contact Point Phone, Contact Point Address, Party Identifiers, related custom DMOs). Even though a source profile may span multiple DMO rows, it is counted as **one** processed record for billing.
 
-### 4.3 When Records Are Processed
+### 5.3 When Records Are Processed
 
 | Scenario | Records Processed |
 |----------|-------------------|
@@ -135,13 +163,13 @@ A single processed record is one **source profile** — defined as an Individual
 | Record deletion | The deleted source profile is counted as processed |
 | Consent/suppression change | The affected source profile is reprocessed |
 
-### 4.4 Cascading Re-evaluation
+### 5.4 Cascading Re-evaluation
 
 Identity Resolution does not just unify new records — it re-evaluates existing profiles that may be affected by newly ingested data. For example, adding 10,000 new records could impact 20,000 existing profiles, resulting in 30,000 processed records and corresponding credit consumption. This cascading effect is a significant cost consideration and is why the "Records (metered)" column may show values higher than expected based on raw data ingestion volumes.
 
 ---
 
-## 5. Migration Path
+## 6. Migration Path
 
 | Aspect | Today | 264 Release |
 |---|---|---|
@@ -150,21 +178,9 @@ Identity Resolution does not just unify new records — it re-evaluates existing
 | **Governance** | None | Ruleset Change Log table |
 | **Operational context** | Date + Status only | Date/Time, Job ID, Run Reason, User, Duration, Status |
 | **Default detail tab** | Details | Ruleset Properties |
+| **API access** | None | Core REST API endpoints for job history, change log, and summary stats |
 
 The Today view (Daily Processing Summary) remains available and unchanged for the current release. The 264 Release view is additive — it does not remove any existing data; it presents the same underlying processing data with greater granularity and adds the new governance table.
-
----
-
-## 6. Future Consideration — Core API Access
-
-Make job history accessible via Core APIs, enabling better transparency and usability. Job history data (run dates, processed records, statuses, job IDs) is currently only available through the Data Cloud UI and is not exposed through Salesforce Core APIs (REST/SOAP). This limits programmatic access for customers who want to:
-
-- Build custom dashboards or reporting on identity resolution performance
-- Integrate processing metrics into external monitoring and alerting systems (Datadog, Splunk, etc.)
-- Automate cost tracking by pulling processed record counts into billing reconciliation workflows
-- Enable ISV/partner applications to surface IR job health without screen-scraping
-
-Exposing job history and ruleset change log data via Core APIs (e.g., a `/services/data/vXX.0/ssot/identity-resolution/rulesets/{id}/jobs` endpoint or Connect API resource) would bring this functionality in line with other Data Cloud features that already have API parity.
 
 ---
 
