@@ -1458,114 +1458,24 @@ export default function IdentityResolutionContent({ demoSession, onDemoSessionCh
           {/* ── DETAILS TAB ── */}
           {detailTab === 'details' && (
             <div className="slds-flex slds-gap_medium slds-p-around_large">
-              {/* Left column — Match Rules + Reconciliation Rules */}
+              {/* Left column — Ruleset Configuration */}
               <div className="slds-flex-1 slds-min-w-0" style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-                {/* Match Rules card */}
                 <div className="sf-card">
-                  <div className="sf-card-header">
-                    <h2 className="slds-text-size_medium slds-font-weight_semibold slds-text-neutral-base">
-                      Match Rules <span className="slds-text-size_small slds-font-weight_regular slds-text-neutral-7">({selectedRuleset.matchRules.length})</span>
-                    </h2>
-                    <button onClick={handleOpenEditMatchRules} className="slds-flex slds-items-center slds-gap_xx-small slds-p-horizontal_small slds-text-size_small slds-font-weight_medium slds-text-white slds-bg-brand slds-border-radius_small slds-transition-colors" style={{ paddingTop: '6px', paddingBottom: '6px' }}>
-                      <Edit3 className="slds-icon-size_x-small" />
-                      Edit
-                    </button>
-                  </div>
-                  {selectedRuleset.matchRules.length === 0 ? (
-                    <div className="sf-card-body slds-text-center slds-p-vertical_x-large slds-text-size_medium slds-text-neutral-7">No match rules configured.</div>
-                  ) : (
-                    <div className="sf-card-body" style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                      {selectedRuleset.matchRules.map((rule, ri) => (
-                        <div key={rule.id} className="slds-flex slds-items-start slds-gap_small">
-                          {ri > 0 && <span className="slds-text-size_small slds-font-weight_bold slds-text-neutral-7 slds-m-top_xx-small slds-text-center slds-flex-shrink-0" style={{ width: '24px' }}>OR</span>}
-                          {ri === 0 && <span className="slds-flex-shrink-0" style={{ width: '24px' }} />}
-                          <div className={`slds-flex-1 slds-flex slds-items-center slds-gap_x-small slds-p-horizontal_small slds-border-radius_large slds-border_all ${
-                            rule.ruleName === 'Unique Identifier 01' ? 'slds-border-color_border-1' : 'slds-border-color_border-1'
-                          }`} style={{ paddingTop: '10px', paddingBottom: '10px', borderColor: rule.ruleName === 'Unique Identifier 01' ? '#FFB75D' : undefined, backgroundColor: rule.ruleName === 'Unique Identifier 01' ? '#FFFBF5' : '#FAFAF9' }}>
-                            {rule.ruleName === 'Unique Identifier 01' && (
-                              <AlertTriangle className="slds-icon-size_small slds-flex-shrink-0" style={{ color: '#FFB75D' }} />
-                            )}
-                            <span className="slds-text-size_medium slds-text-neutral-base">{rule.ruleName}</span>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                </div>
-
-                {/* Reconciliation Rules card */}
-                <div className="sf-card">
-                  <div className="sf-card-header">
-                    <div>
-                      <h2 className="slds-text-size_medium slds-font-weight_semibold slds-text-neutral-base">Reconciliation Rules</h2>
-                      <p className="slds-text-size_small slds-text-neutral-7 slds-m-top_xx-small">Reconciliation rules determine which field value to keep when source profiles are merged into a unified profile.</p>
-                    </div>
-                    {selectedReconFields.size > 0 && (
-                      <button onClick={handleUpdateSelected} className="slds-flex slds-items-center slds-gap_xx-small slds-p-horizontal_small slds-text-size_small slds-font-weight_medium slds-text-white slds-bg-brand slds-border-radius_small slds-transition-colors" style={{ paddingTop: '6px', paddingBottom: '6px' }}>
-                        Update Selected ({selectedReconFields.size})
-                      </button>
-                    )}
-                  </div>
-                  <div>
-                    {selectedRuleset.reconciliationGroups.map((group) => {
-                      const isOpen = reconGroupsOpen[group.dmoName] !== false;
-                      return (
-                        <div key={group.dmoName} className="slds-border_bottom slds-border-color_border-2">
-                          <button onClick={() => toggleReconGroup(group.dmoName)} className="slds-w-full slds-flex slds-items-center slds-justify-between slds-p-horizontal_medium slds-p-vertical_small slds-transition-colors" style={{ backgroundColor: 'transparent' }} onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#FAFAF9'} onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}>
-                            <div className="slds-flex slds-items-center slds-gap_x-small">
-                              {isOpen ? <ChevronDown className="slds-icon-size_small slds-text-neutral-7" /> : <ChevronRight className="slds-icon-size_small slds-text-neutral-7" />}
-                              <span className="slds-text-size_medium slds-font-weight_semibold slds-text-neutral-base">{group.dmoName}</span>
-                            </div>
-                            <div className="slds-flex slds-items-center slds-gap_x-small slds-text-size_small slds-text-neutral-7">
-                              <span>Default Reconciliation Rule:</span>
-                              <span className="slds-font-weight_medium slds-text-neutral-9">{group.defaultRule}</span>
-                              <button
-                                onClick={(e) => { e.stopPropagation(); }}
-                                className="slds-flex slds-items-center slds-justify-center slds-border-radius_small slds-text-neutral-7" style={{ width: '24px', height: '24px' }}
-                                title="Edit Default Reconciliation Rule"
-                              >
-                                <Pencil className="slds-icon-size_xx-small" />
-                              </button>
-                            </div>
-                          </button>
-                          {isOpen && (
-                            <table className="sf-table">
-                              <thead>
-                                <tr>
-                                  <th style={{ width: '40px' }}></th>
-                                  <th>Field</th>
-                                  <th>Reconciliation Rule</th>
-                                  <th className="slds-text-center" style={{ width: '96px' }}>Using Default?</th>
-                                </tr>
-                              </thead>
-                              <tbody>
-                                {group.fields.map((field) => (
-                                  <tr key={field.id}>
-                                    <td>
-                                      <input
-                                        type="checkbox"
-                                        checked={selectedReconFields.has(field.id)}
-                                        onChange={() => toggleReconFieldSelection(field.id)}
-                                        className="slds-icon-size_small slds-border-radius_small slds-border-color_border-1"
-                                      />
-                                    </td>
-                                    <td>
-                                      <button onClick={() => handleOpenEditReconRule(field)} className="sf-link">
-                                        {field.fieldName}
-                                      </button>
-                                    </td>
-                                    <td>{field.reconciliationRule}</td>
-                                    <td className="slds-text-center">
-                                      {field.usingDefault && <Check className="slds-icon-size_small slds-text-success" style={{ margin: '0 auto' }} />}
-                                    </td>
-                                  </tr>
-                                ))}
-                              </tbody>
-                            </table>
-                          )}
-                        </div>
-                      );
-                    })}
+                  <div className="sf-card-header"><h2 className="slds-text-size_medium slds-font-weight_semibold slds-text-neutral-base">Ruleset Configuration</h2></div>
+                  <div className="sf-detail-grid">
+                    {[
+                      ['Ruleset Name', selectedRuleset.rulesetName],
+                      ['Ruleset ID', selectedRuleset.rulesetId],
+                      ['Data Space', selectedRuleset.dataSpace],
+                      ['Primary Data Model Object', selectedRuleset.primaryDataModelObject],
+                      ['Ruleset Status', selectedRuleset.rulesetStatus],
+                      ['Number of Match Rules', String(selectedRuleset.matchRules.length)],
+                    ].map(([label, value]) => (
+                      <div key={label} className="sf-detail-field">
+                        <div className="sf-detail-label">{label}</div>
+                        <div className="sf-detail-value">{value}</div>
+                      </div>
+                    ))}
                   </div>
                 </div>
               </div>
@@ -1654,23 +1564,134 @@ export default function IdentityResolutionContent({ demoSession, onDemoSessionCh
 
           {/* ── RULESET PROPERTIES TAB ── */}
           {detailTab === 'properties' && (
-            <div className="slds-p-around_large">
+            <div className="slds-p-around_large" style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+              {/* Match Rules card */}
               <div className="sf-card">
-                <div className="sf-card-header"><h2 className="slds-text-size_medium slds-font-weight_semibold slds-text-neutral-base">Ruleset Configuration</h2></div>
-                <div className="sf-detail-grid">
-                  {[
-                    ['Ruleset Name', selectedRuleset.rulesetName],
-                    ['Ruleset ID', selectedRuleset.rulesetId],
-                    ['Data Space', selectedRuleset.dataSpace],
-                    ['Primary Data Model Object', selectedRuleset.primaryDataModelObject],
-                    ['Ruleset Status', selectedRuleset.rulesetStatus],
-                    ['Number of Match Rules', String(selectedRuleset.matchRules.length)],
-                  ].map(([label, value]) => (
-                    <div key={label} className="sf-detail-field">
-                      <div className="sf-detail-label">{label}</div>
-                      <div className="sf-detail-value">{value}</div>
-                    </div>
-                  ))}
+                <div className="sf-card-header">
+                  <h2 className="slds-text-size_medium slds-font-weight_semibold slds-text-neutral-base">
+                    Match Rules
+                  </h2>
+                  <button onClick={handleOpenEditMatchRules} className="slds-flex slds-items-center slds-gap_xx-small slds-p-horizontal_small slds-text-size_small slds-font-weight_medium slds-text-white slds-bg-brand slds-border-radius_small slds-transition-colors" style={{ paddingTop: '6px', paddingBottom: '6px' }}>
+                    <Edit3 className="slds-icon-size_x-small" />
+                    Edit
+                  </button>
+                </div>
+                {selectedRuleset.matchRules.length === 0 ? (
+                  <div className="sf-card-body slds-text-center slds-p-vertical_x-large slds-text-size_medium slds-text-neutral-7">No match rules configured.</div>
+                ) : (
+                  <div className="sf-card-body" style={{ padding: '16px 20px' }}>
+                    {selectedRuleset.matchRules.map((rule, ri) => (
+                      <div key={rule.id} style={{ display: 'flex', alignItems: 'flex-start', gap: '0px' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', minHeight: '28px' }}>
+                          {ri > 0 && (
+                            <span className="slds-text-size_small slds-font-weight_bold slds-text-neutral-7" style={{ width: '32px', textAlign: 'center' }}>OR</span>
+                          )}
+                          {ri === 0 && <span style={{ width: '32px' }} />}
+                          <span style={{ width: '6px', height: '6px', borderRadius: '50%', backgroundColor: rule.ruleName.includes('Unique Identifier') ? '#FFB75D' : '#1B96FF', flexShrink: 0, marginRight: '10px' }} />
+                        </div>
+                        <div className="slds-flex slds-items-center slds-gap_x-small" style={{ minHeight: '28px' }}>
+                          {rule.ruleName.includes('Unique Identifier') && (
+                            <AlertTriangle className="slds-icon-size_x-small slds-flex-shrink-0" style={{ color: '#FFB75D' }} />
+                          )}
+                          <span className="slds-text-size_medium slds-text-neutral-base">{rule.ruleName}</span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              {/* Reconciliation Rules card */}
+              <div className="sf-card">
+                <div className="sf-card-header" style={{ flexDirection: 'column', alignItems: 'stretch', gap: '4px' }}>
+                  <h2 className="slds-text-size_medium slds-font-weight_semibold slds-text-neutral-base">Reconciliation Rules</h2>
+                  <p className="slds-text-size_small slds-text-neutral-7">Matched data sources may contain conflicting data, such as different phone numbers. Reconciliation rules determine which value to keep in the unified profile.</p>
+                </div>
+                <div>
+                  {selectedRuleset.reconciliationGroups.map((group) => {
+                    const isOpen = reconGroupsOpen[group.dmoName] !== false;
+                    const groupFieldIds = group.fields.map(f => f.id);
+                    const selectedInGroup = groupFieldIds.filter(id => selectedReconFields.has(id)).length;
+                    return (
+                      <div key={group.dmoName} className="slds-border_bottom slds-border-color_border-2">
+                        <button onClick={() => toggleReconGroup(group.dmoName)} className="slds-w-full slds-flex slds-items-center slds-justify-between slds-p-horizontal_medium slds-p-vertical_small slds-transition-colors" style={{ backgroundColor: 'transparent' }} onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#FAFAF9'} onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}>
+                          <div className="slds-flex slds-items-center slds-gap_x-small">
+                            {isOpen ? <ChevronDown className="slds-icon-size_small slds-text-neutral-7" /> : <ChevronRight className="slds-icon-size_small slds-text-neutral-7" />}
+                            <span className="slds-text-size_medium slds-font-weight_semibold slds-text-neutral-base">{group.dmoName}</span>
+                          </div>
+                        </button>
+                        {isOpen && (
+                          <div>
+                            {/* Default rule + Update Selected row */}
+                            <div className="slds-flex slds-items-center slds-justify-between slds-p-horizontal_medium slds-p-vertical_x-small" style={{ backgroundColor: '#FAFAF9', borderTop: '1px solid #e5e5e5' }}>
+                              <div className="slds-flex slds-items-center slds-gap_x-small slds-text-size_small slds-text-neutral-7">
+                                <span>Default Reconciliation Rule:</span>
+                                <span className="slds-font-weight_medium slds-text-neutral-9">{group.defaultRule}</span>
+                                <button
+                                  onClick={(e) => { e.stopPropagation(); }}
+                                  className="slds-flex slds-items-center slds-justify-center slds-border-radius_small slds-text-neutral-7" style={{ width: '24px', height: '24px' }}
+                                  title="Edit Default Reconciliation Rule"
+                                >
+                                  <Pencil className="slds-icon-size_xx-small" />
+                                </button>
+                              </div>
+                              <button
+                                onClick={() => handleUpdateSelected()}
+                                disabled={selectedInGroup === 0}
+                                className="slds-flex slds-items-center slds-gap_xx-small slds-p-horizontal_small slds-text-size_small slds-font-weight_medium slds-border-radius_small slds-transition-colors"
+                                style={{
+                                  paddingTop: '4px', paddingBottom: '4px',
+                                  backgroundColor: selectedInGroup > 0 ? '#0176D3' : '#E5E5E5',
+                                  color: selectedInGroup > 0 ? '#fff' : '#999',
+                                  cursor: selectedInGroup > 0 ? 'pointer' : 'default',
+                                }}
+                              >
+                                Update Selected
+                              </button>
+                            </div>
+                            <table className="sf-table">
+                              <thead>
+                                <tr>
+                                  <th style={{ width: '40px' }}></th>
+                                  <th>Field</th>
+                                  <th>Reconciliation Rule</th>
+                                  <th className="slds-text-center" style={{ width: '96px' }}>Using Default?</th>
+                                </tr>
+                              </thead>
+                              <tbody>
+                                {group.fields.map((field) => (
+                                  <tr key={field.id}>
+                                    <td>
+                                      <input
+                                        type="checkbox"
+                                        checked={selectedReconFields.has(field.id)}
+                                        onChange={() => toggleReconFieldSelection(field.id)}
+                                        className="slds-icon-size_small slds-border-radius_small slds-border-color_border-1"
+                                      />
+                                    </td>
+                                    <td>
+                                      <div className="slds-flex slds-items-center slds-gap_xx-small">
+                                        {field.fieldName === 'Individual Id' && (
+                                          <AlertTriangle className="slds-icon-size_xx-small slds-flex-shrink-0" style={{ color: '#FFB75D' }} />
+                                        )}
+                                        <button onClick={() => handleOpenEditReconRule(field)} className="sf-link">
+                                          {field.fieldName}
+                                        </button>
+                                      </div>
+                                    </td>
+                                    <td>{field.reconciliationRule}</td>
+                                    <td className="slds-text-center">
+                                      {field.usingDefault && <Check className="slds-icon-size_small slds-text-success" style={{ margin: '0 auto' }} />}
+                                    </td>
+                                  </tr>
+                                ))}
+                              </tbody>
+                            </table>
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
                 </div>
               </div>
             </div>
