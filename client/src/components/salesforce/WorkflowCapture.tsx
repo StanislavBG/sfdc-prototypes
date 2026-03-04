@@ -62,8 +62,16 @@ export default function WorkflowCapture({
 
   // Voice recording
   const [isRecording, setIsRecording] = useState(false);
+  const [interimText, setInterimText] = useState('');
+  const [voiceError, setVoiceError] = useState<string | null>(null);
   const [pulsePhase, setPulsePhase] = useState(0);
   const recognitionRef = useRef<any>(null);
+  const wantRecordingRef = useRef(false);
+  // Refs to avoid stale closures in recognition callbacks
+  const currentNoteRef = useRef(currentNote);
+  const selectedStepIdRef = useRef(selectedStepId);
+  useEffect(() => { currentNoteRef.current = currentNote; }, [currentNote]);
+  useEffect(() => { selectedStepIdRef.current = selectedStepId; }, [selectedStepId]);
 
   // Export
   const [exporting, setExporting] = useState(false);
@@ -78,14 +86,23 @@ export default function WorkflowCapture({
     return () => clearInterval(interval);
   }, [isRecording]);
 
-  // Clean up speech recognition on unmount
+  // Clean up speech recognition on unmount or deactivation
   useEffect(() => {
     return () => {
+      wantRecordingRef.current = false;
       if (recognitionRef.current) {
         try { recognitionRef.current.stop(); } catch {}
+        recognitionRef.current = null;
       }
     };
   }, []);
+
+  // Clear voice error after 5s
+  useEffect(() => {
+    if (!voiceError) return;
+    const t = setTimeout(() => setVoiceError(null), 5000);
+    return () => clearTimeout(t);
+  }, [voiceError]);
 
   // ------- Capture -------
 
@@ -130,12 +147,13 @@ export default function WorkflowCapture({
     );
   }, []);
 
-  const handleNoteChange = (value: string) => {
+  const handleNoteChange = useCallback((value: string) => {
     setCurrentNote(value);
-    if (selectedStepId) {
-      updateStepNote(selectedStepId, value);
+    currentNoteRef.current = value;
+    if (selectedStepIdRef.current) {
+      updateStepNote(selectedStepIdRef.current, value);
     }
-  };
+  }, [updateStepNote]);
 
   const selectStep = (stepId: string) => {
     setSelectedStepId(stepId);
@@ -157,55 +175,114 @@ export default function WorkflowCapture({
 
   // ------- Voice -------
 
-  const toggleVoice = () => {
+  const stopVoice = useCallback(() => {
+    wantRecordingRef.current = false;
+    setIsRecording(false);
+    setInterimText('');
+    if (recognitionRef.current) {
+      try { recognitionRef.current.stop(); } catch {}
+      recognitionRef.current = null;
+    }
+  }, []);
+
+  const startVoice = useCallback(() => {
     const SpeechRecognition =
       (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
 
     if (!SpeechRecognition) {
-      // Fallback: simulate
-      if (isRecording) {
-        setIsRecording(false);
-        return;
-      }
-      setIsRecording(true);
-      setTimeout(() => {
-        const simulated = 'User navigates to the main dashboard and checks the data streams status.';
-        if (selectedStepId) {
-          const existing = currentNote ? currentNote + ' ' : '';
-          handleNoteChange(existing + simulated);
+      setVoiceError('Speech recognition not supported in this browser. Use Chrome, Edge, or Safari.');
+      return;
+    }
+
+    if (!selectedStepIdRef.current) {
+      setVoiceError('Select a step first, then use voice to add notes.');
+      return;
+    }
+
+    // Request mic permission explicitly first
+    navigator.mediaDevices?.getUserMedia({ audio: true })
+      .then((stream) => {
+        // Permission granted — stop the stream (we only needed permission, SpeechRecognition manages its own audio)
+        stream.getTracks().forEach((t) => t.stop());
+
+        const recognition = new SpeechRecognition();
+        recognition.continuous = true;
+        recognition.interimResults = true;
+        recognition.lang = navigator.language || 'en-US';
+        recognition.maxAlternatives = 1;
+
+        recognition.onresult = (event: any) => {
+          let finalTranscript = '';
+          let interim = '';
+          for (let i = event.resultIndex; i < event.results.length; i++) {
+            const result = event.results[i];
+            if (result.isFinal) {
+              finalTranscript += result[0].transcript;
+            } else {
+              interim += result[0].transcript;
+            }
+          }
+
+          if (finalTranscript && selectedStepIdRef.current) {
+            const existing = currentNoteRef.current ? currentNoteRef.current + ' ' : '';
+            const newNote = existing + finalTranscript.trim();
+            handleNoteChange(newNote);
+          }
+
+          setInterimText(interim);
+        };
+
+        recognition.onerror = (event: any) => {
+          const err = event.error;
+          if (err === 'no-speech' || err === 'aborted') return;
+          if (err === 'not-allowed') {
+            setVoiceError('Microphone access denied. Check browser permissions.');
+          } else if (err === 'network') {
+            setVoiceError('Speech recognition requires a network connection in this browser.');
+          } else {
+            setVoiceError(`Voice error: ${err}`);
+          }
+          stopVoice();
+        };
+
+        recognition.onend = () => {
+          setInterimText('');
+          // Auto-restart if we still want to be recording (browsers stop after silence)
+          if (wantRecordingRef.current) {
+            try {
+              recognition.start();
+            } catch {
+              stopVoice();
+            }
+          } else {
+            setIsRecording(false);
+          }
+        };
+
+        recognitionRef.current = recognition;
+        wantRecordingRef.current = true;
+        setIsRecording(true);
+        setVoiceError(null);
+        recognition.start();
+      })
+      .catch((err) => {
+        if (err.name === 'NotAllowedError' || err.name === 'PermissionDeniedError') {
+          setVoiceError('Microphone access denied. Allow microphone in browser settings.');
+        } else if (err.name === 'NotFoundError') {
+          setVoiceError('No microphone found. Connect a microphone and try again.');
+        } else {
+          setVoiceError(`Microphone error: ${err.message || err.name}`);
         }
-        setIsRecording(false);
-      }, 2500);
-      return;
+      });
+  }, [stopVoice, handleNoteChange]);
+
+  const toggleVoice = useCallback(() => {
+    if (isRecording) {
+      stopVoice();
+    } else {
+      startVoice();
     }
-
-    if (isRecording && recognitionRef.current) {
-      recognitionRef.current.stop();
-      setIsRecording(false);
-      return;
-    }
-
-    const recognition = new SpeechRecognition();
-    recognition.continuous = false;
-    recognition.interimResults = false;
-    recognition.lang = 'en-US';
-
-    recognition.onresult = (event: any) => {
-      const transcript = event.results[0][0].transcript;
-      if (selectedStepId) {
-        const existing = currentNote ? currentNote + ' ' : '';
-        handleNoteChange(existing + transcript);
-      }
-      setIsRecording(false);
-    };
-
-    recognition.onerror = () => setIsRecording(false);
-    recognition.onend = () => setIsRecording(false);
-
-    recognitionRef.current = recognition;
-    recognition.start();
-    setIsRecording(true);
-  };
+  }, [isRecording, stopVoice, startVoice]);
 
   // ------- Export -------
 
@@ -457,6 +534,17 @@ export default function WorkflowCapture({
                       )}
                     </button>
                   </div>
+                  {interimText && (
+                    <div className="wfc-interim-text">
+                      <Mic className="w-3 h-3" style={{ color: '#EA4335', flexShrink: 0 }} />
+                      <span>{interimText}</span>
+                    </div>
+                  )}
+                  {voiceError && (
+                    <div className="wfc-voice-error">
+                      {voiceError}
+                    </div>
+                  )}
                   <textarea
                     value={currentNote}
                     onChange={(e) => handleNoteChange(e.target.value)}
