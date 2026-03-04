@@ -601,9 +601,12 @@ export default function DataStreamsContent({ demoSession, currentTimeline }: Dat
               dataSpace: selectedDataSpace,
               tenant: selectedTenant,
               fields: Array.from({ length: entity.fieldCount }, (_, fi) => ({
-                name: `${entity.name}_Field_${fi + 1}`,
-                type: ['Text', 'Number', 'Date', 'Lookup', 'Boolean'][fi % 5],
-                description: `Field ${fi + 1} of ${entity.name}`,
+                id: `sf-${entity.name.replace(/\s+/g, '-').toLowerCase()}-wiz-${fi}`,
+                fieldName: `${entity.name}_Field_${fi + 1}`,
+                dataType: ['Text', 'Number', 'Date', 'Lookup', 'Boolean'][fi % 5],
+                targetDMO: 'Individual',
+                targetField: `${entity.name}_Field_${fi + 1}`,
+                mappingStatus: 'Auto-Mapped' as const,
               })),
             });
           });
@@ -1023,8 +1026,8 @@ export default function DataStreamsContent({ demoSession, currentTimeline }: Dat
                     <h3 className="slds-text-size_medium slds-font-weight_semibold slds-text-neutral-base">Data Mapping</h3>
                   </div>
                   <div className="sf-card-body">
-                    {hasMappingDatakit ? (
-                      /* Initialized state (Image 1) — datakit installed */
+                    {fields.length > 0 ? (
+                      /* Populated state — fields available */
                       <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
                         <div>
                           <p className="slds-text-uppercase slds-tracking-wide slds-text-neutral-7 slds-m-bottom_xx-small" style={{ fontSize: '10px' }}>Data Space</p>
@@ -1050,7 +1053,7 @@ export default function DataStreamsContent({ demoSession, currentTimeline }: Dat
                         </button>
                       </div>
                     ) : (
-                      /* Empty state (Image 3) — no datakit installed */
+                      /* Empty state — no fields yet */
                       <div className="slds-text-center slds-p-vertical_large">
                         <div className="slds-border-radius_pill slds-bg-neutral-2 slds-flex slds-items-center slds-justify-center slds-m-bottom_medium" style={{ width: '64px', height: '64px', margin: '0 auto 16px' }}>
                           <svg viewBox="0 0 24 24" className="slds-text-neutral-7 slds-opacity_50" style={{ width: '32px', height: '32px' }} fill="none" stroke="currentColor" strokeWidth="1.5">
@@ -1061,7 +1064,7 @@ export default function DataStreamsContent({ demoSession, currentTimeline }: Dat
                         </div>
                         <h4 className="slds-text-size_medium slds-font-weight_semibold slds-text-neutral-base slds-m-bottom_xx-small">No Data Mapping Available</h4>
                         <p className="slds-text-size_small slds-text-neutral-7 slds-leading-relaxed">
-                          Install a Data Kit from Identity Resolution to enable field mapping for this data stream.
+                          Stream is pending first refresh. Mapping will be available once data is ingested.
                         </p>
                       </div>
                     )}
