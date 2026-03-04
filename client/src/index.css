@@ -474,10 +474,11 @@
    Layout root + body + main
    ========================================== */
 .sf-layout-root {
-  min-height: 100vh;
+  height: 100vh;
   display: flex;
   flex-direction: column;
   background: var(--slds-g-color-neutral-2);
+  overflow: hidden;
 }
 
 .sf-layout-body {
