@@ -66,11 +66,11 @@ interface UrlState {
 
 function parseUrl(pathname: string): UrlState {
   const parts = pathname.replace(/^\/+|\/+$/g, '').split('/').filter(Boolean);
-  if (parts.length === 0) return { tab: 'Data Streams' };
+  if (parts.length === 0) return { tab: 'Home' };
 
   const firstSlug = parts[0];
   const tab = slugToTab[firstSlug];
-  if (!tab) return { tab: 'Data Streams' };
+  if (!tab) return { tab: 'Home' };
 
   // IR sub-routes: /identity-resolutions/:rulesetSlug/:detailTab
   if (firstSlug === 'identity-resolutions' && parts.length >= 2) {
@@ -229,7 +229,7 @@ export default function Layout({ children }: LayoutProps) {
       navigateTo('Google Drive');
     } else if (appId === 'data-cloud') {
       setCurrentTimeline('today');
-      navigateTo('Data Streams');
+      navigateTo('Home');
     } else {
       setCurrentTimeline('today');
       navigateTo('Home');
