@@ -1046,107 +1046,28 @@ export default function IdentityResolutionContent({ demoSession, onDemoSessionCh
                   </span>
                 </div>
                 <div className="sf-card-body">
-                  {byomMappingPopulated ? (
-                    <>
-                      {/* Populated mapping status */}
-                      <div className="slds-flex slds-items-center slds-justify-between slds-m-bottom_medium">
-                        <div className="slds-flex slds-items-center slds-gap_x-small">
+                  <div className="slds-flex slds-items-center slds-justify-between">
+                    <div className="slds-flex slds-items-center slds-gap_x-small">
+                      {byomMappingPopulated ? (
+                        <>
                           <CheckCircle2 className="slds-icon-size_default slds-text-success" />
                           <p className="slds-text-size_medium slds-text-neutral-9">
-                            <span className="sf-link slds-font-weight_medium">Your Mapping</span> is complete. 3rd party rules active.
+                            <span className="slds-font-weight_medium">MDM mapping complete.</span> 3rd party rules active.
                           </p>
-                        </div>
-                        <button className="slds-p-horizontal_medium slds-text-size_small slds-font-weight_medium slds-border_all slds-border-color_border-1 slds-border-radius_small slds-hover-bg-neutral-2 slds-text-neutral-9" style={{ paddingTop: '6px', paddingBottom: '6px' }}>
-                          Convert to Regular IR
-                        </button>
-                      </div>
-
-                      {/* Populated mapping canvas — all connected */}
-                      <div className="slds-border_all slds-border-color_border-1 slds-border-radius_large slds-p-around_medium" style={{ backgroundColor: '#FAFAF9' }}>
-                        <div className="slds-flex slds-items-start slds-pos-relative" style={{ gap: 0 }}>
-                          {/* Source fields column */}
-                          <div className="slds-flex-shrink-0" style={{ width: '200px' }}>
-                            <div className="slds-text-uppercase slds-tracking-wide slds-text-neutral-7 slds-font-weight_medium slds-m-bottom_x-small slds-p-horizontal_x-small" style={{ fontSize: '10px' }}>Source Fields</div>
-                            {['First Name', 'Last Name', 'Email', 'Phone', 'Address Line 1', 'City', 'State', 'Postal Code'].map((f) => (
-                              <div key={f} className="slds-flex slds-items-center slds-gap_x-small slds-p-horizontal_x-small slds-text-size_small slds-text-neutral-base slds-border_bottom slds-border-color_border-1" style={{ paddingTop: '6px', paddingBottom: '6px' }}>
-                                <div className="slds-border-radius_pill slds-bg-success" style={{ width: '8px', height: '8px' }} />
-                                {f}
-                              </div>
-                            ))}
-                          </div>
-
-                          {/* Center — SVG connection lines */}
-                          <div className="slds-flex-1 slds-pos-relative" style={{ minHeight: '220px' }}>
-                            <svg className="slds-w-full slds-h-full slds-pos-absolute slds-inset-0" viewBox="0 0 200 260" preserveAspectRatio="none">
-                              {[0,1,2,3,4,5,6,7].map((i) => {
-                                const y = 30 + i * 29;
-                                return <line key={i} x1="0" y1={y} x2="200" y2={y} stroke="#4BC076" strokeWidth="1.5" strokeDasharray="4 2" opacity="0.6" />;
-                              })}
-                            </svg>
-                          </div>
-
-                          {/* Target DMO column */}
-                          <div className="slds-flex-shrink-0" style={{ width: '200px' }}>
-                            <div className="slds-text-uppercase slds-tracking-wide slds-text-neutral-7 slds-font-weight_medium slds-m-bottom_x-small slds-p-horizontal_x-small" style={{ fontSize: '10px' }}>Target DMO</div>
-                            {['ssot__FirstName__c', 'ssot__LastName__c', 'ssot__Email__c', 'ssot__Phone__c', 'ssot__Street__c', 'ssot__City__c', 'ssot__State__c', 'ssot__PostalCode__c'].map((f) => (
-                              <div key={f} className="slds-flex slds-items-center slds-justify-end slds-gap_x-small slds-p-horizontal_x-small slds-text-size_small slds-text-neutral-base slds-border_bottom slds-border-color_border-1" style={{ paddingTop: '6px', paddingBottom: '6px' }}>
-                                {f}
-                                <div className="slds-border-radius_pill slds-bg-success" style={{ width: '8px', height: '8px' }} />
-                              </div>
-                            ))}
-                          </div>
-                        </div>
-                      </div>
-                    </>
-                  ) : (
-                    <>
-                      {/* Empty mapping status */}
-                      <div className="slds-flex slds-items-center slds-justify-between slds-m-bottom_medium">
-                        <div className="slds-flex slds-items-center slds-gap_x-small">
+                        </>
+                      ) : (
+                        <>
                           <AlertTriangle className="slds-icon-size_default slds-text-warning" />
                           <p className="slds-text-size_medium slds-text-neutral-9">
-                            <span className="slds-font-weight_medium">No mappings configured.</span> Map source fields to target DMOs to activate identity resolution.
+                            <span className="slds-font-weight_medium">No mappings configured.</span> Install a datakit to activate.
                           </p>
-                        </div>
-                        <button className="slds-p-horizontal_medium slds-text-size_small slds-font-weight_medium slds-text-white slds-bg-brand slds-border-radius_small" style={{ paddingTop: '6px', paddingBottom: '6px' }}>
-                          Start Mapping
-                        </button>
-                      </div>
-
-                      {/* Empty mapping canvas */}
-                      <div className="slds-border_all slds-border-color_border-1 slds-border-radius_large slds-p-around_medium" style={{ backgroundColor: '#FAFAF9' }}>
-                        <div className="slds-flex slds-items-start" style={{ gap: 0 }}>
-                          <div className="slds-flex-shrink-0" style={{ width: '200px' }}>
-                            <div className="slds-text-uppercase slds-tracking-wide slds-text-neutral-7 slds-font-weight_medium slds-m-bottom_x-small slds-p-horizontal_x-small" style={{ fontSize: '10px' }}>Source Fields</div>
-                            {['First Name', 'Last Name', 'Email', 'Phone', 'Address Line 1', 'City', 'State', 'Postal Code'].map((f) => (
-                              <div key={f} className="slds-flex slds-items-center slds-gap_x-small slds-p-horizontal_x-small slds-text-size_small slds-text-neutral-9 slds-border_bottom slds-border-color_border-1" style={{ paddingTop: '6px', paddingBottom: '6px' }}>
-                                <div className="slds-border-radius_pill" style={{ width: '8px', height: '8px', backgroundColor: '#D8DDE6' }} />
-                                {f}
-                              </div>
-                            ))}
-                          </div>
-                          <div className="slds-flex-1 slds-flex slds-items-center slds-justify-center" style={{ minHeight: '220px' }}>
-                            <div className="slds-text-center">
-                              <div className="slds-border-radius_pill slds-flex slds-items-center slds-justify-center slds-m-bottom_x-small" style={{ width: '48px', height: '48px', margin: '0 auto 8px', backgroundColor: 'var(--slds-g-color-border-2)' }}>
-                                <ArrowRight className="slds-icon-size_default" style={{ color: '#B0B0B0' }} />
-                              </div>
-                              <p className="slds-text-size_small slds-text-neutral-7">No connections</p>
-                              <p className="slds-text-neutral-7 slds-m-top_xx-small" style={{ fontSize: '10px' }}>Drag fields to create mappings</p>
-                            </div>
-                          </div>
-                          <div className="slds-flex-shrink-0" style={{ width: '200px' }}>
-                            <div className="slds-text-uppercase slds-tracking-wide slds-text-neutral-7 slds-font-weight_medium slds-m-bottom_x-small slds-p-horizontal_x-small" style={{ fontSize: '10px' }}>Target DMO</div>
-                            {['ssot__FirstName__c', 'ssot__LastName__c', 'ssot__Email__c', 'ssot__Phone__c', 'ssot__Street__c', 'ssot__City__c', 'ssot__State__c', 'ssot__PostalCode__c'].map((f) => (
-                              <div key={f} className="slds-flex slds-items-center slds-justify-end slds-gap_x-small slds-p-horizontal_x-small slds-text-size_small slds-text-neutral-9 slds-border_bottom slds-border-color_border-1" style={{ paddingTop: '6px', paddingBottom: '6px' }}>
-                                {f}
-                                <div className="slds-border-radius_pill" style={{ width: '8px', height: '8px', backgroundColor: '#D8DDE6' }} />
-                              </div>
-                            ))}
-                          </div>
-                        </div>
-                      </div>
-                    </>
-                  )}
+                        </>
+                      )}
+                    </div>
+                    <button className="slds-p-horizontal_medium slds-text-size_small slds-font-weight_medium slds-border_all slds-border-color_border-1 slds-border-radius_small slds-hover-bg-neutral-2 slds-text-neutral-9" style={{ paddingTop: '6px', paddingBottom: '6px' }}>
+                      Merge with Records
+                    </button>
+                  </div>
 
                   {/* Collapsible Details */}
                   <div className="slds-border_top slds-border-color_border-1 slds-p-top_small slds-m-top_medium">
@@ -2441,8 +2362,8 @@ export default function IdentityResolutionContent({ demoSession, onDemoSessionCh
                   </thead>
                   <tbody>
                     {sessionRulesets.map((rs) => (
-                      <tr key={rs.id}>
-                        <td><button onClick={() => { selectRuleset(rs); changeDetailTab('details'); }} className="sf-link slds-font-weight_medium">{rs.rulesetName}</button></td>
+                      <tr key={rs.id} className="slds-cursor-pointer sf-hover-bg-neutral" onClick={() => { selectRuleset(rs); changeDetailTab('properties'); }}>
+                        <td><span className="sf-link slds-font-weight_medium">{rs.rulesetName}</span></td>
                         <td>{rs.rulesetId}</td>
                         <td>{rs.dataSpace}</td>
                         <td>{rs.primaryDataModelObject}</td>
@@ -2486,8 +2407,8 @@ export default function IdentityResolutionContent({ demoSession, onDemoSessionCh
               </thead>
               <tbody>
                 {rulesets.map((rs) => (
-                  <tr key={rs.id}>
-                    <td><button onClick={() => { selectRuleset(rs); changeDetailTab('details'); }} className="sf-link slds-font-weight_medium">{rs.rulesetName}</button></td>
+                  <tr key={rs.id} className="slds-cursor-pointer sf-hover-bg-neutral" onClick={() => { selectRuleset(rs); changeDetailTab('properties'); }}>
+                    <td><span className="sf-link slds-font-weight_medium">{rs.rulesetName}</span></td>
                     <td>{rs.rulesetId}</td>
                     <td>{rs.dataSpace}</td>
                     <td>{rs.primaryDataModelObject}</td>
