@@ -74,8 +74,8 @@ export default function LeftNav({
   // Do any groups use section-header icons? (modern Data Cloud style)
   const useSectionHeaders = groups.some((g) => !!g.icon);
 
-  // Collapsible sections — only first section expanded by default
-  const [expandedSections, setExpandedSections] = useState<Set<number>>(() => new Set([0]));
+  // Collapsible sections — Home (0) and Connect & Unify (1) expanded by default
+  const [expandedSections, setExpandedSections] = useState<Set<number>>(() => new Set([0, 1]));
 
   const toggleSection = (idx: number) => {
     setExpandedSections((prev) => {
