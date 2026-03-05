@@ -1309,38 +1309,34 @@ export default function DataStreamsContent({ demoSession, currentTimeline }: Dat
                             </button>
                           );
                         })()}
-                      </div>
 
-                      {/* Informatica MDM — extra row, only when connected */}
-                      {hasInformaticaConn && (
-                        <div className="slds-css-grid slds-css-grid-cols-3 slds-gap_medium slds-m-top_medium">
-                          {(() => {
-                            const isSelected = selectedSource === 'informatica';
-                            return (
-                              <button
-                                onClick={() => setSelectedSource('informatica')}
-                                className={`slds-pos-relative slds-flex slds-flex-col slds-items-center slds-text-center slds-border-radius_large slds-p-around_large slds-transition-all ${
-                                  isSelected ? 'slds-border-color_brand slds-shadow_small' : 'slds-bg-white'
-                                }`}
-                                style={{ border: isSelected ? '2px solid var(--slds-g-color-brand-1)' : '2px solid #D8DDE6', backgroundColor: isSelected ? '#EEF4FF' : undefined }}
-                              >
-                                {isSelected && (
-                                  <div className="slds-pos-absolute slds-bg-brand slds-flex slds-items-center slds-justify-center" style={{ top: 0, right: 0, width: '24px', height: '24px', clipPath: 'polygon(0 0, 100% 0, 100% 100%)' }}>
-                                    <Check className="slds-text-white slds-pos-absolute" style={{ width: '10px', height: '10px', top: '2px', right: '2px' }} />
-                                  </div>
-                                )}
-                                <div className="slds-border-radius_small slds-flex slds-items-center slds-justify-center slds-m-bottom_small" style={{ width: '56px', height: '56px', backgroundColor: '#FF4A00' }}>
-                                  <svg viewBox="0 0 40 40" style={{ width: '36px', height: '36px' }}>
-                                    <text x="20" y="26" textAnchor="middle" fill="white" fontSize="12" fontWeight="bold">INFA</text>
-                                  </svg>
+                        {/* Informatica MDM — always shown in 264 Release */}
+                        {is264Release && (() => {
+                          const isSelected = selectedSource === 'informatica';
+                          return (
+                            <button
+                              onClick={() => setSelectedSource('informatica')}
+                              className={`slds-pos-relative slds-flex slds-flex-col slds-items-center slds-text-center slds-border-radius_large slds-p-around_large slds-transition-all ${
+                                isSelected ? 'slds-border-color_brand slds-shadow_small' : 'slds-bg-white'
+                              }`}
+                              style={{ border: isSelected ? '2px solid var(--slds-g-color-brand-1)' : '2px solid #D8DDE6', backgroundColor: isSelected ? '#EEF4FF' : undefined }}
+                            >
+                              {isSelected && (
+                                <div className="slds-pos-absolute slds-bg-brand slds-flex slds-items-center slds-justify-center" style={{ top: 0, right: 0, width: '24px', height: '24px', clipPath: 'polygon(0 0, 100% 0, 100% 100%)' }}>
+                                  <Check className="slds-text-white slds-pos-absolute" style={{ width: '10px', height: '10px', top: '2px', right: '2px' }} />
                                 </div>
-                                <div className="slds-text-size_medium slds-font-weight_semibold slds-text-neutral-base">Informatica MDM</div>
-                                <div className="slds-text-size_small slds-text-neutral-7 slds-m-top_xx-small">Ingest master data entities from Informatica MDM</div>
-                              </button>
-                            );
-                          })()}
-                        </div>
-                      )}
+                              )}
+                              <div className="slds-border-radius_small slds-flex slds-items-center slds-justify-center slds-m-bottom_small" style={{ width: '56px', height: '56px', backgroundColor: '#FF4A00' }}>
+                                <svg viewBox="0 0 40 40" style={{ width: '36px', height: '36px' }}>
+                                  <text x="20" y="26" textAnchor="middle" fill="white" fontSize="12" fontWeight="bold">INFA</text>
+                                </svg>
+                              </div>
+                              <div className="slds-text-size_medium slds-font-weight_semibold slds-text-neutral-base">Informatica MDM</div>
+                              <div className="slds-text-size_small slds-text-neutral-7 slds-m-top_xx-small">Ingest master data entities from Informatica MDM</div>
+                            </button>
+                          );
+                        })()}
+                      </div>
                     </div>
 
                     {/* ─── Other Sources ─── */}
