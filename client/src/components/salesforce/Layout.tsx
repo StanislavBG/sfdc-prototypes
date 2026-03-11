@@ -58,7 +58,20 @@ const irSlugToTab: Record<string, string> = {
   'processing-history': 'history',
 };
 
+// Timeline URL slug mappings
+const timelineToSlug: Record<string, string> = {
+  'today': 'today',
+  '264-release': '264',
+  'context-explorer': 'context-explorer',
+};
+const slugToTimeline: Record<string, string> = {
+  'today': 'today',
+  '264': '264-release',
+  'context-explorer': 'context-explorer',
+};
+
 interface UrlState {
+  timeline: string;
   tab: string;
   irRulesetSlug?: string;
   irDetailTab?: string;
@@ -66,33 +79,58 @@ interface UrlState {
 
 function parseUrl(pathname: string): UrlState {
   const parts = pathname.replace(/^\/+|\/+$/g, '').split('/').filter(Boolean);
-  if (parts.length === 0) return { tab: 'Home' };
+  if (parts.length === 0) return { timeline: 'today', tab: 'Home' };
 
-  const firstSlug = parts[0];
-  const tab = slugToTab[firstSlug];
-  if (!tab) return { tab: 'Home' };
+  // First segment is timeline prefix
+  const timelineSlug = parts[0];
+  const timeline = slugToTimeline[timelineSlug];
 
-  // IR sub-routes: /identity-resolutions/:rulesetSlug/:detailTab
-  if (firstSlug === 'identity-resolutions' && parts.length >= 2) {
-    const rulesetSlug = parts[1];
-    const detailTabSlug = parts[2] || 'properties';
+  if (!timeline) {
+    // Legacy URL without timeline prefix — treat first segment as tab slug
+    const tab = slugToTab[timelineSlug];
+    if (!tab) return { timeline: 'today', tab: 'Home' };
+
+    if (timelineSlug === 'identity-resolutions' && parts.length >= 2) {
+      return {
+        timeline: 'today',
+        tab: 'Identity Resolutions',
+        irRulesetSlug: parts[1],
+        irDetailTab: irSlugToTab[parts[2] || 'properties'] || 'properties',
+      };
+    }
+    return { timeline: 'today', tab };
+  }
+
+  // Second segment is tab slug
+  const tabSlug = parts[1];
+  if (!tabSlug) return { timeline, tab: 'Home' };
+
+  const tab = slugToTab[tabSlug];
+  if (!tab) return { timeline, tab: 'Home' };
+
+  // IR sub-routes: /{timeline}/identity-resolutions/:rulesetSlug/:detailTab
+  if (tabSlug === 'identity-resolutions' && parts.length >= 3) {
+    const rulesetSlug = parts[2];
+    const detailTabSlug = parts[3] || 'properties';
     return {
+      timeline,
       tab: 'Identity Resolutions',
       irRulesetSlug: rulesetSlug,
       irDetailTab: irSlugToTab[detailTabSlug] || 'properties',
     };
   }
 
-  return { tab };
+  return { timeline, tab };
 }
 
-function buildUrl(tab: string, irRulesetSlug?: string, irDetailTab?: string): string {
+function buildUrl(timeline: string, tab: string, irRulesetSlug?: string, irDetailTab?: string): string {
+  const tSlug = timelineToSlug[timeline] || 'today';
   const slug = tabToSlug[tab] || toSlug(tab);
   if (tab === 'Identity Resolutions' && irRulesetSlug) {
     const dtSlug = irDetailTab ? (irTabSlugs[irDetailTab] || irDetailTab) : 'properties';
-    return `/${slug}/${irRulesetSlug}/${dtSlug}`;
+    return `/${tSlug}/${slug}/${irRulesetSlug}/${dtSlug}`;
   }
-  return `/${slug}`;
+  return `/${tSlug}/${slug}`;
 }
 
 // ── Demo Session State ─────────────────────────────────────────────
@@ -111,8 +149,8 @@ interface LayoutProps {
 }
 
 // ── URL Breadcrumb ─────────────────────────────────────────────────
-function UrlBreadcrumb({ tab, rulesetSlug, detailTab }: { tab: string; rulesetSlug?: string; detailTab?: string }) {
-  const url = buildUrl(tab, rulesetSlug, detailTab);
+function UrlBreadcrumb({ timeline, tab, rulesetSlug, detailTab }: { timeline: string; tab: string; rulesetSlug?: string; detailTab?: string }) {
+  const url = buildUrl(timeline, tab, rulesetSlug, detailTab);
   const segments = url.replace(/^\//, '').split('/').filter(Boolean);
   return (
     <div className="sf-url-breadcrumb">
@@ -135,7 +173,7 @@ export default function Layout({ children }: LayoutProps) {
 
   const [activeWorkflow, setActiveWorkflow] = useState<Workflow | null>(null);
   const [timeMachineOpen, setTimeMachineOpen] = useState(false);
-  const [currentTimeline, setCurrentTimeline] = useState('today');
+  const [currentTimeline, setCurrentTimeline] = useState(initialUrl.timeline);
   const [activeTab, setActiveTab] = useState(initialUrl.tab);
   const [agentMinimized, setAgentMinimized] = useState(false);
   const [currentApp, setCurrentApp] = useState('data-cloud');
@@ -170,17 +208,18 @@ export default function Layout({ children }: LayoutProps) {
       suppressUrlPush.current = false;
       return;
     }
-    const url = buildUrl(activeTab, irRulesetSlug, irDetailTab);
+    const url = buildUrl(currentTimeline, activeTab, irRulesetSlug, irDetailTab);
     if (window.location.pathname !== url) {
-      window.history.pushState({ tab: activeTab, irRulesetSlug, irDetailTab }, '', url);
+      window.history.pushState({ timeline: currentTimeline, tab: activeTab, irRulesetSlug, irDetailTab }, '', url);
     }
-  }, [activeTab, irRulesetSlug, irDetailTab]);
+  }, [currentTimeline, activeTab, irRulesetSlug, irDetailTab]);
 
   // Handle browser back / forward
   useEffect(() => {
     const onPopState = () => {
       const parsed = parseUrl(window.location.pathname);
       suppressUrlPush.current = true;
+      setCurrentTimeline(parsed.timeline);
       setActiveTab(parsed.tab);
       setIrRulesetSlug(parsed.irRulesetSlug);
       setIrDetailTab(parsed.irDetailTab);
@@ -366,7 +405,7 @@ export default function Layout({ children }: LayoutProps) {
           />
           <main ref={mainRef} className="sf-layout-main">
             {/* URL breadcrumb bar */}
-            <UrlBreadcrumb tab={activeTab} rulesetSlug={irRulesetSlug} detailTab={irDetailTab} />
+            <UrlBreadcrumb timeline={currentTimeline} tab={activeTab} rulesetSlug={irRulesetSlug} detailTab={irDetailTab} />
             {children || (
               activeTab === 'Home' ? (
                 <HomeContent />
