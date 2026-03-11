@@ -449,7 +449,13 @@ export default function DataStreamsContent({ demoSession, currentTimeline }: Dat
   const [dataSpaceDropdownOpen, setDataSpaceDropdownOpen] = useState(false);
 
   // Informatica bundle selection — tenant comes from session connections
-  const sessionTenants = demoSession?.informaticaConnections.map((c) => c.alias) || [];
+  // In 264-release, provide a default tenant if none configured via Data Cloud Setup
+  const sessionTenants = (() => {
+    const fromSession = demoSession?.informaticaConnections.map((c) => c.alias) || [];
+    if (fromSession.length > 0) return fromSession;
+    if (is264Release) return ['INFA_Prod'];
+    return [];
+  })();
   const [selectedTenant, setSelectedTenant] = useState(() => sessionTenants[0] || '');
   const [selectedBundles, setSelectedBundles] = useState<Set<string>>(new Set());
 
@@ -1198,7 +1204,7 @@ export default function DataStreamsContent({ demoSession, currentTimeline }: Dat
       {newModalOpen && (
         <div className="slds-pos-fixed slds-inset-0 slds-z-50 slds-flex slds-items-center slds-justify-center">
           <div className="slds-pos-absolute slds-inset-0 sf-overlay" onClick={() => setNewModalOpen(false)} />
-          <div className={`slds-pos-relative slds-bg-white slds-border-radius_large slds-shadow_large slds-flex slds-flex-col slds-transition-all`} style={{ maxHeight: '90vh', width: newModalStep === 1 || newModalStep === 2 ? '900px' : newModalStep === 4 ? '960px' : '640px' }}>
+          <div onClick={(e) => e.stopPropagation()} className={`slds-pos-relative slds-bg-white slds-border-radius_large slds-shadow_large slds-flex slds-flex-col slds-transition-all`} style={{ maxHeight: '90vh', width: newModalStep === 1 || newModalStep === 2 ? '900px' : newModalStep === 4 ? '960px' : '640px' }}>
             {/* Header */}
             <div className="slds-flex slds-items-center slds-justify-between slds-p-horizontal_large slds-p-vertical_medium slds-border_bottom slds-border-color_border-1">
               <div>
