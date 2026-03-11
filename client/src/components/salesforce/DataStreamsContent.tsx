@@ -81,7 +81,7 @@ const informaticaBundles: InformaticaBundleExt[] = [
     id: 'ib-1', name: 'Customer 360', description: 'Customer master data including demographics, preferences, and relationships', objectCount: 12, installed: false,
     type: 'MDM Business Entity Bundle',
     entities: [
-      { name: 'Person', fieldCount: 24 }, { name: 'Organization', fieldCount: 18 }, { name: 'Address', fieldCount: 14 },
+      { name: 'Individual', fieldCount: 24 }, { name: 'Cross Reference DLO', fieldCount: 0 }, { name: 'Address', fieldCount: 14 },
       { name: 'Phone', fieldCount: 8 }, { name: 'Email', fieldCount: 6 }, { name: 'Loyalty', fieldCount: 10 },
       { name: 'AlternateId', fieldCount: 5 }, { name: 'Relationship', fieldCount: 7 }, { name: 'Household', fieldCount: 9 },
       { name: 'SocialProfile', fieldCount: 6 }, { name: 'Consent', fieldCount: 8 }, { name: 'CustomerAccount', fieldCount: 12 },
@@ -116,10 +116,10 @@ const informaticaBundles: InformaticaBundleExt[] = [
     ],
   },
   {
-    id: 'ib-5', name: 'Organization 360', description: 'Organization hierarchy, departments, and cost centers', objectCount: 9, installed: false,
+    id: 'ib-5', name: 'Organization 360', description: 'Organization hierarchy, departments, and cost centers', objectCount: 10, installed: false,
     type: 'MDM Business Entity Bundle',
     entities: [
-      { name: 'Organization', fieldCount: 18 }, { name: 'Department', fieldCount: 10 }, { name: 'CostCenter', fieldCount: 8 },
+      { name: 'Organization', fieldCount: 18 }, { name: 'Cross Reference DLO', fieldCount: 0 }, { name: 'Department', fieldCount: 10 }, { name: 'CostCenter', fieldCount: 8 },
       { name: 'BusinessUnit', fieldCount: 7 }, { name: 'Division', fieldCount: 6 }, { name: 'LegalEntity', fieldCount: 12 },
       { name: 'OrgHierarchy', fieldCount: 5 }, { name: 'OrgRelationship', fieldCount: 6 }, { name: 'Location', fieldCount: 14 },
     ],
@@ -453,7 +453,7 @@ export default function DataStreamsContent({ demoSession, currentTimeline }: Dat
   const sessionTenants = (() => {
     const fromSession = demoSession?.informaticaConnections.map((c) => c.alias) || [];
     if (fromSession.length > 0) return fromSession;
-    if (is264Release) return ['INFA_Prod'];
+    if (is264Release) return ['INFA_MDM_01'];
     return [];
   })();
   const [selectedTenant, setSelectedTenant] = useState(() => sessionTenants[0] || '');
@@ -1070,7 +1070,9 @@ export default function DataStreamsContent({ demoSession, currentTimeline }: Dat
                         </div>
                         <h4 className="slds-text-size_medium slds-font-weight_semibold slds-text-neutral-base slds-m-bottom_xx-small">No Data Mapping Available</h4>
                         <p className="slds-text-size_small slds-text-neutral-7 slds-leading-relaxed">
-                          Stream is pending first refresh. Mapping will be available once data is ingested.
+                          {selectedStream.name.includes('Cross Reference DLO')
+                            ? 'Cross Reference DLO mappings will be available once an Identity Resolution process is created.'
+                            : 'Stream is pending first refresh. Mapping will be available once data is ingested.'}
                         </p>
                       </div>
                     )}
