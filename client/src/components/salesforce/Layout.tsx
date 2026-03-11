@@ -202,6 +202,19 @@ export default function Layout({ children }: LayoutProps) {
   const appName = currentAppData?.name || 'Data 360';
 
   // ── URL ↔ State sync ──────────────────────────────────────────────
+  // On mount, ensure the URL includes the timeline prefix (replace, not push)
+  const didInitialRewrite = useRef(false);
+
+  useEffect(() => {
+    if (!didInitialRewrite.current) {
+      didInitialRewrite.current = true;
+      const correctUrl = buildUrl(currentTimeline, activeTab, irRulesetSlug, irDetailTab);
+      if (window.location.pathname !== correctUrl) {
+        window.history.replaceState({ timeline: currentTimeline, tab: activeTab, irRulesetSlug, irDetailTab }, '', correctUrl);
+      }
+    }
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
   // Push URL when navigation state changes
   useEffect(() => {
     if (suppressUrlPush.current) {
