@@ -8,6 +8,7 @@ import GoogleDriveContent from './GoogleDriveContent';
 import SemanticSearchContent from './SemanticSearchContent';
 import IdentityResolutionContent from './IdentityResolutionContent';
 import DataStreamsContent from './DataStreamsContent';
+import DataModelContent from './DataModelContent';
 import DataCloudSetupContent from './DataCloudSetupContent';
 import WorkflowSidebar from './WorkflowSidebar';
 import WorkflowArea from './WorkflowArea';
@@ -430,6 +431,8 @@ export default function Layout({ children }: LayoutProps) {
                 <IdentityResolutionContent demoSession={demoSession} onDemoSessionChange={setDemoSession} currentTimeline={currentTimeline} initialRulesetSlug={irRulesetSlug} initialDetailTab={irDetailTab} onNavigate={handleIrNavigate} />
               ) : activeTab === 'Data Streams' ? (
                 <DataStreamsContent demoSession={demoSession} currentTimeline={currentTimeline} />
+              ) : activeTab === 'Data Model' ? (
+                <DataModelContent />
               ) : (
                 <div className="slds-p-around_large">
                   <div className="sf-card">
