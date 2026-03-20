@@ -79,7 +79,7 @@ interface UrlState {
 
 function parseUrl(pathname: string): UrlState {
   const parts = pathname.replace(/^\/+|\/+$/g, '').split('/').filter(Boolean);
-  if (parts.length === 0) return { timeline: 'today', tab: 'Home' };
+  if (parts.length === 0) return { timeline: '264-release', tab: 'Home' };
 
   // First segment is timeline prefix
   const timelineSlug = parts[0];
@@ -88,17 +88,17 @@ function parseUrl(pathname: string): UrlState {
   if (!timeline) {
     // Legacy URL without timeline prefix — treat first segment as tab slug
     const tab = slugToTab[timelineSlug];
-    if (!tab) return { timeline: 'today', tab: 'Home' };
+    if (!tab) return { timeline: '264-release', tab: 'Home' };
 
     if (timelineSlug === 'identity-resolutions' && parts.length >= 2) {
       return {
-        timeline: 'today',
+        timeline: '264-release',
         tab: 'Identity Resolutions',
         irRulesetSlug: parts[1],
         irDetailTab: irSlugToTab[parts[2] || 'properties'] || 'properties',
       };
     }
-    return { timeline: 'today', tab };
+    return { timeline: '264-release', tab };
   }
 
   // Second segment is tab slug
