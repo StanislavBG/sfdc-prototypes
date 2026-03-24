@@ -15,6 +15,8 @@ import {
   Filter,
   CheckCircle2,
   Edit3,
+  Link2,
+  Trash2,
   ExternalLink,
   Upload,
   Server,
@@ -707,38 +709,71 @@ export default function DataStreamsContent({ demoSession, currentTimeline }: Dat
   const [detailTab, setDetailTab] = useState<'fields' | 'details' | 'refresh-history'>('fields');
 
   // ──────────────────────────────────────────────────────────────────
-  // VISUAL MAPPING REVIEW SCREEN (Image 4)
+  // VISUAL MAPPING REVIEW SCREEN — Data Cloud-style mapping experience
   // ──────────────────────────────────────────────────────────────────
   if (selectedStream && reviewFieldId !== null) {
     const allFields = selectedStream.fields || [];
     const objectName = selectedStream.object;
+    const streamName = selectedStream.name;
     // Group target fields by DMO for the right side
     const dmoGroups: Record<string, StreamField[]> = {};
     allFields.forEach((f) => { (dmoGroups[f.targetDMO] = dmoGroups[f.targetDMO] || []).push(f); });
-    const autoMappedCount = allFields.filter((f) => f.mappingStatus === 'Auto-Mapped').length;
+    const firstDmoName = Object.keys(dmoGroups)[0] || objectName;
+    // Flatten target fields for connection drawing
+    const targetFieldsFlat: StreamField[] = [];
+    Object.values(dmoGroups).forEach((fields) => targetFieldsFlat.push(...fields));
+
+    // Type icon for field data type
+    const typeIcon = (dt: string) => {
+      if (dt.includes('Date') || dt.includes('Time')) return '\uD83D\uDCC5'; // calendar
+      if (dt.includes('Bool')) return '\u2714'; // checkmark
+      if (dt.includes('Float') || dt.includes('Number') || dt.includes('Currency')) return '#';
+      return 'Aa';
+    };
+
+    // Row height for connection computation
+    const ROW_H = 36;
+    const HEADER_H = 72; // header area offset before fields start
 
     return (
-      <div className="slds-h-full slds-flex slds-flex-col slds-bg-neutral-2">
-        {/* Breadcrumb header */}
-        <div className="slds-bg-white slds-border_bottom slds-border-color_border-1 slds-p-horizontal_large slds-p-vertical_small slds-flex slds-items-center slds-gap_x-small">
-          <button onClick={() => setReviewFieldId(null)} className="slds-flex slds-items-center slds-gap_xx-small slds-text-size_medium slds-text-brand sf-hover-underline">
-            <ArrowLeft className="slds-icon-size_small" />
-            {selectedStream.name}
-          </button>
-          <ChevronRight className="slds-icon-size_xx-small slds-text-neutral-7" />
-          <span className="slds-text-size_medium slds-font-weight_medium slds-text-neutral-base">Field Mapping</span>
+      <div className="slds-h-full slds-flex slds-flex-col" style={{ backgroundColor: '#F3F3F3' }}>
+        {/* Top header bar — Data Cloud mapping style */}
+        <div className="slds-bg-white slds-border_bottom slds-border-color_border-1 slds-p-horizontal_large slds-flex slds-items-center slds-justify-between" style={{ minHeight: '56px' }}>
+          <div className="slds-flex slds-items-center slds-gap_medium">
+            <div className="slds-flex slds-items-center slds-gap_x-small">
+              <div className="slds-border-radius_small slds-flex slds-items-center slds-justify-center slds-flex-shrink-0" style={{ width: '28px', height: '28px', backgroundColor: '#FF5D2D' }}>
+                <svg viewBox="0 0 24 24" style={{ width: '16px', height: '16px' }}><text x="12" y="16" textAnchor="middle" fill="white" fontSize="9" fontWeight="bold">DL</text></svg>
+              </div>
+              <div>
+                <p className="slds-text-neutral-7" style={{ fontSize: '10px', lineHeight: 1 }}>Data Lake Objects</p>
+                <h2 className="slds-font-weight_bold slds-text-neutral-base" style={{ fontSize: '14px', lineHeight: 1.2 }}>{streamName} Mappings</h2>
+              </div>
+            </div>
+            <div className="slds-m-left_large">
+              <p className="slds-text-neutral-7 slds-font-weight_semibold" style={{ fontSize: '11px' }}>Data Space</p>
+              <p className="slds-text-size_small slds-text-neutral-base">{selectedStream.dataSpace}</p>
+            </div>
+          </div>
+          <div className="slds-flex slds-items-center slds-gap_small">
+            <button onClick={() => setReviewFieldId(null)} className="slds-p-horizontal_medium slds-p-vertical_x-small slds-text-size_small slds-font-weight_medium slds-text-neutral-9 slds-border_all slds-border-color_border-1 slds-border-radius_small sf-hover-bg-neutral">Close</button>
+            <button className="slds-p-horizontal_medium slds-p-vertical_x-small slds-text-size_small slds-font-weight_medium slds-text-neutral-9 slds-border_all slds-border-color_border-1 slds-border-radius_small sf-hover-bg-neutral">Save &amp; Close</button>
+            <button className="slds-p-horizontal_medium slds-p-vertical_x-small slds-text-size_small slds-font-weight_medium slds-text-white slds-bg-brand slds-border-radius_small">Save</button>
+          </div>
         </div>
 
-        {/* 3-panel layout */}
-        <div className="slds-flex-1 slds-overflow-hidden slds-flex">
-          {/* LEFT: Source Fields */}
-          <div className="slds-flex-shrink-0 slds-border_right slds-border-color_border-1 slds-bg-white slds-flex slds-flex-col" style={{ width: '360px' }}>
-            <div className="slds-p-horizontal_medium slds-p-vertical_small slds-border_bottom slds-border-color_border-1 slds-flex slds-items-center slds-gap_x-small">
-              <div className="slds-icon-size_large slds-border-radius_small slds-flex slds-items-center slds-justify-center slds-flex-shrink-0" style={{ backgroundColor: '#FF4A00' }}>
-                <svg viewBox="0 0 24 24" className="slds-icon-size_small"><text x="12" y="16" textAnchor="middle" fill="white" fontSize="8" fontWeight="bold">IN</text></svg>
-              </div>
-              <h3 className="slds-text-size_medium slds-font-weight_semibold slds-text-neutral-base">Source Fields</h3>
-              <span className="slds-text-size_small slds-text-neutral-7" style={{ marginLeft: 'auto' }}>{allFields.length} fields</span>
+        {/* 3-panel mapping layout */}
+        <div className="slds-flex-1 slds-overflow-hidden slds-flex" style={{ padding: '12px', gap: '0' }}>
+          {/* LEFT: Source Fields panel */}
+          <div className="slds-bg-white slds-border_all slds-border-color_border-1 slds-flex slds-flex-col" style={{ width: '300px', flexShrink: 0, borderRadius: '8px 0 0 8px' }}>
+            <div className="slds-p-horizontal_medium slds-p-vertical_small">
+              <h3 className="slds-font-weight_bold slds-text-neutral-base slds-text-size_medium slds-m-bottom_x-small">{streamName}</h3>
+              <input type="text" placeholder="Search Fields..." className="slds-w-full slds-p-horizontal_small slds-text-size_small slds-border_all slds-border-color_border-1 slds-border-radius_small" style={{ paddingTop: '5px', paddingBottom: '5px', outline: 'none' }} />
+            </div>
+            <div className="slds-p-horizontal_medium slds-p-vertical_xx-small slds-border_bottom slds-border-color_border-1">
+              <p className="slds-text-size_small slds-font-weight_semibold slds-text-neutral-base">{streamName}</p>
+            </div>
+            <div className="slds-border_bottom slds-border-color_border-1 slds-p-horizontal_medium" style={{ paddingTop: '6px', paddingBottom: '6px', borderLeft: '3px solid var(--slds-g-color-brand)' }}>
+              <span className="slds-text-size_small slds-font-weight_semibold slds-text-neutral-base">Is Mapped ({allFields.length})</span>
             </div>
             <div className="slds-flex-1 slds-overflow-y-auto">
               {allFields.map((field) => {
@@ -747,101 +782,108 @@ export default function DataStreamsContent({ demoSession, currentTimeline }: Dat
                   <button
                     key={field.id}
                     onClick={() => setReviewFieldId(field.id)}
-                    className={`slds-w-full slds-text-left slds-p-horizontal_medium slds-flex slds-items-center slds-gap_small slds-border_bottom slds-border-color_border-1 slds-transition-colors ${isActive ? '' : 'sf-hover-bg-neutral'}`}
-                    style={{ paddingTop: '10px', paddingBottom: '10px', ...(isActive ? { backgroundColor: '#FFF3ED' } : {}) }}
+                    className={`slds-w-full slds-text-left slds-flex slds-items-center slds-transition-colors ${isActive ? '' : 'sf-hover-bg-neutral'}`}
+                    style={{ paddingLeft: '16px', paddingRight: '8px', height: `${ROW_H}px`, ...(isActive ? { backgroundColor: '#EEF4FF' } : {}) }}
                   >
-                    <div className={`slds-border-radius_pill slds-flex-shrink-0 ${field.mappingStatus === 'Auto-Mapped' ? 'slds-bg-success' : ''}`} style={{ width: '8px', height: '8px', ...(field.mappingStatus === 'Unmapped' ? { backgroundColor: '#BA0517' } : field.mappingStatus !== 'Auto-Mapped' ? { backgroundColor: '#FFB75D' } : {}) }} />
-                    <div className="slds-flex-1 slds-min-w-0">
-                      <div className="slds-text-size_small slds-font-weight_medium slds-text-neutral-base slds-truncate" style={{ fontFamily: 'monospace' }}>{field.fieldName}</div>
-                      <div className="slds-text-neutral-7" style={{ fontSize: '10px' }}>{field.dataType}</div>
-                    </div>
-                    {field.mappingStatus === 'Auto-Mapped' && <Check className="slds-icon-size_x-small slds-text-success slds-flex-shrink-0" />}
+                    <span className="slds-flex-shrink-0 slds-text-neutral-7 slds-flex slds-items-center slds-justify-center" style={{ width: '20px', fontSize: '11px', fontFamily: 'monospace' }}>{typeIcon(field.dataType)}</span>
+                    <span className="slds-text-size_small slds-text-neutral-base slds-truncate slds-flex-1" style={{ marginLeft: '6px' }}>{field.fieldName}</span>
+                    {/* Connection dot on right edge */}
+                    <span className="slds-flex-shrink-0 slds-border-radius_pill" style={{ width: '8px', height: '8px', backgroundColor: '#706E6B', marginLeft: '4px' }} />
                   </button>
                 );
               })}
             </div>
           </div>
 
-          {/* CENTER: Connection lines */}
-          <div className="slds-flex-shrink-0 slds-flex slds-items-stretch slds-pos-relative" style={{ width: '120px', backgroundColor: '#F9F9F9' }}>
-            <svg className="slds-w-full slds-h-full" preserveAspectRatio="none" viewBox={`0 0 120 ${Math.max(allFields.length * 40, 400)}`}>
+          {/* CENTER: Connection lines with arrow nodes */}
+          <div className="slds-flex-1 slds-pos-relative" style={{ minWidth: '200px' }}>
+            <svg className="slds-w-full slds-h-full" style={{ overflow: 'visible' }}>
               {allFields.map((field, i) => {
-                const dmoKeys = Object.keys(dmoGroups);
-                let rightY = 0;
-                let found = false;
-                let offset = 0;
-                for (const dmo of dmoKeys) {
-                  offset += 44; // header
-                  for (const f of dmoGroups[dmo]) {
-                    if (f.id === field.id) {
-                      rightY = offset + 18;
-                      found = true;
-                      break;
-                    }
-                    offset += 40;
-                  }
-                  if (found) break;
-                  offset += 8;
-                }
-                if (!found) rightY = i * 40 + 60;
-                const leftY = i * 40 + 60;
+                // Find target index in flat list
+                const targetIdx = targetFieldsFlat.findIndex((f) => f.id === field.id);
+                const leftY = HEADER_H + i * ROW_H + ROW_H / 2;
+                const rightY = HEADER_H + (targetIdx >= 0 ? targetIdx : i) * ROW_H + ROW_H / 2;
                 const isActive = field.id === reviewFieldId;
-                const color = field.mappingStatus === 'Auto-Mapped' ? '#2E844A' : '#FFB75D';
+                const svgW = 100; // percentage-based, but we use viewBox coords
+                // Mid point for the arrow node
+                const midX = 50;
+                const midY = (leftY + rightY) / 2;
                 return (
-                  <path
-                    key={field.id}
-                    d={`M 0 ${leftY} C 60 ${leftY}, 60 ${rightY}, 120 ${rightY}`}
-                    stroke={color}
-                    strokeWidth={isActive ? 2.5 : 1.5}
-                    fill="none"
-                    opacity={isActive ? 1 : 0.3}
-                  />
+                  <g key={field.id} opacity={isActive ? 1 : 0.35}>
+                    {/* Left curve */}
+                    <path
+                      d={`M 0 ${leftY} C ${midX * 0.6} ${leftY}, ${midX * 0.4} ${midY}, ${midX} ${midY}`}
+                      stroke="#706E6B"
+                      strokeWidth={isActive ? 2 : 1.2}
+                      fill="none"
+                    />
+                    {/* Right curve */}
+                    <path
+                      d={`M ${midX} ${midY} C ${midX + midX * 0.6} ${midY}, ${svgW - midX * 0.4} ${rightY}, ${svgW} ${rightY}`}
+                      stroke="#706E6B"
+                      strokeWidth={isActive ? 2 : 1.2}
+                      fill="none"
+                    />
+                    {/* Arrow node in center: circle → arrow → circle */}
+                    <circle cx={midX - 12} cy={midY} r="5" fill="white" stroke="#706E6B" strokeWidth="1.2" />
+                    <text x={midX} y={midY + 3.5} textAnchor="middle" fontSize="9" fill="#706E6B" fontFamily="sans-serif">&rarr;</text>
+                    <circle cx={midX + 12} cy={midY} r="5" fill="white" stroke="#706E6B" strokeWidth="1.2" />
+                  </g>
                 );
               })}
             </svg>
           </div>
 
-          {/* RIGHT: Target DMO */}
-          <div className="slds-flex-1 slds-bg-white slds-flex slds-flex-col slds-border_left slds-border-color_border-1">
-            <div className="slds-p-horizontal_medium slds-p-vertical_small slds-border_bottom slds-border-color_border-1 slds-flex slds-items-center slds-gap_x-small">
-              <div className="slds-icon-size_large slds-border-radius_small slds-bg-brand slds-flex slds-items-center slds-justify-center slds-flex-shrink-0">
-                <Database className="slds-icon-size_x-small slds-text-white" />
-              </div>
-              <h3 className="slds-text-size_medium slds-font-weight_semibold slds-text-neutral-base">Target DMO</h3>
-              <span className="slds-text-size_small slds-text-neutral-7" style={{ marginLeft: 'auto' }}>{objectName}</span>
+          {/* RIGHT: Target DMO panel (Data Model entities) */}
+          <div className="slds-bg-white slds-border_all slds-border-color_border-1 slds-flex slds-flex-col" style={{ width: '300px', flexShrink: 0, borderRadius: '0 8px 8px 0' }}>
+            <div className="slds-p-horizontal_medium slds-p-vertical_small slds-flex slds-items-center slds-justify-between">
+              <h3 className="slds-font-weight_bold slds-text-neutral-base slds-text-size_medium">Data Model entities</h3>
+              <button className="slds-flex slds-items-center slds-justify-center slds-text-neutral-7" style={{ width: '24px', height: '24px' }}>
+                <Edit3 className="slds-icon-size_x-small" />
+              </button>
             </div>
-            <div className="slds-flex-1 slds-overflow-y-auto">
-              {Object.entries(dmoGroups).map(([dmoName, fields]) => (
-                <div key={dmoName}>
-                  <div className="slds-p-horizontal_medium slds-border_bottom slds-border-color_border-1" style={{ paddingTop: '10px', paddingBottom: '10px', backgroundColor: '#F9F9F9' }}>
-                    <span className="slds-text-size_small slds-font-weight_semibold slds-text-brand">{dmoName}</span>
+            <div className="slds-p-horizontal_medium slds-p-bottom_small">
+              <input type="text" placeholder="Search Fields..." className="slds-w-full slds-p-horizontal_small slds-text-size_small slds-border_all slds-border-color_border-1 slds-border-radius_small" style={{ paddingTop: '5px', paddingBottom: '5px', outline: 'none' }} />
+            </div>
+            {Object.entries(dmoGroups).map(([dmoName, fields]) => (
+              <div key={dmoName} className="slds-flex slds-flex-col slds-flex-1 slds-min-h-0">
+                <div className="slds-p-horizontal_medium slds-flex slds-items-center slds-justify-between slds-border_bottom slds-border-color_border-1" style={{ paddingTop: '6px', paddingBottom: '6px' }}>
+                  <span className="slds-text-size_small slds-font-weight_bold slds-text-neutral-base">{dmoName.replace(/__dlm$/, '').replace(/ssot__/, '')}</span>
+                  <div className="slds-flex slds-items-center slds-gap_xx-small">
+                    <Edit3 className="slds-icon-size_xx-small slds-text-neutral-7" />
+                    <Link2 className="slds-icon-size_xx-small slds-text-neutral-7" />
+                    <Trash2 className="slds-icon-size_xx-small slds-text-neutral-7" />
                   </div>
+                </div>
+                <div className="slds-border_bottom slds-border-color_border-1 slds-p-horizontal_medium" style={{ paddingTop: '6px', paddingBottom: '6px', borderLeft: '3px solid var(--slds-g-color-brand)' }}>
+                  <span className="slds-text-size_small slds-font-weight_semibold slds-text-neutral-base">Is Mapped ({fields.length})</span>
+                </div>
+                <div className="slds-flex-1 slds-overflow-y-auto">
                   {fields.map((field) => {
                     const isActive = field.id === reviewFieldId;
                     return (
                       <button
                         key={field.id}
                         onClick={() => setReviewFieldId(field.id)}
-                        className={`slds-w-full slds-text-left slds-p-horizontal_medium slds-flex slds-items-center slds-gap_small slds-border_bottom slds-border-color_border-1 slds-transition-colors ${isActive ? '' : 'sf-hover-bg-neutral'}`}
-                        style={{ paddingTop: '10px', paddingBottom: '10px', ...(isActive ? { backgroundColor: '#EEF4FF' } : {}) }}
+                        className={`slds-w-full slds-text-left slds-flex slds-items-center slds-transition-colors ${isActive ? '' : 'sf-hover-bg-neutral'}`}
+                        style={{ paddingLeft: '8px', paddingRight: '16px', height: `${ROW_H}px`, ...(isActive ? { backgroundColor: '#EEF4FF' } : {}) }}
                       >
-                        <div className={`slds-border-radius_pill slds-flex-shrink-0 ${field.mappingStatus === 'Auto-Mapped' ? 'slds-bg-success' : ''}`} style={{ width: '8px', height: '8px', ...(field.mappingStatus !== 'Auto-Mapped' ? { backgroundColor: '#FFB75D' } : {}) }} />
-                        <div className="slds-flex-1 slds-min-w-0">
-                          <div className="slds-text-size_small slds-font-weight_medium slds-text-neutral-base slds-truncate" style={{ fontFamily: 'monospace' }}>{field.targetField}</div>
-                          <div className="slds-text-neutral-7" style={{ fontSize: '10px' }}>{field.dataType}</div>
-                        </div>
+                        {/* Connection dot on left edge */}
+                        <span className="slds-flex-shrink-0 slds-border-radius_pill" style={{ width: '8px', height: '8px', backgroundColor: '#706E6B', marginRight: '6px' }} />
+                        <span className="slds-flex-shrink-0 slds-text-neutral-7 slds-flex slds-items-center slds-justify-center" style={{ width: '20px', fontSize: '11px', fontFamily: 'monospace' }}>{typeIcon(field.dataType)}</span>
+                        <span className="slds-text-size_small slds-text-neutral-base slds-truncate slds-flex-1" style={{ marginLeft: '6px' }}>{field.targetField.replace(/^ssot__/, '').replace(/__c$/, '')}</span>
                       </button>
                     );
                   })}
                 </div>
-              ))}
-            </div>
+              </div>
+            ))}
           </div>
         </div>
 
         {/* Identity Match DMO prerequisite info — only for Cross Reference DLO */}
         {selectedStream.name.includes('Cross Reference DLO') && (
-          <div className="slds-bg-white slds-border_top slds-border-color_border-1 slds-overflow-y-auto" style={{ maxHeight: '320px' }}>
+          <div className="slds-bg-white slds-border_top slds-border-color_border-1 slds-overflow-y-auto" style={{ maxHeight: '280px', margin: '0 12px 12px', borderRadius: '8px' }}>
             <div className="slds-p-horizontal_large slds-p-vertical_medium" style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
               {/* Setup Prerequisite */}
               <div>
@@ -890,23 +932,6 @@ export default function DataStreamsContent({ demoSession, currentTimeline }: Dat
             </div>
           </div>
         )}
-
-        {/* Footer */}
-        <div className="slds-bg-white slds-border_top slds-border-color_border-1 slds-p-horizontal_large slds-p-vertical_small slds-flex slds-items-center slds-justify-between">
-          <div className="slds-flex slds-items-center slds-gap_medium">
-            <button onClick={() => setReviewFieldId(null)} className="slds-p-horizontal_medium slds-p-vertical_x-small slds-text-size_medium slds-font-weight_medium slds-text-neutral-9 slds-border_all slds-border-color_border-1 slds-border-radius_small sf-hover-bg-neutral">
-              Back
-            </button>
-            <div className="slds-flex slds-items-center slds-gap_medium slds-text-size_small slds-text-neutral-7">
-              <div className="slds-flex slds-items-center slds-gap_xx-small"><div className="slds-border-radius_pill slds-bg-success" style={{ width: '8px', height: '8px' }} /> Auto-Mapped ({autoMappedCount})</div>
-              <div className="slds-flex slds-items-center slds-gap_xx-small"><div className="slds-border-radius_pill" style={{ width: '8px', height: '8px', backgroundColor: '#FFB75D' }} /> Review Needed</div>
-              <div className="slds-flex slds-items-center slds-gap_xx-small"><div className="slds-border-radius_pill" style={{ width: '8px', height: '8px', backgroundColor: '#BA0517' }} /> Unmapped</div>
-            </div>
-          </div>
-          <button className="slds-p-horizontal_large slds-p-vertical_x-small slds-text-size_medium slds-font-weight_medium slds-text-white slds-bg-brand slds-border-radius_small" style={{ cursor: 'pointer' }}>
-            Approve Mapping
-          </button>
-        </div>
       </div>
     );
   }
