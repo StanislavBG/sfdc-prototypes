@@ -1683,6 +1683,7 @@ export default function DataStreamsContent({ demoSession, currentTimeline }: Dat
                             {informaticaBundles.map((bundle) => {
                               const isSelected = selectedBundles.has(bundle.id);
                               const isFocused = focusedBundleId === bundle.id;
+                              const isHighlighted = bundle.name === 'Customer 360' || bundle.name === 'Organization 360';
                               return (
                                 <button
                                   key={bundle.id}
@@ -1691,7 +1692,7 @@ export default function DataStreamsContent({ demoSession, currentTimeline }: Dat
                                   className={`slds-flex slds-items-center slds-gap_small slds-p-around_small slds-text-left slds-border_all slds-border-color_border-1 slds-transition-all ${
                                     isSelected ? 'slds-border-color_brand' : ''
                                   }`}
-                                  style={{ backgroundColor: isSelected ? '#EEF4FF' : isFocused ? '#FAFAF9' : 'white' }}
+                                  style={{ backgroundColor: isSelected ? '#EEF4FF' : isFocused ? '#FAFAF9' : 'white', ...(!isHighlighted ? { opacity: 0.35, pointerEvents: 'none' as const } : {}) }}
                                 >
                                   <div className="slds-border-radius_small slds-flex slds-items-center slds-justify-center slds-flex-shrink-0" style={{ width: '32px', height: '32px', backgroundColor: '#FF4A00' }}>
                                     <svg viewBox="0 0 32 32" className="slds-icon-size_default">
