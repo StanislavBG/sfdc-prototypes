@@ -26,8 +26,8 @@ export const timelines: TimelineOption[] = [
   },
   {
     id: '2-years',
-    label: '2 Years Away',
-    description: 'Projected future state with planned capabilities',
+    label: 'Revolution Release',
+    description: 'Future state with planned capabilities',
     icon: Calendar,
     color: '#9B8BF4',
   },
