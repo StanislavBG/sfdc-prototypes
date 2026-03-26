@@ -27,6 +27,15 @@ import {
 } from 'lucide-react';
 import { appNavGroups, type NavGroup } from '@/lib/mock-data';
 
+// Tabs that have real content implemented
+const implementedTabs = new Set([
+  'Home',
+  'Data Streams',
+  'Identity Resolutions',
+  'Google Drive',
+  'Semantic Search',
+]);
+
 // Map group-level icon identifiers → lucide components (for section headers)
 const groupIcons: Record<string, React.ElementType> = {
   'list-filter': ListFilter,
@@ -161,10 +170,11 @@ export default function LeftNav({
                 {isExpanded &&
                   group.items.map((item) => {
                     const isActive = activeTab === item.label;
+                    const isImplemented = implementedTabs.has(item.label);
                     return (
                       <button
                         key={item.label}
-                        className={`sf-left-nav-item sf-left-nav-item--section ${isActive ? 'active' : ''}`}
+                        className={`sf-left-nav-item sf-left-nav-item--section ${isActive ? 'active' : ''} ${!isImplemented ? 'sf-left-nav-item--disabled' : ''}`}
                         onClick={() => onChangeTab(item.label)}
                       >
                         <span className="slds-truncate">{item.label}</span>
@@ -194,10 +204,11 @@ export default function LeftNav({
             {group.items.map((item) => {
               const Icon = navIcons[item.label];
               const isActive = activeTab === item.label;
+              const isImplemented = implementedTabs.has(item.label);
               return (
                 <button
                   key={item.label}
-                  className={`sf-left-nav-item ${isActive ? 'active' : ''}`}
+                  className={`sf-left-nav-item ${isActive ? 'active' : ''} ${!isImplemented ? 'sf-left-nav-item--disabled' : ''}`}
                   onClick={() => onChangeTab(item.label)}
                 >
                   {Icon && (
