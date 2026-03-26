@@ -14,6 +14,7 @@ import WorkflowArea from './WorkflowArea';
 import TimeMachine from './TimeMachine';
 import AppLauncher from './AppLauncher';
 import WorkflowCapture from './WorkflowCapture';
+import OnboardingOverlay from './OnboardingOverlay';
 import { MdsSimulatorProvider } from './MdsSimulatorContext';
 import { salesforceApps, type Workflow } from '@/lib/mock-data';
 
@@ -182,6 +183,11 @@ export default function Layout({ children }: LayoutProps) {
   const [workflowCaptureActive, setWorkflowCaptureActive] = useState(false);
   const [exportToast, setExportToast] = useState<string | null>(null);
 
+  // Onboarding — show on first visit (persisted via localStorage)
+  const [showOnboarding, setShowOnboarding] = useState(() => {
+    return !localStorage.getItem('data360-onboarded');
+  });
+
   // IR sub-route state (from URL)
   const [irRulesetSlug, setIrRulesetSlug] = useState<string | undefined>(initialUrl.irRulesetSlug);
   const [irDetailTab, setIrDetailTab] = useState<string | undefined>(initialUrl.irDetailTab);
@@ -286,6 +292,20 @@ export default function Layout({ children }: LayoutProps) {
       setCurrentTimeline('today');
       navigateTo('Home');
     }
+  };
+
+  // ── Onboarding handlers ──
+  const handleOnboardingSelect = (id: string) => {
+    localStorage.setItem('data360-onboarded', '1');
+    setShowOnboarding(false);
+    handleSelectTimeline(id);
+  };
+
+  const handleOnboardingDismiss = () => {
+    localStorage.setItem('data360-onboarded', '1');
+    setShowOnboarding(false);
+    // Default to 264 Release when dismissing
+    handleSelectTimeline('264-release');
   };
 
   // ── Figma export handlers ──
@@ -490,6 +510,14 @@ export default function Layout({ children }: LayoutProps) {
         onDeactivate={() => setWorkflowCaptureActive(false)}
         captureTargetRef={mainRef}
       />
+
+      {/* Onboarding overlay for new users */}
+      {showOnboarding && (
+        <OnboardingOverlay
+          onSelectTimeline={handleOnboardingSelect}
+          onDismiss={handleOnboardingDismiss}
+        />
+      )}
 
       {/* Export toast notification */}
       {exportToast && (

@@ -3696,3 +3696,219 @@ tr:hover .sf-drive-more-btn {
 .sf-dropdown-item-active {
   background: rgba(234, 67, 53, 0.05) !important;
 }
+
+/* ==========================================
+   Grayed-out nav items (unimplemented)
+   ========================================== */
+.sf-left-nav-item--disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+.sf-left-nav-item--disabled:hover {
+  background: transparent !important;
+}
+
+/* ==========================================
+   Onboarding Overlay
+   ========================================== */
+.sf-onboarding-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: sf-onboarding-fade-in 0.25s ease;
+}
+
+@keyframes sf-onboarding-fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes sf-onboarding-slide-up {
+  from { opacity: 0; transform: translateY(24px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.sf-onboarding-panel {
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 24px 64px rgba(0, 0, 0, 0.24);
+  width: 560px;
+  max-width: calc(100vw - 32px);
+  max-height: calc(100vh - 64px);
+  overflow-y: auto;
+  animation: sf-onboarding-slide-up 0.35s ease;
+}
+
+.sf-onboarding-header {
+  text-align: center;
+  padding: 32px 32px 20px;
+  border-bottom: 1px solid var(--slds-g-color-border-1);
+}
+
+.sf-onboarding-header-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  background: #F3F0FF;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 12px;
+}
+
+.sf-onboarding-title {
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--slds-g-color-neutral-base);
+  margin: 0 0 6px;
+}
+
+.sf-onboarding-subtitle {
+  font-size: 14px;
+  color: var(--slds-g-color-neutral-7);
+  margin: 0;
+  line-height: 1.5;
+}
+
+.sf-onboarding-cards {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 20px 24px;
+}
+
+.sf-onboarding-card {
+  border: 1px solid var(--slds-g-color-border-1);
+  border-radius: 12px;
+  padding: 16px;
+  cursor: pointer;
+  background: white;
+  text-align: left;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease;
+}
+
+.sf-onboarding-card:hover {
+  border-color: var(--slds-g-color-brand-2);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+  transform: translateY(-1px);
+}
+
+.sf-onboarding-card-top {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.sf-onboarding-card-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.sf-onboarding-card-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.sf-onboarding-card-label {
+  display: block;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--slds-g-color-neutral-base);
+}
+
+.sf-onboarding-card-desc {
+  display: block;
+  font-size: 12px;
+  color: var(--slds-g-color-neutral-7);
+  margin-top: 2px;
+}
+
+.sf-onboarding-badge {
+  font-size: 11px;
+  font-weight: 600;
+  color: white;
+  padding: 3px 8px;
+  border-radius: 10px;
+  flex-shrink: 0;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+.sf-onboarding-card-features {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 12px 0;
+  border-top: 1px solid var(--slds-g-color-border-1);
+}
+
+.sf-onboarding-feature {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: var(--slds-g-color-neutral-7);
+}
+
+.sf-onboarding-card-action {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  padding-top: 8px;
+  transition: gap 0.15s ease;
+}
+
+.sf-onboarding-card:hover .sf-onboarding-card-action {
+  gap: 10px;
+}
+
+.sf-onboarding-footer {
+  padding: 16px 24px 24px;
+  border-top: 1px solid var(--slds-g-color-border-1);
+  text-align: center;
+}
+
+.sf-onboarding-footer-options {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 8px;
+}
+
+.sf-onboarding-footer-label {
+  font-size: 12px;
+  color: var(--slds-g-color-neutral-7);
+  font-weight: 500;
+}
+
+.sf-onboarding-footer-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
+  color: var(--slds-g-color-neutral-7);
+  background: #F3F3F3;
+  padding: 3px 8px;
+  border-radius: 6px;
+}
+
+.sf-onboarding-footer-hint {
+  font-size: 12px;
+  color: var(--slds-g-color-neutral-7);
+  margin: 0;
+  opacity: 0.7;
+}
