@@ -308,6 +308,13 @@ export default function Layout({ children }: LayoutProps) {
     handleSelectTimeline('264-release');
   };
 
+  const handleOnboardingLaunchSetup = () => {
+    localStorage.setItem('data360-onboarded', '1');
+    setShowOnboarding(false);
+    handleSelectTimeline('264-release');
+    setShowDataCloudSetup(true);
+  };
+
   // ── Figma export handlers ──
   const showToast = useCallback((msg: string) => {
     setExportToast(msg);
@@ -516,6 +523,7 @@ export default function Layout({ children }: LayoutProps) {
         <OnboardingOverlay
           onSelectTimeline={handleOnboardingSelect}
           onDismiss={handleOnboardingDismiss}
+          onLaunchSetup={handleOnboardingLaunchSetup}
         />
       )}
 
