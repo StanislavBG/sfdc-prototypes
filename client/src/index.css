@@ -3912,3 +3912,147 @@ tr:hover .sf-drive-more-btn {
   margin: 0;
   opacity: 0.7;
 }
+
+/* Step indicator (1 — 2) */
+.sf-onboarding-step-indicator {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0;
+  padding: 16px 24px 4px;
+}
+
+.sf-onboarding-step {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--slds-g-color-neutral-7);
+  background: #F3F3F3;
+  flex-shrink: 0;
+  transition: all 0.2s ease;
+}
+
+.sf-onboarding-step.active {
+  background: #FF5D2D;
+  color: white;
+}
+
+.sf-onboarding-step.completed {
+  background: #0F9D58;
+  color: white;
+}
+
+.sf-onboarding-step-line {
+  width: 48px;
+  height: 2px;
+  background: #E5E5E5;
+  transition: background 0.2s ease;
+}
+
+.sf-onboarding-step-line.active {
+  background: #0F9D58;
+}
+
+/* Setup guide steps (step 2) */
+.sf-onboarding-setup-guide {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  padding: 16px 24px 8px;
+}
+
+.sf-onboarding-setup-step {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--slds-g-color-border-1);
+}
+
+.sf-onboarding-setup-step:last-child {
+  border-bottom: none;
+}
+
+.sf-onboarding-setup-step-num {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: #FF5D2D;
+  color: white;
+  font-size: 12px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+.sf-onboarding-setup-step-content {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.sf-onboarding-setup-step-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--slds-g-color-neutral-base);
+}
+
+.sf-onboarding-setup-step-desc {
+  font-size: 12px;
+  color: var(--slds-g-color-neutral-7);
+  line-height: 1.4;
+}
+
+/* CTA actions for step 2 */
+.sf-onboarding-setup-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 12px 24px 16px;
+}
+
+.sf-onboarding-setup-cta {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px 20px;
+  background: #FF5D2D;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s ease, transform 0.1s ease;
+}
+
+.sf-onboarding-setup-cta:hover {
+  background: #E8522A;
+  transform: translateY(-1px);
+}
+
+.sf-onboarding-setup-skip {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 20px;
+  background: none;
+  border: none;
+  color: var(--slds-g-color-neutral-7);
+  font-size: 13px;
+  cursor: pointer;
+  transition: color 0.15s ease;
+}
+
+.sf-onboarding-setup-skip:hover {
+  color: var(--slds-g-color-neutral-base);
+}
