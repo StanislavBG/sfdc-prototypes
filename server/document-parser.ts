@@ -14,6 +14,7 @@
  */
 
 import * as cheerio from "cheerio";
+import { ocrPdfWithVision, describeDocumentImages } from "./vision-describer";
 
 // ---------------------------------------------------------------------------
 // Shared types
@@ -46,6 +47,7 @@ export interface ParsedDocument {
 
 const FORMAT_MAP: Record<string, string> = {
   ".pdf": "pdf",
+  ".docx": "docx",
   ".mhtml": "mhtml",
   ".mht": "mhtml",
   ".csv": "csv",
@@ -79,12 +81,27 @@ async function parsePdf(buffer: Buffer, fileName: string): Promise<ParsedDocumen
     pagerender: undefined,
   });
 
-  const fullText = data.text || "";
+  let fullText = data.text || "";
   const title = (data.info?.Title as string) || fileName.replace(/\.pdf$/i, "");
   const pageCount = data.numpages || 1;
+  let isOcr = false;
 
-  // Split text by page breaks (pdf-parse inserts \n\n between pages typically)
-  // We use a heuristic: split on large whitespace gaps that likely represent page breaks
+  // Detect scanned/image-based PDFs (very little text per page)
+  const textDensity = fullText.trim().length / (pageCount || 1);
+  if (textDensity < 50) {
+    try {
+      console.log(`Low text density (${textDensity.toFixed(0)} chars/page) — trying OCR via Gemini Vision`);
+      const ocrResult = await ocrPdfWithVision(buffer, fileName);
+      if (ocrResult.text.trim().length > fullText.trim().length) {
+        fullText = ocrResult.text;
+        isOcr = true;
+      }
+    } catch (err: any) {
+      console.warn("OCR fallback failed:", err.message);
+      // Continue with whatever text we have
+    }
+  }
+
   const sections: DocumentSection[] = [];
 
   // Try to get per-page text by re-parsing with page tracking
@@ -99,16 +116,30 @@ async function parsePdf(buffer: Buffer, fileName: string): Promise<ParsedDocumen
 
     if (!pageText) continue;
 
-    // Within each page, split on heading-like patterns
-    const subSections = splitOnHeadings(pageText);
-    for (const sub of subSections) {
-      sections.push({
-        content: sub.content,
-        heading: sub.heading,
-        page: page + 1,
-        sectionIndex: sectionIdx++,
-        type: sub.type,
-      });
+    // Split page into text and table regions
+    const regions = splitTextAndTables(pageText);
+    for (const region of regions) {
+      if (region.type === "table") {
+        sections.push({
+          content: region.content,
+          heading: region.heading,
+          page: page + 1,
+          sectionIndex: sectionIdx++,
+          type: "table",
+        });
+      } else {
+        // Within text regions, split on heading-like patterns
+        const subSections = splitOnHeadings(region.content);
+        for (const sub of subSections) {
+          sections.push({
+            content: sub.content,
+            heading: sub.heading || region.heading,
+            page: page + 1,
+            sectionIndex: sectionIdx++,
+            type: sub.type,
+          });
+        }
+      }
     }
   }
 
@@ -119,6 +150,22 @@ async function parsePdf(buffer: Buffer, fileName: string): Promise<ParsedDocumen
       sectionIndex: 0,
       type: "text",
     });
+  }
+
+  // Try to extract image descriptions (opt-in, non-blocking)
+  try {
+    const images = await describeDocumentImages(buffer, fileName);
+    for (const img of images) {
+      sections.push({
+        content: `[Image on page ${img.page}] ${img.description}`,
+        heading: `Image — Page ${img.page}`,
+        page: img.page,
+        sectionIndex: sectionIdx++,
+        type: "text",
+      });
+    }
+  } catch {
+    // Image description is best-effort
   }
 
   return {
@@ -132,6 +179,7 @@ async function parsePdf(buffer: Buffer, fileName: string): Promise<ParsedDocumen
       charCount: fullText.length,
       author: data.info?.Author || undefined,
       subject: data.info?.Subject || undefined,
+      ocrApplied: isOcr,
     },
   };
 }
@@ -274,6 +322,23 @@ function parseHtml(html: string, fileName: string): ParsedDocument {
       charCount: fullContent.length,
     },
   };
+}
+
+// ---------------------------------------------------------------------------
+// DOCX Parser (via Mammoth → HTML → existing parseHtml)
+// ---------------------------------------------------------------------------
+
+async function parseDocx(buffer: Buffer, fileName: string): Promise<ParsedDocument> {
+  const mammoth = await import("mammoth");
+  const result = await mammoth.convertToHtml({ buffer });
+  const doc = parseHtml(result.value, fileName);
+  doc.metadata.format = "docx";
+  if (result.messages.length > 0) {
+    doc.metadata.mammothWarnings = result.messages
+      .filter((m: any) => m.type === "warning")
+      .map((m: any) => m.message);
+  }
+  return doc;
 }
 
 // ---------------------------------------------------------------------------
@@ -441,6 +506,140 @@ function parsePlainText(buffer: Buffer, fileName: string): ParsedDocument {
 }
 
 // ---------------------------------------------------------------------------
+// Table detection utility (used by PDF parser)
+// ---------------------------------------------------------------------------
+
+interface TextRegion {
+  content: string;
+  heading?: string;
+  type: "text" | "table";
+}
+
+/**
+ * Detect tabular regions in extracted PDF text.
+ * Heuristics:
+ *   - Lines with pipe (|) delimiters
+ *   - Lines with separator rows (---+--- or === patterns)
+ *   - Runs of lines with consistent multi-space column alignment
+ */
+function splitTextAndTables(text: string): TextRegion[] {
+  const lines = text.split("\n");
+  const regions: TextRegion[] = [];
+  let currentText = "";
+  let currentTable = "";
+  let tableHeading: string | undefined;
+  let inTable = false;
+
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i];
+    const isTableLine = isLikelyTableRow(line);
+
+    if (isTableLine && !inTable) {
+      // Entering a table region — flush text
+      if (currentText.trim()) {
+        regions.push({ content: currentText.trim(), type: "text" });
+        // Use last non-empty text line as table context heading
+        const textLines = currentText.trim().split("\n").filter((l) => l.trim());
+        tableHeading = textLines[textLines.length - 1]?.trim();
+      }
+      currentText = "";
+      inTable = true;
+      currentTable = line + "\n";
+    } else if (isTableLine && inTable) {
+      currentTable += line + "\n";
+    } else if (!isTableLine && inTable) {
+      // Exiting table — flush it
+      if (currentTable.trim()) {
+        const markdown = convertToMarkdownTable(currentTable.trim());
+        regions.push({
+          content: markdown,
+          heading: tableHeading,
+          type: "table",
+        });
+      }
+      currentTable = "";
+      inTable = false;
+      tableHeading = undefined;
+      currentText += line + "\n";
+    } else {
+      currentText += line + "\n";
+    }
+  }
+
+  // Flush remaining
+  if (inTable && currentTable.trim()) {
+    const markdown = convertToMarkdownTable(currentTable.trim());
+    regions.push({ content: markdown, heading: tableHeading, type: "table" });
+  }
+  if (currentText.trim()) {
+    regions.push({ content: currentText.trim(), type: "text" });
+  }
+
+  // If nothing was split into tables, return original as single text region
+  if (regions.length === 0 && text.trim()) {
+    return [{ content: text.trim(), type: "text" }];
+  }
+
+  return regions;
+}
+
+function isLikelyTableRow(line: string): boolean {
+  const trimmed = line.trim();
+  if (!trimmed) return false;
+
+  // Pipe-delimited rows: "| col1 | col2 |" or "col1 | col2"
+  if ((trimmed.match(/\|/g) || []).length >= 2) return true;
+
+  // Separator rows: "---+---", "---|---", "===+===", "--- --- ---"
+  if (/^[-=+|:\s]{5,}$/.test(trimmed) && /[-=]{3,}/.test(trimmed)) return true;
+
+  // Tab-delimited with 3+ columns
+  if ((trimmed.match(/\t/g) || []).length >= 2) return true;
+
+  // Multi-space aligned columns (3+ columns separated by 2+ spaces)
+  const multiSpaceCols = trimmed.split(/\s{2,}/).filter(Boolean);
+  if (multiSpaceCols.length >= 3 && trimmed.length > 20) return true;
+
+  return false;
+}
+
+function convertToMarkdownTable(tableText: string): string {
+  const lines = tableText.split("\n").filter((l) => l.trim());
+  if (lines.length === 0) return tableText;
+
+  // Already pipe-delimited — clean up and ensure proper Markdown format
+  if (lines[0].includes("|")) {
+    const rows = lines
+      .filter((l) => !/^[-=+|:\s]+$/.test(l.trim())) // skip separator rows
+      .map((l) => {
+        const cells = l.split("|").map((c) => c.trim()).filter(Boolean);
+        return "| " + cells.join(" | ") + " |";
+      });
+
+    if (rows.length >= 1) {
+      const colCount = (rows[0].match(/\|/g) || []).length - 1;
+      const separator = "| " + Array(colCount).fill("---").join(" | ") + " |";
+      return [rows[0], separator, ...rows.slice(1)].join("\n");
+    }
+  }
+
+  // Tab or multi-space delimited — convert to pipe table
+  const delimiter = lines[0].includes("\t") ? /\t+/ : /\s{2,}/;
+  const rows = lines.map((l) => {
+    const cells = l.split(delimiter).map((c) => c.trim()).filter(Boolean);
+    return "| " + cells.join(" | ") + " |";
+  });
+
+  if (rows.length >= 1) {
+    const colCount = (rows[0].match(/\|/g) || []).length - 1;
+    const separator = "| " + Array(Math.max(colCount, 1)).fill("---").join(" | ") + " |";
+    return [rows[0], separator, ...rows.slice(1)].join("\n");
+  }
+
+  return tableText;
+}
+
+// ---------------------------------------------------------------------------
 // Heading splitter utility (used by PDF and fallback cases)
 // ---------------------------------------------------------------------------
 
@@ -520,6 +719,8 @@ export async function parseDocument(
   switch (format) {
     case "pdf":
       return parsePdf(buffer, fileName);
+    case "docx":
+      return parseDocx(buffer, fileName);
     case "mhtml":
       return parseMhtmlDoc(buffer, fileName);
     case "csv":

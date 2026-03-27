@@ -11,6 +11,9 @@ import {
 import { generateEmbedding, ensureVectorTable } from "./embeddings";
 import { parseDocument, type ParsedDocument } from "./document-parser";
 import { smartChunk, type DocumentChunk } from "./smart-chunker";
+import { semanticChunk } from "./semantic-chunker";
+
+export type ChunkingStrategy = "smart" | "semantic";
 
 // ---------------------------------------------------------------------------
 // Legacy chunking utility (kept for backwards compat / reprocess)
@@ -74,12 +77,14 @@ export class DatabaseStorage {
   async insertDocument(
     buffer: Buffer,
     fileName: string,
+    chunkingStrategy: ChunkingStrategy = "smart",
   ): Promise<{
     document: HelpDocument;
     parsed: ParsedDocument;
     chunksStored: number;
     totalChunks: number;
     errors: string[];
+    chunkingStrategy: ChunkingStrategy;
   }> {
     // 1. Parse the document
     const parsed = await parseDocument(buffer, fileName);
@@ -90,8 +95,10 @@ export class DatabaseStorage {
       .values({ fileName, content: parsed.content })
       .returning();
 
-    // 3. Smart chunk with structural awareness
-    const chunks = smartChunk(parsed, doc.id, fileName);
+    // 3. Chunk with selected strategy
+    const chunks = chunkingStrategy === "semantic"
+      ? await semanticChunk(parsed, doc.id, fileName)
+      : smartChunk(parsed, doc.id, fileName);
 
     // 4. Embed and store each chunk
     const { stored, errors } = await this.embedAndStoreChunks(chunks);
@@ -102,6 +109,7 @@ export class DatabaseStorage {
       chunksStored: stored,
       totalChunks: chunks.length,
       errors,
+      chunkingStrategy,
     };
   }
 
