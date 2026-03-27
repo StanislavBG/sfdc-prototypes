@@ -36,6 +36,70 @@ export async function generateEmbedding(text: string): Promise<number[]> {
 }
 
 /**
+ * Batch-embed multiple texts in a single API call.
+ * Gemini supports up to 100 texts per batch request.
+ * Falls back to individual calls if batch API fails.
+ */
+export async function generateEmbeddings(texts: string[]): Promise<number[][]> {
+  if (!GEMINI_API_KEY) {
+    return texts.map(() => new Array(EMBEDDING_DIM).fill(0));
+  }
+
+  if (texts.length === 0) return [];
+  if (texts.length === 1) return [await generateEmbedding(texts[0])];
+
+  const BATCH_SIZE = 100;
+  const allEmbeddings: number[][] = [];
+
+  for (let i = 0; i < texts.length; i += BATCH_SIZE) {
+    const batch = texts.slice(i, i + BATCH_SIZE);
+
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/${EMBEDDING_MODEL}:batchEmbedContents?key=${GEMINI_API_KEY}`;
+
+    const res = await fetch(url, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        requests: batch.map((text) => ({
+          model: `models/${EMBEDDING_MODEL}`,
+          content: { parts: [{ text: text.slice(0, 8000) }] },
+        })),
+      }),
+    });
+
+    if (!res.ok) {
+      // Fallback to individual calls
+      console.warn(`Batch embedding failed (${res.status}), falling back to individual calls`);
+      for (const text of batch) {
+        allEmbeddings.push(await generateEmbedding(text));
+      }
+      continue;
+    }
+
+    const data = (await res.json()) as { embeddings: { values: number[] }[] };
+    for (const emb of data.embeddings) {
+      allEmbeddings.push(emb.values);
+    }
+  }
+
+  return allEmbeddings;
+}
+
+/**
+ * Compute cosine similarity between two vectors.
+ */
+export function cosineSimilarity(a: number[], b: number[]): number {
+  let dot = 0, normA = 0, normB = 0;
+  for (let i = 0; i < a.length; i++) {
+    dot += a[i] * b[i];
+    normA += a[i] * a[i];
+    normB += b[i] * b[i];
+  }
+  const denom = Math.sqrt(normA) * Math.sqrt(normB);
+  return denom === 0 ? 0 : dot / denom;
+}
+
+/**
  * Ensure the documents table, help_documents table, and pgvector extension exist.
  */
 export async function ensureVectorTable(): Promise<void> {
