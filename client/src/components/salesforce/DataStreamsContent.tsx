@@ -417,6 +417,11 @@ export default function DataStreamsContent({ demoSession, currentTimeline }: Dat
   const { triggerDelay } = useMdsSimulator();
   const is264Release = currentTimeline === '264-release';
 
+  // For 264 Release, only show Customer 360 and Organization 360 bundles
+  const visibleBundles = is264Release
+    ? informaticaBundles.filter((b) => b.name === 'Customer 360' || b.name === 'Organization 360')
+    : informaticaBundles;
+
   // Compute session-aware data streams: base Salesforce streams + streams from installed bundles
   // Informatica streams only appear in 264 Release timeline, tenant comes from session connections
   const sessionStreams: DataStream[] = [];
@@ -1676,11 +1681,11 @@ export default function DataStreamsContent({ demoSession, currentTimeline }: Dat
                     <div className="slds-flex slds-gap_medium">
                       <div className="slds-flex-1 slds-min-w-0">
                         <div className="slds-flex slds-items-center slds-justify-between slds-m-bottom_x-small">
-                          <h4 className="slds-text-size_medium slds-font-weight_semibold slds-text-neutral-base">Standard Bundles ({informaticaBundles.length})</h4>
+                          <h4 className="slds-text-size_medium slds-font-weight_semibold slds-text-neutral-base">Standard Bundles ({visibleBundles.length})</h4>
                         </div>
                         <div className="slds-overflow-y-auto slds-border_all slds-border-color_border-1 slds-border-radius_large" style={{ maxHeight: '320px' }}>
                           <div className="slds-css-grid slds-css-grid-cols-2" style={{ gap: '0px' }}>
-                            {informaticaBundles.map((bundle) => {
+                            {visibleBundles.map((bundle) => {
                               const isSelected = selectedBundles.has(bundle.id);
                               const isFocused = focusedBundleId === bundle.id;
                               return (
