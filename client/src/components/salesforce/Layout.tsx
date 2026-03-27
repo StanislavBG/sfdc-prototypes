@@ -14,7 +14,7 @@ import WorkflowArea from './WorkflowArea';
 import TimeMachine from './TimeMachine';
 import AppLauncher from './AppLauncher';
 import WorkflowCapture from './WorkflowCapture';
-import OnboardingOverlay from './OnboardingOverlay';
+import OnboardingOverlay, { type UserPersona } from './OnboardingOverlay';
 import { MdsSimulatorProvider } from './MdsSimulatorContext';
 import { salesforceApps, type Workflow } from '@/lib/mock-data';
 
@@ -188,6 +188,11 @@ export default function Layout({ children }: LayoutProps) {
     return !localStorage.getItem('data360-onboarded');
   });
 
+  // User persona for Revolution Release (persisted)
+  const [userPersona, setUserPersona] = useState<UserPersona>(() => {
+    return (localStorage.getItem('data360-persona') as UserPersona) || 'new-configure';
+  });
+
   // IR sub-route state (from URL)
   const [irRulesetSlug, setIrRulesetSlug] = useState<string | undefined>(initialUrl.irRulesetSlug);
   const [irDetailTab, setIrDetailTab] = useState<string | undefined>(initialUrl.irDetailTab);
@@ -313,6 +318,14 @@ export default function Layout({ children }: LayoutProps) {
     setShowOnboarding(false);
     handleSelectTimeline('264-release');
     setShowDataCloudSetup(true);
+  };
+
+  const handleOnboardingPersona = (persona: UserPersona) => {
+    localStorage.setItem('data360-onboarded', '1');
+    localStorage.setItem('data360-persona', persona);
+    setShowOnboarding(false);
+    setUserPersona(persona);
+    handleSelectTimeline('2-years');
   };
 
   // ── Figma export handlers ──
@@ -488,9 +501,10 @@ export default function Layout({ children }: LayoutProps) {
           <WorkflowSidebar
             activeWorkflow={activeWorkflow}
             onSelectWorkflow={setActiveWorkflow}
+            persona={userPersona}
           />
           <main className="sf-layout-main">
-            {children || <WorkflowArea workflow={activeWorkflow} />}
+            {children || <WorkflowArea workflow={activeWorkflow} persona={userPersona} />}
           </main>
         </div>
       )}
@@ -524,6 +538,7 @@ export default function Layout({ children }: LayoutProps) {
           onSelectTimeline={handleOnboardingSelect}
           onDismiss={handleOnboardingDismiss}
           onLaunchSetup={handleOnboardingLaunchSetup}
+          onSelectPersona={handleOnboardingPersona}
         />
       )}
 
