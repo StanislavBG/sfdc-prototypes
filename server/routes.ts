@@ -4,6 +4,7 @@ import multer from "multer";
 import { storage, chunkText } from "./storage";
 import { api } from "@shared/routes";
 import { parseMhtml } from "./mhtml-parser";
+import { parseDocument } from "./document-parser";
 import { generateEmbedding } from "./embeddings";
 import { pool } from "./db";
 import { z } from "zod";
@@ -371,20 +372,21 @@ export async function registerRoutes(
   // Help Documents
   // =========================================================================
 
-  /** Upload an MHTML file — parse, chunk, embed, store. */
+  /** Upload a document — parse, chunk, embed, store. Supports PDF, MHTML, CSV, Markdown, plain text. */
   app.post(api.helpDocs.upload.path, upload.single("file"), async (req, res) => {
     try {
       const file = req.file;
       if (!file) return res.status(400).json({ message: "No file uploaded" });
 
-      const { title, content } = parseMhtml(file.buffer);
-      const fileName = file.originalname || title;
-      const { document, chunksStored, totalChunks, errors } = await storage.insertHelpDocument(fileName, content);
+      const { document, parsed, chunksStored, totalChunks, errors } = await storage.insertDocument(file.buffer, file.originalname);
 
       const response: Record<string, unknown> = {
         id: document.id,
         fileName: document.fileName,
-        contentLength: content.length,
+        format: parsed.metadata.format,
+        contentLength: parsed.metadata.charCount,
+        sections: parsed.sections.length,
+        pageCount: parsed.metadata.pageCount,
         chunksStored,
         totalChunks,
       };
@@ -524,26 +526,28 @@ export async function registerRoutes(
 
       let content = "";
       let title = "";
+      let format = "";
       try {
-        const parsed = parseMhtml(file.buffer);
+        const parsed = await parseDocument(file.buffer, file.originalname);
         title = parsed.title;
         content = parsed.content;
+        format = parsed.metadata.format;
         steps.push({
-          step: "MHTML parsing",
+          step: "Document parsing",
           status: content.length > 0 ? "ok" : "error",
-          detail: `Title: "${title}" | Content length: ${content.length} chars${content.length === 0 ? " — parser returned empty content" : ""}`,
+          detail: `Format: ${format} | Title: "${title}" | Content: ${content.length} chars | Sections: ${parsed.sections.length}${parsed.metadata.pageCount ? ` | Pages: ${parsed.metadata.pageCount}` : ""}`,
         });
       } catch (e: any) {
-        steps.push({ step: "MHTML parsing", status: "error", detail: e.message });
+        steps.push({ step: "Document parsing", status: "error", detail: e.message });
         return res.json({ steps });
       }
 
-      // Step 6: Chunking
+      // Step 6: Chunking (test with legacy chunker for diagnostics)
       const chunks = chunkText(content);
       steps.push({
         step: "Chunking",
         status: "ok",
-        detail: `${chunks.length} chunk(s) generated (max 1500 chars, 200 overlap) | First chunk: ${chunks[0]?.length || 0} chars`,
+        detail: `${chunks.length} chunk(s) from ${format || "text"} format | First chunk: ${chunks[0]?.length || 0} chars`,
       });
 
       // Step 7: Test embedding on first chunk
@@ -585,56 +589,18 @@ export async function registerRoutes(
     }
   });
 
-  /** Re-publish: re-chunk and re-embed an existing document. */
+  /** Re-publish: re-chunk and re-embed an existing document using smart chunker. */
   app.post(api.helpDocs.republish.path, async (req, res) => {
     try {
       const id = Number(req.params.id);
+      const result = await storage.reprocessHelpDocument(id);
       const doc = await storage.getHelpDocument(id);
-      if (!doc) return res.status(404).json({ message: "Document not found" });
-
-      // Delete old chunks
-      try {
-        await pool.query(
-          `DELETE FROM documents WHERE metadata->>'document_id' = $1 AND metadata->>'type' = 'salesforce_help'`,
-          [String(id)]
-        );
-      } catch { /* table might not exist */ }
-
-      // Re-chunk and re-embed
-      const chunks = chunkText(doc.content);
-      let stored = 0;
-      const errors: string[] = [];
-      for (let i = 0; i < chunks.length; i++) {
-        try {
-          const embedding = await generateEmbedding(chunks[i]);
-          const vectorLiteral = `[${embedding.join(",")}]`;
-          await pool.query(
-            `INSERT INTO documents (content, metadata, embedding)
-             VALUES ($1, $2, $3::vector)`,
-            [
-              chunks[i],
-              JSON.stringify({
-                type: "salesforce_help",
-                document_id: id,
-                file_name: doc.fileName,
-                chunk_index: i,
-                total_chunks: chunks.length,
-              }),
-              vectorLiteral,
-            ]
-          );
-          stored++;
-        } catch (err: any) {
-          errors.push(`Chunk ${i}: ${err.message}`);
-        }
-      }
-
       res.json({
         id,
-        fileName: doc.fileName,
-        totalChunks: chunks.length,
-        chunksStored: stored,
-        errors: errors.length > 0 ? errors : undefined,
+        fileName: doc?.fileName,
+        totalChunks: result.totalChunks,
+        chunksStored: result.chunksStored,
+        errors: result.errors.length > 0 ? result.errors : undefined,
       });
     } catch (err: any) {
       console.error("Republish error:", err);
