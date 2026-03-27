@@ -2,6 +2,7 @@ import type { Express } from "express";
 import type { Server } from "http";
 import multer from "multer";
 import { storage, chunkText } from "./storage";
+import { detectFormat } from "./document-parser";
 import { api } from "@shared/routes";
 import { parseMhtml } from "./mhtml-parser";
 import { parseDocument } from "./document-parser";
@@ -184,6 +185,16 @@ export async function registerRoutes(
           createdAt: r.created_at,
           updatedAt: r.updated_at,
         });
+
+        // Auto-index supported formats for vector search (non-blocking)
+        const format = detectFormat(name);
+        if (format !== "text" || /\.(txt|md|csv|json|xml|html|htm)$/i.test(name)) {
+          storage.insertDocument(file.buffer, name).then((res) => {
+            console.log(`Auto-indexed ${name}: ${res.chunksStored}/${res.totalChunks} chunks`);
+          }).catch((err) => {
+            console.warn(`Auto-index failed for ${name}:`, err.message);
+          });
+        }
       }
 
       res.status(201).json(results);
