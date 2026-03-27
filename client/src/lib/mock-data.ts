@@ -828,6 +828,81 @@ export const forYouWorkflows: Workflow[] = [
 // Static popular use cases
 export const popularWorkflows: Workflow[] = [
   {
+    id: 'wf-connect-unify',
+    title: 'Connect & Unify',
+    description: 'Connect data sources and create unified customer profiles end-to-end.',
+    icon: 'Database',
+    category: 'popular',
+    steps: [
+      {
+        id: 'cu-1',
+        title: 'Connect Data Sources',
+        description: 'Choose and configure your data source connectors.',
+        status: 'active',
+        detailType: 'choices',
+        detailContent: {
+          heading: 'Data Sources',
+          description: 'Which data sources would you like to connect?',
+          options: [
+            { label: 'Salesforce CRM', description: 'Sync accounts, contacts, and opportunities', recommended: true },
+            { label: 'Informatica MDM', description: 'Master data management bundles' },
+            { label: 'Marketing Cloud', description: 'Email engagement & journeys' },
+            { label: 'External APIs', description: 'REST/SOAP integrations' },
+          ],
+        },
+      },
+      {
+        id: 'cu-2',
+        title: 'Map to Data Model',
+        description: 'Map incoming fields to the Data Cloud data model.',
+        status: 'upcoming',
+        detailType: 'config',
+        detailContent: {
+          heading: 'Data Model Mapping',
+          description: 'Map source fields to Data Cloud objects and relationships.',
+          fields: [
+            { label: 'Target Object', value: 'Unified Individual', editable: true },
+            { label: 'Primary Key', value: 'Email Address', editable: true },
+            { label: 'Relationship Key', value: 'Account ID', editable: true },
+          ],
+        },
+      },
+      {
+        id: 'cu-3',
+        title: 'Configure Identity Resolution',
+        description: 'Set up matching rules to unify records across sources.',
+        status: 'upcoming',
+        detailType: 'choices',
+        detailContent: {
+          heading: 'Identity Resolution',
+          description: 'How should records be matched and unified?',
+          options: [
+            { label: 'Deterministic', description: 'Exact match on email, phone, or ID', recommended: true },
+            { label: 'Probabilistic', description: 'Fuzzy matching using ML models' },
+            { label: 'Hybrid', description: 'Both approaches for maximum coverage' },
+          ],
+        },
+      },
+      {
+        id: 'cu-4',
+        title: 'Test & Deploy',
+        description: 'Run a test unification batch and review results.',
+        status: 'upcoming',
+        detailType: 'review',
+        detailContent: {
+          heading: 'Unification Review',
+          description: 'Review the test results before deploying.',
+          tips: [
+            'A sample of 1,000 records will be processed for testing.',
+            'Review match quality and duplicate resolution.',
+            'Deploy to begin scheduled unification runs.',
+            'Monitor results via the Data Quality dashboard.',
+          ],
+        },
+      },
+    ],
+  },
+  {
     id: 'wf-activation',
     title: 'Create an Activation',
     description: 'Push a segment to a marketing or advertising platform.',
