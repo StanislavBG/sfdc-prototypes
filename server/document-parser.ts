@@ -14,6 +14,7 @@
  */
 
 import * as cheerio from "cheerio";
+import { ocrPdfWithVision, describeDocumentImages } from "./vision-describer";
 
 // ---------------------------------------------------------------------------
 // Shared types
@@ -80,12 +81,27 @@ async function parsePdf(buffer: Buffer, fileName: string): Promise<ParsedDocumen
     pagerender: undefined,
   });
 
-  const fullText = data.text || "";
+  let fullText = data.text || "";
   const title = (data.info?.Title as string) || fileName.replace(/\.pdf$/i, "");
   const pageCount = data.numpages || 1;
+  let isOcr = false;
 
-  // Split text by page breaks (pdf-parse inserts \n\n between pages typically)
-  // We use a heuristic: split on large whitespace gaps that likely represent page breaks
+  // Detect scanned/image-based PDFs (very little text per page)
+  const textDensity = fullText.trim().length / (pageCount || 1);
+  if (textDensity < 50) {
+    try {
+      console.log(`Low text density (${textDensity.toFixed(0)} chars/page) — trying OCR via Gemini Vision`);
+      const ocrResult = await ocrPdfWithVision(buffer, fileName);
+      if (ocrResult.text.trim().length > fullText.trim().length) {
+        fullText = ocrResult.text;
+        isOcr = true;
+      }
+    } catch (err: any) {
+      console.warn("OCR fallback failed:", err.message);
+      // Continue with whatever text we have
+    }
+  }
+
   const sections: DocumentSection[] = [];
 
   // Try to get per-page text by re-parsing with page tracking
@@ -136,6 +152,22 @@ async function parsePdf(buffer: Buffer, fileName: string): Promise<ParsedDocumen
     });
   }
 
+  // Try to extract image descriptions (opt-in, non-blocking)
+  try {
+    const images = await describeDocumentImages(buffer, fileName);
+    for (const img of images) {
+      sections.push({
+        content: `[Image on page ${img.page}] ${img.description}`,
+        heading: `Image — Page ${img.page}`,
+        page: img.page,
+        sectionIndex: sectionIdx++,
+        type: "text",
+      });
+    }
+  } catch {
+    // Image description is best-effort
+  }
+
   return {
     title,
     content: fullText,
@@ -147,6 +179,7 @@ async function parsePdf(buffer: Buffer, fileName: string): Promise<ParsedDocumen
       charCount: fullText.length,
       author: data.info?.Author || undefined,
       subject: data.info?.Subject || undefined,
+      ocrApplied: isOcr,
     },
   };
 }

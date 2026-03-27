@@ -372,13 +372,14 @@ export async function registerRoutes(
   // Help Documents
   // =========================================================================
 
-  /** Upload a document — parse, chunk, embed, store. Supports PDF, MHTML, CSV, Markdown, plain text. */
+  /** Upload a document — parse, chunk, embed, store. Supports PDF, DOCX, MHTML, CSV, Markdown, plain text. */
   app.post(api.helpDocs.upload.path, upload.single("file"), async (req, res) => {
     try {
       const file = req.file;
       if (!file) return res.status(400).json({ message: "No file uploaded" });
 
-      const { document, parsed, chunksStored, totalChunks, errors } = await storage.insertDocument(file.buffer, file.originalname);
+      const strategy = (req.body?.chunkingStrategy === "semantic" ? "semantic" : "smart") as "smart" | "semantic";
+      const { document, parsed, chunksStored, totalChunks, errors, chunkingStrategy } = await storage.insertDocument(file.buffer, file.originalname, strategy);
 
       const response: Record<string, unknown> = {
         id: document.id,
@@ -389,6 +390,7 @@ export async function registerRoutes(
         pageCount: parsed.metadata.pageCount,
         chunksStored,
         totalChunks,
+        chunkingStrategy,
       };
       if (errors.length > 0) {
         response.warnings = errors;
