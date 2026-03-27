@@ -280,7 +280,7 @@ export default function SemanticSearchContent() {
           <input
             ref={diagFileRef}
             type="file"
-            accept=".pdf,.mhtml,.mht,.csv,.tsv,.md,.markdown,.txt,.text,.html,.htm,.json,.xml,.log"
+            accept=".pdf,.docx,.mhtml,.mht,.csv,.tsv,.md,.markdown,.txt,.text,.html,.htm,.json,.xml,.log"
             className="sf-hidden"
             onChange={(e) => {
               runDiagnose(e.target.files);
@@ -368,7 +368,7 @@ export default function SemanticSearchContent() {
             <input
               ref={fileRef}
               type="file"
-              accept=".pdf,.mhtml,.mht,.csv,.tsv,.md,.markdown,.txt,.text,.html,.htm,.json,.xml,.log"
+              accept=".pdf,.docx,.mhtml,.mht,.csv,.tsv,.md,.markdown,.txt,.text,.html,.htm,.json,.xml,.log"
               multiple
               className="sf-hidden"
               onChange={(e) => handleFiles(e.target.files)}
@@ -382,7 +382,7 @@ export default function SemanticSearchContent() {
               {uploading ? 'Processing...' : 'Drop files here or click to browse'}
             </span>
             <span className="slds-text-size_small slds-text-neutral-7 slds-m-top_xx-small">
-              PDF, MHTML, CSV, Markdown, plain text — up to 50 MB
+              PDF, Word, MHTML, CSV, Markdown, plain text — up to 50 MB
             </span>
           </div>
 
@@ -524,17 +524,34 @@ export default function SemanticSearchContent() {
                       className="slds-p-around_small slds-border-radius_small slds-border_all slds-border-color_border-2 slds-hover-border-brand-2 slds-transition-colors"
                     >
                       <div className="slds-grid slds-grid_vertical-align-center slds-grid_align-spread slds-m-bottom_xxx-small">
-                        <span className="slds-text-size_small slds-font-weight_medium slds-text-brand">
+                        <span className="slds-text-size_small slds-font-weight_medium slds-text-brand slds-flex slds-items-center slds-gap_xx-small">
                           {(r.metadata as any)?.file_name || `Result ${i + 1}`}
+                          {(r.metadata as any)?.section_type === 'table' && (
+                            <span style={{ fontSize: '9px', fontWeight: 600, color: '#5A3E9E', background: '#F3F0FF', padding: '1px 5px', borderRadius: '4px' }}>TABLE</span>
+                          )}
+                          {(r.metadata as any)?.page && (
+                            <span style={{ fontSize: '9px', color: '#706E6B' }}>p.{(r.metadata as any).page}</span>
+                          )}
                         </span>
                         <span className="slds-text-size_small slds-text-neutral-7">
                           {(r.similarity * 100).toFixed(1)}%
                         </span>
                       </div>
-                      <p className="slds-text-size_small slds-text-neutral-9 sf-line-clamp-4">
-                        {r.content.slice(0, 300)}
-                        {r.content.length > 300 ? '...' : ''}
-                      </p>
+                      {(r.metadata as any)?.heading && (
+                        <div className="slds-text-neutral-7 slds-m-bottom_xxx-small" style={{ fontSize: '11px' }}>
+                          § {(r.metadata as any).heading}
+                        </div>
+                      )}
+                      {(r.metadata as any)?.section_type === 'table' ? (
+                        <pre className="slds-text-size_small slds-text-neutral-9" style={{ whiteSpace: 'pre-wrap', fontFamily: 'monospace', fontSize: '11px', maxHeight: '120px', overflow: 'hidden' }}>
+                          {r.content.slice(0, 500)}
+                        </pre>
+                      ) : (
+                        <p className="slds-text-size_small slds-text-neutral-9 sf-line-clamp-4">
+                          {r.content.slice(0, 300)}
+                          {r.content.length > 300 ? '...' : ''}
+                        </p>
+                      )}
                     </div>
                   ))}
                 </div>
