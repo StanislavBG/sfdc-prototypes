@@ -257,7 +257,7 @@ export default function HelpDocExplorer() {
               Salesforce Help Documents
             </h1>
             <p className="slds-text-size_small slds-text-neutral-7">
-              Upload MHTML files to index and search Salesforce documentation
+              Upload documents to index and search (PDF, MHTML, CSV, Markdown, text)
             </p>
           </div>
         </div>
@@ -281,7 +281,7 @@ export default function HelpDocExplorer() {
           <input
             ref={diagFileRef}
             type="file"
-            accept=".mhtml,.mht"
+            accept=".pdf,.mhtml,.mht,.csv,.tsv,.md,.markdown,.txt,.text,.html,.htm,.json,.xml,.log"
             className="sf-hidden"
             onChange={(e) => {
               runDiagnose(e.target.files);
@@ -369,7 +369,7 @@ export default function HelpDocExplorer() {
             <input
               ref={fileRef}
               type="file"
-              accept=".mhtml,.mht"
+              accept=".pdf,.mhtml,.mht,.csv,.tsv,.md,.markdown,.txt,.text,.html,.htm,.json,.xml,.log"
               multiple
               className="sf-hidden"
               onChange={(e) => handleFiles(e.target.files)}
@@ -380,10 +380,10 @@ export default function HelpDocExplorer() {
               <Upload className="slds-square_large slds-text-neutral-7 slds-m-bottom_x-small" />
             )}
             <span className="slds-text-size_medium slds-font-weight_medium slds-text-neutral-base">
-              {uploading ? 'Processing...' : 'Drop MHTML files here or click to browse'}
+              {uploading ? 'Processing...' : 'Drop files here or click to browse'}
             </span>
             <span className="slds-text-size_small slds-text-neutral-7 slds-m-top_xx-small">
-              Accepts .mhtml and .mht files up to 20 MB
+              PDF, MHTML, CSV, Markdown, plain text — up to 50 MB
             </span>
           </div>
 
