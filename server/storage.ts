@@ -9,9 +9,11 @@ import {
   type HelpDocument,
 } from "@shared/schema";
 import { generateEmbedding, ensureVectorTable } from "./embeddings";
+import { parseDocument, type ParsedDocument } from "./document-parser";
+import { smartChunk, type DocumentChunk } from "./smart-chunker";
 
 // ---------------------------------------------------------------------------
-// Chunking utility
+// Legacy chunking utility (kept for backwards compat / reprocess)
 // ---------------------------------------------------------------------------
 
 const CHUNK_MAX_CHARS = 1500;
@@ -29,7 +31,7 @@ export function chunkText(
   while (start < text.length) {
     const end = Math.min(start + maxChars, text.length);
     chunks.push(text.slice(start, end));
-    if (end === text.length) break; // Reached the end
+    if (end === text.length) break;
     start = end - overlap;
   }
   return chunks;
@@ -65,7 +67,48 @@ export class DatabaseStorage {
     await ensureVectorTable();
   }
 
-  /** Insert a help document and store its chunks with embeddings. */
+  /**
+   * Insert a document using the new multi-format parser + smart chunker.
+   * Accepts any supported format (PDF, MHTML, CSV, Markdown, plain text).
+   */
+  async insertDocument(
+    buffer: Buffer,
+    fileName: string,
+  ): Promise<{
+    document: HelpDocument;
+    parsed: ParsedDocument;
+    chunksStored: number;
+    totalChunks: number;
+    errors: string[];
+  }> {
+    // 1. Parse the document
+    const parsed = await parseDocument(buffer, fileName);
+
+    // 2. Store master record
+    const [doc] = await db
+      .insert(helpDocuments)
+      .values({ fileName, content: parsed.content })
+      .returning();
+
+    // 3. Smart chunk with structural awareness
+    const chunks = smartChunk(parsed, doc.id, fileName);
+
+    // 4. Embed and store each chunk
+    const { stored, errors } = await this.embedAndStoreChunks(chunks);
+
+    return {
+      document: doc,
+      parsed,
+      chunksStored: stored,
+      totalChunks: chunks.length,
+      errors,
+    };
+  }
+
+  /**
+   * Legacy insert method (kept for backwards compat).
+   * Use insertDocument() for new uploads.
+   */
   async insertHelpDocument(
     fileName: string,
     content: string,
@@ -108,46 +151,56 @@ export class DatabaseStorage {
     return { document: doc, chunksStored: stored, totalChunks: chunks.length, errors };
   }
 
+  /**
+   * Re-process a document: delete old chunks, re-parse from stored content,
+   * re-chunk with smart chunker, and re-embed.
+   */
   async reprocessHelpDocument(id: number): Promise<{ chunksStored: number; totalChunks: number; errors: string[] }> {
     const doc = await this.getHelpDocument(id);
     if (!doc) throw new Error("Document not found");
 
+    // Delete old chunks
     await pool.query(
       `DELETE FROM documents WHERE metadata->>'document_id' = $1 AND metadata->>'type' = 'salesforce_help'`,
       [String(id)],
     );
 
-    const chunks = chunkText(doc.content);
+    // Re-parse using stored content (detect format from filename)
+    const buffer = Buffer.from(doc.content, "utf-8");
+    const parsed = await parseDocument(buffer, doc.fileName);
+    const chunks = smartChunk(parsed, doc.id, doc.fileName);
+
+    const { stored, errors } = await this.embedAndStoreChunks(chunks);
+
+    return { chunksStored: stored, totalChunks: chunks.length, errors };
+  }
+
+  /** Embed and store an array of DocumentChunks. */
+  private async embedAndStoreChunks(
+    chunks: DocumentChunk[],
+  ): Promise<{ stored: number; errors: string[] }> {
     let stored = 0;
     const errors: string[] = [];
+
     for (let i = 0; i < chunks.length; i++) {
+      const chunk = chunks[i];
       try {
-        const embedding = await generateEmbedding(chunks[i]);
+        const embedding = await generateEmbedding(chunk.content);
         const vectorLiteral = toVectorLiteral(embedding);
         await pool.query(
           `INSERT INTO documents (content, metadata, embedding)
            VALUES ($1, $2, $3::vector)`,
-          [
-            chunks[i],
-            JSON.stringify({
-              type: "salesforce_help",
-              document_id: doc.id,
-              file_name: doc.fileName,
-              chunk_index: i,
-              total_chunks: chunks.length,
-            }),
-            vectorLiteral,
-          ],
+          [chunk.content, JSON.stringify(chunk.metadata), vectorLiteral],
         );
         stored++;
       } catch (err: any) {
         const msg = `Chunk ${i}: ${err.message}`;
-        console.error(`Reprocess chunk ${i} failed for ${doc.fileName}:`, err.message);
+        console.error(`Chunk ${i} embedding failed:`, err.message);
         errors.push(msg);
       }
     }
 
-    return { chunksStored: stored, totalChunks: chunks.length, errors };
+    return { stored, errors };
   }
 
   /** List all help documents (without full content). */
@@ -155,7 +208,6 @@ export class DatabaseStorage {
     { id: number; fileName: string; createdAt: Date | null; chunkCount: number }[]
   > {
     const docs = await db.select().from(helpDocuments);
-    // Get chunk counts in one query
     const chunkCounts = await pool.query(`
       SELECT metadata->>'document_id' as doc_id, COUNT(*) as cnt
       FROM documents
@@ -186,7 +238,6 @@ export class DatabaseStorage {
 
   /** Delete a help document and all its chunks. */
   async deleteHelpDocument(id: number): Promise<number> {
-    // Delete chunks first (may not exist if embeddings failed)
     try {
       await pool.query(
         `DELETE FROM documents WHERE metadata->>'document_id' = $1 AND metadata->>'type' = 'salesforce_help'`,
@@ -195,7 +246,6 @@ export class DatabaseStorage {
     } catch (err: any) {
       console.warn(`Could not delete chunks for doc ${id}:`, err.message);
     }
-    // Always delete the master document row
     await db.delete(helpDocuments).where(eq(helpDocuments.id, id));
     return 1;
   }
