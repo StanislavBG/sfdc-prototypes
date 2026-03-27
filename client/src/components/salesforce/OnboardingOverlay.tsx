@@ -1,10 +1,13 @@
 import { useRef, useState } from 'react';
-import { Sparkles, Rocket, Calendar, ArrowRight, Check, Clock, Compass, Settings, Zap, ChevronRight } from 'lucide-react';
+import { Sparkles, Rocket, Calendar, ArrowRight, Check, Clock, Compass, Settings, Zap, ChevronRight, UserPlus, RefreshCw, Crown } from 'lucide-react';
+
+export type UserPersona = 'new-configure' | 'frequent' | 'power';
 
 interface OnboardingOverlayProps {
   onSelectTimeline: (id: string) => void;
   onDismiss: () => void;
   onLaunchSetup: () => void;
+  onSelectPersona: (persona: UserPersona) => void;
 }
 
 const timelineCards = [
@@ -38,13 +41,42 @@ const timelineCards = [
   },
 ];
 
-export default function OnboardingOverlay({ onSelectTimeline, onDismiss, onLaunchSetup }: OnboardingOverlayProps) {
+const personaCards: { id: UserPersona; label: string; description: string; icon: React.ElementType; color: string; details: string }[] = [
+  {
+    id: 'new-configure',
+    label: 'New to Data Cloud',
+    description: 'First time setting up — guided walkthroughs and step-by-step configuration',
+    icon: UserPlus,
+    color: '#0F9D58',
+    details: 'Guided setup, contextual help, and recommended workflows',
+  },
+  {
+    id: 'frequent',
+    label: 'Frequent User',
+    description: 'You know the basics — personalized shortcuts and recent activity',
+    icon: RefreshCw,
+    color: '#1B96FF',
+    details: 'Personalized "For You" section based on your usage history',
+  },
+  {
+    id: 'power',
+    label: 'Power User',
+    description: 'Advanced features, bulk operations, and full configuration access',
+    icon: Crown,
+    color: '#9B8BF4',
+    details: 'Full feature set, advanced workflows, and admin tools',
+  },
+];
+
+export default function OnboardingOverlay({ onSelectTimeline, onDismiss, onLaunchSetup, onSelectPersona }: OnboardingOverlayProps) {
   const overlayRef = useRef<HTMLDivElement>(null);
-  const [step, setStep] = useState<'choose' | 'setup-prompt'>('choose');
+  const [step, setStep] = useState<'choose' | 'setup-prompt' | 'persona-picker'>('choose');
 
   const handleTimelineClick = (id: string) => {
     if (id === '264-release') {
       setStep('setup-prompt');
+    } else if (id === '2-years') {
+      setStep('persona-picker');
     } else {
       onSelectTimeline(id);
     }
@@ -52,12 +84,7 @@ export default function OnboardingOverlay({ onSelectTimeline, onDismiss, onLaunc
 
   const handleBackdropClick = (e: React.MouseEvent) => {
     if (e.target === overlayRef.current) {
-      if (step === 'setup-prompt') {
-        // Dismiss from step 2 → load 264 Release without setup
-        onDismiss();
-      } else {
-        onDismiss();
-      }
+      onDismiss();
     }
   };
 
@@ -146,7 +173,8 @@ export default function OnboardingOverlay({ onSelectTimeline, onDismiss, onLaunc
             </p>
           </div>
         </div>
-      ) : (
+
+      ) : step === 'setup-prompt' ? (
         /* Step 2: Informatica setup prompt (264 Release path) */
         <div className="sf-onboarding-panel">
           <div className="sf-onboarding-header">
@@ -169,7 +197,6 @@ export default function OnboardingOverlay({ onSelectTimeline, onDismiss, onLaunc
             <div className="sf-onboarding-step active">2</div>
           </div>
 
-          {/* Visual walkthrough */}
           <div className="sf-onboarding-setup-guide">
             <div className="sf-onboarding-setup-step">
               <div className="sf-onboarding-setup-step-num">1</div>
@@ -200,7 +227,6 @@ export default function OnboardingOverlay({ onSelectTimeline, onDismiss, onLaunc
             </div>
           </div>
 
-          {/* CTA buttons */}
           <div className="sf-onboarding-setup-actions">
             <button
               className="sf-onboarding-setup-cta"
@@ -221,6 +247,62 @@ export default function OnboardingOverlay({ onSelectTimeline, onDismiss, onLaunc
           <div className="sf-onboarding-footer">
             <p className="sf-onboarding-footer-hint">
               You can always access setup later via the <Settings style={{ width: 12, height: 12, display: 'inline', verticalAlign: 'middle' }} /> gear icon in the header.
+            </p>
+          </div>
+        </div>
+
+      ) : (
+        /* Step 2: Persona picker (Revolution Release path) */
+        <div className="sf-onboarding-panel">
+          <div className="sf-onboarding-header">
+            <div className="sf-onboarding-header-icon" style={{ background: '#F3F0FF' }}>
+              <Calendar style={{ color: '#9B8BF4', width: 24, height: 24 }} />
+            </div>
+            <h2 className="sf-onboarding-title">How do you use Data Cloud?</h2>
+            <p className="sf-onboarding-subtitle">
+              The Revolution Release adapts to your experience level.
+              Choose the profile that best describes you — this personalizes your landing page, sidebar, and available workflows.
+            </p>
+          </div>
+
+          <div className="sf-onboarding-step-indicator">
+            <div className="sf-onboarding-step completed">
+              <Check style={{ width: 14, height: 14 }} />
+            </div>
+            <div className="sf-onboarding-step-line active" />
+            <div className="sf-onboarding-step active">2</div>
+          </div>
+
+          <div className="sf-onboarding-cards">
+            {personaCards.map((p) => {
+              const Icon = p.icon;
+              return (
+                <button
+                  key={p.id}
+                  className="sf-onboarding-card"
+                  onClick={() => onSelectPersona(p.id)}
+                >
+                  <div className="sf-onboarding-card-top">
+                    <div className="sf-onboarding-card-icon" style={{ backgroundColor: p.color }}>
+                      <Icon style={{ width: 22, height: 22, color: 'white' }} />
+                    </div>
+                    <div className="sf-onboarding-card-info">
+                      <span className="sf-onboarding-card-label">{p.label}</span>
+                      <span className="sf-onboarding-card-desc">{p.description}</span>
+                    </div>
+                  </div>
+                  <div className="sf-onboarding-persona-detail">
+                    <ArrowRight style={{ width: 14, height: 14, color: p.color, flexShrink: 0 }} />
+                    <span>{p.details}</span>
+                  </div>
+                </button>
+              );
+            })}
+          </div>
+
+          <div className="sf-onboarding-footer">
+            <p className="sf-onboarding-footer-hint">
+              You can change your experience profile anytime from settings.
             </p>
           </div>
         </div>

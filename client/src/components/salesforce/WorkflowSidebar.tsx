@@ -11,8 +11,10 @@ import {
   Database,
   UserSearch,
   ChevronRight,
+  Lock,
 } from 'lucide-react';
 import VoiceCapture from './VoiceCapture';
+import type { UserPersona } from './OnboardingOverlay';
 import {
   currentUser,
   forYouWorkflows,
@@ -30,14 +32,19 @@ const workflowIcons: Record<string, React.ElementType> = {
   UserSearch,
 };
 
+// The first popular use case ("Connect & Unify") is the only actionable one
+const ACTIONABLE_WORKFLOW_ID = 'wf-connect-unify';
+
 interface WorkflowSidebarProps {
   activeWorkflow: Workflow | null;
   onSelectWorkflow: (workflow: Workflow) => void;
+  persona?: UserPersona;
 }
 
 export default function WorkflowSidebar({
   activeWorkflow,
   onSelectWorkflow,
+  persona = 'new-configure',
 }: WorkflowSidebarProps) {
   const [inputText, setInputText] = useState('');
   const [voiceOpen, setVoiceOpen] = useState(false);
@@ -47,10 +54,12 @@ export default function WorkflowSidebar({
     setVoiceOpen(false);
   };
 
+  const showForYou = persona === 'frequent' || persona === 'power';
+
   return (
     <nav className="sf-workflow-sidebar">
       <div className="sf-workflow-sidebar-body">
-        {/* Question + Input group */}
+        {/* Describe Your Task — always visible for all personas */}
         <div className="sf-workflow-input-group">
           <div className="slds-grid slds-grid_vertical-align-center slds-gap_x-small slds-m-bottom_x-small">
             <Sparkles className="slds-icon-size_small" style={{ color: '#9B8BF4' }} />
@@ -84,37 +93,39 @@ export default function WorkflowSidebar({
           </div>
         </div>
 
-        {/* For You group */}
-        <div className="sf-workflow-group">
-          <div className="sf-workflow-group-header">
-            <span className="sf-workflow-group-title">For You</span>
-            <span className="sf-workflow-group-subtitle">
-              Based on your role as {currentUser.title}
-            </span>
+        {/* For You — only for Frequent and Power users */}
+        {showForYou && (
+          <div className="sf-workflow-group">
+            <div className="sf-workflow-group-header">
+              <span className="sf-workflow-group-title">For You</span>
+              <span className="sf-workflow-group-subtitle">
+                Based on your role as {currentUser.title}
+              </span>
+            </div>
+            {forYouWorkflows.map((wf) => {
+              const Icon = workflowIcons[wf.icon] || Sparkles;
+              const isActive = activeWorkflow?.id === wf.id;
+              return (
+                <button
+                  key={wf.id}
+                  className={`sf-workflow-item ${isActive ? 'active' : ''}`}
+                  onClick={() => onSelectWorkflow(wf)}
+                >
+                  <div className="sf-workflow-item-icon">
+                    <Icon className="slds-icon-size_small" />
+                  </div>
+                  <div className="sf-workflow-item-text">
+                    <span className="sf-workflow-item-label">{wf.title}</span>
+                    <span className="sf-workflow-item-desc">{wf.description}</span>
+                  </div>
+                  <ChevronRight className="slds-icon-size_x-small slds-text-neutral-7 slds-flex-shrink-0 sf-chevron-reveal" />
+                </button>
+              );
+            })}
           </div>
-          {forYouWorkflows.map((wf) => {
-            const Icon = workflowIcons[wf.icon] || Sparkles;
-            const isActive = activeWorkflow?.id === wf.id;
-            return (
-              <button
-                key={wf.id}
-                className={`sf-workflow-item ${isActive ? 'active' : ''}`}
-                onClick={() => onSelectWorkflow(wf)}
-              >
-                <div className="sf-workflow-item-icon">
-                  <Icon className="slds-icon-size_small" />
-                </div>
-                <div className="sf-workflow-item-text">
-                  <span className="sf-workflow-item-label">{wf.title}</span>
-                  <span className="sf-workflow-item-desc">{wf.description}</span>
-                </div>
-                <ChevronRight className="slds-icon-size_x-small slds-text-neutral-7 slds-flex-shrink-0 sf-chevron-reveal" />
-              </button>
-            );
-          })}
-        </div>
+        )}
 
-        {/* Popular Use Cases group */}
+        {/* Popular Use Cases — always visible, but only Connect & Unify is actionable */}
         <div className="sf-workflow-group">
           <div className="sf-workflow-group-header">
             <span className="sf-workflow-group-title">Popular Use Cases</span>
@@ -122,20 +133,30 @@ export default function WorkflowSidebar({
           {popularWorkflows.map((wf) => {
             const Icon = workflowIcons[wf.icon] || Sparkles;
             const isActive = activeWorkflow?.id === wf.id;
+            const isActionable = wf.id === ACTIONABLE_WORKFLOW_ID;
             return (
               <button
                 key={wf.id}
-                className={`sf-workflow-item ${isActive ? 'active' : ''}`}
-                onClick={() => onSelectWorkflow(wf)}
+                className={`sf-workflow-item ${isActive ? 'active' : ''} ${!isActionable ? 'sf-workflow-item--coming-soon' : ''}`}
+                onClick={() => { if (isActionable) onSelectWorkflow(wf); }}
               >
                 <div className="sf-workflow-item-icon">
                   <Icon className="slds-icon-size_small" />
                 </div>
                 <div className="sf-workflow-item-text">
-                  <span className="sf-workflow-item-label">{wf.title}</span>
+                  <span className="sf-workflow-item-label">
+                    {wf.title}
+                    {!isActionable && (
+                      <span className="sf-coming-soon-badge">Coming Soon</span>
+                    )}
+                  </span>
                   <span className="sf-workflow-item-desc">{wf.description}</span>
                 </div>
-                <ChevronRight className="slds-icon-size_x-small slds-text-neutral-7 slds-flex-shrink-0 sf-chevron-reveal" />
+                {isActionable ? (
+                  <ChevronRight className="slds-icon-size_x-small slds-text-neutral-7 slds-flex-shrink-0 sf-chevron-reveal" />
+                ) : (
+                  <Lock className="slds-icon-size_x-small slds-flex-shrink-0" style={{ color: '#C9C7C5' }} />
+                )}
               </button>
             );
           })}
