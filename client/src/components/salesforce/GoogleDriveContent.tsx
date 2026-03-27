@@ -136,6 +136,11 @@ export default function GoogleDriveContent() {
   const [searchQuery, setSearchQuery] = useState('');
   const [isSearching, setIsSearching] = useState(false);
 
+  // Semantic search
+  const [semanticMode, setSemanticMode] = useState(false);
+  const [semanticResults, setSemanticResults] = useState<any[]>([]);
+  const [semanticLoading, setSemanticLoading] = useState(false);
+
   // Upload
   const [uploading, setUploading] = useState(false);
   const [dragOver, setDragOver] = useState(false);
@@ -371,9 +376,28 @@ export default function GoogleDriveContent() {
 
   // ------ Search ------
 
-  const handleSearch = (e: React.FormEvent) => {
+  const handleSearch = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (searchQuery.trim()) {
+    if (!searchQuery.trim()) return;
+
+    if (semanticMode) {
+      // Semantic vector search
+      setSemanticLoading(true);
+      setIsSearching(true);
+      try {
+        const res = await fetch('/api/help-documents/search', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ query: searchQuery.trim(), limit: 10 }),
+        });
+        const data = await res.json();
+        setSemanticResults(Array.isArray(data) ? data : []);
+      } catch {
+        setSemanticResults([]);
+      } finally {
+        setSemanticLoading(false);
+      }
+    } else {
       setIsSearching(true);
       loadFiles();
     }
@@ -382,6 +406,7 @@ export default function GoogleDriveContent() {
   const clearSearch = () => {
     setSearchQuery('');
     setIsSearching(false);
+    setSemanticResults([]);
   };
 
   // ------ Paste-to-file ------
@@ -554,14 +579,14 @@ export default function GoogleDriveContent() {
           {/* Search */}
           <form onSubmit={handleSearch} style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
             <div style={{ position: 'relative' }}>
-              <Search className="w-4 h-4" style={{ position: 'absolute', left: 10, top: '50%', transform: 'translateY(-50%)', color: 'var(--slds-g-color-neutral-7)' }} />
+              <Search className="w-4 h-4" style={{ position: 'absolute', left: 10, top: '50%', transform: 'translateY(-50%)', color: semanticMode ? '#9B8BF4' : 'var(--slds-g-color-neutral-7)' }} />
               <input
                 type="text"
-                placeholder="Search in Drive"
+                placeholder={semanticMode ? "Ask a question about your documents…" : "Search in Drive"}
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="sf-input"
-                style={{ paddingLeft: 32, width: 240, height: 36, borderRadius: 24, fontSize: 13 }}
+                style={{ paddingLeft: 32, width: semanticMode ? 320 : 240, height: 36, borderRadius: 24, fontSize: 13, borderColor: semanticMode ? '#9B8BF4' : undefined, transition: 'width 0.2s ease' }}
               />
               {searchQuery && (
                 <button
@@ -573,6 +598,22 @@ export default function GoogleDriveContent() {
                 </button>
               )}
             </div>
+            <button
+              type="button"
+              onClick={() => { setSemanticMode(!semanticMode); setSemanticResults([]); }}
+              title={semanticMode ? "Switch to keyword search" : "Switch to AI semantic search"}
+              style={{
+                display: 'flex', alignItems: 'center', gap: 4,
+                padding: '6px 10px', borderRadius: 20, border: '1px solid',
+                borderColor: semanticMode ? '#9B8BF4' : 'var(--slds-g-color-border-1)',
+                background: semanticMode ? '#F3F0FF' : 'white',
+                color: semanticMode ? '#9B8BF4' : 'var(--slds-g-color-neutral-7)',
+                fontSize: 11, fontWeight: 600, cursor: 'pointer', whiteSpace: 'nowrap',
+                transition: 'all 0.15s ease',
+              }}
+            >
+              {semanticMode ? '✦ AI Search' : '✦ AI'}
+            </button>
           </form>
 
           {/* View toggle */}
@@ -673,6 +714,56 @@ export default function GoogleDriveContent() {
             <div style={{ marginBottom: 16, display: 'flex', alignItems: 'center', gap: 8, color: 'var(--slds-g-color-brand)' }}>
               <Loader2 className="w-4 h-4 sf-spin" />
               <span className="slds-text-size_small slds-font-weight_medium">Uploading...</span>
+            </div>
+          )}
+
+          {/* Semantic search results panel */}
+          {semanticMode && isSearching && (
+            <div style={{ padding: '16px 24px', borderBottom: '1px solid var(--slds-g-color-border-2)', background: '#FAFAFE' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
+                <span style={{ color: '#9B8BF4', fontSize: 14 }}>✦</span>
+                <span className="slds-text-size_medium slds-font-weight_semibold slds-text-neutral-base">
+                  AI Search Results
+                </span>
+                {semanticLoading && <Loader2 className="w-4 h-4 slds-text-brand sf-spin" />}
+                <span className="slds-text-size_small slds-text-neutral-7">
+                  {!semanticLoading && `${semanticResults.length} result${semanticResults.length !== 1 ? 's' : ''}`}
+                </span>
+              </div>
+              {semanticResults.length === 0 && !semanticLoading && (
+                <p className="slds-text-size_small slds-text-neutral-7" style={{ padding: '12px 0' }}>
+                  No matching content found. Try rephrasing your question, or upload documents to build the knowledge base.
+                </p>
+              )}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 8, maxHeight: 400, overflowY: 'auto' }}>
+                {semanticResults.map((r: any, i: number) => (
+                  <div
+                    key={r.id || i}
+                    style={{ padding: 12, background: '#fff', borderRadius: 8, border: '1px solid var(--slds-g-color-border-1)' }}
+                  >
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 }}>
+                      <span style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 13, fontWeight: 600, color: 'var(--slds-g-color-brand)' }}>
+                        {r.metadata?.file_name || `Result ${i + 1}`}
+                        {r.metadata?.section_type === 'table' && (
+                          <span style={{ fontSize: 9, fontWeight: 600, color: '#5A3E9E', background: '#F3F0FF', padding: '1px 5px', borderRadius: 4 }}>TABLE</span>
+                        )}
+                        {r.metadata?.page && (
+                          <span style={{ fontSize: 9, color: '#706E6B' }}>p.{r.metadata.page}</span>
+                        )}
+                      </span>
+                      <span style={{ fontSize: 12, color: '#706E6B' }}>
+                        {(r.similarity * 100).toFixed(1)}% match
+                      </span>
+                    </div>
+                    {r.metadata?.heading && (
+                      <div style={{ fontSize: 11, color: '#706E6B', marginBottom: 4 }}>§ {r.metadata.heading}</div>
+                    )}
+                    <p style={{ fontSize: 12, color: '#444', margin: 0, lineHeight: 1.5 }}>
+                      {r.content?.slice(0, 300)}{r.content?.length > 300 ? '…' : ''}
+                    </p>
+                  </div>
+                ))}
+              </div>
             </div>
           )}
 
