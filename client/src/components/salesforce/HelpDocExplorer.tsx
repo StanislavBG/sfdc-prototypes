@@ -281,7 +281,7 @@ export default function HelpDocExplorer() {
           <input
             ref={diagFileRef}
             type="file"
-            accept=".pdf,.mhtml,.mht,.csv,.tsv,.md,.markdown,.txt,.text,.html,.htm,.json,.xml,.log"
+            accept=".pdf,.docx,.mhtml,.mht,.csv,.tsv,.md,.markdown,.txt,.text,.html,.htm,.json,.xml,.log"
             className="sf-hidden"
             onChange={(e) => {
               runDiagnose(e.target.files);
@@ -369,7 +369,7 @@ export default function HelpDocExplorer() {
             <input
               ref={fileRef}
               type="file"
-              accept=".pdf,.mhtml,.mht,.csv,.tsv,.md,.markdown,.txt,.text,.html,.htm,.json,.xml,.log"
+              accept=".pdf,.docx,.mhtml,.mht,.csv,.tsv,.md,.markdown,.txt,.text,.html,.htm,.json,.xml,.log"
               multiple
               className="sf-hidden"
               onChange={(e) => handleFiles(e.target.files)}
@@ -383,7 +383,7 @@ export default function HelpDocExplorer() {
               {uploading ? 'Processing...' : 'Drop files here or click to browse'}
             </span>
             <span className="slds-text-size_small slds-text-neutral-7 slds-m-top_xx-small">
-              PDF, MHTML, CSV, Markdown, plain text — up to 50 MB
+              PDF, Word, MHTML, CSV, Markdown, plain text — up to 50 MB
             </span>
           </div>
 
