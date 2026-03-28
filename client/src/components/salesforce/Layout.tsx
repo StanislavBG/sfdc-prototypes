@@ -183,9 +183,10 @@ export default function Layout({ children }: LayoutProps) {
   const [workflowCaptureActive, setWorkflowCaptureActive] = useState(false);
   const [exportToast, setExportToast] = useState<string | null>(null);
 
-  // Onboarding — show on first visit (persisted via localStorage)
+  // Onboarding — show when landing on default URL (root / no specific path)
   const [showOnboarding, setShowOnboarding] = useState(() => {
-    return !localStorage.getItem('data360-onboarded');
+    const path = window.location.pathname.replace(/^\/+|\/+$/g, '');
+    return path === '' || path === '264/home' || path === '264';
   });
 
   // User persona for Revolution Release (persisted)
@@ -301,27 +302,23 @@ export default function Layout({ children }: LayoutProps) {
 
   // ── Onboarding handlers ──
   const handleOnboardingSelect = (id: string) => {
-    localStorage.setItem('data360-onboarded', '1');
     setShowOnboarding(false);
     handleSelectTimeline(id);
   };
 
   const handleOnboardingDismiss = () => {
-    localStorage.setItem('data360-onboarded', '1');
     setShowOnboarding(false);
     // Default to 264 Release when dismissing
     handleSelectTimeline('264-release');
   };
 
   const handleOnboardingLaunchSetup = () => {
-    localStorage.setItem('data360-onboarded', '1');
     setShowOnboarding(false);
     handleSelectTimeline('264-release');
     setShowDataCloudSetup(true);
   };
 
   const handleOnboardingPersona = (persona: UserPersona) => {
-    localStorage.setItem('data360-onboarded', '1');
     localStorage.setItem('data360-persona', persona);
     setShowOnboarding(false);
     setUserPersona(persona);
