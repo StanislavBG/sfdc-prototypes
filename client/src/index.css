@@ -4132,3 +4132,59 @@ tr:hover .sf-drive-more-btn {
   color: var(--slds-g-color-neutral-7);
   line-height: 1.3;
 }
+
+/* ==========================================
+   AI Answer Panel (RAG)
+   ========================================== */
+.sf-ai-answer-panel {
+  border: 1px solid #D8D0F0;
+  border-radius: 10px;
+  background: #FAFAFF;
+  overflow: hidden;
+}
+
+.sf-ai-answer-header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 14px;
+  background: #F3F0FF;
+  border-bottom: 1px solid #E8E0FF;
+  color: var(--slds-g-color-neutral-base);
+}
+
+.sf-ai-answer-body {
+  padding: 12px 14px;
+  color: var(--slds-g-color-neutral-base);
+}
+
+.sf-ai-answer-sources {
+  padding: 8px 14px;
+  border-top: 1px solid #E8E0FF;
+  background: #F3F0FF;
+}
+
+/* Clickable search result cards */
+.sf-search-result-card {
+  display: block;
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid var(--slds-g-color-border-2);
+  border-radius: 8px;
+  background: white;
+  cursor: pointer;
+  text-align: left;
+  transition: border-color 0.15s ease, background 0.15s ease;
+}
+
+.sf-search-result-card:hover {
+  border-color: var(--slds-g-color-brand-2);
+  background: #FAFAFE;
+}
+
+.sf-line-clamp-2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
