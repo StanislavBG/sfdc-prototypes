@@ -86,6 +86,14 @@ export const api = {
         limit: z.number().min(1).max(20).optional(),
       }),
     },
+    ask: {
+      method: 'POST' as const,
+      path: '/api/help-documents/ask' as const,
+      input: z.object({
+        query: z.string().min(1),
+        limit: z.number().min(1).max(20).optional(),
+      }),
+    },
     diagnose: {
       method: 'POST' as const,
       path: '/api/help-documents/diagnose' as const,
