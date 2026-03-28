@@ -12,6 +12,9 @@ import {
   Stethoscope,
   CheckCircle2,
   XCircle,
+  Sparkles,
+  ChevronDown,
+  ChevronRight,
 } from 'lucide-react';
 import { apiRequest } from '@/lib/queryClient';
 
@@ -225,9 +228,14 @@ export default function SemanticSearchContent() {
 
   // ------ Search ------
 
+  const [aiAnswer, setAiAnswer] = useState<string>('');
+  const [askingAi, setAskingAi] = useState(false);
+  const [expandedCard, setExpandedCard] = useState<number | null>(null);
+
   const runSearch = async () => {
     if (!searchQuery.trim()) return;
     setSearching(true);
+    setAiAnswer('');
     try {
       const res = await apiRequest('POST', '/api/help-documents/search', {
         query: searchQuery,
@@ -238,6 +246,27 @@ export default function SemanticSearchContent() {
     } catch {
       /* ignore */
     }
+    setSearching(false);
+  };
+
+  const runAskAi = async () => {
+    if (!searchQuery.trim()) return;
+    setAskingAi(true);
+    setSearching(true);
+    setAiAnswer('');
+    setSearchResults([]);
+    try {
+      const res = await apiRequest('POST', '/api/help-documents/ask', {
+        query: searchQuery,
+        limit: 8,
+      });
+      const data = await res.json();
+      setAiAnswer(data.answer || '');
+      setSearchResults(data.sources || []);
+    } catch (err: any) {
+      setAiAnswer(`Error: ${err.message || 'Failed to get AI answer'}`);
+    }
+    setAskingAi(false);
     setSearching(false);
   };
 
@@ -256,7 +285,7 @@ export default function SemanticSearchContent() {
               Semantic Search
             </h1>
             <p className="slds-text-size_small slds-text-neutral-7">
-              Upload MHTML files to index and search documentation using vector embeddings
+              Upload documents to index and search using AI-powered vector embeddings
             </p>
           </div>
         </div>
@@ -352,8 +381,144 @@ export default function SemanticSearchContent() {
       )}
 
       <div className="slds-css-grid slds-css-grid-cols-3 slds-gap_large">
-        {/* ---- Left 2/3: Drop zone + Document table ---- */}
+        {/* ---- Left 2/3: Search (primary) ---- */}
         <div style={{ gridColumn: 'span 2', display: 'flex', flexDirection: 'column', gap: '16px' }}>
+          {/* Search */}
+          <div className="sf-card">
+            <div className="sf-card-header">
+              <h2 className="slds-text-size_medium slds-font-weight_semibold slds-text-neutral-base">
+                Semantic Search
+              </h2>
+            </div>
+            <div className="slds-p-around_medium" style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+              <div className="slds-grid slds-gap_x-small">
+                <input
+                  type="text"
+                  placeholder="Ask a question or search documents..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') {
+                      e.shiftKey ? runAskAi() : runSearch();
+                    }
+                  }}
+                  className="sf-input slds-col"
+                />
+                <button
+                  onClick={runSearch}
+                  disabled={searching || !searchQuery.trim()}
+                  className="sf-btn sf-btn-brand"
+                  title="Vector search (Enter)"
+                >
+                  {searching && !askingAi ? (
+                    <Loader2 className="slds-icon-size_x-small sf-spin" />
+                  ) : (
+                    <Search className="slds-icon-size_x-small" />
+                  )}
+                </button>
+                <button
+                  onClick={runAskAi}
+                  disabled={askingAi || !searchQuery.trim()}
+                  className="sf-btn"
+                  title="Ask AI — get a synthesized answer (Shift+Enter)"
+                  style={{
+                    background: askingAi ? '#E8E0FF' : '#9B8BF4',
+                    color: 'white',
+                    border: 'none',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 4,
+                  }}
+                >
+                  {askingAi ? (
+                    <Loader2 className="slds-icon-size_x-small sf-spin" />
+                  ) : (
+                    <Sparkles className="slds-icon-size_x-small" />
+                  )}
+                </button>
+              </div>
+              <div className="slds-text-neutral-7" style={{ fontSize: '10px' }}>
+                Enter = vector search &nbsp;|&nbsp; Shift+Enter or ✦ = Ask AI for a synthesized answer
+              </div>
+
+              {/* AI Answer panel */}
+              {aiAnswer && (
+                <div className="sf-ai-answer-panel">
+                  <div className="sf-ai-answer-header">
+                    <Sparkles style={{ width: 16, height: 16, color: '#9B8BF4', flexShrink: 0 }} />
+                    <span className="slds-font-weight_semibold" style={{ fontSize: 13 }}>AI Answer</span>
+                  </div>
+                  <div className="sf-ai-answer-body">
+                    {aiAnswer.split('\n').map((line, i) => (
+                      <p key={i} style={{ margin: line.trim() ? '0 0 6px' : '0', fontSize: 13, lineHeight: 1.6 }}>
+                        {line || '\u00A0'}
+                      </p>
+                    ))}
+                  </div>
+                  {searchResults.length > 0 && (
+                    <div className="sf-ai-answer-sources">
+                      <span style={{ fontSize: 10, fontWeight: 600, color: '#706E6B', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+                        Based on {searchResults.length} source chunks
+                      </span>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* Search results — clickable cards */}
+              {searchResults.length > 0 && (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', maxHeight: '600px', overflowY: 'auto' }}>
+                  {searchResults.map((r, i) => {
+                    const isExpanded = expandedCard === r.id;
+                    const meta = r.metadata as any;
+                    return (
+                      <button
+                        key={r.id}
+                        onClick={() => setExpandedCard(isExpanded ? null : r.id)}
+                        className="sf-search-result-card"
+                        style={{
+                          borderColor: isExpanded ? 'var(--slds-g-color-brand-2)' : undefined,
+                          background: isExpanded ? '#FAFAFE' : undefined,
+                        }}
+                      >
+                        <div className="slds-grid slds-grid_vertical-align-center slds-grid_align-spread" style={{ marginBottom: 3 }}>
+                          <span className="slds-flex slds-items-center slds-gap_xx-small" style={{ fontSize: 12, fontWeight: 600, color: 'var(--slds-g-color-brand)' }}>
+                            {isExpanded ? <ChevronDown style={{ width: 12, height: 12 }} /> : <ChevronRight style={{ width: 12, height: 12 }} />}
+                            {meta?.file_name || `Result ${i + 1}`}
+                            {meta?.section_type === 'table' && (
+                              <span style={{ fontSize: 9, fontWeight: 600, color: '#5A3E9E', background: '#F3F0FF', padding: '1px 5px', borderRadius: 4 }}>TABLE</span>
+                            )}
+                            {meta?.page && (
+                              <span style={{ fontSize: 9, color: '#706E6B' }}>p.{meta.page}</span>
+                            )}
+                          </span>
+                          <span style={{ fontSize: 11, color: '#706E6B' }}>
+                            {(r.similarity * 100).toFixed(1)}%
+                          </span>
+                        </div>
+                        {meta?.heading && (
+                          <div style={{ fontSize: 11, color: '#706E6B', marginBottom: 3 }}>§ {meta.heading}</div>
+                        )}
+                        {isExpanded ? (
+                          <div style={{ fontSize: 12, color: '#444', lineHeight: 1.6, whiteSpace: 'pre-wrap', textAlign: 'left' }}>
+                            {r.content}
+                          </div>
+                        ) : (
+                          <div style={{ fontSize: 12, color: '#706E6B', textAlign: 'left' }} className="sf-line-clamp-2">
+                            {r.content.slice(0, 200)}{r.content.length > 200 ? '…' : ''}
+                          </div>
+                        )}
+                      </button>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+
+        {/* ---- Right 1/3: Upload + Documents ---- */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
           {/* Drop zone */}
           <div
             onDragOver={(e) => {
@@ -481,83 +646,6 @@ export default function SemanticSearchContent() {
               </table>
             )}
           </div>
-        </div>
-
-        {/* ---- Right 1/3: Search + Preview ---- */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-          {/* Search */}
-          <div className="sf-card">
-            <div className="sf-card-header">
-              <h2 className="slds-text-size_medium slds-font-weight_semibold slds-text-neutral-base">
-                Semantic Search
-              </h2>
-            </div>
-            <div className="slds-p-around_medium" style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-              <div className="slds-grid slds-gap_x-small">
-                <input
-                  type="text"
-                  placeholder="Search help documents..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  onKeyDown={(e) => e.key === 'Enter' && runSearch()}
-                  className="sf-input slds-col"
-                />
-                <button
-                  onClick={runSearch}
-                  disabled={searching || !searchQuery.trim()}
-                  className="sf-btn sf-btn-brand"
-                >
-                  {searching ? (
-                    <Loader2 className="slds-icon-size_x-small sf-spin" />
-                  ) : (
-                    <Search className="slds-icon-size_x-small" />
-                  )}
-                </button>
-              </div>
-
-              {/* Search results */}
-              {searchResults.length > 0 && (
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', maxHeight: '400px', overflowY: 'auto' }}>
-                  {searchResults.map((r, i) => (
-                    <div
-                      key={r.id}
-                      className="slds-p-around_small slds-border-radius_small slds-border_all slds-border-color_border-2 slds-hover-border-brand-2 slds-transition-colors"
-                    >
-                      <div className="slds-grid slds-grid_vertical-align-center slds-grid_align-spread slds-m-bottom_xxx-small">
-                        <span className="slds-text-size_small slds-font-weight_medium slds-text-brand slds-flex slds-items-center slds-gap_xx-small">
-                          {(r.metadata as any)?.file_name || `Result ${i + 1}`}
-                          {(r.metadata as any)?.section_type === 'table' && (
-                            <span style={{ fontSize: '9px', fontWeight: 600, color: '#5A3E9E', background: '#F3F0FF', padding: '1px 5px', borderRadius: '4px' }}>TABLE</span>
-                          )}
-                          {(r.metadata as any)?.page && (
-                            <span style={{ fontSize: '9px', color: '#706E6B' }}>p.{(r.metadata as any).page}</span>
-                          )}
-                        </span>
-                        <span className="slds-text-size_small slds-text-neutral-7">
-                          {(r.similarity * 100).toFixed(1)}%
-                        </span>
-                      </div>
-                      {(r.metadata as any)?.heading && (
-                        <div className="slds-text-neutral-7 slds-m-bottom_xxx-small" style={{ fontSize: '11px' }}>
-                          § {(r.metadata as any).heading}
-                        </div>
-                      )}
-                      {(r.metadata as any)?.section_type === 'table' ? (
-                        <pre className="slds-text-size_small slds-text-neutral-9" style={{ whiteSpace: 'pre-wrap', fontFamily: 'monospace', fontSize: '11px', maxHeight: '120px', overflow: 'hidden' }}>
-                          {r.content.slice(0, 500)}
-                        </pre>
-                      ) : (
-                        <p className="slds-text-size_small slds-text-neutral-9 sf-line-clamp-4">
-                          {r.content.slice(0, 300)}
-                          {r.content.length > 300 ? '...' : ''}
-                        </p>
-                      )}
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-          </div>
 
           {/* Preview panel */}
           {(preview || previewLoading) && (
@@ -593,9 +681,9 @@ export default function SemanticSearchContent() {
                       <div className="slds-text-size_small slds-font-weight_medium slds-text-neutral-7 slds-text-uppercase slds-tracking-wide slds-m-bottom_xxx-small">
                         Content
                       </div>
-                      <div className="slds-text-size_small slds-text-neutral-9 slds-leading-relaxed slds-border-radius_small slds-p-around_small" style={{ maxHeight: '400px', overflowY: 'auto', whiteSpace: 'pre-wrap', background: '#FAFAF9', border: '1px solid var(--slds-g-color-border-2)' }}>
-                        {preview.content.slice(0, 5000)}
-                        {preview.content.length > 5000 ? '\n\n... (truncated)' : ''}
+                      <div className="slds-text-size_small slds-text-neutral-9" style={{ whiteSpace: 'pre-wrap', maxHeight: '300px', overflowY: 'auto', lineHeight: 1.5 }}>
+                        {preview.content.slice(0, 10000)}
+                        {preview.content.length > 10000 ? '\n\n... (truncated)' : ''}
                       </div>
                     </div>
                   </div>
@@ -608,3 +696,4 @@ export default function SemanticSearchContent() {
     </div>
   );
 }
+
