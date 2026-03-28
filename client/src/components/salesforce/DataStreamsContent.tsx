@@ -1138,7 +1138,7 @@ export default function DataStreamsContent({ demoSession, currentTimeline }: Dat
           >
             <option value="all">All Sources</option>
             <option value="salesforce">Salesforce CRM</option>
-            {is264Release && <option value="informatica">Informatica MDM</option>}
+            {is264Release && hasInformaticaConn && <option value="informatica">Informatica MDM</option>}
             <option value="api">Ingestion API</option>
           </select>
         </div>
@@ -1323,8 +1323,8 @@ export default function DataStreamsContent({ demoSession, currentTimeline }: Dat
                           );
                         })()}
 
-                        {/* Informatica MDM — always shown in 264 Release */}
-                        {is264Release && (() => {
+                        {/* Informatica MDM — only shown after tenant is configured in Data Cloud Setup */}
+                        {is264Release && hasInformaticaConn && (() => {
                           const isSelected = selectedSource === 'informatica';
                           return (
                             <button

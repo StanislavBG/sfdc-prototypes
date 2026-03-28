@@ -6,7 +6,7 @@ import { detectFormat } from "./document-parser";
 import { api } from "@shared/routes";
 import { parseMhtml } from "./mhtml-parser";
 import { parseDocument } from "./document-parser";
-import { generateEmbedding } from "./embeddings";
+import { generateEmbedding, generateAnswer } from "./embeddings";
 import { pool } from "./db";
 import { z } from "zod";
 
@@ -477,6 +477,22 @@ export async function registerRoutes(
         return res.status(400).json({ message: err.errors[0].message });
       }
       throw err;
+    }
+  });
+
+  /** Ask AI: vector search + LLM answer synthesis (RAG). */
+  app.post(api.helpDocs.ask.path, async (req, res) => {
+    try {
+      const input = api.helpDocs.ask.input.parse(req.body);
+      const sources = await storage.searchHelpDocuments(input.query, input.limit || 8);
+      const answer = await generateAnswer(input.query, sources);
+      res.json({ answer, sources });
+    } catch (err) {
+      if (err instanceof z.ZodError) {
+        return res.status(400).json({ message: err.errors[0].message });
+      }
+      console.error("Ask AI error:", err);
+      res.status(500).json({ message: (err as any).message || "Failed to generate answer" });
     }
   });
 
