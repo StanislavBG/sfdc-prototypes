@@ -574,7 +574,8 @@ export default function IdentityResolutionContent({ demoSession, onDemoSessionCh
 
   // New Ruleset wizard
   const [newRulesetOpen, setNewRulesetOpen] = useState(false);
-  const [newRulesetStep, setNewRulesetStep] = useState<1 | 2 | 3 | 4>(1);
+  // Steps: 1=record type, 2=IR type (264 only), 3=review (create path), 4=datakit picker, 5=review (datakit path)
+  const [newRulesetStep, setNewRulesetStep] = useState<number>(1);
   const [newRulesetOption, setNewRulesetOption] = useState<'create' | 'datakit' | null>(null);
   const [newRulesetRecordType, setNewRulesetRecordType] = useState<string | null>(null);
   const [newRulesetIRType, setNewRulesetIRType] = useState<'byom' | 'dc-ir' | null>(null);
@@ -624,10 +625,7 @@ export default function IdentityResolutionContent({ demoSession, onDemoSessionCh
   };
 
   const handleOpenNewRuleset = (mode: 'create' | 'datakit' = 'create') => {
-    setNewRulesetStep(mode === 'create' ? 1 : 1);
     setNewRulesetOption(mode);
-    setNewRulesetRecordType(null);
-    setNewRulesetIRType(null);
     setNewRulesetName('');
     setNewRulesetPrimaryDMO('Individual');
     setNewRulesetDataSpace('default');
@@ -635,6 +633,18 @@ export default function IdentityResolutionContent({ demoSession, onDemoSessionCh
     setSelectedDatakit(currentTimeline === '264-release' ? 'Informatica MDM' : 'Knowledge Space');
     setSelectedDatakitRuleset(null);
     setTooltipOpen(null);
+    setNewRulesetDropdownOpen(false);
+
+    if (mode === 'datakit') {
+      // Shortcut: pre-select Individuals + BYOM, jump to datakit picker
+      setNewRulesetRecordType('Individuals');
+      setNewRulesetIRType('byom');
+      setNewRulesetStep(4 as any); // datakit picker step
+    } else {
+      setNewRulesetRecordType(null);
+      setNewRulesetIRType(null);
+      setNewRulesetStep(1);
+    }
     setNewRulesetOpen(true);
   };
 
@@ -648,27 +658,37 @@ export default function IdentityResolutionContent({ demoSession, onDemoSessionCh
 
   const handleNewRulesetNext = () => {
     if (newRulesetStep === 1 && newRulesetRecordType) {
-      // Step 1: Record type selected → set DMO
+      // Step 1: Record type → set DMO
       const rt = recordTypeOptions.find((r) => r.key === newRulesetRecordType);
       if (rt) setNewRulesetPrimaryDMO(rt.dmo);
       if (is264Release) {
-        // 264 Release: show IR type step
         triggerDelay(() => setNewRulesetStep(2));
       } else {
-        // Today: skip IR type, go straight to review
         setNewRulesetIRType('dc-ir');
         setNewRulesetOption('create');
         setNewRulesetName('Unification_Ruleset');
         triggerDelay(() => setNewRulesetStep(3));
       }
     } else if (newRulesetStep === 2 && newRulesetIRType) {
-      // Step 2: IR type selected → pre-populate and go to review
+      // Step 2: IR type selected
       if (newRulesetIRType === 'byom') {
+        // BYOM → go to datakit picker (step 4)
         setNewRulesetOption('datakit');
-        setNewRulesetName(`${newRulesetRecordType || 'Individual'} (BYOM)`);
+        triggerDelay(() => setNewRulesetStep(4));
       } else {
+        // DC IR → go to review (step 3)
         setNewRulesetOption('create');
         setNewRulesetName('Unification_Ruleset');
+        triggerDelay(() => setNewRulesetStep(3));
+      }
+    } else if (newRulesetStep === 4 && selectedDatakitRuleset) {
+      // Step 4: Datakit picked → populate and go to review
+      const currentRulesets = datakitRulesets[selectedDatakit] || [];
+      const picked = currentRulesets.find((r) => r.id === selectedDatakitRuleset);
+      if (picked) {
+        setNewRulesetName(picked.name);
+        setNewRulesetPrimaryDMO(picked.primaryDMO);
+        setNewRulesetDataSpace(picked.dataSpace);
       }
       triggerDelay(() => setNewRulesetStep(3));
     }
@@ -678,8 +698,18 @@ export default function IdentityResolutionContent({ demoSession, onDemoSessionCh
     setTooltipOpen(null);
     if (newRulesetStep === 2) setNewRulesetStep(1);
     else if (newRulesetStep === 3) {
-      if (is264Release) setNewRulesetStep(2);
+      if (newRulesetOption === 'datakit') setNewRulesetStep(4);
+      else if (is264Release) setNewRulesetStep(2);
       else setNewRulesetStep(1);
+    } else if (newRulesetStep === 4) {
+      // Back from datakit picker
+      if (newRulesetIRType === 'byom' && newRulesetRecordType) {
+        // Came from IR type step
+        setNewRulesetStep(2);
+      } else {
+        // Came from shortcut (Install from Data Kit button)
+        setNewRulesetOpen(false);
+      }
     }
   };
 
@@ -2492,7 +2522,7 @@ export default function IdentityResolutionContent({ demoSession, onDemoSessionCh
       {newRulesetOpen && (
         <div className="slds-pos-fixed slds-inset-0 slds-z-50 slds-flex slds-items-center slds-justify-center">
           <div className="slds-pos-absolute slds-inset-0" style={{ backgroundColor: 'rgba(0,0,0,0.4)' }} onClick={() => setNewRulesetOpen(false)} />
-          <div className={`slds-pos-relative slds-bg-white slds-border-radius_large slds-shadow_large slds-flex slds-flex-col slds-transition-all`} style={{ maxHeight: '85vh', width: '680px' }}>
+          <div className={`slds-pos-relative slds-bg-white slds-border-radius_large slds-shadow_large slds-flex slds-flex-col slds-transition-all`} style={{ maxHeight: '85vh', width: newRulesetStep === 4 ? '860px' : '680px' }}>
             {/* Header */}
             <div className="slds-flex slds-items-center slds-justify-between slds-p-horizontal_large slds-p-vertical_medium slds-border_bottom slds-border-color_border-1">
               <div>
@@ -2605,6 +2635,103 @@ export default function IdentityResolutionContent({ demoSession, onDemoSessionCh
                 </div>
               )}
 
+              {/* Step 4: Datakit Picker (BYOM / Install from Data Kit path) */}
+              {newRulesetStep === 4 && (
+                <div className="slds-flex" style={{ gap: 0, margin: '-24px', height: '420px' }}>
+                  {/* Left sidebar: datakit categories */}
+                  <div className="slds-flex-shrink-0 slds-overflow-y-auto" style={{ width: '220px', borderRight: '1px solid var(--slds-g-color-border-1)', backgroundColor: '#FAFAF9' }}>
+                    <div className="slds-p-around_small">
+                      <input
+                        type="text"
+                        value={datakitSearch}
+                        onChange={(e) => setDatakitSearch(e.target.value)}
+                        placeholder="Search datakits..."
+                        className="slds-w-full slds-p-horizontal_x-small slds-text-size_small slds-border_all slds-border-color_border-1 slds-border-radius_small" style={{ paddingTop: '6px', paddingBottom: '6px', outline: 'none' }}
+                      />
+                    </div>
+                    <nav className="slds-p-horizontal_xx-small slds-p-bottom_small">
+                      {datakitCategories
+                        .filter((cat) => cat.toLowerCase().includes(datakitSearch.toLowerCase()))
+                        .map((cat) => {
+                          const isInformatica = cat === 'Informatica MDM';
+                          const isActive = selectedDatakit === cat;
+                          return (
+                            <button
+                              key={cat}
+                              onClick={() => triggerDelay(() => { setSelectedDatakit(cat); setSelectedDatakitRuleset(null); })}
+                              className={`slds-w-full slds-text-left slds-p-horizontal_small slds-p-vertical_x-small slds-text-size_medium slds-border-radius_medium slds-m-bottom_xx-small slds-transition-colors ${
+                                isActive && isInformatica ? 'slds-font-weight_semibold' :
+                                isActive ? 'slds-text-brand slds-font-weight_semibold' :
+                                isInformatica ? 'slds-font-weight_medium' : 'slds-text-neutral-9'
+                              }`}
+                              style={{
+                                backgroundColor: isActive && isInformatica ? '#FFF3ED' : isActive ? '#EEF4FF' : undefined,
+                                color: isInformatica ? '#FF4A00' : undefined,
+                              }}
+                            >
+                              {cat}
+                              {isInformatica && !isActive && (
+                                <span className="slds-m-left_xx-small slds-inline-flex slds-items-center slds-p-horizontal_xx-small slds-border-radius_small slds-font-weight_bold slds-text-white" style={{ fontSize: '10px', paddingTop: '2px', paddingBottom: '2px', backgroundColor: '#FF4A00' }}>NEW</span>
+                              )}
+                            </button>
+                          );
+                        })}
+                    </nav>
+                  </div>
+                  {/* Right side: rulesets table */}
+                  <div className="slds-flex-1 slds-overflow-y-auto">
+                    <div className="slds-p-horizontal_medium slds-p-vertical_small slds-border_bottom slds-border-color_border-1">
+                      <h3 className="slds-text-size_medium slds-font-weight_semibold slds-text-neutral-base">Datakit Selection</h3>
+                      <p className="slds-text-size_small slds-text-neutral-7 slds-m-top_xx-small">{selectedDatakit} — select a ruleset to install</p>
+                      {demoSession && demoSession.informaticaConnections.length > 0 && selectedDatakit === 'Informatica MDM' && (
+                        <div className="slds-m-top_x-small slds-p-horizontal_small slds-p-vertical_x-small slds-border-radius_medium slds-border_all" style={{ backgroundColor: '#FFF3ED', borderColor: '#FFD6C0' }}>
+                          <p className="slds-font-weight_medium" style={{ fontSize: '11px', color: '#B33500' }}>
+                            Connected: {demoSession.informaticaConnections.map((c) => c.alias).join(', ')}
+                          </p>
+                          {demoSession.selectedBundles.length > 0 && (
+                            <p className="slds-m-top_xx-small" style={{ fontSize: '11px', color: '#B33500' }}>
+                              Installed Bundles: {demoSession.selectedBundles.join(', ')}
+                            </p>
+                          )}
+                        </div>
+                      )}
+                    </div>
+                    {(datakitRulesets[selectedDatakit] || []).length === 0 ? (
+                      <div className="slds-flex slds-items-center slds-justify-center slds-text-size_medium slds-text-neutral-7" style={{ height: '192px' }}>
+                        No rulesets available for {selectedDatakit}.
+                      </div>
+                    ) : (
+                      <table className="sf-table">
+                        <thead><tr><th style={{ width: '40px' }}></th><th>Ruleset Name</th><th>Description</th></tr></thead>
+                        <tbody>
+                          {(datakitRulesets[selectedDatakit] || []).map((rs) => {
+                            const isPhase2 = !!rs.phase2;
+                            return (
+                              <tr key={rs.id} className={isPhase2 ? 'slds-opacity_50' : 'slds-cursor-pointer'}
+                                style={{ backgroundColor: selectedDatakitRuleset === rs.id && !isPhase2 ? '#EEF4FF' : undefined }}
+                                onClick={() => { if (!isPhase2) setSelectedDatakitRuleset(rs.id); }}>
+                                <td>
+                                  <input type="radio" name="datakit-ruleset" checked={selectedDatakitRuleset === rs.id}
+                                    onChange={() => { if (!isPhase2) setSelectedDatakitRuleset(rs.id); }} disabled={isPhase2}
+                                    className="slds-icon-size_small" style={{ accentColor: 'var(--slds-g-color-brand)' }} />
+                                </td>
+                                <td>
+                                  <div className="slds-flex slds-items-center slds-gap_x-small">
+                                    <span className={`slds-text-size_medium slds-font-weight_medium ${isPhase2 ? 'slds-text-neutral-7' : 'slds-text-neutral-base'}`}>{rs.name}</span>
+                                    {isPhase2 && <span className="sf-badge sf-badge-neutral" style={{ opacity: 0.6 }}>Phase-2</span>}
+                                  </div>
+                                </td>
+                                <td className="slds-text-size_medium slds-text-neutral-7">{rs.primaryDMO} resolution — {rs.dataSpace} data space</td>
+                              </tr>
+                            );
+                          })}
+                        </tbody>
+                      </table>
+                    )}
+                  </div>
+                </div>
+              )}
+
               {/* Step 3: Review Basic Details */}
               {newRulesetStep === 3 && (
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
@@ -2709,57 +2836,63 @@ export default function IdentityResolutionContent({ demoSession, onDemoSessionCh
               )}
             </div>
 
-            {/* Footer with step indicator */}
+            {/* Footer */}
             <div className="slds-flex slds-items-center slds-justify-between slds-p-horizontal_large slds-p-vertical_medium slds-border_top slds-border-color_border-1" style={{ backgroundColor: '#FAFAF9' }}>
+              {/* Step indicator — adapts to path */}
               <div className="slds-flex slds-items-center slds-gap_x-small">
-                {(is264Release ? [1, 2, 3] : [1, 2]).map((s) => {
-                  // For Today timeline: step 1 = record type, step 2 = review (step 3)
-                  const actualStep = !is264Release && s === 2 ? 3 : s;
-                  return (
-                  <div key={s} className="slds-flex slds-items-center slds-gap_xx-small">
-                    <div className={`slds-border-radius_pill slds-flex slds-items-center slds-justify-center slds-text-size_small slds-font-weight_medium ${
-                      actualStep < newRulesetStep ? 'slds-bg-success slds-text-white' :
-                      actualStep === newRulesetStep ? 'slds-bg-brand slds-text-white' :
-                      'slds-text-neutral-7'
-                    }`} style={{ width: '24px', height: '24px', backgroundColor: actualStep > newRulesetStep ? 'var(--slds-g-color-border-2)' : undefined }}>
-                      {actualStep < newRulesetStep ? <Check className="slds-icon-size_xx-small" /> : s}
+                {(() => {
+                  // Determine which visual steps to show based on path
+                  const isDatakitPath = newRulesetOption === 'datakit' && newRulesetStep >= 4;
+                  const steps = isDatakitPath
+                    ? [{ n: 1, actual: 4 }, { n: 2, actual: 3 }] // datakit picker → review
+                    : is264Release
+                      ? [{ n: 1, actual: 1 }, { n: 2, actual: 2 }, { n: 3, actual: 3 }]
+                      : [{ n: 1, actual: 1 }, { n: 2, actual: 3 }];
+                  return steps.map((s, i) => (
+                    <div key={s.n} className="slds-flex slds-items-center slds-gap_xx-small">
+                      <div className={`slds-border-radius_pill slds-flex slds-items-center slds-justify-center slds-text-size_small slds-font-weight_medium ${
+                        s.actual < newRulesetStep ? 'slds-bg-success slds-text-white' :
+                        s.actual === newRulesetStep ? 'slds-bg-brand slds-text-white' : 'slds-text-neutral-7'
+                      }`} style={{ width: '24px', height: '24px', backgroundColor: s.actual > newRulesetStep ? 'var(--slds-g-color-border-2)' : undefined }}>
+                        {s.actual < newRulesetStep ? <Check className="slds-icon-size_xx-small" /> : s.n}
+                      </div>
+                      {i < steps.length - 1 && <div style={{ width: '24px', height: '2px', backgroundColor: s.actual < newRulesetStep ? 'var(--slds-g-color-success)' : 'var(--slds-g-color-border-2)' }} />}
                     </div>
-                    {s < (is264Release ? 3 : 2) && <div style={{ width: '24px', height: '2px', backgroundColor: actualStep < newRulesetStep ? 'var(--slds-g-color-success)' : 'var(--slds-g-color-border-2)' }} />}
-                  </div>
-                  );
-                })}
+                  ));
+                })()}
               </div>
+              {/* Buttons */}
               <div className="slds-flex slds-items-center slds-gap_small">
                 {newRulesetStep === 1 ? (
                   <>
                     <button onClick={() => setNewRulesetOpen(false)} className="slds-p-horizontal_medium slds-p-vertical_x-small slds-text-size_medium slds-font-weight_medium slds-text-neutral-9 slds-border_all slds-border-color_border-1 slds-border-radius_small slds-hover-bg-neutral-2">Cancel</button>
-                    <button
-                      onClick={handleNewRulesetNext}
-                      disabled={!newRulesetRecordType}
-                      className="slds-p-vertical_x-small slds-text-size_medium slds-font-weight_medium slds-text-white slds-bg-brand slds-border-radius_small" style={{ paddingLeft: '20px', paddingRight: '20px', opacity: !newRulesetRecordType ? 0.5 : 1, cursor: !newRulesetRecordType ? 'not-allowed' : 'pointer' }}
-                    >
+                    <button onClick={handleNewRulesetNext} disabled={!newRulesetRecordType}
+                      className="slds-p-vertical_x-small slds-text-size_medium slds-font-weight_medium slds-text-white slds-bg-brand slds-border-radius_small" style={{ paddingLeft: '20px', paddingRight: '20px', opacity: !newRulesetRecordType ? 0.5 : 1, cursor: !newRulesetRecordType ? 'not-allowed' : 'pointer' }}>
                       Next
                     </button>
                   </>
                 ) : newRulesetStep === 2 ? (
                   <>
                     <button onClick={handleNewRulesetBack} className="slds-p-horizontal_medium slds-p-vertical_x-small slds-text-size_medium slds-font-weight_medium slds-text-neutral-9 slds-border_all slds-border-color_border-1 slds-border-radius_small slds-hover-bg-neutral-2">Back</button>
-                    <button
-                      onClick={handleNewRulesetNext}
-                      disabled={!newRulesetIRType}
-                      className="slds-p-vertical_x-small slds-text-size_medium slds-font-weight_medium slds-text-white slds-bg-brand slds-border-radius_small" style={{ paddingLeft: '20px', paddingRight: '20px', opacity: !newRulesetIRType ? 0.5 : 1, cursor: !newRulesetIRType ? 'not-allowed' : 'pointer' }}
-                    >
+                    <button onClick={handleNewRulesetNext} disabled={!newRulesetIRType}
+                      className="slds-p-vertical_x-small slds-text-size_medium slds-font-weight_medium slds-text-white slds-bg-brand slds-border-radius_small" style={{ paddingLeft: '20px', paddingRight: '20px', opacity: !newRulesetIRType ? 0.5 : 1, cursor: !newRulesetIRType ? 'not-allowed' : 'pointer' }}>
+                      Next
+                    </button>
+                  </>
+                ) : newRulesetStep === 4 ? (
+                  <>
+                    <button onClick={handleNewRulesetBack} className="slds-p-horizontal_medium slds-p-vertical_x-small slds-text-size_medium slds-font-weight_medium slds-text-neutral-9 slds-border_all slds-border-color_border-1 slds-border-radius_small slds-hover-bg-neutral-2">Back</button>
+                    <button onClick={handleNewRulesetNext} disabled={!selectedDatakitRuleset}
+                      className="slds-p-vertical_x-small slds-text-size_medium slds-font-weight_medium slds-text-white slds-bg-brand slds-border-radius_small" style={{ paddingLeft: '20px', paddingRight: '20px', opacity: !selectedDatakitRuleset ? 0.5 : 1, cursor: !selectedDatakitRuleset ? 'not-allowed' : 'pointer' }}>
                       Next
                     </button>
                   </>
                 ) : (
                   <>
                     <button onClick={handleNewRulesetBack} className="slds-p-horizontal_medium slds-p-vertical_x-small slds-text-size_medium slds-font-weight_medium slds-text-neutral-9 slds-border_all slds-border-color_border-1 slds-border-radius_small slds-hover-bg-neutral-2">Back</button>
-                    <button
-                      onClick={handleNewRulesetSave}
-                      className="slds-p-vertical_x-small slds-text-size_medium slds-font-weight_medium slds-text-white slds-bg-brand slds-border-radius_small" style={{ paddingLeft: '20px', paddingRight: '20px' }}
-                    >
-                      Next
+                    <button onClick={handleNewRulesetSave}
+                      className="slds-p-vertical_x-small slds-text-size_medium slds-font-weight_medium slds-text-white slds-bg-brand slds-border-radius_small" style={{ paddingLeft: '20px', paddingRight: '20px' }}>
+                      Save
                     </button>
                   </>
                 )}
