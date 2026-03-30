@@ -805,11 +805,11 @@ export default function IdentityResolutionContent({ demoSession, onDemoSessionCh
       isCX: isCXDatakit,
     };
     createMutation.mutate(localToApi(newRs));
-    // Record installed datakit in session
-    if (isFromDatakit && selectedDatakitRuleset && onDemoSessionChange && demoSession) {
+    // Record ruleset in session so it shows in the 264 Release list
+    if (onDemoSessionChange && demoSession) {
       onDemoSessionChange({
         ...demoSession,
-        installedDatakits: [...demoSession.installedDatakits, selectedDatakitRuleset],
+        installedDatakits: [...demoSession.installedDatakits, newRs.rulesetId],
       });
     }
     setNewRulesetOpen(false);
