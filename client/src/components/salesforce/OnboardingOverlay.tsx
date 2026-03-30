@@ -102,6 +102,7 @@ export default function OnboardingOverlay({ onSelectTimeline, onDismiss, onLaunc
               <Sparkles style={{ color: '#9B8BF4', width: 24, height: 24 }} />
             </div>
             <h2 className="sf-onboarding-title">Welcome to Data 360</h2>
+            <span style={{ display: 'inline-block', fontSize: 10, fontWeight: 700, color: '#FF5D2D', background: '#FFF0EB', padding: '2px 8px', borderRadius: 10, letterSpacing: '0.5px', textTransform: 'uppercase', marginTop: 4 }}>Work in Progress</span>
             <p className="sf-onboarding-subtitle">
               Choose a timeline to explore. Each represents a different stage of the product.
             </p>
