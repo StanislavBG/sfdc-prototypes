@@ -388,6 +388,7 @@ export default function Layout({ children }: LayoutProps) {
 
           onToggleWorkflowCapture={() => setWorkflowCaptureActive((v) => !v)}
           workflowCaptureActive={workflowCaptureActive}
+          onRestartOnboarding={() => setShowOnboarding(true)}
         />
         <div className="sf-layout-body">
           <main ref={mainRef} className="sf-layout-main">
@@ -442,6 +443,7 @@ export default function Layout({ children }: LayoutProps) {
         onExportHtml={handleExportHtml}
         onToggleWorkflowCapture={() => setWorkflowCaptureActive((v) => !v)}
         workflowCaptureActive={workflowCaptureActive}
+        onRestartOnboarding={() => setShowOnboarding(true)}
       />
 
       {/* Body: conditionally render based on timeline */}

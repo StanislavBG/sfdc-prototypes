@@ -12,6 +12,7 @@ import {
   Download,
   Clipboard,
   Camera,
+  Sparkles,
 } from 'lucide-react';
 import GlobalSearch from './GlobalSearch';
 import { timelines } from './TimeMachine';
@@ -29,6 +30,7 @@ interface HeaderProps {
   onExportHtml?: () => void;
   onToggleWorkflowCapture?: () => void;
   workflowCaptureActive?: boolean;
+  onRestartOnboarding?: () => void;
 }
 
 // Figma logo SVG icon
@@ -65,6 +67,7 @@ export default function Header({
   onExportHtml,
   onToggleWorkflowCapture,
   workflowCaptureActive,
+  onRestartOnboarding,
 }: HeaderProps) {
   const timelineData = timelines.find((t) => t.id === currentTimeline);
   const [setupMenuOpen, setSetupMenuOpen] = useState(false);
@@ -187,6 +190,19 @@ export default function Header({
                   <div className="slds-col" style={{ textAlign: 'left' }}>
                     <span className="slds-text-size_small slds-font-weight_medium" style={{ color: 'var(--slds-g-color-neutral-base)', display: 'block' }}>Copy HTML for Figma</span>
                     <span className="slds-text-size_xx-small" style={{ color: 'var(--slds-g-color-neutral-7)' }}>Paste into html.to.design</span>
+                  </div>
+                </button>
+                {/* Restart Onboarding */}
+                <button
+                  onClick={() => { setToolsMenuOpen(false); onRestartOnboarding?.(); }}
+                  className="sf-dropdown-item"
+                >
+                  <div className="slds-square_large slds-border-radius_medium slds-flex slds-items-center slds-justify-center slds-flex-shrink-0" style={{ background: '#9B8BF4' }}>
+                    <Sparkles className="slds-icon-size_small slds-text-white" />
+                  </div>
+                  <div className="slds-col" style={{ textAlign: 'left' }}>
+                    <span className="slds-text-size_small slds-font-weight_medium" style={{ color: 'var(--slds-g-color-neutral-base)', display: 'block' }}>Restart Onboarding</span>
+                    <span className="slds-text-size_xx-small" style={{ color: 'var(--slds-g-color-neutral-7)' }}>Show the welcome flow again</span>
                   </div>
                 </button>
               </div>
