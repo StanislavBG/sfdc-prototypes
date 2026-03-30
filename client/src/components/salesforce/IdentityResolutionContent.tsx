@@ -670,15 +670,43 @@ export default function IdentityResolutionContent({ demoSession, onDemoSessionCh
         triggerDelay(() => setNewRulesetStep(3));
       }
     } else if (newRulesetStep === 2 && newRulesetIRType) {
-      // Step 2: IR type selected
+      // Step 2: IR type selected — auto-select the matching datakit
+      setNewRulesetOption('datakit');
+      setSelectedDatakit('Informatica MDM');
+
       if (newRulesetIRType === 'byom') {
-        // BYOM → go to datakit picker (step 4)
-        setNewRulesetOption('datakit');
-        triggerDelay(() => setNewRulesetStep(4));
+        // BYOM: map record type → datakit ruleset
+        const byomMap: Record<string, string> = {
+          'Individuals': 'INFA-C360',
+          'Households': 'INFA-C360',
+          'Accounts': 'INFA-O360',
+          'Leads to Accounts': 'INFA-O360',
+        };
+        const datakitId = byomMap[newRulesetRecordType || 'Individuals'] || 'INFA-C360';
+        setSelectedDatakitRuleset(datakitId);
+        const picked = allInformaticaRulesets.find((r) => r.id === datakitId);
+        if (picked) {
+          setNewRulesetName(picked.name);
+          setNewRulesetPrimaryDMO(picked.primaryDMO);
+          setNewRulesetDataSpace(picked.dataSpace);
+        }
+        triggerDelay(() => setNewRulesetStep(3));
       } else {
-        // DC IR → go to review (step 3)
-        setNewRulesetOption('create');
-        setNewRulesetName('Unification_Ruleset');
+        // DC IR: map record type → Real Time datakit
+        const dcIrMap: Record<string, string> = {
+          'Individuals': 'INFA-C360-RT',
+          'Households': 'INFA-C360-RT',
+          'Accounts': 'INFA-O360',
+          'Leads to Accounts': 'INFA-O360',
+        };
+        const datakitId = dcIrMap[newRulesetRecordType || 'Individuals'] || 'INFA-C360-RT';
+        setSelectedDatakitRuleset(datakitId);
+        const picked = allInformaticaRulesets.find((r) => r.id === datakitId);
+        if (picked) {
+          setNewRulesetName(picked.name + ' (Real Time)');
+          setNewRulesetPrimaryDMO(picked.primaryDMO);
+          setNewRulesetDataSpace(picked.dataSpace);
+        }
         triggerDelay(() => setNewRulesetStep(3));
       }
     } else if (newRulesetStep === 4 && selectedDatakitRuleset) {
@@ -698,7 +726,9 @@ export default function IdentityResolutionContent({ demoSession, onDemoSessionCh
     setTooltipOpen(null);
     if (newRulesetStep === 2) setNewRulesetStep(1);
     else if (newRulesetStep === 3) {
-      if (newRulesetOption === 'datakit') setNewRulesetStep(4);
+      // If we came from step 4 (datakit picker shortcut), go back there
+      if (newRulesetStep === 3 && newRulesetOption === 'datakit' && !newRulesetIRType) setNewRulesetStep(4);
+      // If we came from step 2 (IR type), go back to step 2
       else if (is264Release) setNewRulesetStep(2);
       else setNewRulesetStep(1);
     } else if (newRulesetStep === 4) {
@@ -2528,7 +2558,7 @@ export default function IdentityResolutionContent({ demoSession, onDemoSessionCh
               <div>
                 <h2 className="slds-text-size_large slds-font-weight_semibold slds-text-neutral-base">New Ruleset</h2>
                 <p className="slds-text-size_small slds-text-neutral-7 slds-m-top_xx-small">
-                  {newRulesetStep === 1 ? 'What type of records do you want to consolidate?' : newRulesetStep === 2 ? 'Choose your identity resolution approach.' : 'Review and confirm.'}
+                  {newRulesetStep === 1 ? 'What type of records do you want to consolidate?' : newRulesetStep === 2 ? 'Choose your identity resolution approach.' : newRulesetStep === 4 ? 'Select a datakit to install.' : 'Review and confirm.'}
                 </p>
               </div>
               <button onClick={() => setNewRulesetOpen(false)} className="slds-flex slds-items-center slds-justify-center slds-border-radius_small slds-hover-bg-neutral-2 slds-text-neutral-7" style={{ width: '28px', height: '28px' }}>
