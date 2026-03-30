@@ -582,6 +582,7 @@ export default function IdentityResolutionContent({ demoSession, onDemoSessionCh
   const [newRulesetPrimaryDMO, setNewRulesetPrimaryDMO] = useState('Individual');
   const [newRulesetDataSpace, setNewRulesetDataSpace] = useState('default');
   const [tooltipOpen, setTooltipOpen] = useState<string | null>(null);
+  const [newRulesetDropdownOpen, setNewRulesetDropdownOpen] = useState(false);
   // Datakit selection state
   const [datakitSearch, setDatakitSearch] = useState('');
   const [selectedDatakit, setSelectedDatakit] = useState('Informatica MDM');
@@ -2331,9 +2332,40 @@ export default function IdentityResolutionContent({ demoSession, onDemoSessionCh
           <h1 className="slds-font-weight_bold slds-text-neutral-base" style={{ fontSize: '18px' }}>Identity Resolutions</h1>
           <p className="slds-text-size_small slds-text-neutral-7 slds-m-top_xx-small">Manage rulesets that match and unify source profiles into unified profiles.</p>
         </div>
-        <button onClick={() => handleOpenNewRuleset('create')} className="slds-flex slds-items-center slds-gap_xx-small slds-p-horizontal_medium slds-p-vertical_x-small slds-text-size_medium slds-font-weight_medium slds-text-white slds-bg-brand slds-border-radius_small slds-transition-colors">
-          <Plus className="slds-icon-size_small" /> New Ruleset
-        </button>
+        <div className="slds-pos-relative">
+          <div className="slds-flex" style={{ gap: 0 }}>
+            <button
+              onClick={() => handleOpenNewRuleset('create')}
+              className="slds-flex slds-items-center slds-gap_xx-small slds-p-horizontal_medium slds-p-vertical_x-small slds-text-size_medium slds-font-weight_medium slds-text-white slds-bg-brand slds-transition-colors"
+              style={{ borderRadius: '4px 0 0 4px' }}
+            >
+              <Plus className="slds-icon-size_small" /> New Ruleset
+            </button>
+            <button
+              onClick={() => setNewRulesetDropdownOpen(!newRulesetDropdownOpen)}
+              className="slds-flex slds-items-center slds-justify-center slds-text-white slds-bg-brand slds-transition-colors"
+              style={{ borderRadius: '0 4px 4px 0', borderLeft: '1px solid rgba(255,255,255,0.3)', padding: '8px 10px' }}
+            >
+              <ChevronDown className="slds-icon-size_xx-small" />
+            </button>
+          </div>
+          {newRulesetDropdownOpen && (
+            <div className="slds-pos-absolute slds-bg-white slds-border_all slds-border-color_border-1 slds-border-radius_small slds-shadow_medium slds-z-10" style={{ right: 0, top: '100%', marginTop: 4, width: 220 }}>
+              <button
+                onClick={() => { setNewRulesetDropdownOpen(false); handleOpenNewRuleset('create'); }}
+                className="slds-w-full slds-text-left slds-p-horizontal_medium slds-p-vertical_x-small slds-text-size_medium slds-text-neutral-base slds-hover-bg-neutral-2"
+              >
+                Create New Ruleset
+              </button>
+              <button
+                onClick={() => { setNewRulesetDropdownOpen(false); handleOpenNewRuleset('datakit'); }}
+                className="slds-w-full slds-text-left slds-p-horizontal_medium slds-p-vertical_x-small slds-text-size_medium slds-text-neutral-base slds-hover-bg-neutral-2"
+              >
+                Install from a Data Kit
+              </button>
+            </div>
+          )}
+        </div>
       </div>
       {is264Release ? (
         /* 264 Release: show installed datakit rulesets, or empty state if none */
