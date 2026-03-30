@@ -2528,7 +2528,7 @@ export default function IdentityResolutionContent({ demoSession, onDemoSessionCh
               <div>
                 <h2 className="slds-text-size_large slds-font-weight_semibold slds-text-neutral-base">New Ruleset</h2>
                 <p className="slds-text-size_small slds-text-neutral-7 slds-m-top_xx-small">
-                  {newRulesetStep === 1 ? 'What type of records do you want to consolidate?' : newRulesetStep === 2 ? 'Choose your identity resolution approach.' : 'Review and confirm.'}
+                  {newRulesetStep === 1 ? 'What type of records do you want to consolidate?' : newRulesetStep === 2 ? 'Choose your identity resolution approach.' : newRulesetStep === 4 ? 'Select a datakit to install.' : 'Review and confirm.'}
                 </p>
               </div>
               <button onClick={() => setNewRulesetOpen(false)} className="slds-flex slds-items-center slds-justify-center slds-border-radius_small slds-hover-bg-neutral-2 slds-text-neutral-7" style={{ width: '28px', height: '28px' }}>
