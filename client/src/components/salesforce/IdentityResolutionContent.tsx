@@ -32,6 +32,7 @@ import {
   Layers,
   CreditCard,
   FileText,
+  Sparkles,
 } from 'lucide-react';
 import {
   useIdentityRulesets,
@@ -573,11 +574,14 @@ export default function IdentityResolutionContent({ demoSession, onDemoSessionCh
 
   // New Ruleset wizard
   const [newRulesetOpen, setNewRulesetOpen] = useState(false);
-  const [newRulesetStep, setNewRulesetStep] = useState<1 | 2 | 3>(1);
+  const [newRulesetStep, setNewRulesetStep] = useState<1 | 2 | 3 | 4>(1);
   const [newRulesetOption, setNewRulesetOption] = useState<'create' | 'datakit' | null>(null);
+  const [newRulesetRecordType, setNewRulesetRecordType] = useState<string | null>(null);
+  const [newRulesetIRType, setNewRulesetIRType] = useState<'byom' | 'dc-ir' | null>(null);
   const [newRulesetName, setNewRulesetName] = useState('');
   const [newRulesetPrimaryDMO, setNewRulesetPrimaryDMO] = useState('Individual');
   const [newRulesetDataSpace, setNewRulesetDataSpace] = useState('default');
+  const [tooltipOpen, setTooltipOpen] = useState<string | null>(null);
   // Datakit selection state
   const [datakitSearch, setDatakitSearch] = useState('');
   const [selectedDatakit, setSelectedDatakit] = useState('Informatica MDM');
@@ -618,41 +622,64 @@ export default function IdentityResolutionContent({ demoSession, onDemoSessionCh
     'Content Kit': [],
   };
 
-  const handleOpenNewRuleset = () => {
-    setNewRulesetStep(1);
-    setNewRulesetOption(null);
+  const handleOpenNewRuleset = (mode: 'create' | 'datakit' = 'create') => {
+    setNewRulesetStep(mode === 'create' ? 1 : 1);
+    setNewRulesetOption(mode);
+    setNewRulesetRecordType(null);
+    setNewRulesetIRType(null);
     setNewRulesetName('');
     setNewRulesetPrimaryDMO('Individual');
     setNewRulesetDataSpace('default');
     setDatakitSearch('');
     setSelectedDatakit(currentTimeline === '264-release' ? 'Informatica MDM' : 'Knowledge Space');
     setSelectedDatakitRuleset(null);
+    setTooltipOpen(null);
     setNewRulesetOpen(true);
   };
 
+  // Record type options with descriptions (Step 2)
+  const recordTypeOptions = [
+    { key: 'Individuals', label: 'Individuals', desc: 'Consolidate data about people into comprehensive unified individual profiles.', dmo: 'Individual' },
+    { key: 'Households', label: 'Households', desc: 'Group unified individuals into household units. You must unify individuals before creating households.', dmo: 'Individual' },
+    { key: 'Accounts', label: 'Accounts', desc: 'Consolidate data about business accounts into comprehensive unified account profiles.', dmo: 'Account' },
+    { key: 'Leads to Accounts', label: 'Leads to Accounts', desc: 'Consolidate leads and accounts to ensure reps and agents have a complete view of each customer.', dmo: 'Account' },
+  ];
+
   const handleNewRulesetNext = () => {
-    if (newRulesetStep === 1 && newRulesetOption) {
-      triggerDelay(() => setNewRulesetStep(2));
-    } else if (newRulesetStep === 2) {
-      if (newRulesetOption === 'create' && newRulesetName.trim()) {
-        triggerDelay(() => setNewRulesetStep(3));
-      } else if (newRulesetOption === 'datakit' && selectedDatakitRuleset) {
-        // Populate name/DMO from selected datakit ruleset
-        const currentRulesets = datakitRulesets[selectedDatakit] || [];
-        const picked = currentRulesets.find((r) => r.id === selectedDatakitRuleset);
-        if (picked) {
-          setNewRulesetName(picked.name);
-          setNewRulesetPrimaryDMO(picked.primaryDMO);
-          setNewRulesetDataSpace(picked.dataSpace);
-        }
+    if (newRulesetStep === 1 && newRulesetRecordType) {
+      // Step 1: Record type selected → set DMO
+      const rt = recordTypeOptions.find((r) => r.key === newRulesetRecordType);
+      if (rt) setNewRulesetPrimaryDMO(rt.dmo);
+      if (is264Release) {
+        // 264 Release: show IR type step
+        triggerDelay(() => setNewRulesetStep(2));
+      } else {
+        // Today: skip IR type, go straight to review
+        setNewRulesetIRType('dc-ir');
+        setNewRulesetOption('create');
+        setNewRulesetName('Unification_Ruleset');
         triggerDelay(() => setNewRulesetStep(3));
       }
+    } else if (newRulesetStep === 2 && newRulesetIRType) {
+      // Step 2: IR type selected → pre-populate and go to review
+      if (newRulesetIRType === 'byom') {
+        setNewRulesetOption('datakit');
+        setNewRulesetName(`${newRulesetRecordType || 'Individual'} (BYOM)`);
+      } else {
+        setNewRulesetOption('create');
+        setNewRulesetName('Unification_Ruleset');
+      }
+      triggerDelay(() => setNewRulesetStep(3));
     }
   };
 
   const handleNewRulesetBack = () => {
+    setTooltipOpen(null);
     if (newRulesetStep === 2) setNewRulesetStep(1);
-    else if (newRulesetStep === 3) setNewRulesetStep(2);
+    else if (newRulesetStep === 3) {
+      if (is264Release) setNewRulesetStep(2);
+      else setNewRulesetStep(1);
+    }
   };
 
   const handleNewRulesetSave = () => {
@@ -661,11 +688,12 @@ export default function IdentityResolutionContent({ demoSession, onDemoSessionCh
   };
 
   const handleNewRulesetSaveInner = () => {
+    const isBYOM = newRulesetIRType === 'byom';
     const isFromDatakit = newRulesetOption === 'datakit';
     // Check if the selected datakit ruleset is a CX (Customer 360) type
     const currentDkRulesets = datakitRulesets[selectedDatakit] || [];
     const pickedDk = currentDkRulesets.find((r) => r.id === selectedDatakitRuleset);
-    const isCXDatakit = isFromDatakit && pickedDk?.cx === true;
+    const isCXDatakit = isBYOM || (isFromDatakit && pickedDk?.cx === true);
     // CX datakits get pre-populated with match rules and reconciliation data
     const cxMatchRules: MatchRule[] = isCXDatakit ? [
       { id: 'mr-cx-1', ruleName: 'Fuzzy Name and Normalized Email', priority: 1, criteria: [
@@ -720,7 +748,7 @@ export default function IdentityResolutionContent({ demoSession, onDemoSessionCh
     const newRs: IdentityRuleset = {
       id: `rs-new-${Date.now()}`,
       rulesetName: newRulesetName,
-      rulesetId: isFromDatakit && selectedDatakitRuleset ? selectedDatakitRuleset : `IDR-${new Date().getFullYear()}-${String(rulesets.length + 1).padStart(3, '0')}`,
+      rulesetId: isBYOM ? `INFA-${newRulesetRecordType === 'Accounts' ? 'O360' : 'C360'}` : isFromDatakit && selectedDatakitRuleset ? selectedDatakitRuleset : `UR${String(rulesets.length + 1).padStart(2, '0')}`,
       dataSpace: newRulesetDataSpace,
       primaryDataModelObject: newRulesetPrimaryDMO,
       secondaryDataModelObject: newRulesetPrimaryDMO,
@@ -741,8 +769,8 @@ export default function IdentityResolutionContent({ demoSession, onDemoSessionCh
       processingHistory: isCXDatakit ? generateProcessingHistory() : [],
       legacyProcessingHistory: isCXDatakit ? generateLegacyProcessingHistory() : [],
       rulesetChanges: isCXDatakit ? generateRulesetChanges() : [],
-      isBYOM: isFromDatakit,
-      byomSource: isFromDatakit ? selectedDatakit : undefined,
+      isBYOM: isBYOM || isFromDatakit,
+      byomSource: isBYOM ? 'Informatica MDM' : isFromDatakit ? selectedDatakit : undefined,
       isCX: isCXDatakit,
     };
     createMutation.mutate(localToApi(newRs));
@@ -2303,7 +2331,7 @@ export default function IdentityResolutionContent({ demoSession, onDemoSessionCh
           <h1 className="slds-font-weight_bold slds-text-neutral-base" style={{ fontSize: '18px' }}>Identity Resolutions</h1>
           <p className="slds-text-size_small slds-text-neutral-7 slds-m-top_xx-small">Manage rulesets that match and unify source profiles into unified profiles.</p>
         </div>
-        <button onClick={handleOpenNewRuleset} className="slds-flex slds-items-center slds-gap_xx-small slds-p-horizontal_medium slds-p-vertical_x-small slds-text-size_medium slds-font-weight_medium slds-text-white slds-bg-brand slds-border-radius_small slds-transition-colors">
+        <button onClick={() => handleOpenNewRuleset('create')} className="slds-flex slds-items-center slds-gap_xx-small slds-p-horizontal_medium slds-p-vertical_x-small slds-text-size_medium slds-font-weight_medium slds-text-white slds-bg-brand slds-border-radius_small slds-transition-colors">
           <Plus className="slds-icon-size_small" /> New Ruleset
         </button>
       </div>
@@ -2432,13 +2460,13 @@ export default function IdentityResolutionContent({ demoSession, onDemoSessionCh
       {newRulesetOpen && (
         <div className="slds-pos-fixed slds-inset-0 slds-z-50 slds-flex slds-items-center slds-justify-center">
           <div className="slds-pos-absolute slds-inset-0" style={{ backgroundColor: 'rgba(0,0,0,0.4)' }} onClick={() => setNewRulesetOpen(false)} />
-          <div className={`slds-pos-relative slds-bg-white slds-border-radius_large slds-shadow_large slds-flex slds-flex-col slds-transition-all`} style={{ maxHeight: '85vh', width: newRulesetStep === 2 && newRulesetOption === 'datakit' ? '860px' : '640px' }}>
+          <div className={`slds-pos-relative slds-bg-white slds-border-radius_large slds-shadow_large slds-flex slds-flex-col slds-transition-all`} style={{ maxHeight: '85vh', width: '680px' }}>
             {/* Header */}
             <div className="slds-flex slds-items-center slds-justify-between slds-p-horizontal_large slds-p-vertical_medium slds-border_bottom slds-border-color_border-1">
               <div>
                 <h2 className="slds-text-size_large slds-font-weight_semibold slds-text-neutral-base">New Ruleset</h2>
                 <p className="slds-text-size_small slds-text-neutral-7 slds-m-top_xx-small">
-                  {newRulesetStep === 1 ? 'Select an option to continue.' : newRulesetStep === 2 ? 'Configure your new ruleset.' : 'Review and confirm.'}
+                  {newRulesetStep === 1 ? 'What type of records do you want to consolidate?' : newRulesetStep === 2 ? 'Choose your identity resolution approach.' : 'Review and confirm.'}
                 </p>
               </div>
               <button onClick={() => setNewRulesetOpen(false)} className="slds-flex slds-items-center slds-justify-center slds-border-radius_small slds-hover-bg-neutral-2 slds-text-neutral-7" style={{ width: '28px', height: '28px' }}>
@@ -2448,241 +2476,201 @@ export default function IdentityResolutionContent({ demoSession, onDemoSessionCh
 
             {/* Body */}
             <div className="slds-flex-1 slds-overflow-y-auto slds-p-horizontal_large slds-p-vertical_large">
+              {/* Step 1: Record Type Selection */}
               {newRulesetStep === 1 && (
-                <div className="slds-css-grid slds-css-grid-cols-2 slds-gap_medium">
-                  {([
-                    { key: 'create' as const, icon: Plus, label: 'Create New Ruleset', desc: 'Build a custom identity resolution ruleset from scratch.' },
-                    { key: 'datakit' as const, icon: Download, label: 'Install from Datakits', desc: 'Install a pre-built ruleset from available datakits.' },
-                  ]).map((opt) => {
-                    const selected = newRulesetOption === opt.key;
-                    return (
-                      <button
-                        key={opt.key}
-                        onClick={() => setNewRulesetOption(opt.key)}
-                        className={`slds-pos-relative slds-flex slds-flex-col slds-items-center slds-justify-center slds-border-radius_large slds-transition-all slds-text-center slds-p-horizontal_medium ${
-                          selected
-                            ? 'slds-border-color_brand slds-bg-white slds-shadow_small'
-                            : 'slds-bg-white'
-                        }`}
-                        style={{ height: '160px', borderWidth: '2px', borderStyle: 'solid', borderColor: selected ? undefined : '#D8DDE6' }}
-                      >
-                        {selected && (
-                          <div className="slds-pos-absolute slds-bg-brand slds-flex slds-items-center slds-justify-center" style={{ top: 0, right: 0, width: '28px', height: '28px', clipPath: 'polygon(0 0, 100% 0, 100% 100%)' }}>
-                            <Check className="slds-icon-size_xx-small slds-text-white slds-pos-absolute" style={{ top: '2px', right: '2px' }} />
-                          </div>
-                        )}
-                        <div className={`slds-border-radius_pill slds-flex slds-items-center slds-justify-center slds-m-bottom_small ${selected ? '' : 'slds-bg-neutral-2'}`} style={{ width: '40px', height: '40px', backgroundColor: selected ? '#EEF4FF' : undefined }}>
-                          <opt.icon className={`slds-icon-size_default ${selected ? 'slds-text-brand' : 'slds-text-neutral-7'}`} />
-                        </div>
-                        <span className="slds-text-size_medium slds-font-weight_medium slds-text-neutral-base">{opt.label}</span>
-                        <span className="slds-text-size_small slds-text-neutral-7 slds-m-top_xx-small">{opt.desc}</span>
-                      </button>
-                    );
-                  })}
-                </div>
-              )}
-
-              {newRulesetStep === 2 && newRulesetOption === 'create' && (
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-                  <div>
-                    <label className="slds-text-size_small slds-font-weight_medium slds-text-neutral-7 slds-text-uppercase slds-tracking-wide slds-m-bottom_xx-small" style={{ display: 'block' }}>
-                      <span className="slds-text-error">*</span> Ruleset Name
-                    </label>
-                    <input
-                      type="text"
-                      value={newRulesetName}
-                      onChange={(e) => setNewRulesetName(e.target.value)}
-                      placeholder="e.g., Individual (Main)"
-                      className="slds-w-full slds-p-horizontal_small slds-p-vertical_x-small slds-text-size_medium slds-border_all slds-border-color_border-1 slds-border-radius_small" style={{ outline: 'none' }}
-                    />
-                  </div>
-                  <div>
-                    <label className="slds-text-size_small slds-font-weight_medium slds-text-neutral-7 slds-text-uppercase slds-tracking-wide slds-m-bottom_xx-small" style={{ display: 'block' }}>
-                      <span className="slds-text-error">*</span> Primary Data Model Object
-                    </label>
-                    <select
-                      value={newRulesetPrimaryDMO}
-                      onChange={(e) => setNewRulesetPrimaryDMO(e.target.value)}
-                      className="slds-w-full slds-p-horizontal_small slds-p-vertical_x-small slds-text-size_medium slds-border_all slds-border-color_border-1 slds-border-radius_small slds-bg-white" style={{ outline: 'none' }}
-                    >
-                      {dataModelObjects.map((dmo) => (
-                        <option key={dmo} value={dmo}>{dmo}</option>
-                      ))}
-                    </select>
-                  </div>
-                  <div>
-                    <label className="slds-text-size_small slds-font-weight_medium slds-text-neutral-7 slds-text-uppercase slds-tracking-wide slds-m-bottom_xx-small" style={{ display: 'block' }}>Data Space</label>
-                    <select
-                      value={newRulesetDataSpace}
-                      onChange={(e) => setNewRulesetDataSpace(e.target.value)}
-                      className="slds-w-full slds-p-horizontal_small slds-p-vertical_x-small slds-text-size_medium slds-border_all slds-border-color_border-1 slds-border-radius_small slds-bg-white" style={{ outline: 'none' }}
-                    >
-                      <option value="default">default</option>
-                    </select>
-                  </div>
-                </div>
-              )}
-
-              {newRulesetStep === 2 && newRulesetOption === 'datakit' && (
-                <div className="slds-flex" style={{ gap: 0, margin: '-24px', height: '420px' }}>
-                  {/* Left sidebar: datakit categories */}
-                  <div className="slds-flex-shrink-0 slds-overflow-y-auto" style={{ width: '220px', borderRight: '1px solid var(--slds-g-color-border-1)', backgroundColor: '#FAFAF9' }}>
-                    <div className="slds-p-around_small">
-                      <input
-                        type="text"
-                        value={datakitSearch}
-                        onChange={(e) => setDatakitSearch(e.target.value)}
-                        placeholder="Search datakits..."
-                        className="slds-w-full slds-p-horizontal_x-small slds-text-size_small slds-border_all slds-border-color_border-1 slds-border-radius_small" style={{ paddingTop: '6px', paddingBottom: '6px', outline: 'none' }}
-                      />
-                    </div>
-                    <nav className="slds-p-horizontal_xx-small slds-p-bottom_small">
-                      {datakitCategories
-                        .filter((cat) => cat.toLowerCase().includes(datakitSearch.toLowerCase()))
-                        .map((cat) => {
-                          const isInformatica = cat === 'Informatica MDM';
-                          const isActive = selectedDatakit === cat;
-                          return (
-                            <button
-                              key={cat}
-                              onClick={() => triggerDelay(() => { setSelectedDatakit(cat); setSelectedDatakitRuleset(null); })}
-                              className={`slds-w-full slds-text-left slds-p-horizontal_small slds-p-vertical_x-small slds-text-size_medium slds-border-radius_medium slds-m-bottom_xx-small slds-transition-colors ${
-                                isActive && isInformatica
-                                  ? 'slds-font-weight_semibold'
-                                  : isActive
-                                    ? 'slds-text-brand slds-font-weight_semibold'
-                                    : isInformatica
-                                      ? 'slds-font-weight_medium'
-                                      : 'slds-text-neutral-9'
-                              }`}
-                              style={{
-                                backgroundColor: isActive && isInformatica ? '#FFF3ED' : isActive ? '#EEF4FF' : undefined,
-                                color: isInformatica ? '#FF4A00' : undefined,
-                              }}
-                            >
-                              {cat}
-                              {isInformatica && !isActive && (
-                                <span className="slds-m-left_xx-small slds-inline-flex slds-items-center slds-p-horizontal_xx-small slds-border-radius_small slds-font-weight_bold slds-text-white" style={{ fontSize: '10px', paddingTop: '2px', paddingBottom: '2px', backgroundColor: '#FF4A00' }}>NEW</span>
-                              )}
-                            </button>
-                          );
-                        })}
-                    </nav>
-                  </div>
-
-                  {/* Right side: rulesets table */}
-                  <div className="slds-flex-1 slds-overflow-y-auto">
-                    <div className="slds-p-horizontal_medium slds-p-vertical_small slds-border_bottom slds-border-color_border-1">
-                      <h3 className="slds-text-size_medium slds-font-weight_semibold slds-text-neutral-base">Datakit Selection</h3>
-                      <p className="slds-text-size_small slds-text-neutral-7 slds-m-top_xx-small">{selectedDatakit} — select a ruleset to install</p>
-                      {/* Session context: show remembered connections + bundles */}
-                      {demoSession && demoSession.informaticaConnections.length > 0 && selectedDatakit === 'Informatica MDM' && (
-                        <div className="slds-m-top_x-small slds-p-horizontal_small slds-p-vertical_x-small slds-border-radius_medium slds-border_all" style={{ backgroundColor: '#FFF3ED', borderColor: '#FFD6C0' }}>
-                          <p className="slds-font-weight_medium" style={{ fontSize: '11px', color: '#B33500' }}>
-                            Connected: {demoSession.informaticaConnections.map((c) => c.alias).join(', ')}
-                          </p>
-                          {demoSession.selectedBundles.length > 0 && (
-                            <p className="slds-m-top_xx-small" style={{ fontSize: '11px', color: '#B33500' }}>
-                              Installed Bundles: {demoSession.selectedBundles.join(', ')}
-                            </p>
+                <div>
+                  <h3 className="slds-text-size_medium slds-font-weight_semibold slds-text-neutral-base slds-m-bottom_xx-small">
+                    What type of records do you want to consolidate?
+                  </h3>
+                  <p className="slds-text-size_small slds-text-neutral-7 slds-m-bottom_medium">
+                    This selection determines the type of records processed by this ruleset. You can only process one type of record per ruleset.
+                    <button className="sf-link slds-m-left_xx-small" style={{ fontSize: 'inherit' }}>Tell Me More</button>
+                  </p>
+                  <div className="slds-css-grid slds-css-grid-cols-2 slds-gap_medium">
+                    {recordTypeOptions.map((opt) => {
+                      const selected = newRulesetRecordType === opt.key;
+                      return (
+                        <button
+                          key={opt.key}
+                          onClick={() => setNewRulesetRecordType(opt.key)}
+                          className="slds-pos-relative slds-text-left slds-border-radius_large slds-transition-all slds-p-around_medium"
+                          style={{
+                            borderWidth: '2px', borderStyle: 'solid',
+                            borderColor: selected ? 'var(--slds-g-color-brand)' : '#D8DDE6',
+                            backgroundColor: selected ? '#EEF4FF' : 'white',
+                          }}
+                        >
+                          {selected && (
+                            <div className="slds-pos-absolute slds-bg-brand slds-flex slds-items-center slds-justify-center" style={{ top: 0, right: 0, width: '28px', height: '28px', clipPath: 'polygon(0 0, 100% 0, 100% 100%)' }}>
+                              <Check className="slds-icon-size_xx-small slds-text-white slds-pos-absolute" style={{ top: '2px', right: '2px' }} />
+                            </div>
                           )}
-                        </div>
-                      )}
-                    </div>
-                    {(datakitRulesets[selectedDatakit] || []).length === 0 ? (
-                      <div className="slds-flex slds-items-center slds-justify-center slds-text-size_medium slds-text-neutral-7" style={{ height: '192px' }}>
-                        No rulesets available for {selectedDatakit}.
-                      </div>
-                    ) : (
-                      <table className="sf-table">
-                        <thead>
-                          <tr>
-                            <th style={{ width: '40px' }}></th>
-                            <th>Ruleset Name</th>
-                            <th>Description</th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          {(datakitRulesets[selectedDatakit] || []).map((rs) => {
-                            const isPhase2 = !!rs.phase2;
-                            return (
-                            <tr
-                              key={rs.id}
-                              className={`${isPhase2 ? 'slds-opacity_50 slds-cursor-not-allowed' : 'slds-cursor-pointer'}`}
-                              style={{ backgroundColor: selectedDatakitRuleset === rs.id && !isPhase2 ? '#EEF4FF' : undefined }}
-                              onClick={() => { if (!isPhase2) setSelectedDatakitRuleset(rs.id); }}
-                            >
-                              <td>
-                                <input
-                                  type="radio"
-                                  name="datakit-ruleset"
-                                  checked={selectedDatakitRuleset === rs.id}
-                                  onChange={() => { if (!isPhase2) setSelectedDatakitRuleset(rs.id); }}
-                                  disabled={isPhase2}
-                                  className="slds-icon-size_small" style={{ accentColor: 'var(--slds-g-color-brand)' }}
-                                />
-                              </td>
-                              <td>
-                                <div className="slds-flex slds-items-center slds-gap_x-small">
-                                  <span className={`slds-text-size_medium slds-font-weight_medium ${isPhase2 ? 'slds-text-neutral-7' : 'slds-text-neutral-base'}`}>{rs.name}</span>
-                                  {isPhase2 && (
-                                    <span className="sf-badge sf-badge-neutral" style={{ opacity: 0.6 }}>Phase-2</span>
-                                  )}
-                                </div>
-                              </td>
-                              <td className="slds-text-size_medium slds-text-neutral-7">
-                                {rs.primaryDMO} resolution — {rs.dataSpace} data space
-                              </td>
-                            </tr>
-                            );
-                          })}
-                        </tbody>
-                      </table>
-                    )}
+                          <span className="slds-text-size_large slds-font-weight_semibold slds-text-neutral-base" style={{ display: 'block', marginBottom: 4 }}>
+                            {opt.label}
+                          </span>
+                          <span className="slds-text-size_small" style={{ color: selected ? 'var(--slds-g-color-brand)' : 'var(--slds-g-color-neutral-7)' }}>
+                            {opt.desc}
+                          </span>
+                        </button>
+                      );
+                    })}
                   </div>
                 </div>
               )}
 
+              {/* Step 2: IR Type Selection (264 Release only) */}
+              {newRulesetStep === 2 && (
+                <div>
+                  <h3 className="slds-text-size_medium slds-font-weight_semibold slds-text-neutral-base slds-m-bottom_xx-small">
+                    Choose your identity resolution approach
+                  </h3>
+                  <p className="slds-text-size_small slds-text-neutral-7 slds-m-bottom_medium">
+                    Select how you want to resolve identities for <strong>{newRulesetRecordType}</strong>.
+                  </p>
+                  <div className="slds-css-grid slds-css-grid-cols-2 slds-gap_medium">
+                    {([
+                      {
+                        key: 'byom' as const,
+                        label: 'Bring Your Own MDM',
+                        desc: 'Use your existing MDM system (e.g. Informatica) for identity resolution. Pre-configured match rules from your MDM provider.',
+                        icon: Download,
+                        color: '#FF5D2D',
+                      },
+                      {
+                        key: 'dc-ir' as const,
+                        label: 'Data Cloud Identity Resolution',
+                        desc: 'Use Data Cloud\'s native identity resolution engine. Configure match rules and reconciliation from scratch.',
+                        icon: Fingerprint,
+                        color: 'var(--slds-g-color-brand)',
+                      },
+                    ]).map((opt) => {
+                      const selected = newRulesetIRType === opt.key;
+                      return (
+                        <button
+                          key={opt.key}
+                          onClick={() => setNewRulesetIRType(opt.key)}
+                          className="slds-pos-relative slds-flex slds-flex-col slds-items-center slds-justify-center slds-border-radius_large slds-transition-all slds-text-center slds-p-around_large"
+                          style={{
+                            height: '180px', borderWidth: '2px', borderStyle: 'solid',
+                            borderColor: selected ? opt.color : '#D8DDE6',
+                            backgroundColor: selected ? (opt.key === 'byom' ? '#FFF0EB' : '#EEF4FF') : 'white',
+                          }}
+                        >
+                          {selected && (
+                            <div className="slds-flex slds-items-center slds-justify-center slds-pos-absolute" style={{ top: 0, right: 0, width: '28px', height: '28px', clipPath: 'polygon(0 0, 100% 0, 100% 100%)', backgroundColor: opt.color }}>
+                              <Check className="slds-icon-size_xx-small slds-text-white slds-pos-absolute" style={{ top: '2px', right: '2px' }} />
+                            </div>
+                          )}
+                          <div className="slds-border-radius_pill slds-flex slds-items-center slds-justify-center slds-m-bottom_small" style={{ width: '48px', height: '48px', backgroundColor: selected ? opt.color : '#F3F3F3' }}>
+                            <opt.icon className="slds-icon-size_default" style={{ color: selected ? 'white' : '#706E6B' }} />
+                          </div>
+                          <span className="slds-text-size_medium slds-font-weight_semibold slds-text-neutral-base">{opt.label}</span>
+                          <span className="slds-text-size_small slds-text-neutral-7 slds-m-top_xx-small">{opt.desc}</span>
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
+
+              {/* Step 3: Review Basic Details */}
               {newRulesetStep === 3 && (
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-                  <div className="slds-flex slds-items-start slds-gap_small slds-p-around_medium slds-border-radius_large" style={{ backgroundColor: '#E1F5FE' }}>
-                    <Info className="slds-icon-size_default slds-text-brand slds-flex-shrink-0 slds-m-top_xx-small" />
-                    <div className="slds-text-size_medium slds-text-neutral-9">
-                      {newRulesetOption === 'datakit'
-                        ? <>Your ruleset will be created with defaults from <strong>{selectedDatakit}</strong>. Review and click <strong>Save</strong>.</>
-                        : <>Review the details below and click <strong>Save</strong> to create your new ruleset.</>
-                      }
+                  <h3 className="slds-text-size_medium slds-font-weight_semibold slds-text-neutral-base slds-m-bottom_medium">Review Basic Details</h3>
+
+                  {/* AI recommendation callout */}
+                  <div className="slds-flex slds-items-start slds-gap_small slds-p-around_medium slds-border-radius_large slds-m-bottom_medium" style={{ backgroundColor: '#F3F0FF', border: '1px solid #D8D0F0' }}>
+                    <Sparkles className="slds-flex-shrink-0 slds-m-top_xx-small" style={{ width: 18, height: 18, color: '#9B8BF4' }} />
+                    <div className="slds-text-size_medium" style={{ color: '#5A3E9E' }}>
+                      We've recommended values based on your org's profile and metadata. Review the recommended values and fix anything that doesn't look right.
                     </div>
                   </div>
-                  <div className="sf-card">
-                    <div className="sf-detail-grid">
-                      <div className="sf-detail-field"><div className="sf-detail-label">Ruleset Name</div><div className="sf-detail-value slds-font-weight_medium">{newRulesetName}</div></div>
-                      <div className="sf-detail-field"><div className="sf-detail-label">Primary DMO</div><div className="sf-detail-value">{newRulesetPrimaryDMO}</div></div>
-                      <div className="sf-detail-field"><div className="sf-detail-label">Data Space</div><div className="sf-detail-value">{newRulesetDataSpace}</div></div>
-                      <div className="sf-detail-field"><div className="sf-detail-label">Status</div><div className="sf-detail-value"><span className="sf-badge sf-badge-warning">Draft</span></div></div>
-                      {newRulesetOption === 'datakit' && (
-                        <>
-                          <div className="sf-detail-field"><div className="sf-detail-label">Source</div><div className="sf-detail-value">{selectedDatakit}</div></div>
-                          <div className="sf-detail-field"><div className="sf-detail-label">Mode</div><div className="sf-detail-value">Bring Your Own MDM</div></div>
-                          <div className="sf-detail-field"><div className="sf-detail-label">Ruleset ID</div><div className="sf-detail-value">{selectedDatakitRuleset}</div></div>
-                          <div className="sf-detail-field"><div className="sf-detail-label">Created By</div><div className="sf-detail-value">Data Cloud</div></div>
-                          {/* Session-remembered data */}
-                          {demoSession && demoSession.informaticaConnections.length > 0 && selectedDatakit === 'Informatica MDM' && (
-                            <>
-                              <div className="sf-detail-field">
-                                <div className="sf-detail-label">Connection</div>
-                                <div className="sf-detail-value">{demoSession.informaticaConnections.map((c) => c.alias).join(', ')}</div>
-                              </div>
-                              {demoSession.selectedBundles.length > 0 && (
-                                <div className="sf-detail-field">
-                                  <div className="sf-detail-label">Data Bundles</div>
-                                  <div className="sf-detail-value">{demoSession.selectedBundles.join(', ')}</div>
-                                </div>
-                              )}
-                            </>
-                          )}
-                        </>
-                      )}
+
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                    {/* Data Space */}
+                    <div>
+                      <label className="slds-flex slds-items-center slds-gap_xx-small slds-text-size_small slds-font-weight_medium slds-text-neutral-7 slds-m-bottom_xx-small" style={{ display: 'flex' }}>
+                        <span className="slds-text-error">*</span> Data Space
+                        <Info className="slds-icon-size_xx-small slds-text-neutral-7" />
+                        <Sparkles style={{ width: 12, height: 12, color: '#9B8BF4' }} />
+                      </label>
+                      <input type="text" value={newRulesetDataSpace} onChange={(e) => setNewRulesetDataSpace(e.target.value)}
+                        className="slds-p-horizontal_small slds-p-vertical_x-small slds-text-size_medium slds-border_all slds-border-color_border-1 slds-border-radius_small" style={{ outline: 'none', width: '50%' }} />
+                    </div>
+
+                    {/* Ruleset Name + Ruleset ID side by side */}
+                    <div className="slds-grid slds-gap_medium">
+                      <div className="slds-col">
+                        <label className="slds-flex slds-items-center slds-gap_xx-small slds-text-size_small slds-font-weight_medium slds-text-neutral-7 slds-m-bottom_xx-small" style={{ display: 'flex' }}>
+                          <span className="slds-text-error">*</span> Ruleset Name
+                          <Sparkles style={{ width: 12, height: 12, color: '#9B8BF4' }} />
+                        </label>
+                        <input type="text" value={newRulesetName} onChange={(e) => setNewRulesetName(e.target.value)}
+                          className="slds-w-full slds-p-horizontal_small slds-p-vertical_x-small slds-text-size_medium slds-border_all slds-border-color_border-1 slds-border-radius_small" style={{ outline: 'none' }} />
+                      </div>
+                      <div className="slds-col slds-pos-relative">
+                        <label className="slds-flex slds-items-center slds-gap_xx-small slds-text-size_small slds-font-weight_medium slds-text-neutral-7 slds-m-bottom_xx-small" style={{ display: 'flex' }}>
+                          <span className="slds-text-error">*</span> Ruleset ID
+                          <button onClick={() => setTooltipOpen(tooltipOpen === 'rulesetId' ? null : 'rulesetId')} className="slds-flex">
+                            <Info className="slds-icon-size_xx-small slds-text-brand" />
+                          </button>
+                          <Sparkles style={{ width: 12, height: 12, color: '#9B8BF4' }} />
+                        </label>
+                        <input type="text" value={newRulesetIRType === 'byom' ? `INFA-${newRulesetRecordType === 'Accounts' || newRulesetRecordType === 'Leads to Accounts' ? 'O360' : 'C360'}` : 'UR01'} readOnly
+                          className="slds-w-full slds-p-horizontal_small slds-p-vertical_x-small slds-text-size_medium slds-border_all slds-border-color_border-1 slds-border-radius_small" style={{ outline: 'none', backgroundColor: '#FAFAF9' }} />
+                        {/* Tooltip callout */}
+                        {tooltipOpen === 'rulesetId' && (
+                          <div className="slds-pos-absolute slds-z-10 slds-p-around_medium slds-border-radius_medium slds-shadow_large" style={{ top: -10, right: -260, width: 240, backgroundColor: 'var(--slds-g-color-brand-1)', color: 'white', fontSize: 12, lineHeight: 1.5 }}>
+                            <button onClick={() => setTooltipOpen(null)} className="slds-pos-absolute slds-text-white" style={{ top: 6, right: 8, background: 'none', border: 'none', cursor: 'pointer' }}>
+                              <X style={{ width: 12, height: 12 }} />
+                            </button>
+                            The ruleset ID is appended to all output objects to identify which ruleset they're related to. This isn't required, but each ruleset's ID must be unique. We recommended this ID based on your org's data and metadata.
+                            <div className="slds-pos-absolute" style={{ left: -6, top: 32, width: 0, height: 0, borderTop: '6px solid transparent', borderBottom: '6px solid transparent', borderRight: `6px solid var(--slds-g-color-brand-1)` }} />
+                          </div>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Primary DMO + Match records to */}
+                    <div className="slds-grid slds-gap_medium slds-items-end">
+                      <div className="slds-col">
+                        <label className="slds-flex slds-items-center slds-gap_xx-small slds-text-size_small slds-font-weight_medium slds-text-neutral-7 slds-m-bottom_xx-small" style={{ display: 'flex' }}>
+                          <span className="slds-text-error">*</span> Primary Data Model Object
+                          <Sparkles style={{ width: 12, height: 12, color: '#9B8BF4' }} />
+                        </label>
+                        <select value={newRulesetPrimaryDMO} onChange={(e) => setNewRulesetPrimaryDMO(e.target.value)}
+                          className="slds-w-full slds-p-horizontal_small slds-p-vertical_x-small slds-text-size_medium slds-border_all slds-border-color_border-1 slds-border-radius_small slds-bg-white" style={{ outline: 'none' }}>
+                          {dataModelObjects.map((dmo) => <option key={dmo} value={dmo}>{dmo}</option>)}
+                        </select>
+                      </div>
+                      <div className="slds-col">
+                        <label className="slds-flex slds-items-center slds-gap_xx-small slds-text-size_small slds-font-weight_medium slds-text-neutral-7 slds-m-bottom_xx-small" style={{ display: 'flex' }}>
+                          Data Model Object (automatic)
+                          <Info className="slds-icon-size_xx-small slds-text-neutral-7" />
+                        </label>
+                        <div className="slds-flex slds-items-center slds-gap_small">
+                          <span className="slds-text-size_medium slds-text-neutral-7">Match records to</span>
+                          <input type="text" value={newRulesetPrimaryDMO} readOnly
+                            className="slds-p-horizontal_small slds-p-vertical_x-small slds-text-size_medium slds-border_all slds-border-color_border-1 slds-border-radius_small" style={{ outline: 'none', backgroundColor: '#FAFAF9', flex: 1 }} />
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Description */}
+                    <div>
+                      <label className="slds-flex slds-items-center slds-gap_xx-small slds-text-size_small slds-font-weight_medium slds-text-neutral-7 slds-m-bottom_xx-small" style={{ display: 'flex' }}>
+                        Description
+                        <Sparkles style={{ width: 12, height: 12, color: '#9B8BF4' }} />
+                      </label>
+                      <textarea
+                        value={newRulesetIRType === 'byom'
+                          ? `Installed from Informatica MDM — ${newRulesetRecordType} resolution with pre-configured match rules.`
+                          : `Unifies ${newRulesetRecordType?.toLowerCase() || 'contact'} records across Email, Phone, and ${newRulesetPrimaryDMO} ID.`
+                        }
+                        readOnly
+                        rows={3}
+                        className="slds-w-full slds-p-horizontal_small slds-p-vertical_x-small slds-text-size_medium slds-border_all slds-border-color_border-1 slds-border-radius_small" style={{ outline: 'none', backgroundColor: '#FAFAF9', resize: 'vertical' }}
+                      />
                     </div>
                   </div>
                 </div>
@@ -2692,18 +2680,22 @@ export default function IdentityResolutionContent({ demoSession, onDemoSessionCh
             {/* Footer with step indicator */}
             <div className="slds-flex slds-items-center slds-justify-between slds-p-horizontal_large slds-p-vertical_medium slds-border_top slds-border-color_border-1" style={{ backgroundColor: '#FAFAF9' }}>
               <div className="slds-flex slds-items-center slds-gap_x-small">
-                {[1, 2, 3].map((s) => (
+                {(is264Release ? [1, 2, 3] : [1, 2]).map((s) => {
+                  // For Today timeline: step 1 = record type, step 2 = review (step 3)
+                  const actualStep = !is264Release && s === 2 ? 3 : s;
+                  return (
                   <div key={s} className="slds-flex slds-items-center slds-gap_xx-small">
                     <div className={`slds-border-radius_pill slds-flex slds-items-center slds-justify-center slds-text-size_small slds-font-weight_medium ${
-                      s < newRulesetStep ? 'slds-bg-success slds-text-white' :
-                      s === newRulesetStep ? 'slds-bg-brand slds-text-white' :
+                      actualStep < newRulesetStep ? 'slds-bg-success slds-text-white' :
+                      actualStep === newRulesetStep ? 'slds-bg-brand slds-text-white' :
                       'slds-text-neutral-7'
-                    }`} style={{ width: '24px', height: '24px', backgroundColor: s > newRulesetStep ? 'var(--slds-g-color-border-2)' : undefined }}>
-                      {s < newRulesetStep ? <Check className="slds-icon-size_xx-small" /> : s}
+                    }`} style={{ width: '24px', height: '24px', backgroundColor: actualStep > newRulesetStep ? 'var(--slds-g-color-border-2)' : undefined }}>
+                      {actualStep < newRulesetStep ? <Check className="slds-icon-size_xx-small" /> : s}
                     </div>
-                    {s < 3 && <div style={{ width: '24px', height: '2px', backgroundColor: s < newRulesetStep ? 'var(--slds-g-color-success)' : 'var(--slds-g-color-border-2)' }} />}
+                    {s < (is264Release ? 3 : 2) && <div style={{ width: '24px', height: '2px', backgroundColor: actualStep < newRulesetStep ? 'var(--slds-g-color-success)' : 'var(--slds-g-color-border-2)' }} />}
                   </div>
-                ))}
+                  );
+                })}
               </div>
               <div className="slds-flex slds-items-center slds-gap_small">
                 {newRulesetStep === 1 ? (
@@ -2711,8 +2703,8 @@ export default function IdentityResolutionContent({ demoSession, onDemoSessionCh
                     <button onClick={() => setNewRulesetOpen(false)} className="slds-p-horizontal_medium slds-p-vertical_x-small slds-text-size_medium slds-font-weight_medium slds-text-neutral-9 slds-border_all slds-border-color_border-1 slds-border-radius_small slds-hover-bg-neutral-2">Cancel</button>
                     <button
                       onClick={handleNewRulesetNext}
-                      disabled={!newRulesetOption}
-                      className="slds-p-vertical_x-small slds-text-size_medium slds-font-weight_medium slds-text-white slds-bg-brand slds-border-radius_small" style={{ paddingLeft: '20px', paddingRight: '20px', opacity: !newRulesetOption ? 0.5 : 1, cursor: !newRulesetOption ? 'not-allowed' : 'pointer' }}
+                      disabled={!newRulesetRecordType}
+                      className="slds-p-vertical_x-small slds-text-size_medium slds-font-weight_medium slds-text-white slds-bg-brand slds-border-radius_small" style={{ paddingLeft: '20px', paddingRight: '20px', opacity: !newRulesetRecordType ? 0.5 : 1, cursor: !newRulesetRecordType ? 'not-allowed' : 'pointer' }}
                     >
                       Next
                     </button>
@@ -2722,8 +2714,8 @@ export default function IdentityResolutionContent({ demoSession, onDemoSessionCh
                     <button onClick={handleNewRulesetBack} className="slds-p-horizontal_medium slds-p-vertical_x-small slds-text-size_medium slds-font-weight_medium slds-text-neutral-9 slds-border_all slds-border-color_border-1 slds-border-radius_small slds-hover-bg-neutral-2">Back</button>
                     <button
                       onClick={handleNewRulesetNext}
-                      disabled={newRulesetOption === 'create' ? !newRulesetName.trim() : !selectedDatakitRuleset}
-                      className="slds-p-vertical_x-small slds-text-size_medium slds-font-weight_medium slds-text-white slds-bg-brand slds-border-radius_small" style={{ paddingLeft: '20px', paddingRight: '20px', opacity: (newRulesetOption === 'create' ? !newRulesetName.trim() : !selectedDatakitRuleset) ? 0.5 : 1, cursor: (newRulesetOption === 'create' ? !newRulesetName.trim() : !selectedDatakitRuleset) ? 'not-allowed' : 'pointer' }}
+                      disabled={!newRulesetIRType}
+                      className="slds-p-vertical_x-small slds-text-size_medium slds-font-weight_medium slds-text-white slds-bg-brand slds-border-radius_small" style={{ paddingLeft: '20px', paddingRight: '20px', opacity: !newRulesetIRType ? 0.5 : 1, cursor: !newRulesetIRType ? 'not-allowed' : 'pointer' }}
                     >
                       Next
                     </button>
@@ -2735,7 +2727,7 @@ export default function IdentityResolutionContent({ demoSession, onDemoSessionCh
                       onClick={handleNewRulesetSave}
                       className="slds-p-vertical_x-small slds-text-size_medium slds-font-weight_medium slds-text-white slds-bg-brand slds-border-radius_small" style={{ paddingLeft: '20px', paddingRight: '20px' }}
                     >
-                      Save
+                      Next
                     </button>
                   </>
                 )}
