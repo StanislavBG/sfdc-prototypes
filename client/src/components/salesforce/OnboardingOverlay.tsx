@@ -22,7 +22,6 @@ const timelineCards = [
       'Informatica MDM connector & data bundles',
       'Identity Resolution rulesets',
       'Data Streams ingestion',
-      'AI-powered semantic search',
     ],
   },
   {
