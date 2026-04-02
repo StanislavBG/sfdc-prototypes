@@ -203,13 +203,56 @@ interface DataCloudSetupContentProps {
   demoSession?: DemoSessionState;
   onDemoSessionChange?: (session: DemoSessionState) => void;
   currentTimeline?: string;
+  initialPage?: string;
+  initialSolution?: string;
+  onNavigate?: (page: string, solution?: string) => void;
 }
 
+// Map URL slugs to nav item IDs
+const urlSlugToNavItem: Record<string, string> = {
+  'solution-manager': 'solution-manager',
+  'setup-home': 'setup-home',
+  'installed-packages': 'installed-packages',
+  'permission-sets': 'permission-sets',
+  'users': 'users',
+  'data-spaces': 'data-spaces',
+  'informatica-mdm': 'informatica-mdm',
+  'salesforce-crm': 'salesforce-crm',
+};
+
+const navItemToUrlSlug: Record<string, string> = Object.fromEntries(
+  Object.entries(urlSlugToNavItem).map(([k, v]) => [v, k])
+);
+
+// Map solution URL slugs to solution IDs
+const urlSlugToSolution: Record<string, string> = {
+  'solution-1': 'Phase-1',
+  'phase-1': 'Phase-1',
+  'solution-2': 'Phase-2-A',
+  'phase-2': 'Phase-2-A',
+};
+
 // ── Component ────────────────────────────────────────────────────────
-export default function DataCloudSetupContent({ onBack, demoSession, onDemoSessionChange, currentTimeline }: DataCloudSetupContentProps) {
-  const [activeNavItem, setActiveNavItem] = useState('setup-home');
+export default function DataCloudSetupContent({ onBack, demoSession, onDemoSessionChange, currentTimeline, initialPage, initialSolution, onNavigate }: DataCloudSetupContentProps) {
+  const [activeNavItem, setActiveNavItem] = useState(() => {
+    if (initialPage && urlSlugToNavItem[initialPage]) return urlSlugToNavItem[initialPage];
+    return 'setup-home';
+  });
   const [quickFindQuery, setQuickFindQuery] = useState('');
   const [expandedNavItems, setExpandedNavItems] = useState<Set<string>>(new Set(['feature-manager']));
+
+  // URL-aware navigation helper
+  const navigateSetup = (navId: string, solutionId?: string | null) => {
+    setActiveNavItem(navId);
+    if (navId === 'solution-manager' && solutionId) {
+      setSmActiveSolution(solutionId);
+    } else if (navId !== 'solution-manager') {
+      setSmActiveSolution(null);
+    }
+    const slug = navItemToUrlSlug[navId] || navId;
+    const solSlug = solutionId ? solutionId.toLowerCase().replace(/[^a-z0-9]+/g, '-') : undefined;
+    onNavigate?.(slug, solSlug);
+  };
 
   // Persisted connections state — initialize from demoSession for session persistence
   const [sfdcConnections, setSfdcConnections] = useState<Connection[]>(initialSfdcConnections);
@@ -282,7 +325,12 @@ export default function DataCloudSetupContent({ onBack, demoSession, onDemoSessi
   const [setupHomeTab, setSetupHomeTab] = useState<'get-started' | 'plan-data' | 'monitor'>('get-started');
 
   // Solution Manager state
-  const [smActiveSolution, setSmActiveSolution] = useState<string | null>(null);
+  const [smActiveSolution, setSmActiveSolution] = useState<string | null>(() => {
+    if (initialPage === 'solution-manager' && initialSolution) {
+      return urlSlugToSolution[initialSolution] || null;
+    }
+    return null;
+  });
   const [smActiveStep, setSmActiveStep] = useState(0);
   const [smStepProgress, setSmStepProgress] = useState<Record<string, Record<number, 'not-started' | 'in-progress' | 'completed'>>>({
     'Phase-1': {}, 'Phase-2-A': {}, 'Phase-2-B': {}, 'CH': {},
@@ -658,7 +706,7 @@ export default function DataCloudSetupContent({ onBack, demoSession, onDemoSessi
       setInstallModalOpen(false);
       setInstallModalLoading(false);
       // Navigate to Installed Packages page
-      setActiveNavItem('installed-packages');
+      navigateSetup('installed-packages');
       setPackageDetailName(null);
     }, 2500);
     });
@@ -741,7 +789,7 @@ export default function DataCloudSetupContent({ onBack, demoSession, onDemoSessi
                     <button
                       onClick={() => {
                         if (item.hasChildren) toggleNavExpand(item.id);
-                        else triggerDelay(() => setActiveNavItem(item.id));
+                        else triggerDelay(() => navigateSetup(item.id));
                       }}
                       className={`slds-w-full slds-flex slds-items-center slds-gap_xx-small slds-p-horizontal_medium slds-text-size_small slds-text-left slds-transition-colors ${
                         activeNavItem === item.id
@@ -784,7 +832,7 @@ export default function DataCloudSetupContent({ onBack, demoSession, onDemoSessi
                     {item.hasChildren && expandedNavItems.has(item.id) && item.children?.map((child) => (
                       <button
                         key={child.id}
-                        onClick={() => setActiveNavItem(child.id)}
+                        onClick={() => navigateSetup(child.id)}
                         className={`slds-w-full slds-flex slds-items-center slds-p-right_medium slds-text-size_small slds-text-left slds-transition-colors ${
                           activeNavItem === child.id ? 'slds-text-brand slds-font-weight_semibold' : 'slds-text-neutral-9 sf-hover-bg-neutral'
                         }`}
@@ -1110,7 +1158,7 @@ export default function DataCloudSetupContent({ onBack, demoSession, onDemoSessi
                   <div className="slds-h-full slds-flex slds-flex-col">
                     {/* Breadcrumb */}
                     <div className="slds-bg-white slds-border_bottom slds-border-color_border-1 slds-p-horizontal_large slds-flex slds-items-center slds-gap_x-small" style={{ paddingTop: '10px', paddingBottom: '10px' }}>
-                      <button onClick={() => setSmActiveSolution(null)} className="slds-text-size_small slds-text-brand sf-hover-underline">Solution Manager</button>
+                      <button onClick={() => { setSmActiveSolution(null); onNavigate?.('solution-manager'); }} className="slds-text-size_small slds-text-brand sf-hover-underline">Solution Manager</button>
                       <ChevronRight className="slds-icon-size_xx-small slds-text-neutral-7" />
                       <span className="slds-text-size_small slds-font-weight_medium slds-text-neutral-base">{sol.title}</span>
                     </div>
@@ -1506,7 +1554,7 @@ export default function DataCloudSetupContent({ onBack, demoSession, onDemoSessi
                     return (
                       <button
                         key={tile.id}
-                        onClick={() => { setSmActiveSolution(tile.id); setSmActiveStep(0); }}
+                        onClick={() => { setSmActiveSolution(tile.id); setSmActiveStep(0); onNavigate?.('solution-manager', tile.id.toLowerCase().replace(/[^a-z0-9]+/g, '-')); }}
                         className="slds-text-left slds-bg-white slds-border_all slds-border-color_border-1 slds-border-radius_large slds-p-around_large slds-transition-all"
                       >
                         <span className="slds-font-weight_bold slds-text-brand slds-border-radius_small slds-m-bottom_small" style={{ display: 'inline-block', padding: '4px 8px', fontSize: '11px', background: '#EEF4FF' }}>
