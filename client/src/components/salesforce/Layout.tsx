@@ -76,6 +76,8 @@ interface UrlState {
   tab: string;
   irRulesetSlug?: string;
   irDetailTab?: string;
+  setupPage?: string;       // e.g. 'solution-manager'
+  setupSolution?: string;   // e.g. 'phase-1'
 }
 
 function parseUrl(pathname: string): UrlState {
@@ -87,45 +89,44 @@ function parseUrl(pathname: string): UrlState {
   const timeline = slugToTimeline[timelineSlug];
 
   if (!timeline) {
-    // Legacy URL without timeline prefix — treat first segment as tab slug
     const tab = slugToTab[timelineSlug];
     if (!tab) return { timeline: '264-release', tab: 'Home' };
-
     if (timelineSlug === 'identity-resolutions' && parts.length >= 2) {
-      return {
-        timeline: '264-release',
-        tab: 'Identity Resolutions',
-        irRulesetSlug: parts[1],
-        irDetailTab: irSlugToTab[parts[2] || 'properties'] || 'properties',
-      };
+      return { timeline: '264-release', tab: 'Identity Resolutions', irRulesetSlug: parts[1], irDetailTab: irSlugToTab[parts[2] || 'properties'] || 'properties' };
     }
     return { timeline: '264-release', tab };
   }
 
-  // Second segment is tab slug
+  // Check for settings sub-route: /{timeline}/settings/{page}/{solution}
+  if (parts[1] === 'settings') {
+    return {
+      timeline,
+      tab: 'Home',
+      setupPage: parts[2] || undefined,
+      setupSolution: parts[3] || undefined,
+    };
+  }
+
   const tabSlug = parts[1];
   if (!tabSlug) return { timeline, tab: 'Home' };
 
   const tab = slugToTab[tabSlug];
   if (!tab) return { timeline, tab: 'Home' };
 
-  // IR sub-routes: /{timeline}/identity-resolutions/:rulesetSlug/:detailTab
   if (tabSlug === 'identity-resolutions' && parts.length >= 3) {
-    const rulesetSlug = parts[2];
-    const detailTabSlug = parts[3] || 'properties';
-    return {
-      timeline,
-      tab: 'Identity Resolutions',
-      irRulesetSlug: rulesetSlug,
-      irDetailTab: irSlugToTab[detailTabSlug] || 'properties',
-    };
+    return { timeline, tab: 'Identity Resolutions', irRulesetSlug: parts[2], irDetailTab: irSlugToTab[parts[3] || 'properties'] || 'properties' };
   }
 
   return { timeline, tab };
 }
 
-function buildUrl(timeline: string, tab: string, irRulesetSlug?: string, irDetailTab?: string): string {
+function buildUrl(timeline: string, tab: string, irRulesetSlug?: string, irDetailTab?: string, setupPage?: string, setupSolution?: string): string {
   const tSlug = timelineToSlug[timeline] || 'today';
+  if (setupPage) {
+    return setupSolution
+      ? `/${tSlug}/settings/${setupPage}/${setupSolution}`
+      : `/${tSlug}/settings/${setupPage}`;
+  }
   const slug = tabToSlug[tab] || toSlug(tab);
   if (tab === 'Identity Resolutions' && irRulesetSlug) {
     const dtSlug = irDetailTab ? (irTabSlugs[irDetailTab] || irDetailTab) : 'properties';
@@ -179,7 +180,11 @@ export default function Layout({ children }: LayoutProps) {
   const [agentMinimized, setAgentMinimized] = useState(false);
   const [currentApp, setCurrentApp] = useState('data-cloud');
   const [appLauncherOpen, setAppLauncherOpen] = useState(false);
-  const [showDataCloudSetup, setShowDataCloudSetup] = useState(false);
+  const [showDataCloudSetup, setShowDataCloudSetup] = useState(!!initialUrl.setupPage);
+  // Pass initial setup deep link to DataCloudSetupContent
+  const [setupDeepLink, setSetupDeepLink] = useState<{ page?: string; solution?: string } | null>(
+    initialUrl.setupPage ? { page: initialUrl.setupPage, solution: initialUrl.setupSolution } : null
+  );
   const [workflowCaptureActive, setWorkflowCaptureActive] = useState(false);
   const [exportToast, setExportToast] = useState<string | null>(null);
 
@@ -392,7 +397,18 @@ export default function Layout({ children }: LayoutProps) {
         />
         <div className="sf-layout-body">
           <main ref={mainRef} className="sf-layout-main">
-            <DataCloudSetupContent onBack={() => setShowDataCloudSetup(false)} demoSession={demoSession} onDemoSessionChange={setDemoSession} currentTimeline={currentTimeline} />
+            <DataCloudSetupContent
+              onBack={() => { setShowDataCloudSetup(false); setSetupDeepLink(null); window.history.pushState({}, '', buildUrl(currentTimeline, activeTab)); }}
+              demoSession={demoSession}
+              onDemoSessionChange={setDemoSession}
+              currentTimeline={currentTimeline}
+              initialPage={setupDeepLink?.page}
+              initialSolution={setupDeepLink?.solution}
+              onNavigate={(page, solution) => {
+                const url = buildUrl(currentTimeline, 'Home', undefined, undefined, page, solution);
+                if (window.location.pathname !== url) window.history.pushState({}, '', url);
+              }}
+            />
           </main>
         </div>
         <TimeMachine
