@@ -557,6 +557,32 @@ export default function IdentityResolutionContent({ demoSession, onDemoSessionCh
   const [trimmingBanner, setTrimmingBanner] = useState<string | null>(null);
   const daysSinceLastLb = Math.floor((Date.now() - lastLargeBatchAt.getTime()) / (1000 * 60 * 60 * 24));
   const cleanupRecommended = daysSinceLastLb >= 90;
+  // Real Time tab — Learn-About section + Party ID Anonymity
+  const [learnAboutOpen, setLearnAboutOpen] = useState(true);
+  const [learnAboutTab, setLearnAboutTab] = useState<'about' | 'partyid' | 'future2' | 'future3'>('partyid');
+  const [partyIdOpen, setPartyIdOpen] = useState(true);
+  const [partyIdEditing, setPartyIdEditing] = useState(false);
+  const [pauseAutoJob, setPauseAutoJob] = useState(false);
+  const [partyIdRows, setPartyIdRows] = useState<Array<{ id: string; name: string; type: string; isKnown: boolean }>>([
+    { id: 'pid-1', name: 'Anonymous Identifier', type: 'Device ID', isKnown: false },
+    { id: 'pid-2', name: '1st Party Cookie',     type: 'Web Cookie', isKnown: true },
+    { id: 'pid-3', name: 'Google Analytics _ga', type: 'Web Cookie', isKnown: false },
+    { id: 'pid-4', name: 'IDFA',                 type: 'Mobile Ad ID', isKnown: false },
+    { id: 'pid-5', name: 'AAID (GAID)',          type: 'Mobile Ad ID', isKnown: false },
+    { id: 'pid-6', name: 'LiveRamp RampID',      type: 'Identity Graph', isKnown: true },
+  ]);
+  const [partyIdDraft, setPartyIdDraft] = useState(partyIdRows);
+  const handlePartyIdEdit = () => { setPartyIdDraft(partyIdRows); setPartyIdEditing(true); };
+  const handlePartyIdCancel = () => { setPartyIdDraft(partyIdRows); setPartyIdEditing(false); };
+  const handlePartyIdSave = () => {
+    setPartyIdRows(partyIdDraft);
+    setPartyIdEditing(false);
+    setTrimmingBanner(`Party ID anonymity updated${pauseAutoJob ? ' — auto-job paused before finishing.' : '.'}`);
+  };
+  const togglePartyIdRow = (id: string) => {
+    setPartyIdDraft((rows) => rows.map((r) => r.id === id ? { ...r, isKnown: !r.isKnown } : r));
+  };
+
   const handleTrimmingConfirm = () => {
     if (trimmingConfirm === 'enable') {
       setTrimmingEnabled(true);
@@ -1482,7 +1508,7 @@ export default function IdentityResolutionContent({ demoSession, onDemoSessionCh
           {((currentTimeline === 'today'
             ? ['properties', 'details', 'history', 'realtime']
             : ['properties', 'details', 'history']) as Array<'properties' | 'details' | 'history' | 'realtime'>).map((tab) => {
-            const labels = { properties: 'Ruleset Properties', details: 'Details', history: 'Processing History', realtime: 'Real Time' };
+            const labels = { properties: 'Ruleset Properties', details: 'Details', history: 'Processing History', realtime: 'Real Time - Configurations' };
             return (
               <button key={tab} className={`sf-tab ${detailTab === tab ? 'active' : ''}`} onClick={() => changeDetailTab(tab)}>
                 {labels[tab]}
@@ -2012,6 +2038,178 @@ export default function IdentityResolutionContent({ demoSession, onDemoSessionCh
               <p className="slds-text-size_medium slds-text-neutral-9">
                 Optimize the real-time layer by trimming unknown singleton profiles that have become stale. Source data remains in the Lakehouse.
               </p>
+
+              {/* Learn About Real Time Configurations */}
+              <div className="sf-card">
+                <button
+                  onClick={() => setLearnAboutOpen((o) => !o)}
+                  className="slds-w-full slds-flex slds-items-center slds-gap_x-small slds-p-horizontal_medium slds-p-vertical_small slds-bg-white"
+                  style={{ borderBottom: learnAboutOpen ? '1px solid #e5e5e5' : 'none' }}
+                >
+                  {learnAboutOpen ? <ChevronDown className="slds-icon-size_small slds-text-neutral-7" /> : <ChevronRight className="slds-icon-size_small slds-text-neutral-7" />}
+                  <h2 className="slds-text-size_medium slds-font-weight_semibold slds-text-neutral-base">Learn About Real Time Configurations</h2>
+                </button>
+                {learnAboutOpen && (
+                  <div className="slds-flex" style={{ gap: 0 }}>
+                    {/* Left — sub-tabs + content */}
+                    <div className="slds-flex-1 slds-min-w-0">
+                      <div className="sf-tabs" style={{ borderBottom: '1px solid #e5e5e5' }}>
+                        {([
+                          ['about', 'About'],
+                          ['partyid', 'Party ID'],
+                          ['future2', 'Future Config #2'],
+                          ['future3', 'Future Config #3'],
+                        ] as const).map(([id, label]) => (
+                          <button key={id} className={`sf-tab ${learnAboutTab === id ? 'active' : ''}`} onClick={() => setLearnAboutTab(id)}>
+                            {label}
+                          </button>
+                        ))}
+                      </div>
+                      <div className="slds-p-around_medium slds-text-size_medium slds-text-neutral-9" style={{ minHeight: '140px' }}>
+                        {learnAboutTab === 'about' && (
+                          <p>Real-Time configurations control which profiles are eligible for the hot layer. Use these settings to keep the real-time pipeline lean and focused on high-value profiles.</p>
+                        )}
+                        {learnAboutTab === 'partyid' && (
+                          <p>Configure which Party ID match keys should be treated as anonymous vs. known. Anonymous identifiers (device IDs, ad IDs, third-party cookies) do not by themselves make a profile known and are eligible for unknown-singleton trimming.</p>
+                        )}
+                        {learnAboutTab === 'future2' && (
+                          <p className="slds-text-neutral-7">Coming soon.</p>
+                        )}
+                        {learnAboutTab === 'future3' && (
+                          <p className="slds-text-neutral-7">Coming soon.</p>
+                        )}
+                      </div>
+                    </div>
+                    {/* Right — Resources panel */}
+                    <div className="slds-flex-shrink-0" style={{ width: '280px', borderLeft: '1px solid #e5e5e5', backgroundColor: '#F3F6FB', padding: '16px' }}>
+                      <h3 className="slds-text-size_medium slds-font-weight_semibold slds-text-neutral-base slds-m-bottom_small">Resources</h3>
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                        <a className="slds-flex slds-items-center slds-gap_x-small sf-link slds-text-size_small" href="#" onClick={(e) => e.preventDefault()}>
+                          <FileText className="slds-icon-size_x-small" /> Real-Time Configuration overview
+                        </a>
+                        <a className="slds-flex slds-items-center slds-gap_x-small sf-link slds-text-size_small" href="#" onClick={(e) => e.preventDefault()}>
+                          <FileText className="slds-icon-size_x-small" /> Party ID anonymity guide
+                        </a>
+                        <a className="slds-flex slds-items-center slds-gap_x-small sf-link slds-text-size_small" href="#" onClick={(e) => e.preventDefault()}>
+                          <FileText className="slds-icon-size_x-small" /> Unknown singleton trimming
+                        </a>
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* Party ID Anonymity */}
+              <div className="sf-card">
+                <div className="sf-card-header" style={{ flexDirection: 'column', alignItems: 'stretch', gap: '4px' }}>
+                  <div className="slds-flex slds-items-center slds-justify-between">
+                    <button onClick={() => setPartyIdOpen((o) => !o)} className="slds-flex slds-items-center slds-gap_x-small slds-bg-white">
+                      {partyIdOpen ? <ChevronDown className="slds-icon-size_small slds-text-brand" /> : <ChevronRight className="slds-icon-size_small slds-text-brand" />}
+                      <h2 className="slds-text-size_medium slds-font-weight_semibold slds-text-brand">Party ID Anonymity</h2>
+                    </button>
+                    {!partyIdEditing && (
+                      <button
+                        onClick={handlePartyIdEdit}
+                        className="slds-flex slds-items-center slds-gap_xx-small slds-p-horizontal_small slds-text-size_small slds-font-weight_medium slds-text-brand slds-border-radius_small slds-border_all slds-border-color_brand slds-bg-white"
+                        style={{ paddingTop: '4px', paddingBottom: '4px' }}
+                      >
+                        <Edit3 className="slds-icon-size_x-small" /> Edit
+                      </button>
+                    )}
+                  </div>
+                  <p className="slds-text-size_small slds-text-neutral-7">
+                    Match rules that are associated to Party IDs appear here. Configure each one as known or anonymous to control how it participates in unknown-singleton trimming.
+                  </p>
+                </div>
+                {partyIdOpen && (
+                  <table className="sf-table">
+                    <thead>
+                      <tr>
+                        <th>Name</th>
+                        <th>Type</th>
+                        <th style={{ width: '140px' }}>
+                          <div className="slds-flex slds-items-center slds-gap_xx-small">
+                            Is Known
+                            <Info className="slds-icon-size_xx-small slds-text-neutral-7" />
+                          </div>
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {(partyIdEditing ? partyIdDraft : partyIdRows).map((row) => (
+                        <tr key={row.id}>
+                          <td>{row.name}</td>
+                          <td>{row.type}</td>
+                          <td>
+                            <button
+                              onClick={() => partyIdEditing && togglePartyIdRow(row.id)}
+                              role="switch"
+                              aria-checked={row.isKnown}
+                              disabled={!partyIdEditing}
+                              style={{
+                                width: '40px',
+                                height: '22px',
+                                borderRadius: '11px',
+                                backgroundColor: row.isKnown ? '#0176D3' : '#C9C9C9',
+                                position: 'relative',
+                                transition: 'background-color 0.15s',
+                                cursor: partyIdEditing ? 'pointer' : 'default',
+                                opacity: partyIdEditing ? 1 : 0.85,
+                              }}
+                            >
+                              {row.isKnown && (
+                                <Check className="slds-icon-size_xx-small" style={{ position: 'absolute', top: '4px', left: '6px', color: '#fff' }} />
+                              )}
+                              <span style={{
+                                position: 'absolute',
+                                top: '2px',
+                                left: row.isKnown ? '20px' : '2px',
+                                width: '18px',
+                                height: '18px',
+                                borderRadius: '50%',
+                                backgroundColor: '#fff',
+                                transition: 'left 0.15s',
+                                boxShadow: '0 1px 2px rgba(0,0,0,0.2)',
+                              }} />
+                            </button>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                )}
+                {partyIdEditing && (
+                  <div className="slds-flex slds-items-center slds-justify-between slds-p-horizontal_medium slds-p-vertical_small slds-border_top slds-border-color_border-2" style={{ backgroundColor: '#FAFAF9' }}>
+                    <button
+                      onClick={handlePartyIdCancel}
+                      className="slds-p-horizontal_medium slds-text-size_small slds-font-weight_medium slds-border-radius_small slds-border_all slds-border-color_border-1 slds-text-neutral-9 slds-bg-white"
+                      style={{ paddingTop: '6px', paddingBottom: '6px' }}
+                    >
+                      Cancel
+                    </button>
+                    <div className="slds-flex slds-items-center slds-gap_medium">
+                      <label className="slds-flex slds-items-center slds-gap_x-small slds-text-size_small slds-text-neutral-9 slds-cursor-pointer">
+                        <CreditCard className="slds-icon-size_x-small slds-text-neutral-7" />
+                        Pause Auto-Job run before finishing
+                        <input
+                          type="checkbox"
+                          checked={pauseAutoJob}
+                          onChange={(e) => setPauseAutoJob(e.target.checked)}
+                          className="slds-icon-size_small slds-border-radius_small slds-border-color_border-1"
+                        />
+                      </label>
+                      <button
+                        onClick={handlePartyIdSave}
+                        className="slds-p-horizontal_medium slds-text-size_small slds-font-weight_medium slds-text-white slds-bg-brand slds-border-radius_small"
+                        style={{ paddingTop: '6px', paddingBottom: '6px' }}
+                      >
+                        Save
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
+
 
               {trimmingBanner && (
                 <div className="slds-flex slds-items-start slds-gap_x-small slds-p-around_small slds-border-radius_small" style={{ backgroundColor: '#E1F5FE', border: '1px solid #1B96FF' }}>
