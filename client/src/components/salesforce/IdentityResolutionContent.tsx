@@ -500,9 +500,9 @@ export default function IdentityResolutionContent({ demoSession, onDemoSessionCh
 
   // Navigation state
   const [selectedRuleset, setSelectedRuleset] = useState<IdentityRuleset | null>(null);
-  const initDetailTab = (initialDetailTab === 'properties' || initialDetailTab === 'details' || initialDetailTab === 'history')
+  const initDetailTab = (initialDetailTab === 'properties' || initialDetailTab === 'details' || initialDetailTab === 'history' || initialDetailTab === 'realtime')
     ? initialDetailTab : 'properties';
-  const [detailTab, setDetailTab] = useState<'properties' | 'details' | 'history'>(initDetailTab);
+  const [detailTab, setDetailTab] = useState<'properties' | 'details' | 'history' | 'realtime'>(initDetailTab);
 
   // Restore from URL: select ruleset matching initialRulesetSlug once data loads
   const restoredFromUrl = useRef(false);
@@ -525,7 +525,7 @@ export default function IdentityResolutionContent({ demoSession, onDemoSessionCh
     }
   };
 
-  const changeDetailTab = (tab: 'properties' | 'details' | 'history') => {
+  const changeDetailTab = (tab: 'properties' | 'details' | 'history' | 'realtime') => {
     setDetailTab(tab);
     if (selectedRuleset) {
       onNavigate?.(rulesetToSlug(selectedRuleset), tab);
@@ -545,6 +545,33 @@ export default function IdentityResolutionContent({ demoSession, onDemoSessionCh
   // Collapsible sections
   const [resolutionSummaryOpen, setResolutionSummaryOpen] = useState(true);
   const [propertiesOpen, setPropertiesOpen] = useState(true);
+
+  // Real Time tab — Unknown Singleton Trimming
+  const [trimmingEnabled, setTrimmingEnabled] = useState(false);
+  const [lastLargeBatchAt, setLastLargeBatchAt] = useState<Date>(() => {
+    const d = new Date();
+    d.setDate(d.getDate() - 97);
+    return d;
+  });
+  const [trimmingConfirm, setTrimmingConfirm] = useState<null | 'enable' | 'disable' | 'cleanup'>(null);
+  const [trimmingBanner, setTrimmingBanner] = useState<string | null>(null);
+  const daysSinceLastLb = Math.floor((Date.now() - lastLargeBatchAt.getTime()) / (1000 * 60 * 60 * 24));
+  const cleanupRecommended = daysSinceLastLb >= 90;
+  const handleTrimmingConfirm = () => {
+    if (trimmingConfirm === 'enable') {
+      setTrimmingEnabled(true);
+      setLastLargeBatchAt(new Date());
+      setTrimmingBanner('Cleanup Large Batch scheduled (UnknownSingletonTrimmingCleanupOn).');
+    } else if (trimmingConfirm === 'disable') {
+      setTrimmingEnabled(false);
+      setLastLargeBatchAt(new Date());
+      setTrimmingBanner('Restoration Large Batch scheduled (UnknownSingletonTrimmingCleanupOff).');
+    } else if (trimmingConfirm === 'cleanup') {
+      setLastLargeBatchAt(new Date());
+      setTrimmingBanner('Cleanup Large Batch triggered (trimCleanup=true, UnknownSingletonTrimmingCleanupOn).');
+    }
+    setTrimmingConfirm(null);
+  };
 
   // Match rules editing
   const [editMatchRulesOpen, setEditMatchRulesOpen] = useState(false);
@@ -1452,8 +1479,10 @@ export default function IdentityResolutionContent({ demoSession, onDemoSessionCh
 
         {/* Tabs */}
         <div className="sf-tabs">
-          {(['properties', 'details', 'history'] as const).map((tab) => {
-            const labels = { properties: 'Ruleset Properties', details: 'Details', history: 'Processing History' };
+          {((currentTimeline === 'today'
+            ? ['properties', 'details', 'history', 'realtime']
+            : ['properties', 'details', 'history']) as Array<'properties' | 'details' | 'history' | 'realtime'>).map((tab) => {
+            const labels = { properties: 'Ruleset Properties', details: 'Details', history: 'Processing History', realtime: 'Real Time' };
             return (
               <button key={tab} className={`sf-tab ${detailTab === tab ? 'active' : ''}`} onClick={() => changeDetailTab(tab)}>
                 {labels[tab]}
@@ -1976,7 +2005,160 @@ export default function IdentityResolutionContent({ demoSession, onDemoSessionCh
               </div>
             </div>
           )}
+
+          {/* ── REAL TIME TAB (Today only — Unknown Singleton Trimming) ── */}
+          {detailTab === 'realtime' && currentTimeline === 'today' && (
+            <div className="slds-p-around_large" style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+              <p className="slds-text-size_medium slds-text-neutral-9">
+                Optimize the real-time layer by trimming unknown singleton profiles that have become stale. Source data remains in the Lakehouse.
+              </p>
+
+              {trimmingBanner && (
+                <div className="slds-flex slds-items-start slds-gap_x-small slds-p-around_small slds-border-radius_small" style={{ backgroundColor: '#E1F5FE', border: '1px solid #1B96FF' }}>
+                  <Info className="slds-icon-size_small slds-text-brand slds-flex-shrink-0 slds-m-top_xx-small" />
+                  <div className="slds-flex-1 slds-text-size_small slds-text-neutral-9">{trimmingBanner}</div>
+                  <button onClick={() => setTrimmingBanner(null)} className="slds-text-neutral-7"><X className="slds-icon-size_x-small" /></button>
+                </div>
+              )}
+
+              {trimmingEnabled && cleanupRecommended && (
+                <div className="slds-flex slds-items-start slds-gap_x-small slds-p-around_small slds-border-radius_small" style={{ backgroundColor: '#FEF5E7', border: '1px solid #FFB75D' }}>
+                  <AlertTriangle className="slds-icon-size_small slds-flex-shrink-0 slds-m-top_xx-small" style={{ color: '#B7791F' }} />
+                  <div className="slds-flex-1 slds-text-size_small slds-text-neutral-9">
+                    Cleanup is recommended — stale unknown profiles may be accumulating. Last Large Batch ran {daysSinceLastLb} days ago.
+                  </div>
+                  <button
+                    onClick={() => setTrimmingConfirm('cleanup')}
+                    className="slds-flex slds-items-center slds-gap_xx-small slds-p-horizontal_small slds-text-size_small slds-font-weight_medium slds-text-white slds-bg-brand slds-border-radius_small"
+                    style={{ paddingTop: '6px', paddingBottom: '6px' }}
+                  >
+                    <RefreshCw className="slds-icon-size_x-small" /> Run Cleanup
+                  </button>
+                </div>
+              )}
+
+              {/* Enable / Run Cleanup card */}
+              <div className="sf-card">
+                <div className="sf-card-header">
+                  <h2 className="slds-text-size_medium slds-font-weight_semibold slds-text-neutral-base">Unknown Singleton Trimming</h2>
+                </div>
+                <div className="slds-p-around_medium" style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                  <div className="slds-flex slds-items-center slds-justify-between">
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                      <span className="slds-text-size_medium slds-font-weight_medium slds-text-neutral-base">
+                        {trimmingEnabled ? 'Enabled' : 'Disabled'}
+                      </span>
+                      <span className="slds-text-size_small slds-text-neutral-7">
+                        Toggling forces a Large Batch to {trimmingEnabled ? 'restore previously trimmed profiles' : 'perform the first cleanup'}.
+                      </span>
+                    </div>
+                    <button
+                      onClick={() => setTrimmingConfirm(trimmingEnabled ? 'disable' : 'enable')}
+                      role="switch"
+                      aria-checked={trimmingEnabled}
+                      style={{
+                        width: '44px',
+                        height: '24px',
+                        borderRadius: '12px',
+                        backgroundColor: trimmingEnabled ? '#0176D3' : '#C9C9C9',
+                        position: 'relative',
+                        transition: 'background-color 0.15s',
+                        flexShrink: 0,
+                      }}
+                    >
+                      <span style={{
+                        position: 'absolute',
+                        top: '2px',
+                        left: trimmingEnabled ? '22px' : '2px',
+                        width: '20px',
+                        height: '20px',
+                        borderRadius: '50%',
+                        backgroundColor: '#fff',
+                        transition: 'left 0.15s',
+                        boxShadow: '0 1px 2px rgba(0,0,0,0.2)',
+                      }} />
+                    </button>
+                  </div>
+
+                  {trimmingEnabled && (
+                    <div className="slds-flex slds-items-center slds-justify-between slds-p-around_small slds-border-radius_small" style={{ backgroundColor: '#FAFAF9', border: '1px solid #e5e5e5' }}>
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
+                        <span className="slds-text-size_small slds-font-weight_medium slds-text-neutral-base">Run Cleanup</span>
+                        <span className="slds-text-size_small slds-text-neutral-7">
+                          Force a Large Batch to trim stale unknowns when the pipeline is in Small Batch–only steady state.
+                        </span>
+                      </div>
+                      <button
+                        onClick={() => setTrimmingConfirm('cleanup')}
+                        className="slds-flex slds-items-center slds-gap_xx-small slds-p-horizontal_small slds-text-size_small slds-font-weight_medium slds-text-white slds-bg-brand slds-border-radius_small"
+                        style={{ paddingTop: '6px', paddingBottom: '6px' }}
+                      >
+                        <RefreshCw className="slds-icon-size_x-small" /> Run Cleanup
+                      </button>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Configuration (read-only) */}
+              <div className="sf-card">
+                <div className="sf-card-header">
+                  <h2 className="slds-text-size_medium slds-font-weight_semibold slds-text-neutral-base">Configuration</h2>
+                </div>
+                <div className="sf-detail-grid">
+                  {[
+                    ['Traffic Type', 'Web/Mobile'],
+                    ['Staleness Threshold', '180 days'],
+                    ['Data Sources', 'All SDK data streams (EVENTS) — auto-resolved at job dispatch'],
+                    ['Last Large Batch Run', `${lastLargeBatchAt.toLocaleString()} (${daysSinceLastLb} days ago)`],
+                    ['Cleanup Recommendation', cleanupRecommended ? 'Recommended (>= 90 days since last LB)' : `Not yet (recommended after 90 days)`],
+                  ].map(([label, value]) => (
+                    <div key={label} className="sf-detail-field">
+                      <div className="sf-detail-label">{label}</div>
+                      <div className="sf-detail-value">{value}</div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          )}
         </div>
+
+        {/* ═══════════════════════════════════════════════════════════
+            MODAL: Trimming Toggle / Run Cleanup confirmation
+           ═══════════════════════════════════════════════════════════ */}
+        {trimmingConfirm && (
+          <div className="slds-pos-fixed slds-inset-0 slds-z-50 slds-flex slds-items-center slds-justify-center">
+            <div className="slds-pos-absolute slds-inset-0" style={{ backgroundColor: 'rgba(0,0,0,0.4)' }} onClick={() => setTrimmingConfirm(null)} />
+            <div className="slds-pos-relative slds-bg-white slds-border-radius_large slds-shadow_large slds-flex slds-flex-col" style={{ width: '480px' }}>
+              <div className="slds-flex slds-items-center slds-justify-between slds-p-horizontal_large slds-p-vertical_medium slds-border_bottom slds-border-color_border-1">
+                <h2 className="slds-text-size_large slds-font-weight_semibold slds-text-neutral-base">
+                  {trimmingConfirm === 'enable' && 'Enable Unknown Singleton Trimming'}
+                  {trimmingConfirm === 'disable' && 'Disable Unknown Singleton Trimming'}
+                  {trimmingConfirm === 'cleanup' && 'Run Cleanup'}
+                </h2>
+                <button onClick={() => setTrimmingConfirm(null)} className="slds-text-neutral-7"><X className="slds-icon-size_small" /></button>
+              </div>
+              <div className="slds-p-around_large slds-text-size_medium slds-text-neutral-9" style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                {trimmingConfirm === 'enable' && (
+                  <p>This forces an immediate Large Batch run to perform the first comprehensive cleanup of stale unknown profiles.</p>
+                )}
+                {trimmingConfirm === 'disable' && (
+                  <p>This forces an immediate Large Batch run to restore previously trimmed profiles. Until it completes, the real-time layer may be missing profiles.</p>
+                )}
+                {trimmingConfirm === 'cleanup' && (
+                  <p>This triggers a Large Batch (<code>POST submitMatchMerge</code> with <code>trimCleanup=true</code>) to remove stale unknown profiles that have accumulated since the last LB.</p>
+                )}
+              </div>
+              <div className="slds-flex slds-justify-end slds-gap_x-small slds-p-horizontal_large slds-p-vertical_medium slds-border_top slds-border-color_border-1">
+                <button onClick={() => setTrimmingConfirm(null)} className="slds-p-horizontal_medium slds-text-size_small slds-font-weight_medium slds-border-radius_small slds-border_all slds-border-color_border-1 slds-text-neutral-9 slds-bg-white" style={{ paddingTop: '6px', paddingBottom: '6px' }}>Cancel</button>
+                <button onClick={handleTrimmingConfirm} className="slds-p-horizontal_medium slds-text-size_small slds-font-weight_medium slds-text-white slds-bg-brand slds-border-radius_small" style={{ paddingTop: '6px', paddingBottom: '6px' }}>
+                  {trimmingConfirm === 'cleanup' ? 'Run Cleanup' : 'Confirm'}
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* ═══════════════════════════════════════════════════════════
             MODAL: Edit Match Rules (Instructions → Rules list)

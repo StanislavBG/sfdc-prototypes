@@ -52,11 +52,13 @@ const irTabSlugs: Record<string, string> = {
   properties: 'properties',
   details: 'details',
   history: 'processing-history',
+  realtime: 'real-time',
 };
 const irSlugToTab: Record<string, string> = {
   properties: 'properties',
   details: 'details',
   'processing-history': 'history',
+  'real-time': 'realtime',
 };
 
 // Timeline URL slug mappings
