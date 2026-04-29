@@ -568,7 +568,7 @@ export default function IdentityResolutionContent({ demoSession, onDemoSessionCh
       setTrimmingBanner('Restoration Large Batch scheduled (UnknownSingletonTrimmingCleanupOff).');
     } else if (trimmingConfirm === 'cleanup') {
       setLastLargeBatchAt(new Date());
-      setTrimmingBanner('Cleanup Large Batch triggered (trimCleanup=true).');
+      setTrimmingBanner('Cleanup Large Batch triggered (trimCleanup=true, UnknownSingletonTrimmingCleanupOn).');
     }
     setTrimmingConfirm(null);
   };
@@ -2080,27 +2080,23 @@ export default function IdentityResolutionContent({ demoSession, onDemoSessionCh
                     </button>
                   </div>
 
-                  <div className="slds-flex slds-items-center slds-justify-between slds-p-around_small slds-border-radius_small" style={{ backgroundColor: '#FAFAF9', border: '1px solid #e5e5e5' }}>
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
-                      <span className="slds-text-size_small slds-font-weight_medium slds-text-neutral-base">Run Cleanup</span>
-                      <span className="slds-text-size_small slds-text-neutral-7">
-                        Force a Large Batch to trim stale unknowns when the pipeline is in Small Batch–only steady state.
-                      </span>
+                  {trimmingEnabled && (
+                    <div className="slds-flex slds-items-center slds-justify-between slds-p-around_small slds-border-radius_small" style={{ backgroundColor: '#FAFAF9', border: '1px solid #e5e5e5' }}>
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
+                        <span className="slds-text-size_small slds-font-weight_medium slds-text-neutral-base">Run Cleanup</span>
+                        <span className="slds-text-size_small slds-text-neutral-7">
+                          Force a Large Batch to trim stale unknowns when the pipeline is in Small Batch–only steady state.
+                        </span>
+                      </div>
+                      <button
+                        onClick={() => setTrimmingConfirm('cleanup')}
+                        className="slds-flex slds-items-center slds-gap_xx-small slds-p-horizontal_small slds-text-size_small slds-font-weight_medium slds-text-white slds-bg-brand slds-border-radius_small"
+                        style={{ paddingTop: '6px', paddingBottom: '6px' }}
+                      >
+                        <RefreshCw className="slds-icon-size_x-small" /> Run Cleanup
+                      </button>
                     </div>
-                    <button
-                      onClick={() => setTrimmingConfirm('cleanup')}
-                      disabled={!trimmingEnabled}
-                      className="slds-flex slds-items-center slds-gap_xx-small slds-p-horizontal_small slds-text-size_small slds-font-weight_medium slds-border-radius_small"
-                      style={{
-                        paddingTop: '6px', paddingBottom: '6px',
-                        backgroundColor: trimmingEnabled ? '#0176D3' : '#E5E5E5',
-                        color: trimmingEnabled ? '#fff' : '#999',
-                        cursor: trimmingEnabled ? 'pointer' : 'not-allowed',
-                      }}
-                    >
-                      <RefreshCw className="slds-icon-size_x-small" /> Run Cleanup
-                    </button>
-                  </div>
+                  )}
                 </div>
               </div>
 
