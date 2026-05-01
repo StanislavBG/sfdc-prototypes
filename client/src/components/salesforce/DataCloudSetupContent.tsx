@@ -22,6 +22,9 @@ import {
   ArrowRight,
   Eye,
   EyeOff,
+  Database,
+  ShieldCheck,
+  Sparkles,
 } from 'lucide-react';
 
 // ── Types ────────────────────────────────────────────────────────────
@@ -87,7 +90,7 @@ const setupNavSections: { title: string; items: SetupPage[] }[] = [
     items: [
       { id: 'data-cloud-one', label: 'Data Cloud One', section: '' },
       { id: 'salesforce-crm', label: 'Salesforce CRM', section: '' },
-      { id: 'informatica-mdm-sf', label: 'Informatica MDM', section: '' },
+      { id: 'informatica-mdm-sf', label: 'Informatica', section: '' },
       { id: 'hierarchy-ingestion', label: 'Hierarchy Ingestion', section: '' },
       { id: 'data-360-org-allowlist', label: 'Data 360 Org Allowlist', section: '' },
       {
@@ -107,7 +110,7 @@ const setupNavSections: { title: string; items: SetupPage[] }[] = [
     items: [
       { id: 'external-activation-platforms', label: 'External Activation Platforms', section: '' },
       { id: 'snowflake', label: 'Snowflake', section: '' },
-      { id: 'informatica-mdm', label: 'Informatica MDM', section: '' },
+      { id: 'informatica-mdm', label: 'Informatica', section: '' },
       { id: 'websites-mobile-apps', label: 'Websites & Mobile Apps', section: '' },
       { id: 'ingestion-api', label: 'Ingestion API', section: '' },
       { id: 'other-connectors', label: 'Other Connectors', section: '' },
@@ -295,7 +298,7 @@ export default function DataCloudSetupContent({ onBack, demoSession, onDemoSessi
           tabs: 0,
           objects: 0,
           appExchangeReady: 'Passed',
-          description: isInfaBundle ? `Informatica MDM business entity bundle for ${displayName}. Contains master data objects, match rules, and data quality configurations.` : '',
+          description: isInfaBundle ? `Informatica business entity bundle for ${displayName}. Contains master data objects, match rules, and data quality configurations.` : '',
           versionName: isInfaBundle ? 'Winter 2026' : 'Spring 2025',
           packageType: 'Managed',
           packageId: `033B${Math.random().toString(36).substring(2, 12).toUpperCase()}`,
@@ -387,7 +390,7 @@ export default function DataCloudSetupContent({ onBack, demoSession, onDemoSessi
     const newConnection: Connection = {
       id: `conn-${Date.now()}`,
       connectionName: isInformatica
-        ? `Informatica MDM ${selectedOrgType === 'sandbox' ? 'Sandbox Tenant' : 'Production Tenant'}`
+        ? `Informatica ${selectedOrgType === 'sandbox' ? 'Sandbox Tenant' : 'Production Tenant'}`
         : `Salesforce ${selectedOrgType === 'sandbox' ? 'Sandbox' : 'Org'}`,
       alias: connectionAlias || (isInformatica ? 'INFA_MDM_01' : 'NewOrg'),
       connectionStatus: 'Active',
@@ -659,10 +662,10 @@ export default function DataCloudSetupContent({ onBack, demoSession, onDemoSessi
     return Math.round((completed / sol.steps.length) * 100);
   };
 
-  const currentPageLabel = activeNavItem === 'setup-home' ? 'Data Cloud Setup Home' : activeNavItem === 'salesforce-crm' ? 'Salesforce CRM' : (activeNavItem === 'informatica-mdm' || activeNavItem === 'informatica-mdm-sf') ? 'Informatica MDM' : activeNavItem === 'solution-manager' ? 'Solution Manager' : activeNavItem === 'installed-packages' ? 'Installed Packages' : setupNavSections.flatMap((s) => s.items).find((i) => i.id === activeNavItem)?.label || 'Setup';
+  const currentPageLabel = activeNavItem === 'setup-home' ? 'Data Cloud Setup Home' : activeNavItem === 'salesforce-crm' ? 'Salesforce CRM' : (activeNavItem === 'informatica-mdm' || activeNavItem === 'informatica-mdm-sf') ? 'Informatica' : activeNavItem === 'solution-manager' ? 'Solution Manager' : activeNavItem === 'installed-packages' ? 'Installed Packages' : setupNavSections.flatMap((s) => s.items).find((i) => i.id === activeNavItem)?.label || 'Setup';
   const currentConnections = isInformatica ? informaticaConnections : sfdcConnections;
   const currentBundles = isInformatica ? informaticaBundles : sfdcBundles;
-  const connectorName = isInformatica ? 'Informatica MDM' : 'Salesforce CRM';
+  const connectorName = isInformatica ? 'Informatica' : 'Salesforce CRM';
 
   // ── Install Bundle handler ──
   const handleInstallBundle = () => {
@@ -694,7 +697,7 @@ export default function DataCloudSetupContent({ onBack, demoSession, onDemoSessi
         objects: 0,
         appExchangeReady: 'Passed',
         description: isInfaBundle
-          ? `Informatica MDM business entity bundle for ${displayName}. Contains master data objects, match rules, and data quality configurations.`
+          ? `Informatica business entity bundle for ${displayName}. Contains master data objects, match rules, and data quality configurations.`
           : '',
         versionName: isInfaBundle ? 'Winter 2026' : 'Spring 2025',
         packageType: 'Managed',
@@ -1133,7 +1136,7 @@ export default function DataCloudSetupContent({ onBack, demoSession, onDemoSessi
                         MDS Simulator
                       </div>
                       <p className="slds-text-neutral-7 slds-m-top_xxx-small" style={{ fontSize: '10px' }}>
-                        Multi-Domain Simulator — Informatica MDM + Salesforce Data Cloud prototype environment
+                        Multi-Domain Simulator — Informatica + Salesforce Data Cloud prototype environment
                       </p>
                     </div>
                     <div className="slds-flex slds-flex-col slds-items-center slds-gap_xx-small slds-flex-shrink-0">
@@ -1620,9 +1623,9 @@ export default function DataCloudSetupContent({ onBack, demoSession, onDemoSessi
                       <Zap style={{ width: '28px', height: '28px', color: isInformatica ? '#FF4A00' : 'var(--slds-g-color-neutral-7)' }} />
                     </div>
                     <p className="slds-text-size_medium slds-font-weight_medium slds-text-neutral-base slds-m-bottom_xx-small">No connections configured</p>
-                    <p className="slds-text-size_small slds-text-neutral-7 slds-m-bottom_medium">
+                    <p className="slds-text-size_small slds-text-neutral-7 slds-m-bottom_medium" style={{ maxWidth: '560px', margin: '0 auto 16px auto' }}>
                       {isInformatica
-                        ? 'Connect your Informatica MDM instance to start syncing master data with Data Cloud.'
+                        ? 'Connect your Informatica instance to start syncing master data, data quality, catalog, and reference data with Data Cloud.'
                         : 'Click "New" to connect a Salesforce org.'}
                     </p>
                     <button
@@ -1630,8 +1633,101 @@ export default function DataCloudSetupContent({ onBack, demoSession, onDemoSessi
                       className="slds-inline-flex slds-items-center slds-p-horizontal_medium slds-p-vertical_x-small slds-text-size_medium slds-font-weight_medium slds-text-white slds-border-radius_small slds-transition-colors"
                       style={{ gap: '6px', background: isInformatica ? '#FF4A00' : 'var(--slds-g-color-brand)' }}
                     >
-                      <Plus className="slds-icon-size_small" /> Connect {isInformatica ? 'Informatica MDM' : 'an Org'}
+                      <Plus className="slds-icon-size_small" /> Connect {isInformatica ? 'Informatica' : 'an Org'}
                     </button>
+
+                    {isInformatica && (
+                      <div
+                        className="slds-text-left"
+                        style={{
+                          marginTop: '40px',
+                          paddingTop: '32px',
+                          borderTop: '1px dashed #E5E5E5',
+                          maxWidth: '880px',
+                          marginLeft: 'auto',
+                          marginRight: 'auto',
+                        }}
+                        aria-hidden="true"
+                      >
+                        <div className="slds-text-center slds-m-bottom_medium">
+                          <div className="slds-text-size_x-small slds-font-weight_bold slds-text-uppercase slds-tracking-wide" style={{ color: '#FF4A00', letterSpacing: '0.08em' }}>
+                            What you unlock
+                          </div>
+                          <h3 className="slds-text-size_large slds-font-weight_semibold slds-text-neutral-base slds-m-top_xx-small">
+                            Bring trusted Informatica data into Data 360
+                          </h3>
+                          <p className="slds-text-size_small slds-text-neutral-7 slds-m-top_xx-small" style={{ maxWidth: '560px', margin: '4px auto 0 auto' }}>
+                            Once connected, your Data Cloud tenant gains native access to Informatica's IDMC capabilities — no rebuilding pipelines, no rewriting rules.
+                          </p>
+                        </div>
+
+                        <div
+                          style={{
+                            display: 'grid',
+                            gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))',
+                            gap: '12px',
+                            marginTop: '20px',
+                            opacity: 0.92,
+                          }}
+                        >
+                          {[
+                            {
+                              Icon: Database,
+                              title: 'Master Data Sync',
+                              body: 'Stream golden records from Multidomain MDM SaaS — Customer 360, Organization 360, Product 360, Supplier 360, and custom domains — into Data Cloud as governed DLOs and DMOs.',
+                            },
+                            {
+                              Icon: ShieldCheck,
+                              title: 'Data Quality in Batch Transforms',
+                              body: 'Reuse Informatica Cloud Data Quality (CDQ) rules for cleansing, standardization, validation, and dedup natively inside Data Cloud Batch Transforms — no rule rewrites.',
+                            },
+                            {
+                              Icon: BookOpen,
+                              title: 'Enterprise Catalog Access',
+                              body: "Discover, search, and govern assets through Informatica's Cloud Data Governance & Catalog. See lineage, business glossary terms, and trust scores alongside Data Cloud metadata.",
+                            },
+                            {
+                              Icon: LayoutGrid,
+                              title: 'Reference Data',
+                              body: 'Sync curated datasets from Reference 360 — country codes, currencies, industry taxonomies, and hierarchies — to keep value lists consistent across activations.',
+                            },
+                            {
+                              Icon: Sparkles,
+                              title: 'And many more',
+                              body: 'AI-powered match recommendations, governance & privacy controls, zero-copy real-time activation, and Trusted Context for agentic workflows.',
+                            },
+                          ].map(({ Icon, title, body }) => (
+                            <div
+                              key={title}
+                              className="slds-border-radius_medium slds-p-around_medium"
+                              style={{
+                                background: '#FFFBF8',
+                                border: '1px solid #FFE3D2',
+                                pointerEvents: 'none',
+                                userSelect: 'none',
+                              }}
+                            >
+                              <div
+                                className="slds-flex slds-items-center slds-justify-center slds-border-radius_small slds-m-bottom_x-small"
+                                style={{ width: '32px', height: '32px', background: '#FFF3ED' }}
+                              >
+                                <Icon style={{ width: '18px', height: '18px', color: '#FF4A00' }} />
+                              </div>
+                              <div className="slds-text-size_small slds-font-weight_semibold slds-text-neutral-base slds-m-bottom_xx-small">
+                                {title}
+                              </div>
+                              <p className="slds-text-size_x-small slds-text-neutral-7" style={{ lineHeight: 1.45 }}>
+                                {body}
+                              </p>
+                            </div>
+                          ))}
+                        </div>
+
+                        <p className="slds-text-center slds-text-size_x-small slds-text-neutral-7 slds-m-top_medium" style={{ fontStyle: 'italic' }}>
+                          Preview of capabilities — connect a tenant to enable.
+                        </p>
+                      </div>
+                    )}
                   </div>
                 ) : (
                   <div className="slds-overflow-x-auto">
@@ -2092,7 +2188,7 @@ export default function DataCloudSetupContent({ onBack, demoSession, onDemoSessi
               <h2 className="slds-text-size_xx-large slds-text-neutral-7 slds-m-bottom_large">Allow Access?</h2>
               <div className="slds-w-full slds-bg-white slds-border-radius_large slds-p-around_large" style={{ border: '1px solid #D8DDE6', display: 'flex', flexDirection: 'column', gap: '16px' }}>
                 <p className="slds-text-size_medium slds-text-neutral-9">
-                  {isInformatica ? 'Informatica MDM' : 'Data Cloud Salesforce'} Org Registration is asking to:
+                  {isInformatica ? 'Informatica' : 'Data Cloud Salesforce'} Org Registration is asking to:
                 </p>
                 <ul className="slds-text-size_medium slds-text-neutral-base" style={{ listStyleType: 'disc', marginLeft: '24px', display: 'flex', flexDirection: 'column', gap: '4px' }}>
                   <li>Access the identity URL service</li>
@@ -2181,7 +2277,7 @@ export default function DataCloudSetupContent({ onBack, demoSession, onDemoSessi
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
                     <p className="slds-text-size_medium slds-text-neutral-9">
                       {isInformatica
-                        ? 'Assign an alias for your Informatica MDM tenant connection that contains up to 15 alphanumeric characters. You can\'t change the alias later. The alias is used in data stream names and helps you identify your tenants.'
+                        ? 'Assign an alias for your Informatica tenant connection that contains up to 15 alphanumeric characters. You can\'t change the alias later. The alias is used in data stream names and helps you identify your tenants.'
                         : `Assign an alias for your ${connectorName} connector that contains up to 15 alphanumeric characters. You can't change the alias later. The alias is used in data stream names and helps you filter your connections.`}
                     </p>
                     <div>
