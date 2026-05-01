@@ -1640,23 +1640,23 @@ export default function DataCloudSetupContent({ onBack, demoSession, onDemoSessi
                       <div
                         className="slds-text-left"
                         style={{
-                          marginTop: '40px',
-                          paddingTop: '32px',
+                          marginTop: '48px',
+                          paddingTop: '40px',
                           borderTop: '1px dashed #E5E5E5',
-                          maxWidth: '880px',
-                          marginLeft: 'auto',
-                          marginRight: 'auto',
+                          width: '100%',
+                          paddingLeft: '24px',
+                          paddingRight: '24px',
                         }}
                         aria-hidden="true"
                       >
-                        <div className="slds-text-center slds-m-bottom_medium">
+                        <div className="slds-text-center slds-m-bottom_large">
                           <div className="slds-text-size_x-small slds-font-weight_bold slds-text-uppercase slds-tracking-wide" style={{ color: '#FF4A00', letterSpacing: '0.08em' }}>
                             What you unlock
                           </div>
-                          <h3 className="slds-text-size_large slds-font-weight_semibold slds-text-neutral-base slds-m-top_xx-small">
+                          <h3 className="slds-text-size_x-large slds-font-weight_semibold slds-text-neutral-base slds-m-top_xx-small">
                             Bring trusted Informatica data into Data 360
                           </h3>
-                          <p className="slds-text-size_small slds-text-neutral-7 slds-m-top_xx-small" style={{ maxWidth: '560px', margin: '4px auto 0 auto' }}>
+                          <p className="slds-text-size_medium slds-text-neutral-7 slds-m-top_xx-small" style={{ maxWidth: '720px', margin: '6px auto 0 auto' }}>
                             Once connected, your Data Cloud tenant gains native access to Informatica's IDMC capabilities — no rebuilding pipelines, no rewriting rules.
                           </p>
                         </div>
@@ -1664,10 +1664,10 @@ export default function DataCloudSetupContent({ onBack, demoSession, onDemoSessi
                         <div
                           style={{
                             display: 'grid',
-                            gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))',
-                            gap: '12px',
-                            marginTop: '20px',
-                            opacity: 0.92,
+                            gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
+                            gap: '16px',
+                            marginTop: '24px',
+                            opacity: 0.95,
                           }}
                         >
                           {[
@@ -1699,31 +1699,35 @@ export default function DataCloudSetupContent({ onBack, demoSession, onDemoSessi
                           ].map(({ Icon, title, body }) => (
                             <div
                               key={title}
-                              className="slds-border-radius_medium slds-p-around_medium"
+                              className="slds-border-radius_medium"
                               style={{
                                 background: '#FFFBF8',
                                 border: '1px solid #FFE3D2',
+                                padding: '20px',
                                 pointerEvents: 'none',
                                 userSelect: 'none',
+                                display: 'flex',
+                                flexDirection: 'column',
+                                minHeight: '200px',
                               }}
                             >
                               <div
-                                className="slds-flex slds-items-center slds-justify-center slds-border-radius_small slds-m-bottom_x-small"
-                                style={{ width: '32px', height: '32px', background: '#FFF3ED' }}
+                                className="slds-flex slds-items-center slds-justify-center slds-border-radius_small slds-m-bottom_small"
+                                style={{ width: '40px', height: '40px', background: '#FFF3ED' }}
                               >
-                                <Icon style={{ width: '18px', height: '18px', color: '#FF4A00' }} />
+                                <Icon style={{ width: '22px', height: '22px', color: '#FF4A00' }} />
                               </div>
-                              <div className="slds-text-size_small slds-font-weight_semibold slds-text-neutral-base slds-m-bottom_xx-small">
+                              <div className="slds-text-size_medium slds-font-weight_semibold slds-text-neutral-base slds-m-bottom_x-small">
                                 {title}
                               </div>
-                              <p className="slds-text-size_x-small slds-text-neutral-7" style={{ lineHeight: 1.45 }}>
+                              <p className="slds-text-size_small slds-text-neutral-7" style={{ lineHeight: 1.5 }}>
                                 {body}
                               </p>
                             </div>
                           ))}
                         </div>
 
-                        <p className="slds-text-center slds-text-size_x-small slds-text-neutral-7 slds-m-top_medium" style={{ fontStyle: 'italic' }}>
+                        <p className="slds-text-center slds-text-size_x-small slds-text-neutral-7 slds-m-top_large" style={{ fontStyle: 'italic' }}>
                           Preview of capabilities — connect a tenant to enable.
                         </p>
                       </div>
