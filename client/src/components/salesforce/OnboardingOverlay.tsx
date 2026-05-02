@@ -14,12 +14,12 @@ const timelineCards = [
   {
     id: '264-release',
     label: '264 Release',
-    description: 'Next release — Informatica MDM & new capabilities',
+    description: 'Next release — Informatica & new capabilities',
     icon: Rocket,
     color: '#FF5D2D',
     badge: 'Recommended',
     features: [
-      'Informatica MDM connector & data bundles',
+      'Informatica connector & data bundles',
       'Identity Resolution rulesets',
       'Data Streams ingestion',
     ],
@@ -183,7 +183,7 @@ export default function OnboardingOverlay({ onSelectTimeline, onDismiss, onLaunc
             </div>
             <h2 className="sf-onboarding-title">Configure Informatica Tenant</h2>
             <p className="sf-onboarding-subtitle">
-              The 264 Release showcases the Informatica MDM integration.
+              The 264 Release showcases the Informatica integration.
               Set up your tenant connection first so Data Streams and Identity Resolutions
               display the full experience.
             </p>

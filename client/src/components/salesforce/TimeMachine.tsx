@@ -20,7 +20,7 @@ export const timelines: TimelineOption[] = [
   {
     id: '264-release',
     label: '264 Release',
-    description: 'Next release — Informatica MDM & new capabilities',
+    description: 'Next release — Informatica & new capabilities',
     icon: Rocket,
     color: '#FF5D2D',
   },

@@ -411,14 +411,14 @@ function getBundleStreams(tenant: string): Record<string, DataStream[]> {
   const t = tenant || 'Default';
   return {
     'Informatica MDM Cloud': [
-      { id: 'ds-infa-c360', name: 'Customer 360 - Informatica MDM', source: `Informatica MDM (${t})`, sourceType: 'informatica', object: 'Customer 360', status: 'Active', recordsProcessed: 12061, lastRefreshed: '02/25/2026, 3:45 PM', refreshFrequency: 'Every 1 hour', dataSpace: 'default', tenant: t, fields: generateStreamFields('Customer 360') },
-      { id: 'ds-infa-prod', name: 'Product 360 - Informatica MDM', source: `Informatica MDM (${t})`, sourceType: 'informatica', object: 'Product 360', status: 'Active', recordsProcessed: 8432, lastRefreshed: '02/25/2026, 3:45 PM', refreshFrequency: 'Every 1 hour', dataSpace: 'default', tenant: t, fields: generateStreamFields('Product 360') },
-      { id: 'ds-infa-supp', name: 'Supplier 360 - Informatica MDM', source: `Informatica MDM (${t})`, sourceType: 'informatica', object: 'Supplier 360', status: 'Active', recordsProcessed: 3217, lastRefreshed: '02/25/2026, 2:30 PM', refreshFrequency: 'Every 6 hours', dataSpace: 'default', tenant: t, fields: generateStreamFields('Supplier 360') },
-      { id: 'ds-infa-ref', name: 'Reference 360 - Informatica MDM', source: `Informatica MDM (${t})`, sourceType: 'informatica', object: 'Reference 360', status: 'Active', recordsProcessed: 1456, lastRefreshed: '02/25/2026, 1:00 PM', refreshFrequency: 'Every 12 hours', dataSpace: 'default', tenant: t, fields: generateStreamFields('Reference 360') },
+      { id: 'ds-infa-c360', name: 'Customer 360 - Informatica', source: `Informatica (${t})`, sourceType: 'informatica', object: 'Customer 360', status: 'Active', recordsProcessed: 12061, lastRefreshed: '02/25/2026, 3:45 PM', refreshFrequency: 'Every 1 hour', dataSpace: 'default', tenant: t, fields: generateStreamFields('Customer 360') },
+      { id: 'ds-infa-prod', name: 'Product 360 - Informatica', source: `Informatica (${t})`, sourceType: 'informatica', object: 'Product 360', status: 'Active', recordsProcessed: 8432, lastRefreshed: '02/25/2026, 3:45 PM', refreshFrequency: 'Every 1 hour', dataSpace: 'default', tenant: t, fields: generateStreamFields('Product 360') },
+      { id: 'ds-infa-supp', name: 'Supplier 360 - Informatica', source: `Informatica (${t})`, sourceType: 'informatica', object: 'Supplier 360', status: 'Active', recordsProcessed: 3217, lastRefreshed: '02/25/2026, 2:30 PM', refreshFrequency: 'Every 6 hours', dataSpace: 'default', tenant: t, fields: generateStreamFields('Supplier 360') },
+      { id: 'ds-infa-ref', name: 'Reference 360 - Informatica', source: `Informatica (${t})`, sourceType: 'informatica', object: 'Reference 360', status: 'Active', recordsProcessed: 1456, lastRefreshed: '02/25/2026, 1:00 PM', refreshFrequency: 'Every 12 hours', dataSpace: 'default', tenant: t, fields: generateStreamFields('Reference 360') },
     ],
     'Informatica Data Quality': [
-      { id: 'ds-infa-org', name: 'Organization 360 - Informatica MDM', source: `Informatica MDM (${t})`, sourceType: 'informatica', object: 'Organization 360', status: 'Pending', recordsProcessed: 0, lastRefreshed: '—', refreshFrequency: 'Every 1 hour', dataSpace: 'default', tenant: t, fields: generateStreamFields('Organization 360') },
-      { id: 'ds-infa-fin', name: 'Finance 360 - Informatica MDM', source: `Informatica MDM (${t})`, sourceType: 'informatica', object: 'Finance 360', status: 'Pending', recordsProcessed: 0, lastRefreshed: '—', refreshFrequency: 'Every 6 hours', dataSpace: 'default', tenant: t, fields: generateStreamFields('Finance 360') },
+      { id: 'ds-infa-org', name: 'Organization 360 - Informatica', source: `Informatica (${t})`, sourceType: 'informatica', object: 'Organization 360', status: 'Pending', recordsProcessed: 0, lastRefreshed: '—', refreshFrequency: 'Every 1 hour', dataSpace: 'default', tenant: t, fields: generateStreamFields('Organization 360') },
+      { id: 'ds-infa-fin', name: 'Finance 360 - Informatica', source: `Informatica (${t})`, sourceType: 'informatica', object: 'Finance 360', status: 'Pending', recordsProcessed: 0, lastRefreshed: '—', refreshFrequency: 'Every 6 hours', dataSpace: 'default', tenant: t, fields: generateStreamFields('Finance 360') },
     ],
   };
 }
@@ -545,7 +545,7 @@ export default function DataStreamsContent({ demoSession, currentTimeline }: Dat
   const resolveSourceInfo = (src: string | null): { name: string; color: string; icon: string; category: string } => {
     if (!src) return { name: '', color: '#706E6B', icon: '', category: '' };
     if (src === 'salesforce') return { name: 'Salesforce CRM', color: 'var(--slds-g-color-brand)', icon: 'sf', category: 'CRM' };
-    if (src === 'informatica') return { name: 'Informatica MDM', color: '#FF4A00', icon: 'INFA', category: 'MDM' };
+    if (src === 'informatica') return { name: 'Informatica', color: '#FF4A00', icon: 'INFA', category: 'MDM' };
     const found = allConnectorSources.find((c) => c.id === src);
     if (found) return { name: found.name, color: found.color, icon: found.icon, category: found.category };
     return { name: src, color: '#706E6B', icon: '?', category: '' };
@@ -632,7 +632,7 @@ export default function DataStreamsContent({ demoSession, currentTimeline }: Dat
             newStreams.push({
               id: `ds-infa-${ts}-${bundleId}-${idx}`,
               name: `${entity.name}_Home`,
-              source: `Informatica MDM (${selectedTenant})`,
+              source: `Informatica (${selectedTenant})`,
               sourceType: 'informatica',
               object: bundle.name,
               status: 'Pending',
@@ -1240,7 +1240,7 @@ export default function DataStreamsContent({ demoSession, currentTimeline }: Dat
           >
             <option value="all">All Sources</option>
             <option value="salesforce">Salesforce CRM</option>
-            {is264Release && hasInformaticaConn && <option value="informatica">Informatica MDM</option>}
+            {is264Release && hasInformaticaConn && <option value="informatica">Informatica</option>}
             <option value="api">Ingestion API</option>
           </select>
         </div>
@@ -1425,7 +1425,7 @@ export default function DataStreamsContent({ demoSession, currentTimeline }: Dat
                           );
                         })()}
 
-                        {/* Informatica MDM — only shown after tenant is configured in Data Cloud Setup */}
+                        {/* Informatica — only shown after tenant is configured in Data Cloud Setup */}
                         {is264Release && hasInformaticaConn && (() => {
                           const isSelected = selectedSource === 'informatica';
                           return (
@@ -1446,8 +1446,8 @@ export default function DataStreamsContent({ demoSession, currentTimeline }: Dat
                                   <text x="20" y="26" textAnchor="middle" fill="white" fontSize="12" fontWeight="bold">INFA</text>
                                 </svg>
                               </div>
-                              <div className="slds-text-size_medium slds-font-weight_semibold slds-text-neutral-base">Informatica MDM</div>
-                              <div className="slds-text-size_small slds-text-neutral-7 slds-m-top_xx-small">Ingest master data entities from Informatica MDM</div>
+                              <div className="slds-text-size_medium slds-font-weight_semibold slds-text-neutral-base">Informatica</div>
+                              <div className="slds-text-size_small slds-text-neutral-7 slds-m-top_xx-small">Ingest master data entities from Informatica</div>
                             </button>
                           );
                         })()}
@@ -1735,7 +1735,7 @@ export default function DataStreamsContent({ demoSession, currentTimeline }: Dat
                     <div className="slds-flex slds-items-start slds-gap_small slds-p-around_medium slds-border-radius_large" style={{ backgroundColor: '#E1F5FE' }}>
                       <Info className="slds-icon-size_default slds-text-brand slds-flex-shrink-0 slds-m-top_xx-small" />
                       <div className="slds-text-size_medium slds-text-neutral-9">
-                        To ensure data is ingested from fields and objects created in the future, we recommend granting <strong>View All Fields (Global)</strong> system permission on the Data Cloud Informatica MDM Connector permission set. <span className="sf-link">Learn More</span>
+                        To ensure data is ingested from fields and objects created in the future, we recommend granting <strong>View All Fields (Global)</strong> system permission on the Data Cloud Informatica Connector permission set. <span className="sf-link">Learn More</span>
                       </div>
                     </div>
 
@@ -1808,7 +1808,7 @@ export default function DataStreamsContent({ demoSession, currentTimeline }: Dat
                                   </div>
                                   <div className="slds-flex-1 slds-min-w-0">
                                     <div className="slds-text-size_small slds-font-weight_medium slds-text-neutral-base slds-truncate">{bundle.name}</div>
-                                    <div className="slds-text-neutral-7" style={{ fontSize: '10px' }}>{bundle.entities.length} Entities &middot; Informatica MDM</div>
+                                    <div className="slds-text-neutral-7" style={{ fontSize: '10px' }}>{bundle.entities.length} Entities &middot; Informatica</div>
                                   </div>
                                   {isSelected && <Check className="slds-icon-size_small slds-text-brand slds-flex-shrink-0" />}
                                 </button>
