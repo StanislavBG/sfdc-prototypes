@@ -141,7 +141,7 @@ interface IdentityRuleset {
   legacyProcessingHistory: LegacyProcessingHistoryEntry[];
   rulesetChanges: RulesetChangeEntry[];
   isBYOM?: boolean; // "Bring Your Own MDM" mode — installed from datakit
-  byomSource?: string; // datakit source name e.g. "Informatica MDM"
+  byomSource?: string; // datakit source name e.g. "Informatica"
   isCX?: boolean; // Customer 360 / Real Time — uses standard IR detail view
 }
 
@@ -320,7 +320,7 @@ const mockRulesets: IdentityRuleset[] = [
     rulesetStatus: 'Published',
     lastJobStatus: 'Completed',
     lastJobCompleted: '02/24/2026, 3:45 PM',
-    description: 'Installed from Informatica MDM datakit (CX)',
+    description: 'Installed from Informatica datakit (CX)',
     createdBy: 'Data Cloud',
     createdDate: '5/1/2025, 9:10 PM',
     lastModifiedBy: 'Automated Process',
@@ -639,14 +639,14 @@ export default function IdentityResolutionContent({ demoSession, onDemoSessionCh
   const [newRulesetDropdownOpen, setNewRulesetDropdownOpen] = useState(false);
   // Datakit selection state
   const [datakitSearch, setDatakitSearch] = useState('');
-  const [selectedDatakit, setSelectedDatakit] = useState('Informatica MDM');
+  const [selectedDatakit, setSelectedDatakit] = useState('Informatica');
   const [selectedDatakitRuleset, setSelectedDatakitRuleset] = useState<string | null>(null);
 
-  // Informatica MDM datakit only available in 264 Release timeline
+  // Informatica datakit only available in 264 Release timeline
   const datakitCategories = currentTimeline === '264-release'
-    ? ['Knowledge Space', 'Billing Analytics', 'Informatica MDM', 'Agentforce Analytics', 'Pricing', 'Content Kit']
+    ? ['Knowledge Space', 'Billing Analytics', 'Informatica', 'Agentforce Analytics', 'Pricing', 'Content Kit']
     : ['Knowledge Space', 'Billing Analytics', 'Agentforce Analytics', 'Pricing', 'Content Kit'];
-  // Full catalog of Informatica MDM rulesets — Phase-2 item always shown (grayed), others filtered by session bundle selection
+  // Full catalog of Informatica rulesets — Phase-2 item always shown (grayed), others filtered by session bundle selection
   const allInformaticaRulesets: { name: string; id: string; dataSpace: string; primaryDMO: string; phase2?: boolean; cx?: boolean; bundleName?: string }[] = [
     { name: 'Customer 360', id: 'INFA-C360', dataSpace: 'default', primaryDMO: 'Individual', cx: true, bundleName: 'Informatica MDM Cloud' },
     { name: 'Customer 360', id: 'INFA-C360-RT', dataSpace: 'default', primaryDMO: 'Individual', phase2: true, cx: true, bundleName: 'Informatica MDM Cloud' },
@@ -669,7 +669,7 @@ export default function IdentityResolutionContent({ demoSession, onDemoSessionCh
     'Billing Analytics': [
       { name: 'Billing Account Match', id: 'BA-001', dataSpace: 'default', primaryDMO: 'Account' },
     ],
-    'Informatica MDM': filteredInformaticaRulesets,
+    'Informatica': filteredInformaticaRulesets,
     'Agentforce Analytics': [
       { name: 'Agent Contact Resolution', id: 'AF-001', dataSpace: 'default', primaryDMO: 'Individual' },
     ],
@@ -683,7 +683,7 @@ export default function IdentityResolutionContent({ demoSession, onDemoSessionCh
     setNewRulesetPrimaryDMO('Individual');
     setNewRulesetDataSpace('default');
     setDatakitSearch('');
-    setSelectedDatakit(currentTimeline === '264-release' ? 'Informatica MDM' : 'Knowledge Space');
+    setSelectedDatakit(currentTimeline === '264-release' ? 'Informatica' : 'Knowledge Space');
     setSelectedDatakitRuleset(null);
     setTooltipOpen(null);
     setNewRulesetDropdownOpen(false);
@@ -725,7 +725,7 @@ export default function IdentityResolutionContent({ demoSession, onDemoSessionCh
     } else if (newRulesetStep === 2 && newRulesetIRType) {
       // Step 2: IR type selected — auto-select the matching datakit
       setNewRulesetOption('datakit');
-      setSelectedDatakit('Informatica MDM');
+      setSelectedDatakit('Informatica');
 
       if (newRulesetIRType === 'byom') {
         // BYOM: map record type → datakit ruleset
@@ -884,7 +884,7 @@ export default function IdentityResolutionContent({ demoSession, onDemoSessionCh
       legacyProcessingHistory: isCXDatakit ? generateLegacyProcessingHistory() : [],
       rulesetChanges: isCXDatakit ? generateRulesetChanges() : [],
       isBYOM: isBYOM || isFromDatakit,
-      byomSource: isBYOM ? 'Informatica MDM' : isFromDatakit ? selectedDatakit : undefined,
+      byomSource: isBYOM ? 'Informatica' : isFromDatakit ? selectedDatakit : undefined,
       isCX: isCXDatakit,
     };
     createMutation.mutate(localToApi(newRs));
@@ -1384,7 +1384,7 @@ export default function IdentityResolutionContent({ demoSession, onDemoSessionCh
                   </h3>
                   <svg viewBox="0 0 600 140" className="slds-w-full">
                     {[
-                      { label: 'Informatica MDM', value: 0.72, color: '#FF4A00' },
+                      { label: 'Informatica', value: 0.72, color: '#FF4A00' },
                       { label: 'Salesforce CRM', value: 0.45, color: 'var(--slds-g-color-brand)' },
                       { label: 'Marketing Cloud', value: 0.28, color: '#9C27B0' },
                       { label: 'External API', value: 0.15, color: '#4CAF50' },
@@ -2831,7 +2831,7 @@ export default function IdentityResolutionContent({ demoSession, onDemoSessionCh
                   </svg>
                   <h2 className="slds-text-size_large slds-font-weight_semibold slds-text-neutral-base slds-m-bottom_x-small">No Identity Resolution Rulesets</h2>
                   <p className="slds-text-size_medium slds-text-neutral-7" style={{ maxWidth: '28rem' }}>
-                    Get started by creating a new ruleset. Use <span className="slds-font-weight_semibold" style={{ color: '#FF5D2D' }}>Install from Datakits</span> to set up Informatica MDM identity resolution.
+                    Get started by creating a new ruleset. Use <span className="slds-font-weight_semibold" style={{ color: '#FF5D2D' }}>Install from Datakits</span> to set up Informatica identity resolution.
                   </p>
                 </div>
               </div>
@@ -3063,7 +3063,7 @@ export default function IdentityResolutionContent({ demoSession, onDemoSessionCh
                       {datakitCategories
                         .filter((cat) => cat.toLowerCase().includes(datakitSearch.toLowerCase()))
                         .map((cat) => {
-                          const isInformatica = cat === 'Informatica MDM';
+                          const isInformatica = cat === 'Informatica';
                           const isActive = selectedDatakit === cat;
                           return (
                             <button
@@ -3093,7 +3093,7 @@ export default function IdentityResolutionContent({ demoSession, onDemoSessionCh
                     <div className="slds-p-horizontal_medium slds-p-vertical_small slds-border_bottom slds-border-color_border-1">
                       <h3 className="slds-text-size_medium slds-font-weight_semibold slds-text-neutral-base">Datakit Selection</h3>
                       <p className="slds-text-size_small slds-text-neutral-7 slds-m-top_xx-small">{selectedDatakit} — select a ruleset to install</p>
-                      {demoSession && demoSession.informaticaConnections.length > 0 && selectedDatakit === 'Informatica MDM' && (
+                      {demoSession && demoSession.informaticaConnections.length > 0 && selectedDatakit === 'Informatica' && (
                         <div className="slds-m-top_x-small slds-p-horizontal_small slds-p-vertical_x-small slds-border-radius_medium slds-border_all" style={{ backgroundColor: '#FFF3ED', borderColor: '#FFD6C0' }}>
                           <p className="slds-font-weight_medium" style={{ fontSize: '11px', color: '#B33500' }}>
                             Connected: {demoSession.informaticaConnections.map((c) => c.alias).join(', ')}
@@ -3233,7 +3233,7 @@ export default function IdentityResolutionContent({ demoSession, onDemoSessionCh
                       </label>
                       <textarea
                         value={newRulesetIRType === 'byom'
-                          ? `Installed from Informatica MDM — ${newRulesetRecordType} resolution with pre-configured match rules.`
+                          ? `Installed from Informatica — ${newRulesetRecordType} resolution with pre-configured match rules.`
                           : `Unifies ${newRulesetRecordType?.toLowerCase() || 'contact'} records across Email, Phone, and ${newRulesetPrimaryDMO} ID.`
                         }
                         readOnly

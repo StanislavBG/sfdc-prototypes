@@ -845,7 +845,7 @@ export const popularWorkflows: Workflow[] = [
           description: 'Which data sources would you like to connect?',
           options: [
             { label: 'Salesforce CRM', description: 'Sync accounts, contacts, and opportunities', recommended: true },
-            { label: 'Informatica MDM', description: 'Master data management bundles' },
+            { label: 'Informatica', description: 'Master data management bundles' },
             { label: 'Marketing Cloud', description: 'Email engagement & journeys' },
             { label: 'External APIs', description: 'REST/SOAP integrations' },
           ],
